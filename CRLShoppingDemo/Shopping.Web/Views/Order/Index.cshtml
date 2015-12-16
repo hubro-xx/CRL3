@@ -1,0 +1,31 @@
+﻿@model List<Shopping.Model.Order.OrderMain>
+@{
+    ViewBag.Title = "订单";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table">
+    <tr>
+        <th>订单号</th>
+        <th>数量</th>
+        <th>总金额</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.OrderId</td>
+            <td>@item.TotalNum</td>
+            <td>@item.TotalAmount</td>
+            <td>@item.Status</td>
+            <td>
+                <a href="/order/orderDetail?orderId=@item.OrderId">详细</a>
+                @if(item.Status== Shopping.Model.Order.OrderStatus.待付款)
+                {
+                    <a href="/order/payOrder?orderId=@item.OrderId">付款</a>
+                }
+            </td>
+        </tr>
+    }
+</table>

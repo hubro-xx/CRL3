@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "";
+}
+
+<div class="hero-unit">
+    <h1>CRL项目实例 CRLShoppingDemo</h1>
+    <p>
+        此项目演示了简单的产品销售过程,部份功能实现使用了CRL内置业务系统<br />
+        相对于传统开发的三层结构,此结构至少减少了50%代码量,并且没有那么繁琐,加上可封装继承的结构,让开发更为简便<br />
+        自动编译系统,让你不再需要关心数据结构,同时动态译的方式,让你的查询直接转换为存储过程,效率达到最高<br />
+        通过此演示,可以体验CRL快速开发框架的便捷和灵活性,开发原来可以如此简单<br />
+        首次运行请更改Web.config 数据连接设置connectionString
+       
+    </p>
+    <ul>
+        <li>加入QQ群获取最新源码 1582632 密语CRL</li>
+        <li>CRL开发文档 http://crl.changqidongli.com/ </li>
+    </ul>
+    <p>
+        <h4>角色</h4>
+        <ul>
+            <li>商家,发布产品,角色为 Supplier</li>
+            <li>会员,购买产品,角色为 Member</li>
+        </ul>
+        <h4>实现业务</h4>
+        <ul>
+            <li>会员,商家登录(通用Form验证)</li>
+            <li>产品查询(基于缓存)</li>
+            <li>加入购物车,生成订单(可扩展的购物车系统)</li>
+            <li>订单支付确认,生成交易明细(通用交易管理系统)</li>
+            <li>会员充值加款</li>
+            <li>产品维护</li>
+        </ul>
+        <h4>CRL自动创建了</h4>
+        <ul>
+            <li>对象对应的表结构</li>
+            <li>初始的测试数据</li>
+            <li>分页的存储过程</li>
+        </ul>
+        <a class="btn btn-primary btn-large" href="/product">开始
+        </a>
+    </p>
+</div>

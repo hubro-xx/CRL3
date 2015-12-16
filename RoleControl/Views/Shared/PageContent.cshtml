@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewBag.Title = TempData["title"];
+}
+<div class="tips_box b mt20">
+    <div class="tips_item">
+        <div class="tips_title"><span>系统提示</span></div>
+        <div class="tips_text">
+            <h1><i class="cg">@Html.Raw(TempData["title"])</i></h1>
+            <p>@Html.Raw(TempData["content"])</p>
+        </div>
+    </div>
+
+</div>

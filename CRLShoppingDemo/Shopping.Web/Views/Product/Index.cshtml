@@ -1,0 +1,45 @@
+﻿@model Core.Mvc.PageObj<Shopping.Model.Product>
+@{
+    ViewBag.Title = "";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table">
+    <tr>
+         <th>编号</th>
+        <th>供货商</th>
+        <th>产品名</th>
+        <th>结算价</th>
+        <th>售价</th>
+        <th>操作</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <!--取的关联索引值,见ProductManage重写CacheQuery-->
+            <td>@item["SupplierName"]</td>
+            <td>@item.ProductName</td>
+            <td>@item.SettlementPrice</td>
+            <td>@item.SoldPrice</td>
+            <td>
+                <a href="javascript:addToCart(@item.Id,1)">加入购物车</a>
+            </td>
+        </tr>
+    }
+</table>
+@Core.Mvc.HtmlHelper.CreatePageNavigation(Model)
+<script>
+    function addToCart( productId,   num) {
+        $.post("/cart/AddToCart", { productId: productId, num: num }, function (result) {
+            if(!result.Result)
+            {
+                alert(result.Message);
+                window.location = "/member/login";
+            }
+            else {
+                window.location = "/cart";
+            }
+        });
+    }
+</script>

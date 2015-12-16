@@ -1,0 +1,34 @@
+﻿@{
+    ViewBag.Title = "会员登录";
+}
+
+<h2>@ViewBag.Title</h2>
+<form method="post" id="loginForm" class="form-horizontal" action="login">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+    @Html.Hidden("returnUrl", Request["returnUrl"])
+    <div class="control-group">
+        <div class="controls">
+            默认账号 Member1 123456
+            </div>
+        </div>
+    <div class="control-group">
+        <label class="control-label" for="inputEmail">用户名</label>
+        <div class="controls">
+            @Html.TextBox("AccountNo", "Member1")
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="inputEmail">密 码</label>
+        <div class="controls">
+            @Html.Password("PassWord", "123456")
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="inputEmail"></label>
+        <div class="controls">
+            <input type="submit" value="登录" class="btn" />
+        </div>
+    </div>
+
+</form>

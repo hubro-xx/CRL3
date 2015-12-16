@@ -1,0 +1,34 @@
+﻿@model Core.Mvc.PageObj<CRL.Package.Account.Transaction>
+@{
+    ViewBag.Title = "交易明细";
+    int type = (int)ViewBag.TransactionType;
+}
+
+<h2>@ViewBag.Title</h2>
+<a href="?type=0" class="btn btn-large @Html.Raw(type == 0 ? "btn-primary" : "")">现金</a>
+<a href="?type=1" class="btn btn-large @Html.Raw(type == 1 ? "btn-primary" : "")">积分</a>
+<table class="table">
+    <tr>
+        <th>类型</th>
+        <th>金额</th>
+        <th>方向</th>
+        <th>上次余额</th>
+        <th>本次余额</th>
+        <th>备注</th>
+        <th>时间</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@((Shopping.Model.TransactionType)item.TransactionType)</td>
+            <td>@item.Amount</td>
+            <td>@item.OperateType</td>
+            <td>@item.LastBalance</td>
+            <td>
+                @item.CurrentBalance
+            </td>
+            <td>@item.Remark</td>
+            <td>@item.AddTime</td>
+        </tr>
+    }
+</table>

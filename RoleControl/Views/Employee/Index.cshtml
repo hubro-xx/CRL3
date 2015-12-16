@@ -1,0 +1,84 @@
+﻿@model RoleControl.Models.PageObj<CRL.Package.RoleAuthorize.Employee>
+@{
+    ViewBag.Title = "用户";
+    List<CRL.Package.RoleAuthorize.Role> roles = ViewBag.Role as List<CRL.Package.RoleAuthorize.Role>;
+    var roles2 = new List<CRL.Package.RoleAuthorize.Role>(roles);
+    roles2.Insert(0, new CRL.Package.RoleAuthorize.Role() { Name = "...", Id = 0 });
+    var DepartmentAll = CRL.Package.RoleAuthorize.DepartmentBusiness.Instance.QueryList(b => b.Disable == false).OrderBy(b => b.SequenceCode);
+    var option = CRL.Package.RoleAuthorize.DepartmentBusiness.Instance.GetSelectOption(DepartmentAll, "");
+}
+<script>
+    $(function () {
+        //loadDepartment("", 0, '@Request["DepartmentCode"]');
+    });
+    function loadDepartment(parent, dataType, value) {
+        _dataType = dataType;
+        $.post('/Department/GetDepartment', { parent: parent, dataType: dataType, value: value }, function (data) {
+            $("#DepartmentCode").empty();
+            $("#DepartmentCode").append(data);
+        })
+    }
+</script>
+<h2>用户</h2>
+
+<form action="/Employee/add" method="post" enctype="multipart/form-data">
+    名称:<input type="text" name="Name" style="width:120px"  />
+        密码:<input type="password" name="PassWord" style="width:120px"/> 
+        角色:@Html.DropDownList("Role",new SelectList(ViewBag.Role, "id", "Name", ""))
+         <span>部门：</span>
+                <select name="DepartmentCode" style="width:150px;color:black" id="DepartmentCode" class="seach_input">
+                    @Html.Raw(option);
+                </select>
+        <input type="submit" value="增加" />
+</form>
+
+<form action="/Employee/" method="get">
+  名称:<input type="text" name="Name" value="@Request["name"]" />
+    角色:@Html.DropDownList("Role",new SelectList(roles2, "id", "Name", ""))
+     <input type="submit" value="查询" />
+</form>
+<table width="100%" border="1">
+    <tr>
+        <td width="50">代码</td>
+        <td width="120">名称</td>
+        <td width="60">角色</td>
+        <td width="120">部门</td>
+        <td width="60">锁定</td>
+        <td width="60">密码</td>
+        <td width="120">&nbsp;</td>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <form action="/Employee/update" method="post">
+            <tr>
+                <td>@item.Id
+                    <input type="hidden" name="Id" value="@item.Id" /></td>
+                <td><a href="/Employee/detail/@item.Id" target="_blank"> @item.Name</a>[@item.AccountNo]</td>
+                <td>
+                    <select id="Role" name="Role">
+                        <option value="">请选择...</option>
+                        @foreach (var r in roles)
+                        {
+                            <option value="@r.Id" @Html.Raw(item.Role == r.Id?"selected":"")>@r.Name</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <select id="Department" name="Department" style="width:100%">
+                        @Html.Raw(CRL.Package.RoleAuthorize.DepartmentBusiness.Instance.GetSelectOption(DepartmentAll, item.Department))
+                    </select>
+                </td>
+                <td>
+                    <input type="checkbox" checked="@item.Locked" id="Locked" name="Locked" value="true" /></td>
+                <td>
+                    <input type="password" name="PassWord" placeholder="不修改留空" value="" style="width: 100%" /></td>
+                <td>
+                    <input type="submit" value="修改" />
+                    <a href="/Employee/delete?id=@item.Id" onclick="return confirm('确认要删除吗')">删除</a>
+                    <a href="/AccessControl/SetAccess?userId=@item.Id">权限</a>
+                </td>
+            </tr>
+        </form>
+    }
+</table>
+@RoleControl.Models.Pager.Create(Model)

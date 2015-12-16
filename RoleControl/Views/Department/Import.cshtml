@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "批量导入"; 
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>@ViewBag.Title</h2>
+一次只能导入一个大类,格式如下
+<pre>
+分类1
+	分类1_1
+		分类1_1_1
+		分类1_1_2
+	分类1_2
+</pre>
+<form method="post" action="/Department/Import">
+    @Html.Hidden("dataType",Request["dataType"])
+    <textarea name="content" style="width:500px; height:400px" class="seach_input"></textarea>
+    <input type="submit" value="导入" class="qj_but" />
+</form>

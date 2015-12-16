@@ -1,0 +1,51 @@
+﻿@model List<CRL.Package.RoleAuthorize.Menu>
+@{
+    ViewBag.Title = "菜单";
+    List<CRL.Package.RoleAuthorize.Menu> nav = ViewBag.Nav as List<CRL.Package.RoleAuthorize.Menu>;
+}
+
+<h2>菜单</h2>
+<span><a href="/menu/index?parentCode=">一级</a>--</span>
+@foreach (var item in nav)
+{
+    <span><a href="/menu/index?parentCode=@item.SequenceCode">@item.Name [@item.SequenceCode]</a> --</span>
+}
+<form action="/menu/add" method="post">
+    <div>名称:<input type="text" name="Name" style="width:120px" /> 
+        导航中显示:@Html.CheckBox("ShowInNav",true) 
+        路径:<input type="text" name="Url" style="width:400px" /> <input type="hidden" name="parentCode" value="@Request["parentCode"]" /> <input type="submit" value="增加" />
+<input type="button" onclick="window.location='/menu/import'" value="导入菜单" />
+    </div>
+</form>
+<table width="100%" border="1">
+  <tr>
+    <td width="60">代码</td>
+    <td width="120">名称</td>
+    <td>路径</td>
+    <td width="60">导航显示</td>
+    <td width="60">是否禁用</td>
+    <td width="50">排序</td>
+    <td width="120">&nbsp;</td>
+  </tr>
+    @foreach (var item in Model)
+    {
+        <form action="/menu/update" method="post">
+  <tr>
+    <td>@item.SequenceCode <input type="hidden" name="Id" value="@item.Id" /></td>
+    <td><input type="text" name="Name" value="@item.Name" style="width:100%" /></td>
+    <td><input type="text" name="Url" value="@item.Url" style="width:100%" /></td>
+    <td>@Html.CheckBox("ShowInNav",item.ShowInNav)</td>
+    <td>@Html.CheckBox("Disable",item.Disable)</td>
+    <td><input type="text" name="sort" value="@item.Sort" style="width:100%" /></td>
+    <td><input type="submit" value="更新" />
+        <a href="/menu/delete?id=@item.Id" onclick="return confirm('确认要删除吗')">删除</a>  
+        @if(item.SequenceCode.Length<6)
+        {
+        <a href="/menu/index?parentCode=@item.SequenceCode">子级</a>
+        }
+    </td>
+  </tr>
+    </form>
+    }
+</table>
+

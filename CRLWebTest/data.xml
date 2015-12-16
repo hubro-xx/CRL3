@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ArrayOfProductData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProductData>
+    <Id>1</Id>
+    <AddTime>2015-02-25T16:13:32.703</AddTime>
+    <Show>false</Show>
+    <InterFaceUser>2222</InterFaceUser>
+    <BarCode>1212122</BarCode>
+    <TransType>In</TransType>
+    <ProductId />
+    <ProductName>product2</ProductName>
+    <SupplierId />
+    <SupplierName />
+    <CategoryName />
+    <PurchasePrice>0.00</PurchasePrice>
+    <SoldPrice>0.00</SoldPrice>
+    <Style />
+    <Number>0.00</Number>
+    <ProductChannel>自采</ProductChannel>
+  </ProductData>
+  <ProductData>
+    <Id>2</Id>
+    <AddTime>2015-02-25T16:13:36.68</AddTime>
+    <Show>false</Show>
+    <InterFaceUser>2222</InterFaceUser>
+    <BarCode>1212122</BarCode>
+    <TransType>In</TransType>
+    <ProductId />
+    <ProductName>product2</ProductName>
+    <SupplierId />
+    <SupplierName />
+    <CategoryName />
+    <PurchasePrice>0.00</PurchasePrice>
+    <SoldPrice>0.00</SoldPrice>
+    <Style />
+    <Number>0.00</Number>
+    <ProductChannel>自采</ProductChannel>
+  </ProductData>
+</ArrayOfProductData>

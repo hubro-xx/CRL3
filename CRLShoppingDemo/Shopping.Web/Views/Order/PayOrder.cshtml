@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "确认付款";
+}
+
+<h2>@ViewBag.Title</h2>
+<p class="lead">
+    扣款并确认订单,同时生成交易流水
+</p>
+<form method="post" action="">
+    订单号:@Request["orderId"])
+    <input type="hidden" name="c" value="1" />
+    @Html.Hidden("orderId", Request["orderId"])
+    <input type="submit" value="确认付款" />
+</form>

@@ -1,0 +1,38 @@
+﻿@model Shopping.Model.Product
+@{
+    ViewBag.Title = "ProductUpdate";
+}
+
+<h2>@ViewBag.Title</h2>
+<form class="form-horizontal" method="post" action="/supplier/ProductUpdate">
+    <div class="control-group">
+        <label class="control-label" for="inputEmail">名称</label>
+        <div class="controls">
+            @Html.TextBoxFor(b => b.ProductName)
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="inputPassword">结算价</label>
+        <div class="controls">
+            @Html.TextBoxFor(b => b.SettlementPrice)
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="inputPassword">售价</label>
+        <div class="controls">
+            @Html.TextBoxFor(b => b.SoldPrice)
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="inputPassword">状态</label>
+        <div class="controls">
+            @Html.DropDownListFor(b => b.ProductStatus, new SelectList(Enum.GetValues(typeof(CRL.Package.Product.ProductStatus))))
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            @Html.HiddenFor(b=>b.Id)
+            <button type="submit" class="btn">保存</button>
+        </div>
+    </div>
+</form>

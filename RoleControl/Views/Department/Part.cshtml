@@ -1,0 +1,37 @@
+﻿@model List<CRL.Package.RoleAuthorize.Department>
+@{
+    ViewBag.Title = "Part";
+    Layout = "";
+    string parentCode = Request["parentCode"];
+    string[] colorArry = new string[] { "blue", "green", "red", "#00FF66", "#663399","black","black" };
+}
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    @foreach (var item in Model)
+    {
+        var color = colorArry[item.SequenceCode.Length / 2];
+        <tr>
+            <td class="list_bot" style="text-align:left;padding-left:@Html.Raw(parentCode.Length / 2 * 30)px" onclick="javascript:loadChild('@item.SequenceCode')">
+                &nbsp;&nbsp;@Html.TextBox("Name_"+item.SequenceCode, item.Name, new { style="border:1px solid "+color,Class="seach_input"})
+            </td>
+            <td width="10%" class="list_bot">@item.SequenceCode</td>
+            <td width="15%" class="list_bot">@Html.TextBox("Sort_" + item.SequenceCode, item.Sort, new { style="width:40px;",Class="seach_input"})</td>
+            <td width="10%" class="list_bot">@Html.CheckBox("Disable_"+item.SequenceCode, item.Disable)</td>
+            <td width="18%" class="list_bot">
+                <a href="javascript:save('@item.SequenceCode')">保存</a> 
+                <a href="javascript:add('@item.SequenceCode')">添加子级</a>
+                <a href="javascript:deleteCategory('@item.SequenceCode')" class="confirm">删</a>
+            </td>
+        </tr>
+    
+    <tr>
+        <td colspan="5" class="list_bot" id="tr_@item.SequenceCode" style="padding:0px; margin:0px;border:0px;text-align:left;"></td>
+    </tr>
+    }
+    @if (Model.Count() == 0)
+    {
+    <tr>
+        <td style="padding-left:@Html.Raw(parentCode.Length / 2 * 40)px;color:red" colspan="5">没有子级</td>
+    </tr>
+    }
+</table>

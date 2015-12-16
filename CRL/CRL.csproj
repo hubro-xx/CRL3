@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{221A152B-1136-46A0-BF49-37D8E8EF19A0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CRL</RootNamespace>
+    <AssemblyName>CRL</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\CRL.xml</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CoreHelper, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ref\CoreHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.CHINAPNRLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <HintPath>..\ref\Interop.CHINAPNRLib.dll</HintPath>
+    </Reference>
+    <Reference Include="LitJson">
+      <HintPath>..\ref\LitJson.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ref\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attribute\FieldIndexType.cs" />
+    <Compile Include="Attribute\FieldType.cs" />
+    <Compile Include="CacheServerSetting.cs" />
+    <Compile Include="CacheServer\CacheClientProxy.cs" />
+    <Compile Include="CacheServer\CacheService.cs" />
+    <Compile Include="CacheServer\Command.cs" />
+    <Compile Include="CacheServer\TcpPoolClient.cs" />
+    <Compile Include="CacheServer\TcpServer.cs" />
+    <Compile Include="CacheServer\ResultData.cs" />
+    <Compile Include="CallBackDataReader.cs" />
+    <Compile Include="DBAdapter\DBAdapterBase.cs" />
+    <Compile Include="DBAdapter\MSSQLDBAdapter.cs" />
+    <Compile Include="DBAdapter\MySQLDBAdapter.cs" />
+    <Compile Include="DBAdapter\ORACLEDBAdapter.cs" />
+    <Compile Include="Base.cs" />
+    <Compile Include="BaseProvider.cs" />
+    <Compile Include="Attribute\FieldAttribute.cs" />
+    <Compile Include="DbContext.cs" />
+    <Compile Include="DBExtend\DBExtend.cs" />
+    <Compile Include="DBExtend\DBExtendAutoSp.cs" />
+    <Compile Include="DBExtend\DBExtendDelete.cs" />
+    <Compile Include="DBExtend\DBExtendInsert.cs" />
+    <Compile Include="DBExtend\DBExtendPage.cs" />
+    <Compile Include="DBExtend\DBExtendQuery.cs" />
+    <Compile Include="DBExtend\DBExtendUpdate.cs" />
+    <Compile Include="DBExtend\DynamicQuery.cs" />
+    <Compile Include="DBExtend\FunctionType.cs" />
+    <Compile Include="Dynamic\DynamicObject.cs" />
+    <Compile Include="Dynamic\DapperRowMetaObject.cs" />
+    <Compile Include="Dynamic\DynamicObjConvert.cs" />
+    <Compile Include="ExistsTableCache\ColumnBackgroundCheck.cs" />
+    <Compile Include="ExistsTableCache\DataBase.cs" />
+    <Compile Include="ExistsTableCache\Table.cs" />
+    <Compile Include="ExpressionJoin.cs" />
+    <Compile Include="ExtensionMethod\Avg.cs" />
+    <Compile Include="ExtensionMethod\Between.cs" />
+    <Compile Include="ExtensionMethod\FieldChange.cs" />
+    <Compile Include="ExtensionMethod\In.cs" />
+    <Compile Include="ExtensionMethod\Max.cs" />
+    <Compile Include="ExtensionMethod\Min.cs" />
+    <Compile Include="ExtensionMethod\Sum.cs" />
+    <Compile Include="IgnoreCaseDictionary.cs" />
+    <Compile Include="LambdaQuery\CRLExpression.cs" />
+    <Compile Include="LambdaQuery\CRLExpressionVisitor.cs" />
+    <Compile Include="LambdaQuery\Distinct.cs" />
+    <Compile Include="LambdaQuery\ExpressionVisitor.cs" />
+    <Compile Include="LambdaQuery\ExecuteResult.cs" />
+    <Compile Include="LambdaQuery\Extensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LambdaQuery\Group.cs" />
+    <Compile Include="LambdaQuery\Join.cs" />
+    <Compile Include="LambdaQuery\JoinType.cs" />
+    <Compile Include="LambdaQuery\LambdaCompileCache.cs" />
+    <Compile Include="LambdaQuery\LambdaCreater.cs" />
+    <Compile Include="LambdaQuery\LambdaQuery.cs" />
+    <Compile Include="ExtensionMethod\ExtensionMethod.cs" />
+    <Compile Include="IModelBase.cs" />
+    <Compile Include="LambdaQuery\LambdaQueryBase.cs" />
+    <Compile Include="LambdaQuery\LambdaQueryJoin.cs" />
+    <Compile Include="LambdaQuery\MethodAnalyze.cs" />
+    <Compile Include="LambdaQuery\ParameterRebinder.cs" />
+    <Compile Include="MemoryDataCache\CacheService.cs" />
+    <Compile Include="MemoryDataCache\MemoryDataCacheItem.cs" />
+    <Compile Include="MemoryDataCache\QueryItem.cs" />
+    <Compile Include="MemoryDataCache\UpdateItem.cs" />
+    <Compile Include="ObjectConvert.cs" />
+    <Compile Include="ParameCollection.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProviderOrigin.cs" />
+    <Compile Include="SettingConfig.cs" />
+    <Compile Include="Attribute\TableAttribute.cs" />
+    <Compile Include="Sharding\BaseProvider.cs" />
+    <Compile Include="Sharding\DBService.cs" />
+    <Compile Include="Sharding\DB\DataBase.cs" />
+    <Compile Include="Sharding\DB\DataBaseManage.cs" />
+    <Compile Include="Sharding\DB\DataSequence.cs" />
+    <Compile Include="Sharding\DB\DataSequenceManage.cs" />
+    <Compile Include="Sharding\DB\Table.cs" />
+    <Compile Include="Sharding\DB\TableManage.cs" />
+    <Compile Include="Sharding\DB\TablePart.cs" />
+    <Compile Include="Sharding\DB\TablePartManage.cs" />
+    <Compile Include="Sharding\Location.cs" />
+    <Compile Include="Sharding\UnionType.cs" />
+    <Compile Include="SummaryAnalysis.cs" />
+    <Compile Include="ExistsTableCache\ExistsTableCache.cs" />
+    <Compile Include="TypeCache.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Update.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

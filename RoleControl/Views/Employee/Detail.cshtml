@@ -1,0 +1,71 @@
+﻿@model CRL.Package.RoleAuthorize.Employee
+@{
+    ViewBag.Title = "修改用户";
+    List<CRL.Package.RoleAuthorize.Menu> menus = ViewBag.Menus as List<CRL.Package.RoleAuthorize.Menu>;
+}
+<h2>修改用户</h2>
+<script>
+    $(function () {
+        loadDepartment("", 0, "@Model.Department");
+    });
+    function loadDepartment(parent, dataType, value) {
+        _dataType = dataType;
+        $.post('/Department/GetDepartment', { parent: parent, dataType: dataType, value: value }, function (data) {
+            $("#Department").empty();
+            $("#Department").append(data);
+        })
+    }
+</script>
+
+@using (Html.BeginForm("Detail", "Employee", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <fieldset>
+        <legend>详细信息</legend>
+        <ol>
+            <li>
+                帐号:@Html.Label("AccountNo",Model.AccountNo)
+            </li>
+            <li>
+                名称:@Html.TextBox("Name",Model.Name)
+            </li>
+            <li>
+                手机:@Html.TextBox("Mobile",Model.Mobile)
+            </li>
+            <li>
+                Q Q:@Html.TextBox("QQ",Model.QQ)
+            </li>
+             <li>
+                邮箱:@Html.TextBox("Email",Model.Email)
+                 @Html.Hidden("Id",Model.Id)
+            </li>
+            <li>
+                生日:@Html.TextBox("Birthday",Model.Birthday.ToShortDateString())
+            </li>
+            <li>
+                性别:
+                <select name="sex">
+                    <option value="男" @Html.Raw(Model.Sex=="男"?"selected":"")>男</option>
+                    <option value="女" @Html.Raw(Model.Sex=="女"?"selected":"")>女</option>
+                   </select>
+            </li>
+            <li>
+                身份证号:@Html.TextBox("IdentityNo",Model.IdentityNo)
+            </li>
+            <li>
+                地址:@Html.TextBox("Address",Model.Address)
+            </li>
+            <li>
+                绑定IP:@Html.TextBox("RegisterIp",Model.RegisterIp)
+            </li>
+            <li>部门:<select name="Department" style="width:150px;color:black" id="Department" class="seach_input"></select></li>
+        </ol>
+        <input type="submit" value="保存" />
+    </fieldset>
+}
+<h3>用户菜单</h3>
+<ul>
+    @foreach (var item in menus)
+    {
+    <li>@Html.Raw(item.GetPadding()) @item.Name [@item.SequenceCode] @item.Url</li>
+    }
+</ul>

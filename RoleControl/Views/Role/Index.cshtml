@@ -1,0 +1,28 @@
+﻿@model List<CRL.Package.RoleAuthorize.Role>
+@{
+    ViewBag.Title = "角色";
+}
+
+<h2>@ViewBag.Title (按业务功能分)</h2>
+<form action="/Role/add" method="post">
+    <div>名称:<input type="text" name="Name" /> <input type="submit" value="增加" /></div>
+</form>
+<table width="100%" border="1">
+  <tr>
+    <td width="60">代码</td>
+    <td width="120">名称</td>
+    <td >备注</td>
+    <td width="120">&nbsp;</td>
+  </tr>
+    @foreach (var item in Model)
+    {
+        <form action="/Role/update" method="post">
+  <tr>
+    <td>@item.Id <input type="hidden" name="Id" value="@item.Id" /></td>
+    <td><input type="text" name="Name" value="@item.Name" style="width:100%" /></td>
+    <td><input type="text" name="Remark" value="@item.Remark" style="width:100%" /></td>
+    <td><input type="submit" value="更新" /> <a href="/Role/delete?id=@item.Id" onclick="return confirm('确认要删除吗')">删除</a> <a href="/AccessControl/SetAccess?roleId=@item.Id">权限</a> </td>
+  </tr>
+    </form>
+    }
+</table>

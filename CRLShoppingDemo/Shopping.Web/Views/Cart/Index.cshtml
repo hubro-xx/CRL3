@@ -1,0 +1,26 @@
+﻿@model List<Shopping.Model.CartItem>
+@{
+    ViewBag.Title = "购物车";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table">
+    <tr>
+        <th>产品名</th>
+        <th>数量</th>
+        <th>价格</th>
+        <th>操作</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ProductName</td>
+            <td>@item.Num</td>
+            <td>@item.Price</td>
+            <td></td>
+        </tr>
+    }
+</table>
+<form method="post" action="/order/createOrder">
+    <input type="submit"  value="创建订单" class="btn"/>
+</form>

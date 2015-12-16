@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Title = "部门"; 
+}
+
+<script type="text/javascript">
+    $(function () {
+        loadChild("");
+    })
+
+    function loadChild(parentCode) {
+        var dataType = $("#dataType").val();
+        var obj = $("#tr_" + parentCode);
+        var loaded = obj.attr("loaded");
+        if (loaded == "true") {
+            obj.html("");
+            obj.attr("loaded", "false");
+        }
+        else {
+            $.post("/Department/Part", { parentCode: parentCode, dataType: dataType }, function (result) {
+                obj.html(result);
+                obj.attr("loaded", "true");
+            });
+        }
+    }
+    function save(sequenceCode) {
+        var dataType = $("#dataType").val();
+        var name = $("#Name_" + sequenceCode).val();
+        var sort = $("#Sort_" + sequenceCode).val();
+        var disable = $("#Disable_" + sequenceCode).attr("checked") == "checked";
+        $.post("/Department/Save", { sequenceCode: sequenceCode, name: name, sort: sort, disable: disable, dataType: dataType }, function (result) {
+            alert("保存成功");
+        });
+    }
+    function add(parentCode) {
+        var dataType = $("#dataType").val();
+        var name = prompt("请输入部门名称,多个用,号隔开", "部门名称一");
+        if (name == "") {
+            alert("请重新输入");
+            return;
+        }
+        if (name == null)
+            return;
+        $.post("/Department/Add", { parentCode: parentCode, name: name, dataType: dataType }, function (result) {
+            loadChild(parentCode);
+            loadChild(parentCode);
+            alert("保存成功");
+        });
+    }
+    function deleteCategory(code) {
+        var dataType = $("#dataType").val();
+        if (!confirm("确认要删除吗?"))
+            return;
+        $.post("/Department/delete", { code: code, dataType: dataType }, function (result) {
+            if (result.Result) {
+                loadChild("");
+                loadChild("");
+                alert("删除成功");
+            }
+            else {
+                alert("删除失败:"+result.Message);
+            }
+        });
+    }
+    function changeDataType(dataType) {
+        window.location = '?dataType=' + dataType;
+    }
+</script>
+
+<h2>@ViewBag.Title (按组织架构分)</h2>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+					<td class="list_tt">名称</td>
+					<td width="10%" class="list_tt">代码</td>
+					<td width="15%" class="list_tt">排序</td>
+					<td width="10%" class="list_tt">禁用</td>
+					<td width="18%" class="list_tt"><a href="javascript:add('')">添加主部门</a> <a href="/Department/import" class="fancybox fancybox.iframe">导入</a></td>
+				</tr>
+                <tr>
+                    <td colspan="5" id="tr_">&nbsp;</td>
+                </tr>
+			</table>

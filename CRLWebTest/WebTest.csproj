@@ -1,0 +1,423 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5B1E144D-0586-4B80-B4E6-F90C81E9CDB7}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WebTest</RootNamespace>
+    <AssemblyName>WebTest</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\WebTest.XML</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PublishDatabases>false</PublishDatabases>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CoreHelper, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ref\CoreHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ref\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CRLExpressionTest.aspx" />
+    <Content Include="Page\About.aspx" />
+    <Content Include="Page\AutoSp.aspx" />
+    <Content Include="Page\Cache.aspx" />
+    <Content Include="Page\Cache2.aspx" />
+    <Content Include="Page\CacheManage.aspx" />
+    <Content Include="Page\DataVerification.aspx" />
+    <Content Include="Default.aspx" />
+    <Content Include="Page\Delete.aspx" />
+    <Content Include="Page\ExportAndImport.aspx" />
+    <Content Include="Page\ExportModelInfo.aspx" />
+    <Content Include="Global.asax" />
+    <Content Include="Page\ExtensionMethod.aspx" />
+    <Content Include="Page\Insert.aspx" />
+    <Content Include="Page\Model.aspx" />
+    <Content Include="Page\OrderTest.aspx" />
+    <Content Include="Page\Pager.aspx" />
+    <Content Include="Page\Query1.aspx" />
+    <Content Include="Page\Query2.aspx" />
+    <Content Include="Page\Query3.aspx" />
+    <Content Include="Page\Sharding.aspx" />
+    <Content Include="Page\TableExistsCache.aspx" />
+    <Content Include="Page\TestAll.aspx" />
+    <Content Include="pay.aspx" />
+    <Content Include="Resources\sp_ExecuteScript_ORACLE.sql" />
+    <Content Include="Resources\sp_page_MSSql.sql" />
+    <Content Include="Resources\sp_page_MySql.sql" />
+    <Content Include="Resources\sp_page_ORACLE.sql" />
+    <Content Include="Page\SqlTransaction.aspx" />
+    <Content Include="Page\Synchronous.aspx" />
+    <Content Include="Page\test.aspx" />
+    <Content Include="Page\Update.aspx" />
+    <Content Include="Page\UserTransactionTest.aspx" />
+    <Content Include="Update.txt" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Code\Member.cs" />
+    <Compile Include="Code\MemberManage.cs" />
+    <Compile Include="Code\ModelTest.cs" />
+    <Compile Include="Code\Setting.cs" />
+    <Compile Include="Code\Sharding\MemberManage.cs" />
+    <Compile Include="Code\Sharding\OrderManage.cs" />
+    <Compile Include="Code\TestAll.cs" />
+    <Compile Include="CRLExpressionTest.aspx.cs">
+      <DependentUpon>CRLExpressionTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CRLExpressionTest.aspx.designer.cs">
+      <DependentUpon>CRLExpressionTest.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\About.aspx.cs">
+      <DependentUpon>About.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\About.aspx.designer.cs">
+      <DependentUpon>About.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\AutoSp.aspx.cs">
+      <DependentUpon>AutoSp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\AutoSp.aspx.designer.cs">
+      <DependentUpon>AutoSp.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Cache.aspx.cs">
+      <DependentUpon>Cache.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Cache.aspx.designer.cs">
+      <DependentUpon>Cache.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Code\AccountManage.cs" />
+    <Compile Include="Code\LocalSqlHelper.cs" />
+    <Compile Include="Code\Order.cs" />
+    <Compile Include="Code\OrderManage.cs" />
+    <Compile Include="Code\ProductData.cs" />
+    <Compile Include="Code\ProductDataManage.cs" />
+    <Compile Include="Code\TransactionManage.cs" />
+    <Compile Include="Page\Cache2.aspx.cs">
+      <DependentUpon>Cache2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Cache2.aspx.designer.cs">
+      <DependentUpon>Cache2.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\CacheManage.aspx.cs">
+      <DependentUpon>CacheManage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\CacheManage.aspx.designer.cs">
+      <DependentUpon>CacheManage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\CacheServer.ashx.cs">
+      <DependentUpon>CacheServer.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\DataVerification.aspx.cs">
+      <DependentUpon>DataVerification.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\DataVerification.aspx.designer.cs">
+      <DependentUpon>DataVerification.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Delete.aspx.cs">
+      <DependentUpon>Delete.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Delete.aspx.designer.cs">
+      <DependentUpon>Delete.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\ExportAndImport.aspx.cs">
+      <DependentUpon>ExportAndImport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\ExportAndImport.aspx.designer.cs">
+      <DependentUpon>ExportAndImport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\ExportModelInfo.aspx.cs">
+      <DependentUpon>ExportModelInfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\ExportModelInfo.aspx.designer.cs">
+      <DependentUpon>ExportModelInfo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Page\ExtensionMethod.aspx.cs">
+      <DependentUpon>ExtensionMethod.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\ExtensionMethod.aspx.designer.cs">
+      <DependentUpon>ExtensionMethod.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Insert.aspx.cs">
+      <DependentUpon>Insert.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Insert.aspx.designer.cs">
+      <DependentUpon>Insert.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Model.aspx.cs">
+      <DependentUpon>Model.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Model.aspx.designer.cs">
+      <DependentUpon>Model.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\OrderTest.aspx.cs">
+      <DependentUpon>OrderTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\OrderTest.aspx.designer.cs">
+      <DependentUpon>OrderTest.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Pager.aspx.cs">
+      <DependentUpon>Pager.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Pager.aspx.designer.cs">
+      <DependentUpon>Pager.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Query3.aspx.cs">
+      <DependentUpon>Query3.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Query3.aspx.designer.cs">
+      <DependentUpon>Query3.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Sharding.aspx.cs">
+      <DependentUpon>Sharding.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Sharding.aspx.designer.cs">
+      <DependentUpon>Sharding.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\TableExistsCache.aspx.cs">
+      <DependentUpon>TableExistsCache.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\TableExistsCache.aspx.designer.cs">
+      <DependentUpon>TableExistsCache.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\TestAll.aspx.cs">
+      <DependentUpon>TestAll.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\TestAll.aspx.designer.cs">
+      <DependentUpon>TestAll.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="pay.aspx.cs">
+      <DependentUpon>pay.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="pay.aspx.designer.cs">
+      <DependentUpon>pay.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Query1.aspx.cs">
+      <DependentUpon>Query1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Query1.aspx.designer.cs">
+      <DependentUpon>Query1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Query2.aspx.cs">
+      <DependentUpon>Query2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Query2.aspx.designer.cs">
+      <DependentUpon>Query2.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Site1.Master.cs">
+      <DependentUpon>Site1.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site1.Master.designer.cs">
+      <DependentUpon>Site1.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Page\SqlTransaction.aspx.cs">
+      <DependentUpon>SqlTransaction.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\SqlTransaction.aspx.designer.cs">
+      <DependentUpon>SqlTransaction.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Synchronous.aspx.cs">
+      <DependentUpon>Synchronous.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Synchronous.aspx.designer.cs">
+      <DependentUpon>Synchronous.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\test.aspx.cs">
+      <DependentUpon>test.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\test.aspx.designer.cs">
+      <DependentUpon>test.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\Update.aspx.cs">
+      <DependentUpon>Update.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\Update.aspx.designer.cs">
+      <DependentUpon>Update.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\UserTransactionTest.aspx.cs">
+      <DependentUpon>UserTransactionTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\UserTransactionTest.aspx.designer.cs">
+      <DependentUpon>UserTransactionTest.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Site1.Master" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DBConnection\Default.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Page\CacheServer.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DBConnection\db2.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CRL.Package\CRL.Package.csproj">
+      <Project>{1b013a5c-beb1-4efd-9737-fa4dd1c85d18}</Project>
+      <Name>CRL.Package</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CRL\CRL.csproj">
+      <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
+      <Name>CRL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>56640</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:56641/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetDir)\CRL.DLL $(ProjectDir)\ref
+copy $(TargetDir)\CRL.XML $(ProjectDir)\ref</PostBuildEvent>
+  </PropertyGroup>
+</Project>

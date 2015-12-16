@@ -1,0 +1,113 @@
+using System;
+
+using System.Collections.Generic;
+
+using System.Linq;
+
+using System.Web;
+
+using System.Web.Mvc;
+
+using System.Xml.Linq;
+
+
+
+using Moon.Orm;
+
+using mynorthdb;
+
+
+
+namespace Razor.Moon
+
+{
+
+    /// <summary>
+
+    /// Description of CheckLoginAttribute.
+
+    /// </summary>
+
+    public class CustemerAuthenAttribute:AuthorizeAttribute
+
+    {
+
+        public new string[] ActionRoles { get; set; }
+
+        protected override bool AuthorizeCore(HttpContextBase httpContext)
+
+        {
+
+            if (httpContext == null) {
+
+                throw new ArgumentNullException("HttpContext");
+
+            }
+
+            if (!httpContext.User.Identity.IsAuthenticated) {
+
+                return false;
+
+            }
+
+            if (ActionRoles == null) {
+
+                return true;
+
+            }
+
+            if (ActionRoles.Length == 0)
+
+            {
+
+                return true;
+
+            }
+
+            if (ActionRoles.Contains(httpContext.User.Identity.Name))
+
+            {
+
+                return true;
+
+            }
+
+            return false;
+
+        }
+
+        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
+
+        {
+
+            var  Request=filterContext.HttpContext.Request;
+
+            string url=Request.Url.Scheme+"://"+Request.Url.Authority+"/Home/Login";
+
+            filterContext.Result = new RedirectResult(url);
+
+        }
+
+        public override void OnAuthorization(System.Web.Mvc.AuthorizationContext filterContext)
+
+        {
+
+            string controllerName = filterContext.ActionDescriptor.ControllerDescriptor.ControllerName;
+
+            string actionName = filterContext.ActionDescriptor.ActionName;
+
+            string roles = ActionRoleManager.GetActionRoles(actionName, controllerName);
+
+            if (!string.IsNullOrWhiteSpace(roles)) {
+
+                this.ActionRoles = roles.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+            }
+
+            base.OnAuthorization(filterContext);
+
+        }
+
+    }
+
+}

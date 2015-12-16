@@ -1,0 +1,69 @@
+﻿@model Dictionary<CRL.Package.RoleAuthorize.Menu, List<CRL.Package.RoleAuthorize.Menu>>
+@{
+    //var role = CRL.Package.RoleAuthorize.RoleAction.Roles.Find(b => b.Id == int.Parse(Request["roleId"]));
+}
+<style type="text/css">
+    .menu_True {
+        color:green;
+    }
+    .menu_False {
+        color:#0094ff;
+    }
+    .operate {
+        color:#999999;
+    }
+</style>
+<script>
+    function selectOpreate(code,checked) {
+        $("input[code='" + code + "']").each(function()
+        {
+            $(this).attr("checked", checked);
+        }); 
+    }
+    function selectMenu(code, checked) {
+        var arry=new Array();
+        $("input[code^='" + code + "']").each(function()
+        {
+            $(this).attr("checked", checked);
+            arry.push($(this).attr("code"));
+        });
+        setAccess(arry.join(","),checked);
+    }
+    function setAccess(menu,acc) {
+        var roleId="@Request["roleId"]";
+        var userId="@Request["userId"]";
+        $.post('/AccessControl/SetItemAccess', { menuCode: menu, acc: acc, roleId: roleId, userId: userId }, function (d) {
+            if (d.Result) {
+                //alert("设置成功");
+                return true;
+            }
+            alert("设置失败"+d.Message);
+        })
+        
+        return false;
+    }
+</script>
+<h2>@ViewBag.Title</h2>
+@using (Html.BeginForm()) {
+foreach (var item in Model.Keys)
+{
+    <fieldset>
+        <legend style="font-weight:bold">@Html.Label("menu" + item.SequenceCode, item.Name+" ["+item.SequenceCode+"]")
+            @Html.CheckBox("menu" + item.SequenceCode, false, new {onclick="selectMenu('"+item.SequenceCode+"',this.checked)" })  </legend>
+        @foreach (var m in Model[item])
+        {
+            <div style="width: 200px; float: left; display: inherit; margin: 3px">
+                <label class="menu_@m.ShowInNav.ToString()" title="@m.Url">
+                    @Html.Raw(m.Name+" ["+m.SequenceCode +"]")
+                    <input id="menu_@m.SequenceCode" name="Query_@m.SequenceCode" @Html.Raw(!m.Enabled?"disabled":"") code="@m.SequenceCode" type="checkbox" @Html.Raw(m.Que?"checked='checked'":"") value="true" onclick="setAccess('@m.SequenceCode    ',this.checked)" />
+                </label>
+                <input name="selectOperate" type="hidden" value="@m.SequenceCode" />
+                
+            </div>
+        }
+    </fieldset>
+}
+<!--
+    <input type="submit" value="保存" />
+    -->
+}

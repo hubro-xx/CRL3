@@ -1,0 +1,29 @@
+﻿@model Core.Mvc.PageObj<Shopping.Model.Product>
+@{
+    ViewBag.Title = "产品管理";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table">
+    <tr>
+        <th>产品名</th>
+        <th>结算价</th>
+        <th>售价</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ProductName</td>
+            <td>@item.SettlementPrice</td>
+            <td>@item.SoldPrice</td>
+            <td>@item.ProductStatus</td>
+            <td>
+                <a href="/supplier/ProductUpdate/@item.Id">修改</a>
+            </td>
+        </tr>
+    }
+</table>
+@Core.Mvc.HtmlHelper.CreatePageNavigation(Model)
+

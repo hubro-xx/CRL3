@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewBag.Title = "导入菜单";
+    string txt = ViewBag.MenuTxt;
+}
+
+<h2>导入菜单</h2>
+会清除当前所有菜单
+示例:
+<pre>
+产品单据管理
+	单据查询 /ProductReceipt/List
+	采购单提交 /ProductReceipt/Create
+
+</pre>
+<form action="/menu/import" method="post">
+   <textarea cols="20" id="txt" name="txt" rows="20">@txt</textarea>
+    <input type="submit" value="导入" onclick="return confirm('确认要导入吗,将会清除当前所有菜单')" />
+</form>
