@@ -156,9 +156,10 @@ namespace CRL
         public static TDest ToType<TDest>(this object source)
             where TDest : class,new()
         {
-            var simpleTypes = typeof(TDest).GetProperties();
+            var simpleTypes = typeof(TDest).GetProperties().ToList();
+            simpleTypes.RemoveAll(b => b.SetMethod == null);
             List<PropertyInfo> complexTypes = source.GetType().GetProperties().ToList();
-            complexTypes.RemoveAll(b => b.Name == "Item");
+            complexTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
             TDest obj = new TDest();
             foreach (var info in simpleTypes)
             {
@@ -181,7 +182,8 @@ namespace CRL
         public static List<TDest> ToType<TDest>(this IEnumerable source)
             where TDest : class,new()
         {
-            var simpleTypes = typeof(TDest).GetProperties();
+            var simpleTypes = typeof(TDest).GetProperties().ToList();
+            simpleTypes.RemoveAll(b => b.SetMethod == null);
             List<PropertyInfo> complexTypes = null;
             List<TDest> list = new List<TDest>();
             foreach (var item in source)
@@ -190,7 +192,7 @@ namespace CRL
                 if (complexTypes == null)
                 {
                     complexTypes = item.GetType().GetProperties().ToList();
-                    complexTypes.RemoveAll(b => b.Name == "Item");
+                    complexTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
                 }
                 foreach (var info in simpleTypes)
                 {
