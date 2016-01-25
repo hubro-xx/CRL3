@@ -52,7 +52,7 @@ namespace WebTest.Code
         /// 初始创建表后的数据
         /// </summary>
         /// <returns></returns>
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<ProductData>();
             list.Add(new ProductData() { BarCode = "123", Number = 10,UserId=1 });
@@ -156,7 +156,6 @@ namespace WebTest.Code
             get;
             set;
         }
-
         public ProductChannel ProductChannel
         {
             get;

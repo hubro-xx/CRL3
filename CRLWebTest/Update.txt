@@ -73,7 +73,6 @@
 2015-04-24
 	重大更新,增加了分布式缓存查询,能用编程语法查询服务器缓存了
 	TCP形式支持连接池的机制,简单实现了并发连接
-	http://www.cnblogs.com/hubro/p/4467700.html
 2015-05-05
 	使缓存服务支持分布式
 2015-05-08
@@ -110,14 +109,12 @@
 	为实现分库分表,重新整理数据访问对象传递为DbContext
 	实现了分表表名转换
 	升级了访问对象创建,回调委托类型支持分库定位
-	http://www.cnblogs.com/hubro/p/4821399.html
 2015-09-21
 	版本升级为2.4
 2015-09-22
 	优化字段选择和扩展方法查询
 2015-09-26
 	升级改到3.0版,2.X版不再更新
-	http://www.cnblogs.com/hubro/p/4911978.html
 2015-09-28
 	Model索引值类型改为dynamic
 	减少QueryList方法参数
@@ -164,34 +161,9 @@
 	 优化了查询方法,LambdaQuery能直接返回所有查询结果了
 2015-11-20
 	版本升级为3.1
-	http://www.cnblogs.com/hubro/p/4981728.html
 	去掉了业务类里LambdaQuery为参数的查询方法,改为直接由LambdaQuery进行查询返回
 	返回结果为以下类型
 	List<dynamic> ToDynamic()
 	List<TResult> ToList<TResult>()
 	List<T> ToList()
 	Dictionary<TKey, TValue> ToDictionary<TKey, TValue>()
-	筛选值时,能按关联表选择了,GROUP也一样
-2015-11-21
-	优化分页判断
-	修改匿名对象查询,使能正确返回值
-	关联查询改为查询分支了,Join方法会创建一个LambdaQueryJoin对象进行链式调用
-2015-11-25
-	增加Nullable可空类型属性支持
-	public DateTime? Birthday
-    {
-        get;
-        set;
-    }
-2015-11-25
-	优化表达式动态编译,使常量不再编译成委托
-2015-12-04
-	优化了关联,使关联后还能关联
-2015-12-07
-	修改字段别名判断出错
-	增加测试类TestAll
-2015-12-11
-	统一函数方法查询语法,增加返回单个字段返回方法GetScalar
-2015-12-15
-	去掉NOTIN,NOTLIKE扩展方法,扩展方法源类型改为强类型
-	优化缓存按主键查询方法,直接用键值查询

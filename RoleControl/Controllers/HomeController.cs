@@ -81,7 +81,7 @@ namespace RoleControl.Controllers
                 u.Role = 1;
                 u.PassWord = CRL.Package.RoleAuthorize.EmployeeBusiness.Instance.EncryptPass(pass);
                 u.Name = name;
-                int id = CRL.Package.RoleAuthorize.EmployeeBusiness.Instance.Add(u);
+                CRL.Package.RoleAuthorize.EmployeeBusiness.Instance.Add(u);
             }
             return AutoBackResult("完成", Request.UrlReferrer.ToString());
         }

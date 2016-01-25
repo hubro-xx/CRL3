@@ -8,8 +8,19 @@ namespace WebTest.Code
     [CRL.Attribute.Table(TableName="table1")]//映射表名为table1
     public class ModelTest:CRL.IModelBase
     {
+        protected override bool CheckRepeatedInsert
+        {
+            get
+            {
+                return base.CheckRepeatedInsert;
+            }
+        }
+        protected override void OnColumnCreated(string fieldName)
+        {
+            base.OnColumnCreated(fieldName);
+        }
         //创建表时,初始数据,自增暂为自动
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<ModelTest>();
             list.Add(new ModelTest() { BarCode = "123", Price = 10, ProductName="创建表时初始" });

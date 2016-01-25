@@ -4,7 +4,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <p class="lead">
     当前版本 CRL<%=WebTest.Code.Setting.GetVersion() %> <br />
-    框架源码: https://github.com/hubro-xx/CRL3<br />
+    入群以获取最新源码<br />
     版本更新请关注:<a href="http://www.cnblogs.com/hubro">http://www.cnblogs.com/hubro</a>
     <br />
     QQ群:1582632 密语:CRL

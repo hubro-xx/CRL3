@@ -5,10 +5,13 @@ using System.Web;
 
 namespace WebTest.Code
 {
+    /// <summary>
+    /// 订单
+    /// </summary>
     [CRL.Attribute.Table(TableName = "OrderProduct")]//重新指定对应的表名
     public class Order : CRL.IModelBase
     {
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<Order>();
             list.Add(new Order() { UserId = 1, OrderId = "123" });

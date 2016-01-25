@@ -15,7 +15,7 @@ namespace Shopping.Model
         /// 初始默认数据
         /// </summary>
         /// <returns></returns>
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<Product>();
             for (int i = 1; i < 100; i++)

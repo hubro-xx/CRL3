@@ -56,7 +56,7 @@ namespace WebTest.Page
             txtOutput.Text = query.PrintQuery();
             foreach (var item in list)
             {
-                var str = string.Format("{0}______{1}<br>", item.BarCode, item["Name1"]);//取名称为Name1的索引值
+                var str = string.Format("{0}______{1}<br>", item.BarCode, item.Bag.Name1);//取名称为Name1的索引值
                 Response.Write(str);
             }
         }

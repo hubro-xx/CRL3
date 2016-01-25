@@ -5,9 +5,12 @@ using System.Web;
 
 namespace WebTest.Code
 {
+    /// <summary>
+    /// 会员
+    /// </summary>
     public class Member:CRL.Package.Person.Member
     {
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<Member>();
             list.Add(new Member() { Name = "hubro" });

@@ -118,6 +118,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\ClassGuid.cs" />
     <Compile Include="Code\Member.cs" />
     <Compile Include="Code\MemberManage.cs" />
     <Compile Include="Code\ModelTest.cs" />

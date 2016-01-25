@@ -381,7 +381,7 @@
         </member>
         <member name="M:CRL.DBAdapter.MSSQLDBAdapter.InsertObject(CRL.IModel)">
             <summary>
-            获取插入语法
+            插入对象,并返回主键
             </summary>
             <param name="obj"></param>
             <returns></returns>
@@ -537,7 +537,6 @@
             获取插入语法
             </summary>
             <param name="obj"></param>
-            <param name="helper"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.DBAdapter.ORACLEDBAdapter.GetWithNolockFormat">
@@ -666,7 +665,6 @@
             添加一条记录[基本方法]
             </summary>
             <param name="p"></param>
-            <returns></returns>
         </member>
         <member name="M:CRL.ProviderOrigin`1.BatchInsert(System.Collections.Generic.List{`0},System.Boolean)">
             <summary>
@@ -675,7 +673,7 @@
             <param name="list"></param>
             <param name="keepIdentity">是否保持自增主键</param>
         </member>
-        <member name="M:CRL.ProviderOrigin`1.QueryItem(System.Int32)">
+        <member name="M:CRL.ProviderOrigin`1.QueryItem(System.Object)">
             <summary>
             按主键查询一项[基本方法]
             </summary>
@@ -691,7 +689,7 @@
             <param name="compileSp"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.ProviderOrigin`1.Delete(System.Int32)">
+        <member name="M:CRL.ProviderOrigin`1.Delete(System.Object)">
             <summary>
             按主键删除
             </summary>
@@ -904,11 +902,11 @@
             <param name="expression"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.BaseProvider`1.QueryItemFromCache(System.Int32)">
+        <member name="M:CRL.BaseProvider`1.QueryItemFromCache(System.Object)">
             <summary>
             从对象缓存中进行查询一项
             </summary>
-            <param name="id"></param>
+            <param name="key"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.BaseProvider`1.QueryItemFromCache(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
@@ -1030,11 +1028,6 @@
             自定义数据库字段类型,如 varchar(50)
             </summary>
         </member>
-        <member name="F:CRL.Attribute.FieldAttribute.NotNull">
-            <summary>
-            是否为空
-            </summary>
-        </member>
         <member name="F:CRL.Attribute.FieldAttribute.Length">
             <summary>
             长度,超过3000字段类型将会设为ntext
@@ -1102,6 +1095,7 @@
         <member name="P:CRL.Attribute.FieldAttribute.KeepIdentity">
             <summary>
             当是主键时,是否保留原标识,和IsPrimaryKey一起用
+            在插入和生成表脚本时,会按此判断
             </summary>
         </member>
         <member name="P:CRL.Attribute.FieldAttribute.IsPrimaryKey">
@@ -1123,6 +1117,11 @@
         <member name="P:CRL.Attribute.FieldAttribute.MapingName">
             <summary>
             映射名称,在查询时用 如 new{Name1=b.Name}
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.NotNull">
+            <summary>
+            不可为空,主键自动为不可为空
             </summary>
         </member>
         <member name="T:CRL.DbContext">
@@ -1432,7 +1431,7 @@
             <param name="where"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Delete``1(System.Int32)">
+        <member name="M:CRL.DBExtend.Delete``1(System.Object)">
             <summary>
             按主键删除
             </summary>
@@ -1461,7 +1460,6 @@
             单个插入
             </summary>
             <param name="obj"></param>
-            <returns></returns>
         </member>
         <member name="M:CRL.DBExtend.Page``1(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
@@ -1512,7 +1510,7 @@
             <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.QueryItem``1(System.Int32)">
+        <member name="M:CRL.DBExtend.QueryItem``1(System.Object)">
             <summary>
             按ID查询
             </summary>
@@ -2088,7 +2086,17 @@
             <param name="source"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.ExtensionMethod.ToType``1(System.Collections.IEnumerable)">
+        <member name="M:CRL.ExtensionMethod.ToType``2(System.Collections.Generic.IEnumerable{``0},System.Action{``0,``1})">
+            <summary>
+            转换为共同属性的集合
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <typeparam name="TDest"></typeparam>
+            <param name="source"></param>
+            <param name="action">指定转换委托再次处理,可为空</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ExtensionMethod.ToType``1(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             转换为共同属性的集合
             </summary>
@@ -3033,15 +3041,27 @@
             如果有自定义主键名对象,请继承此类型
             </summary>
         </member>
-        <member name="M:CRL.IModel.CheckData">
+        <member name="M:CRL.IModel.ToJson">
             <summary>
-            数据校验方法
+            序列化为JSON
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CRL.IModel.CheckData">
+            <summary>
+            数据校验方法,可重写
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.IModel.OnColumnCreated(System.String)">
+            <summary>
+            当列创建时,可重写
+            </summary>
+            <param name="fieldName"></param>
+        </member>
         <member name="M:CRL.IModel.GetInitData">
             <summary>
-            创建表时的初始数据
+            创建表时的初始数据,可重写
             </summary>
             <returns></returns>
         </member>
@@ -3107,9 +3127,16 @@
         <member name="P:CRL.IModel.Item(System.String)">
             <summary>
             获取关联查询的值
+            不分区大小写
             </summary>
             <param name="key"></param>
             <returns></returns>
+        </member>
+        <member name="P:CRL.IModel.Bag">
+            <summary>
+            动态Bag,可用此取索引值
+            不区分大小写
+            </summary>
         </member>
         <member name="P:CRL.IModelBase.Id">
             <summary>
@@ -3373,25 +3400,6 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="obj"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.ObjectConvert.CloneToSimple``2(``1)">
-            <summary>
-            把复杂对象转换为简单对象
-            </summary>
-            <typeparam name="TDest"></typeparam>
-            <typeparam name="TSource"></typeparam>
-            <param name="source"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.ObjectConvert.CloneToSimple``2(System.Collections.Generic.List{``1})">
-            <summary>
-            把复杂对象转换为简单对象
-            不会转换不对应的字段
-            </summary>
-            <typeparam name="TDest">目的</typeparam>
-            <typeparam name="TSource">源</typeparam>
-            <param name="source"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.ObjectConvert.DataReaderToObj(System.Data.Common.DbDataReader,System.Type,System.Collections.Generic.IEnumerable{CRL.Attribute.FieldAttribute})">

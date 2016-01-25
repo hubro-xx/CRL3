@@ -17,7 +17,7 @@ namespace WebTest
         protected void Button1_Click(object sender, EventArgs e)
         {
             Type[] types = new Type[] { typeof(Code.ProductData) };
-            string[] xmlFiles = new string[] { Server.MapPath(TextBox1.Text) };
+            var xmlFiles = new List<string> { Server.MapPath(TextBox1.Text) };
             CRL.SummaryAnalysis.ExportToFile(types, xmlFiles);
         }
     }

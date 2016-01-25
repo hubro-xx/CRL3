@@ -49,9 +49,9 @@ namespace RoleControl.Controllers
             u.PassWord = CRL.Package.RoleAuthorize.EmployeeBusiness.Instance.EncryptPass(PassWord);
             u.Department = departmentCode;
             u.Name = Name;
-            int id = CRL.Package.RoleAuthorize.EmployeeBusiness.Instance.Add(u);
+            CRL.Package.RoleAuthorize.EmployeeBusiness.Instance.Add(u);
             return Redirect("/Employee/");
-            return AutoBackResult("操作成功", "/Employee/detail?id=" + id);
+            return AutoBackResult("操作成功", "/Employee/detail?id=" + u.Id);
         }
         /// <summary>
         /// 添加员工头像

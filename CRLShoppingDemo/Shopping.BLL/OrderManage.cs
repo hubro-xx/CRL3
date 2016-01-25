@@ -72,8 +72,7 @@ namespace Shopping.BLL
             }
             order.TotalAmount = amountTotal;
             order.TotalNum = total;
-            int id = db.InsertFromObj(order);
-            order.Id = id;
+            db.InsertFromObj(order);
             return true;
         }
         /// <summary>

@@ -12,7 +12,18 @@ namespace WebTest
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            TestAllQuery();
+            TestGuid();
+            //TestAllQuery();
+        }
+        void TestGuid()
+        {
+            
+            var c = new Code.ClassGuid();
+            c.id = System.Guid.NewGuid();
+            c.Name = "aaaa";
+            Code.ClassGuidManage.Instance.Add(c);
+
+            var list = Code.ClassGuidManage.Instance.QueryItem(c.id);
         }
         string getSecond
         {

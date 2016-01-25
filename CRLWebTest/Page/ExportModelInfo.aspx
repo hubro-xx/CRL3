@@ -17,7 +17,7 @@ XML文档地址<asp:TextBox ID="TextBox1" runat="server">/bin/WebTest.xml</asp:T
 
 <pre>
 Type[] types = new Type[] { typeof(Code.ProductData) };
-string[] xmlFiles = new string[] { Server.MapPath(TextBox1.Text) };
+var xmlFiles = new List&lt;string>{ Server.MapPath(TextBox1.Text) };
 CRL.SummaryAnalysis.ExportToFile(types, xmlFiles);
 </pre>
 
