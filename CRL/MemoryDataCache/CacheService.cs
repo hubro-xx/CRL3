@@ -11,6 +11,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO.Compression;
 using CoreHelper;
 using System.Collections;
+using System.Collections.Concurrent;
 
 namespace CRL.MemoryDataCache
 {
@@ -24,7 +25,7 @@ namespace CRL.MemoryDataCache
         static Thread thread;
 
         static object lockObj = new object();
-        internal static Dictionary<string, MemoryDataCacheItem> cacheDatas = new Dictionary<string, MemoryDataCacheItem>();
+        internal static ConcurrentDictionary<string, MemoryDataCacheItem> cacheDatas = new ConcurrentDictionary<string, MemoryDataCacheItem>();
         /// <summary>
         /// 缓存类型的KEY
         /// </summary>
@@ -58,8 +59,8 @@ namespace CRL.MemoryDataCache
             }
             if (!cacheDatas.ContainsKey(key))
                 return;
-            var data = cacheDatas[key].Data as Dictionary<int, TItem>;
-            int keyValue = obj.GetpPrimaryKeyValue();
+            var data = cacheDatas[key].Data as Dictionary<string, TItem>;
+            var keyValue = obj.GetpPrimaryKeyValue();
             if (!data.ContainsKey(keyValue))
             {
                 if (checkInsert)
@@ -104,13 +105,13 @@ namespace CRL.MemoryDataCache
         /// <param name="timeOut">失效分钟</param>
         /// <param name="helper">DBHelper对象,如果Params有值,则按参数缓存,慎用,会造成大量缓存</param>
         /// <returns></returns>
-        internal static Dictionary<int, TItem> GetCacheList<TItem>(string qeury, int timeOut, DBHelper helper) where TItem : IModel, new()
+        internal static Dictionary<string, TItem> GetCacheList<TItem>(string qeury, int timeOut, DBHelper helper) where TItem : IModel, new()
         {
             string key = "";
             return GetCacheList<TItem>(qeury, timeOut, helper, out key);
         }
 
-        internal static Dictionary<int, TItem> GetCacheList<TItem>(string qeury, int timeOut, DBHelper helper, out string key) where TItem : IModel, new()
+        internal static Dictionary<string, TItem> GetCacheList<TItem>(string qeury, int timeOut, DBHelper helper, out string key) where TItem : IModel, new()
         {
             Type type = typeof(TItem);
             qeury = qeury.ToLower();
@@ -122,11 +123,11 @@ namespace CRL.MemoryDataCache
             //按参数进行缓存
             key = StringHelper.EncryptMD5(qeury + Params);
             //初始缓存
-            lock (lockObj)
-            {
+            //lock (lockObj)
+            //{
                 if (!cacheDatas.ContainsKey(key))
                 {
-                    cacheDatas.Add(key, new MemoryDataCacheItem() { Data = null, TimeOut = timeOut, DBHelper = helper, Query = qeury, Params = new Dictionary<string, object>(helper.Params), Type = type });
+                    cacheDatas.TryAdd(key, new MemoryDataCacheItem() { Data = null, TimeOut = timeOut, DBHelper = helper, Query = qeury, Params = new Dictionary<string, object>(helper.Params), Type = type });
                     if (typeCache.ContainsKey(type))
                     {
                         typeCache[type].Add(key);
@@ -141,10 +142,10 @@ namespace CRL.MemoryDataCache
                     var dataItem2 = cacheDatas[key];
                     if (dataItem2.QueryCount == 0)//缓存没有创建好时返回空
                     {
-                        return new Dictionary<int, TItem>();
+                        return new Dictionary<string, TItem>();
                     }
                 }
-            }
+            //}
             var dataItem = cacheDatas[key];
             //首次查询
             if (dataItem.QueryCount == 0)
@@ -165,7 +166,7 @@ namespace CRL.MemoryDataCache
                 dataItem.UpdatedData = null;
             }
             cacheDatas[key].UseTime = DateTime.Now;
-            return dataItem.Data as Dictionary<int, TItem>;
+            return dataItem.Data as Dictionary<string, TItem>;
         }
 
 
@@ -230,15 +231,16 @@ namespace CRL.MemoryDataCache
                 var keys = GetCacheTypeKey(type);
                 foreach (var key in keys)
                 {
-                    cacheDatas.Remove(key);
+                    MemoryDataCache.MemoryDataCacheItem val;
+                    cacheDatas.TryRemove(key,out val);
                 }
             }
         }
-        internal static Dictionary<int, TItem> GetCacheItem<TItem>(string key) where TItem : IModel
+        internal static Dictionary<string, TItem> GetCacheItem<TItem>(string key) where TItem : IModel
         {
             if (!cacheDatas.ContainsKey(key))
             {
-                return new Dictionary<int, TItem>();
+                return new Dictionary<string, TItem>();
             }
             var dataItem = cacheDatas[key];
             dataItem.UseTime = DateTime.Now;
@@ -248,7 +250,7 @@ namespace CRL.MemoryDataCache
                 dataItem.UpdatedData = null;
             }
 
-            return dataItem.Data as Dictionary<int, TItem>;
+            return dataItem.Data as Dictionary<string, TItem>;
         }
         /// <summary>
         /// 根据键移除一个缓存
@@ -256,7 +258,8 @@ namespace CRL.MemoryDataCache
         /// <param name="key"></param>
         public static void RemoveCache(string key)
         {
-            cacheDatas.Remove(key);
+            MemoryDataCacheItem val;
+            cacheDatas.TryRemove(key,out val);
         }
         /// <summary>
         /// 根据键更新一个缓存

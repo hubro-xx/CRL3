@@ -156,18 +156,43 @@ namespace CRL
         public static TDest ToType<TDest>(this object source)
             where TDest : class,new()
         {
-            var simpleTypes = typeof(TDest).GetProperties().ToList();
-            simpleTypes.RemoveAll(b => b.SetMethod == null);
-            List<PropertyInfo> complexTypes = source.GetType().GetProperties().ToList();
-            complexTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
-            TDest obj = new TDest();
-            foreach (var info in simpleTypes)
+            var destTypes = typeof(TDest).GetProperties().ToList();
+            destTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+            List<PropertyInfo> sourceTypes = source.GetType().GetProperties().ToList();
+            sourceTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+            var obj = ToType(sourceTypes, destTypes,source, typeof(TDest));
+            return obj as TDest;
+        }
+        static object ToType(IEnumerable<PropertyInfo> sourceTypes, IEnumerable<PropertyInfo> destTypes, object source, Type toType)
+        {
+            if (source == null)
+                return null;
+            object obj = System.Activator.CreateInstance(toType);
+            foreach (var info in destTypes)
             {
-                var complexInfo = complexTypes.Find(b => b.Name == info.Name);
-                if (complexInfo != null)
+                var sourceInfo = sourceTypes.Find(b => b.Name.ToLower() == info.Name.ToLower());
+                if (sourceInfo != null)
                 {
-                    object value = complexInfo.GetValue(source, null);
-                    value = ObjectConvert.ConvertObject(info.PropertyType, value);
+                    object value;
+                    var nameSpace = sourceInfo.PropertyType.Namespace;
+                    if (nameSpace == "System" || sourceInfo.PropertyType.BaseType == typeof(Enum))
+                    {
+                        value = sourceInfo.GetValue(source, null);
+                        value = ObjectConvert.ConvertObject(info.PropertyType, value);
+                    }
+                    else//如果是class,则再转换一次
+                    {
+                        object value2 = sourceInfo.GetValue(source,null);
+                        if(value2==null)
+                        {
+                            continue;
+                        }
+                        var sourceTypes2 = sourceInfo.PropertyType.GetProperties().ToList();
+                        sourceTypes2.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+                        var destTypes2 = info.PropertyType.GetProperties().ToList();
+                        destTypes2.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+                        value = ToType(sourceTypes2, destTypes2, value2, info.PropertyType);
+                    }
                     info.SetValue(obj, value, null);
                 }
             }
@@ -176,37 +201,45 @@ namespace CRL
         /// <summary>
         /// 转换为共同属性的集合
         /// </summary>
+        /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TDest"></typeparam>
         /// <param name="source"></param>
+        /// <param name="action">指定转换委托再次处理,可为空</param>
         /// <returns></returns>
-        public static List<TDest> ToType<TDest>(this IEnumerable source)
-            where TDest : class,new()
+        public static List<TDest> ToType<TSource, TDest>(this IEnumerable<TSource> source, Action<TSource, TDest> action)
+    where TDest : class,new()
         {
-            var simpleTypes = typeof(TDest).GetProperties().ToList();
-            simpleTypes.RemoveAll(b => b.SetMethod == null);
-            List<PropertyInfo> complexTypes = null;
             List<TDest> list = new List<TDest>();
+            if (source.Count() == 0)
+            {
+                return list;
+            }
+            var destTypes = typeof(TDest).GetProperties().ToList();
+            destTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+            List<PropertyInfo> sourceTypes = source.First().GetType().GetProperties().ToList();
+            sourceTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+
             foreach (var item in source)
             {
-                TDest obj = new TDest();
-                if (complexTypes == null)
+                TDest obj = ToType(sourceTypes, destTypes, item, typeof(TDest)) as TDest;
+                if (action != null)
                 {
-                    complexTypes = item.GetType().GetProperties().ToList();
-                    complexTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
-                }
-                foreach (var info in simpleTypes)
-                {
-                    var complexInfo = complexTypes.Find(b => b.Name == info.Name);
-                    if (complexInfo != null)
-                    {
-                        object value = complexInfo.GetValue(item,null);
-                        value = ObjectConvert.ConvertObject(info.PropertyType, value);
-                        info.SetValue(obj, value, null);
-                    }
+                    action(item, obj);
                 }
                 list.Add(obj);
             }
             return list;
+        }
+        /// <summary>
+        /// 转换为共同属性的集合
+        /// </summary>
+        /// <typeparam name="TDest"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static List<TDest> ToType<TDest>(this IEnumerable<object> source)
+            where TDest : class,new()
+        {
+            return ToType<object, TDest>(source, null);
         }
         #endregion
 

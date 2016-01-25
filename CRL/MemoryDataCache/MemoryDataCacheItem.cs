@@ -17,7 +17,8 @@ namespace CRL.MemoryDataCache
         public string Query;
         /// <summary>
         /// 缓存数据
-        /// Dictionary<int, TItem>
+        /// 为了兼容所有主键类型,用string
+        /// Dictionary<string, TItem>
         /// </summary>
         public object Data;
         /// <summary>

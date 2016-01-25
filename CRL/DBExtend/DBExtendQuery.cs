@@ -17,9 +17,9 @@ namespace CRL
         /// <typeparam name="TItem"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public TItem QueryItem<TItem>(int id) where TItem : IModel, new()
+        public TItem QueryItem<TItem>(object id) where TItem : IModel, new()
         {
-            var expression = GetQueryIdExpression<TItem>(id);
+            var expression = Base.GetQueryIdExpression<TItem>(id);
             return QueryItem<TItem>(expression);
         }
         /// <summary>

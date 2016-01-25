@@ -138,14 +138,10 @@ namespace CRL
         /// 添加一条记录[基本方法]
         /// </summary>
         /// <param name="p"></param>
-        /// <returns></returns>
-        public int Add(TModel p)
+        public void Add(TModel p)
         {
             DBExtend helper = DBExtend;
-            int id = helper.InsertFromObj(p);
-            var field = TypeCache.GetTable(p.GetType()).PrimaryKey;
-            field.SetValue(p, id);
-            return id;
+            helper.InsertFromObj(p);
         }
         /// <summary>
         /// 批量插入[基本方法]
@@ -160,26 +156,15 @@ namespace CRL
         #endregion
 
         #region 查询一项
-        Expression<Func<TModel, bool>> GetQueryId(int id)
-        {
-            var parameter = Expression.Parameter(typeof(TModel), "b");
-            //创建常数 
-            var constant = Expression.Constant(id);
-            var table = TypeCache.GetTable(typeof(TModel));
-            MemberExpression member = Expression.PropertyOrField(parameter, table.PrimaryKey.Name);
-            var body = Expression.Equal(member, constant);
-            //获取Lambda表达式
-            var lambda = Expression.Lambda<Func<TModel, Boolean>>(body, parameter);
-            return lambda;
-        }
         /// <summary>
         /// 按主键查询一项[基本方法]
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public TModel QueryItem(int id)
+        public TModel QueryItem(object id)
         {
-            var lambda = GetQueryId(id);
+            DBExtend helper = DBExtend;
+            var lambda = Base.GetQueryIdExpression<TModel>(id);
             return QueryItem(lambda);
         }
         /// <summary>
@@ -202,7 +187,7 @@ namespace CRL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public int Delete(int id)
+        public int Delete(object id)
         {
             var helper = DBExtend;
             var filed = TypeCache.GetTable(typeof(TModel)).PrimaryKey;

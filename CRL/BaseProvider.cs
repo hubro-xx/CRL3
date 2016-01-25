@@ -51,7 +51,8 @@ namespace CRL
             if (TypeCache.ModelKeyCache.ContainsKey(type))
             {
                 CRL.MemoryDataCache.CacheService.RemoveCache(TypeCache.ModelKeyCache[type]);
-                TypeCache.ModelKeyCache.Remove(type);
+                string val;
+                TypeCache.ModelKeyCache.TryRemove(type,out val);
             }
         }
         /// <summary>
@@ -177,28 +178,17 @@ namespace CRL
             int total;
             return QueryFromCache(expression, out total, 0, 0);
         }
-        //Expression<Func<TModel, bool>> GetQueryId(int id)
-        //{
-        //    var parameter = Expression.Parameter(typeof(TModel), "b");
-        //    //创建常数 
-        //    var constant = Expression.Constant(id);
-        //    var table = TypeCache.GetTable(typeof(TModel));
-        //    MemberExpression member = Expression.PropertyOrField(parameter, table.PrimaryKey.Name);
-        //    var body = Expression.Equal(member, constant);
-        //    //获取Lambda表达式
-        //    var lambda = Expression.Lambda<Func<TModel, Boolean>>(body, parameter);
-        //    return lambda;
-        //}
         /// <summary>
         /// 从对象缓存中进行查询一项
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public TModel QueryItemFromCache(int id)
+        public TModel QueryItemFromCache(object key)
         {
+            string id = key.ToString();
             if (QueryCacheFromRemote)
             {
-                var expression = DBExtend.GetQueryIdExpression<TModel>(id);
+                var expression = Base.GetQueryIdExpression<TModel>(id);
                 return QueryItemFromCache(expression);
             }
             else
@@ -266,7 +256,7 @@ namespace CRL
                         var primaryKey = TypeCache.GetTable(typeof(TModel)).PrimaryKey.Name;
                         if (member.Member.Name.ToUpper() == primaryKey.ToUpper())
                         {
-                            var value = (int)LambdaCompileCache.GetExpressionCacheValue(binary.Right);
+                            var value = (string)LambdaCompileCache.GetExpressionCacheValue(binary.Right);
                             //var value = (int)Expression.Lambda(binary.Right).Compile().DynamicInvoke();
                             var all = GetCache(CacheQuery());
                             if(all==null)
@@ -300,7 +290,7 @@ namespace CRL
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        protected Dictionary<int, TModel> GetCache(LambdaQuery<TModel> query)
+        protected Dictionary<string, TModel> GetCache(LambdaQuery<TModel> query)
         {
             Type type = typeof(TModel);
             int expMinute = query.__ExpireMinute;
@@ -308,7 +298,7 @@ namespace CRL
                 expMinute = 5;
             query.__ExpireMinute = expMinute;
             string dataCacheKey;
-            var list = new Dictionary<int, TModel>();
+            var list = new Dictionary<string, TModel>();
             if (!TypeCache.ModelKeyCache.ContainsKey(type))
             {
                 var helper = GetDbHelper();//避开事务控制,使用新的连接
@@ -318,7 +308,7 @@ namespace CRL
                 {
                     if (!TypeCache.ModelKeyCache.ContainsKey(type))
                     {
-                        TypeCache.ModelKeyCache.Add(type, dataCacheKey);
+                        TypeCache.ModelKeyCache.TryAdd(type, dataCacheKey);
                     }
                 }
             }

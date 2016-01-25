@@ -122,6 +122,7 @@
     <Compile Include="Dynamic\DynamicObject.cs" />
     <Compile Include="Dynamic\DapperRowMetaObject.cs" />
     <Compile Include="Dynamic\DynamicObjConvert.cs" />
+    <Compile Include="Dynamic\DynamicViewDataDictionary.cs" />
     <Compile Include="ExistsTableCache\ColumnBackgroundCheck.cs" />
     <Compile Include="ExistsTableCache\DataBase.cs" />
     <Compile Include="ExistsTableCache\Table.cs" />

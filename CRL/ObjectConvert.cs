@@ -122,64 +122,7 @@ namespace CRL
             var type = typeof(T);
             return (T)ConvertObject(type, obj);
         }
-        /// <summary>
-        /// 把复杂对象转换为简单对象
-        /// </summary>
-        /// <typeparam name="TDest"></typeparam>
-        /// <typeparam name="TSource"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static TDest CloneToSimple<TDest, TSource>(TSource source)
-            where TDest : class,new()
-            where TSource : class,new()
-        {
-            var simpleTypes = TypeCache.GetProperties(typeof(TDest), false);
-            var complexTypes = TypeCache.GetProperties(typeof(TSource), false);
-            TDest obj = new TDest();
-            foreach (Attribute.FieldAttribute info in simpleTypes.Values)
-            {
-                if (complexTypes.ContainsKey(info.Name))
-                {
-                    var complexInfo = complexTypes[info.Name];
-                    object value = complexInfo.GetValue(source);
-
-                    info.SetValue(obj, value);
-                }
-            }
-            return obj;
-        }
-        /// <summary>
-        /// 把复杂对象转换为简单对象
-        /// 不会转换不对应的字段
-        /// </summary>
-        /// <typeparam name="TDest">目的</typeparam>
-        /// <typeparam name="TSource">源</typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static List<TDest> CloneToSimple<TDest, TSource>(List<TSource> source)
-            where TDest : class,new()
-            where TSource : class,new()
-        {
-            var simpleTypes = TypeCache.GetProperties(typeof(TDest), false);
-            var complexTypes = TypeCache.GetProperties(typeof(TSource), false);
-            List<TDest> list = new List<TDest>();
-            foreach (TSource item in source)
-            {
-                TDest obj = new TDest();
-                foreach (Attribute.FieldAttribute info in simpleTypes.Values)
-                {
-                    if (complexTypes.ContainsKey(info.Name))
-                    {
-                        var complexInfo = complexTypes[info.Name];
-                        object value = complexInfo.GetValue(item);
-
-                        info.SetValue(obj, value);
-                    }
-                }
-                list.Add(obj);
-            }
-            return list;
-        }
+       
         internal static List<TItem> DataReaderToList<TItem>(DbDataReader reader, out double runTime, bool setConstraintObj = false) where TItem : class, new()
         {
             var mainType = typeof(TItem);
@@ -326,9 +269,9 @@ namespace CRL
         /// <typeparam name="TItem"></typeparam>
         /// <param name="list"></param>
         /// <returns></returns>
-        internal static Dictionary<int, TItem> ConvertToDictionary<TItem>(IEnumerable list) where TItem : IModel
+        internal static Dictionary<string, TItem> ConvertToDictionary<TItem>(IEnumerable list) where TItem : IModel
         {
-            var dic = new Dictionary<int, TItem>();
+            var dic = new Dictionary<string, TItem>();
             foreach (var item in list)
             {
                 var keyValue = (item as IModel).GetpPrimaryKeyValue();

@@ -16,6 +16,10 @@ namespace CRL
             public string Name;
             public string ModelRemark;
             public Type Type;
+            public override string ToString()
+            {
+                return string.Format("{0} {1}", Name, Remark);
+            }
         }
         public static List<Type> GetInfoFromDll(Type[] currentTypes)
         {
@@ -47,16 +51,21 @@ namespace CRL
             }
             return findTypes.OrderBy(b => b.Name).ToList();
         }
-        public static Dictionary<string, List<FieldItem>> GetInfoFromXml(string[] xmlFiles)
+        public static Dictionary<string, List<FieldItem>> GetInfoFromXml(List<string> xmlFiles)
         {
             Dictionary<string, List<FieldItem>> list = new Dictionary<string, List<FieldItem>>();
             if (xmlFiles == null)
             {
                 return list;
             }
-            if (xmlFiles.Length == 0)
+            if (xmlFiles.Count == 0)
             {
                 return list;
+            }
+            var CRLModelFile = CoreHelper.RequestHelper.GetFilePath("/bin/CRL.Package.xml");
+            if (System.IO.File.Exists(CRLModelFile))
+            {
+                xmlFiles.Add(CRLModelFile);
             }
             foreach (string xmlFile in xmlFiles)
             {
@@ -106,6 +115,10 @@ namespace CRL
                     }
                 }
             }
+            var list2 = new List<FieldItem>();
+            list2.Add(new FieldItem() { Name = "Id", Type = typeof(Int32), Remark = "自增主键" });
+            list2.Add(new FieldItem() { Name = "AddTime", Type = typeof(DateTime), Remark = "添加时间" });
+            list.Add("CRL.IModelBase", list2);
             return list;
         }
 
@@ -119,13 +132,31 @@ namespace CRL
                 if (fields.ContainsKey(typeName))
                 {
                     var list = fields[typeName];
-                    foreach (var item in list)
+                    Type parentType = type.BaseType;
+                    while (parentType != typeof(Object))
                     {
-                        var item2 = list2[item.Name];
+                        if (fields.ContainsKey(parentType.FullName))
+                        {
+                            list.AddRange(fields[parentType.FullName]);
+                        }
+                        parentType = parentType.BaseType;
+                    }
+                    //foreach (var item in list)
+                    //{
+                    //    var item2 = list2[item.Name];
+                    //    if (item2 != null)
+                    //    {
+                    //        item2.Remark = item.Remark;
+                    //        item2.ModelRemark = item.ModelRemark;
+                    //    }
+                    //}
+                    foreach (var item in list2.Values)
+                    {
+                        var item2 = list.Find(b => b.Name == item.Name);
                         if (item2 != null)
                         {
-                            item2.Remark = item.Remark;
-                            item2.ModelRemark = item.ModelRemark;
+                            item.Remark = item2.Remark;
+                            item.ModelRemark = item2.ModelRemark;
                         }
                     }
                 }
@@ -138,7 +169,7 @@ namespace CRL
             return result;
         }
 
-        public static string ExportToFile(Type[] currentTypes, string[] xmlFiles)
+        public static string ExportToFile(Type[] currentTypes, List<string> xmlFiles)
         {
             var a = GetInfoFromDll(currentTypes);
             var b = GetInfoFromXml(xmlFiles);
@@ -146,18 +177,34 @@ namespace CRL
             StringBuilder sb = new StringBuilder("<meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>");
             foreach (var item in c)
             {
-                var tableName = CRL.TypeCache.GetTableName(item.Key,null);
+                var tableName = CRL.TypeCache.GetTableName(item.Key, null);
                 sb.Append(@"<table border='1' cellpadding='4' cellspacing='1' style='width:100%'>
   <tr>
     <td colspan='5'><b>" + tableName + "[" + item.Key.FullName + "]</b>(" + item.Value[0].ModelRemark + ")</td></tr><tr><th>名称</th><th>类型</th><th>长度</th><th>索引</th><th>备注</th></tr>");
                 var list = item.Value;
                 foreach (var p in list)
                 {
-                    sb.Append(@"<tr><td width='150'>" + p.Name + "</td><td  width='220'>" + p.PropertyType + "</td><td  width='40'>" + p.Length + "</td><td  width='40'>" + p.FieldIndexType + "</td><td>" + p.Remark + "</td></tr>");
+                    var lengthStr = "";
+                    if (p.PropertyType == typeof(string) || p.PropertyType == typeof(System.Byte[]))
+                    {
+                        lengthStr = p.Length.ToString();
+                    }
+                    string remark = p.Remark;
+                    if (p.PropertyType.BaseType == typeof(Enum))
+                    {
+                        var enumValues = Enum.GetNames(p.PropertyType);
+
+                        remark += p.Name + "[" + string.Join(",", enumValues) + "]";
+                    }
+                    if (p.FieldType == Attribute.FieldType.虚拟字段)
+                    {
+                        remark += string.Format("[as {0}]", System.Text.RegularExpressions.Regex.Replace(p.VirtualField, @"\{.+?\}", ""));
+                    }
+                    sb.Append(@"<tr><td width='150'>" + p.Name + "</td><td  width='220'>" + p.PropertyType + "</td><td  width='40'>" + lengthStr + "</td><td  width='40'>" + p.FieldIndexType + "</td><td>" + remark + "</td></tr>");
                 }
                 sb.Append("</table>");
             }
-            string saveFile = System.Web.Hosting.HostingEnvironment.MapPath(string.Format("/model{0}.html", currentTypes[0].Name));
+            string saveFile = System.Web.Hosting.HostingEnvironment.MapPath(string.Format("/model_{0}.html", currentTypes[0].Assembly.ManifestModule.Name));
             System.IO.File.WriteAllText(saveFile, sb.ToString());
             System.Diagnostics.Process.Start(saveFile);
             return sb.ToString(); 

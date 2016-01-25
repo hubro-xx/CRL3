@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,12 +9,12 @@ namespace CRL
 {
     internal class TypeCache
     {
-        static object lockObj = new object();
-        internal static Dictionary<Type, Attribute.TableAttribute> typeCache = new Dictionary<Type, Attribute.TableAttribute>();
+        //static object lockObj = new object();
+        internal static ConcurrentDictionary<Type, Attribute.TableAttribute> typeCache = new ConcurrentDictionary<Type, Attribute.TableAttribute>();
         /// <summary>
         /// 对象类型缓存
         /// </summary>
-        internal static Dictionary<Type, string> ModelKeyCache = new Dictionary<Type, string>();
+        internal static ConcurrentDictionary<Type, string> ModelKeyCache = new ConcurrentDictionary<Type, string>();
 
 
         /// <summary>
@@ -61,12 +62,16 @@ namespace CRL
                 des = objAttrs[0] as Attribute.TableAttribute;
             }
             des.Type = type;
-            lock (lockObj)
+            //lock (lockObj)
+            //{
+            //    if (!typeCache.ContainsKey(type))
+            //    {
+            //        typeCache.Add(type, des);
+            //    }
+            //}
+            if (!typeCache.ContainsKey(type))
             {
-                if (!typeCache.ContainsKey(type))
-                {
-                    typeCache.Add(type, des);
-                }
+                typeCache.TryAdd(type, des);
             }
             if (string.IsNullOrEmpty(des.TableName))
             {
@@ -185,6 +190,7 @@ namespace CRL
                 if (f.IsPrimaryKey)//保存主键
                 {
                     table.PrimaryKey = f;
+                    f.FieldIndexType = Attribute.FieldIndexType.非聚集唯一;
                     n += 1;
                 }
                 list.Add(f);

@@ -9,8 +9,8 @@ namespace CRL.LambdaQuery
 {
     internal class LambdaCompileCache
     {
-        static Dictionary<string, object> ResultCache = new Dictionary<string, object>();
-        static object lockObj = new object();
+        //static Dictionary<string, object> ResultCache = new Dictionary<string, object>();
+        //static object lockObj = new object();
         public static object GetExpressionCacheValue(Expression expression)
         {
             //只能处理常量

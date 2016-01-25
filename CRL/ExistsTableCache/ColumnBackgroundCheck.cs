@@ -4,28 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.Concurrent;
 namespace CRL.ExistsTableCache
 {
     internal class ColumnBackgroundCheck
     {
-        static Dictionary<string, DBExtend> dBExtends = new Dictionary<string, DBExtend>();
-        static object lockObj = new object();
-        static Dictionary<Type, string> needCheks = new Dictionary<Type, string>();
+        static ConcurrentDictionary<string, DBExtend> dBExtends = new ConcurrentDictionary<string, DBExtend>();
+        //static object lockObj = new object();
+        static ConcurrentDictionary<Type, string> needCheks = new ConcurrentDictionary<Type, string>();
         static Thread thread;
         public static void Add(DBExtend dBExtend, Type type)
         {
             var dbName = dBExtend.dbHelper.DatabaseName;
-            lock (lockObj)
-            {
+            //lock (lockObj)
+            //{
                 if (!dBExtends.ContainsKey(dbName))
                 {
-                    dBExtends.Add(dbName, dBExtend);
+                    dBExtends.TryAdd(dbName, dBExtend);
                 }
                 if (!needCheks.ContainsKey(type))
                 {
-                    needCheks.Add(type, dbName);
+                    needCheks.TryAdd(type, dbName);
                 }
-            }
+            //}
             if (thread == null)
             {
                 thread = new Thread(new ThreadStart(DoWatch));
@@ -74,12 +75,17 @@ namespace CRL.ExistsTableCache
                         needCreates.Add(field);
                     }
                 }
+                var model = System.Activator.CreateInstance(item.Key) as IModel;
                 foreach (var field in needCreates)
                 {
                     IModel.SetColumnDbType(_DBAdapter, field);
                     string str = IModel.CreateColumn(db, field);
+                    model.OnColumnCreated(field.Name);
                 }
-                needCheks.Remove(item.Key);
+                string val;
+                needCheks.TryRemove(item.Key, out val);
+               
+               
             }
         }
     }

@@ -97,10 +97,15 @@ namespace CRL.DBAdapter
             {
                 columnType = string.Format(columnType, info.Length);
             }
+            //if (info.IsPrimaryKey)
+            //{
+            //    columnType = "NUMBER(4) Not Null Primary Key";
+            //}
             if (info.IsPrimaryKey)
             {
-                columnType = "NUMBER(4) Not Null Primary Key";
+                columnType = " " + columnType + " Primary Key ";
             }
+
             if (!string.IsNullOrEmpty(info.ColumnType))
             {
                 columnType = info.ColumnType;
@@ -157,12 +162,10 @@ namespace CRL.DBAdapter
                 {
                     primaryKey = item.Name;
                 }
+                var columnType = GetDBColumnType(item.PropertyType);
                 string nullStr = item.NotNull ? "NOT NULL" : "";
                 string str = string.Format("{0} {1} {2} ", item.KeyWordName, item.ColumnType, nullStr);
-                if (item.IsPrimaryKey)
-                {
-                    str = " " + item.Name + " INTEGER Not Null Primary Key";
-                }
+
                 list2.Add(str);
 
             }
@@ -230,9 +233,8 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         /// 获取插入语法
         /// </summary>
         /// <param name="obj"></param>
-        /// <param name="helper"></param>
         /// <returns></returns>
-        public override int InsertObject(IModel obj)
+        public override object InsertObject(IModel obj)
         {
             Type type = obj.GetType();
             string table = TypeCache.GetTableName(type, dbContext);

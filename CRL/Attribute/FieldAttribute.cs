@@ -19,6 +19,7 @@ namespace CRL.Attribute
         bool isPrimaryKey = false;
         /// <summary>
         /// 当是主键时,是否保留原标识,和IsPrimaryKey一起用
+        /// 在插入和生成表脚本时,会按此判断
         /// </summary>
         public bool KeepIdentity
         {
@@ -249,10 +250,25 @@ namespace CRL.Attribute
         /// 自定义数据库字段类型,如 varchar(50)
         /// </summary>
         public string ColumnType;
+        bool notNull;
         /// <summary>
-        /// 是否为空
+        /// 不可为空,主键自动为不可为空
         /// </summary>
-        public bool NotNull;
+        public bool NotNull
+        {
+            get
+            {
+                if (IsPrimaryKey)
+                {
+                    return true;
+                }
+                return notNull;
+            }
+            set
+            {
+                notNull = value;
+            }
+        }
         /// <summary>
         /// 长度,超过3000字段类型将会设为ntext
         /// 若是需要指定长度,请赋值

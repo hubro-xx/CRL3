@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Dynamic;
 
 namespace CRL
 {
@@ -49,27 +50,42 @@ namespace CRL
     //[Attribute.ModelProxy]
     public abstract class IModel : ICloneable
     {
-        protected static object lockObj = new object();
+        /// <summary>
+        /// 序列化为JSON
+        /// </summary>
+        /// <returns></returns>
         public string ToJson()
         {
             return CoreHelper.StringHelper.SerializerToJson(this);
         }
+
+        #region 方法重写
         /// <summary>
-        /// 数据校验方法
+        /// 数据校验方法,可重写
         /// </summary>
         /// <returns></returns>
         public virtual string CheckData()
         {
             return "";
         }
+
         /// <summary>
-        /// 创建表时的初始数据
+        /// 当列创建时,可重写
+        /// </summary>
+        /// <param name="fieldName"></param>
+        protected internal virtual void OnColumnCreated(string fieldName)
+        {
+        }
+        /// <summary>
+        /// 创建表时的初始数据,可重写
         /// </summary>
         /// <returns></returns>
-        public virtual System.Collections.IList GetInitData()
+        protected internal virtual System.Collections.IList GetInitData()
         {
             return null;
         }
+        #endregion
+
         [System.Xml.Serialization.XmlIgnore]
         [NonSerialized]
         Dictionary<string, dynamic> Datas = new Dictionary<string, dynamic>();
@@ -86,9 +102,10 @@ namespace CRL
                 return true;
             }
         }
-
+        #region 索引
         /// <summary>
         /// 获取关联查询的值
+        /// 不分区大小写
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -110,6 +127,7 @@ namespace CRL
                 Datas[key.ToLower()] = value;
             }
         }
+        #endregion
 
         #region 检查表
         /// <summary>
@@ -154,6 +172,8 @@ namespace CRL
                     helper.Execute(indexScript);
                 }
                 result = string.Format("创建字段:{0} {1} {2}\r\n", item.TableName, item.Name,item.PropertyType);
+                var model = System.Activator.CreateInstance(item.ModelType) as IModel;
+                model.OnColumnCreated(item.Name);
                 CoreHelper.EventLog.Log(result, "", false);
             }
             catch (Exception ero)
@@ -368,6 +388,7 @@ namespace CRL
             Changes[name] = value;
         }
         #endregion
+
         /// <summary>
         /// 创建当前对象的浅表副本
         /// </summary>
@@ -391,11 +412,33 @@ namespace CRL
             }
             return modelKey;
         }
-        internal int GetpPrimaryKeyValue()
+        internal string GetpPrimaryKeyValue()
         {
             var primaryKey = TypeCache.GetTable(GetType()).PrimaryKey;
-            var keyValue = (int)primaryKey.GetValue(this);
-            return keyValue;
+            var keyValue = primaryKey.GetValue(this);
+            return keyValue.ToString();
         }
+
+        #region 动态字典,效果同索引
+        private Dynamic.DynamicViewDataDictionary _dynamicViewDataDictionary;
+
+        /// <summary>
+        /// 动态Bag,可用此取索引值
+        /// 不区分大小写
+        /// </summary>
+        public dynamic Bag
+        {
+            get
+            {
+                if (this._dynamicViewDataDictionary == null)
+                {
+                    this._dynamicViewDataDictionary = new Dynamic.DynamicViewDataDictionary(Datas);
+                }
+                return this._dynamicViewDataDictionary;
+            }
+        }
+
+        #endregion
+
     }
 }

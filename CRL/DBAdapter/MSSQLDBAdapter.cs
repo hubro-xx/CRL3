@@ -102,11 +102,11 @@ end", spName, script);
             {
                 if (info.KeepIdentity)
                 {
-                    columnType = "int NOT NULL";
+                    columnType = columnType + " ";
                 }
                 else
                 {
-                    columnType = "int IDENTITY(1,1) NOT NULL";
+                    columnType = columnType + " IDENTITY(1,1) ";
                 }
             }
             if (!string.IsNullOrEmpty(info.ColumnType))
@@ -250,11 +250,11 @@ end", spName, script);
         }
 
         /// <summary>
-        /// 获取插入语法
+        /// 插入对象,并返回主键
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override int InsertObject(IModel obj)
+        public override object InsertObject(IModel obj)
         {
             Type type = obj.GetType();
             string table = TypeCache.GetTableName(type, dbContext);
@@ -294,16 +294,17 @@ end", spName, script);
             sql1 = sql1.Substring(0, sql1.Length - 1);
             sql2 = sql2.Substring(0, sql2.Length - 1);
             sql += sql1 + ") values( " + sql2 + ") ; ";
+            sql = SqlFormat(sql);
             if (primaryKey.KeepIdentity)
             {
-                sql += "SELECT " + primaryKey.GetValue(obj) + ";";
+                helper.Execute(sql);
+                return primaryKey.GetValue(obj);
             }
             else
             {
                 sql += "SELECT scope_identity() ;";
+                return helper.ExecScalar(sql);
             }
-            sql = SqlFormat(sql);
-            return Convert.ToInt32(helper.ExecScalar(sql));
         }
         /// <summary>
         /// 获取 with(nolock)

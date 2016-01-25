@@ -640,17 +640,6 @@ namespace CRL
         }
         #endregion
 
-       internal Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(int id) where TModel : IModel, new()
-       {
-           var parameter = Expression.Parameter(typeof(TModel), "b");
-           //创建常数 
-           var constant = Expression.Constant(id);
-           var table = TypeCache.GetTable(typeof(TModel));
-           MemberExpression member = Expression.PropertyOrField(parameter, table.PrimaryKey.Name);
-           var body = Expression.Equal(member, constant);
-           //获取Lambda表达式
-           var lambda = Expression.Lambda<Func<TModel, Boolean>>(body, parameter);
-           return lambda;
-       }
+
     }
 }

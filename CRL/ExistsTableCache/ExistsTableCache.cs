@@ -166,7 +166,7 @@ namespace CRL.ExistsTableCache
                     //不是同一服务器创建的缓存则重建
                     if (cache.Server != server)
                     {
-                        cache = new ExistsTableCache() { Server = server };
+                        //cache = new ExistsTableCache() { Server = server };
                     }
                 }
                 catch { }

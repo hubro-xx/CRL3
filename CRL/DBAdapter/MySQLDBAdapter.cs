@@ -90,8 +90,16 @@ EXECUTE  ' {1} ';
             }
             if (info.IsPrimaryKey)
             {
-                columnType = "int primary key not  null  auto_increment";
+                if (info.KeepIdentity)
+                {
+                    columnType = " " + columnType + " primary key";
+                }
+                else
+                {
+                    columnType = " " + columnType + " primary key auto_increment";
+                }
             }
+
             if (!string.IsNullOrEmpty(info.ColumnType))
             {
                 columnType = info.ColumnType;
@@ -143,18 +151,10 @@ EXECUTE  ' {1} ';
             foreach (Attribute.FieldAttribute item in fields)
             {
                 string nullStr = item.NotNull ? "NOT NULL" : "";
+                var columnType = GetDBColumnType(item.PropertyType);
+
                 string str = string.Format("{0} {1} {2} ", item.KeyWordName, item.ColumnType, nullStr);
-                if (item.IsPrimaryKey)
-                {
-                    if (item.KeepIdentity)
-                    {
-                        str = " " + item.Name + " int primary key";
-                    }
-                    else
-                    {
-                        str = " " + item.Name + " int primary key auto_increment";
-                    }
-                }
+
                 list2.Add(str);
                 
             }
@@ -200,7 +200,7 @@ EXECUTE  ' {1} ';
         /// <param name="obj"></param>
         /// <param name="helper"></param>
         /// <returns></returns>
-        public override int InsertObject(IModel obj)
+        public override object InsertObject(IModel obj)
         {
             Type type = obj.GetType();
             string table = TypeCache.GetTableName(type, dbContext);
@@ -240,16 +240,17 @@ EXECUTE  ' {1} ';
             sql1 = sql1.Substring(0, sql1.Length - 1);
             sql2 = sql2.Substring(0, sql2.Length - 1);
             sql += sql1 + ") values( " + sql2 + ") ; ";
+            sql = SqlFormat(sql);
             if (primaryKey.KeepIdentity)
             {
-                sql += "SELECT " + primaryKey.GetValue(obj) + ";";
+                helper.Execute(sql);
+                return primaryKey.GetValue(obj);
             }
             else
             {
                 sql += "SELECT LAST_INSERT_ID();";
+                return helper.ExecScalar(sql);
             }
-            sql = SqlFormat(sql);
-            return Convert.ToInt32(helper.ExecScalar(sql));
         }
         /// <summary>
         /// 获取 with(nolock)

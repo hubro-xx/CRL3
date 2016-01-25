@@ -6,6 +6,7 @@ using System.Text;
 using System.Reflection;
 using System.Data;
 using System.Text.RegularExpressions;
+using System.Linq.Expressions;
 
 namespace CRL
 {
@@ -57,7 +58,22 @@ namespace CRL
             }
             return str;
         }
-       
+        internal static Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(object id) where TModel : IModel, new()
+        {
+            var table = TypeCache.GetTable(typeof(TModel));
+            if (table.PrimaryKey.PropertyType != id.GetType())
+            {
+                throw new Exception("参数类型与主键类型定义不一致");
+            }
+            var parameter = Expression.Parameter(typeof(TModel), "b");
+            //创建常数 
+            var constant = Expression.Constant(id);
+            MemberExpression member = Expression.PropertyOrField(parameter, table.PrimaryKey.Name);
+            var body = Expression.Equal(member, constant);
+            //获取Lambda表达式
+            var lambda = Expression.Lambda<Func<TModel, Boolean>>(body, parameter);
+            return lambda;
+        }
         /// <summary>
         /// 检测所有对象
         /// </summary>

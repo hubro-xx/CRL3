@@ -171,7 +171,7 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public abstract int InsertObject(CRL.IModel obj);
+        public abstract object InsertObject(CRL.IModel obj);
         /// <summary>
         /// 获取查询前几条
         /// </summary>

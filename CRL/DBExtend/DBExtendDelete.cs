@@ -31,9 +31,9 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public int Delete<TModel>(int id) where TModel : IModel, new()
+        public int Delete<TModel>(object id) where TModel : IModel, new()
         {
-            var expression = GetQueryIdExpression<TModel>(id);
+            var expression = Base.GetQueryIdExpression<TModel>(id);
             return Delete<TModel>(expression);
         }
         /// <summary>

@@ -49,14 +49,16 @@ namespace CRL
         /// 单个插入
         /// </summary>
         /// <param name="obj"></param>
-        /// <returns></returns>
-        public int InsertFromObj<TItem>(TItem obj) where TItem : IModel, new()
+        public void InsertFromObj<TItem>(TItem obj) where TItem : IModel, new()
         {
             CheckTableCreated<TItem>();
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
             CheckData(obj);
             var index = _DBAdapter.InsertObject(obj);
-            primaryKey.SetValue(obj, index);
+            if (!primaryKey.KeepIdentity)
+            {
+                primaryKey.SetValue(obj, index);
+            }
             ClearParame();
             var clone = obj.Clone();
             obj.OriginClone = clone as TItem;
@@ -67,7 +69,7 @@ namespace CRL
             //    MemoryDataCache.UpdateCacheItem(key, obj);
             //}
             UpdateCacheItem<TItem>(obj, null, true);
-            return index;
+            //return index;
         }
         #endregion
     }
