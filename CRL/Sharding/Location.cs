@@ -6,6 +6,9 @@ using System.Text;
 
 namespace CRL.Sharding
 {
+    /// <summary>
+    /// 数据定位
+    /// </summary>
     public class Location
     {
         public DataBase DataBase;

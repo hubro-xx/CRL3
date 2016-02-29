@@ -8,7 +8,7 @@ namespace CRL.CacheServer
     /// <summary>
     /// 查询服务
     /// </summary>
-    public class CacheService
+    internal class CacheService
     {
         /// <summary>
         /// 按json格式查询

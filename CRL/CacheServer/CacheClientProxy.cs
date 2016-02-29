@@ -9,7 +9,7 @@ namespace CRL.CacheServer
     /// <summary>
     /// 客户端代理
     /// </summary>
-    public abstract class CacheClientProxy
+    internal abstract class CacheClientProxy
     {
         /// <summary>
         /// 服务器接口地址
@@ -26,7 +26,7 @@ namespace CRL.CacheServer
         /// <returns></returns>
         internal List<T> Query<T>(Expression<Func<T, bool>> expression,out int total, int pageIndex = 0, int pageSize = 0) where T : class, new()
         {
-            var query = new CRL.LambdaQuery.CRLExpressionVisitor<T>();
+            var query = new CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor<T>();
             var json = query.Where(expression, pageIndex, pageSize);
             var command = new Command() { CommandType = CommandType.查询, Data = json, ObjectType = typeof(T).FullName };
             json = CoreHelper.StringHelper.SerializerToJson(command);

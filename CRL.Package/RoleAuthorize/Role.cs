@@ -11,7 +11,7 @@ namespace CRL.Package.RoleAuthorize
     [Attribute.Table( TableName="Roles")]
     public sealed class Role : IModelBase
     {
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<Role>();
             list.Add(new Role() { Name = "管理员" });

@@ -9,6 +9,11 @@ namespace CRL.LambdaQuery
 {
     internal class LambdaCreater<T> where T : class, new()
     {
+        public Expression CreatePropertyExpression(string propertyName)
+        {
+            var parameter = CreateParameter();
+            return parameter.Property(propertyName);
+        }
         #region Equal(等于表达式)
 
         /// <summary>
@@ -24,7 +29,7 @@ namespace CRL.LambdaQuery
                     .Equal(value)
                     .ToLambda<Func<T, bool>>(parameter);
         }
-        public Expression<Func<T, bool>> Equal(MethodCallExpression left, object value)
+        public Expression<Func<T, bool>> Equal(Expression left, object value)
         {
             var parameter = CreateParameter();
             return left
@@ -56,7 +61,7 @@ namespace CRL.LambdaQuery
                     .NotEqual(value)
                     .ToLambda<Func<T, bool>>(parameter);
         }
-        public Expression<Func<T, bool>> NotEqual(MethodCallExpression left, object value)
+        public Expression<Func<T, bool>> NotEqual(Expression left, object value)
         {
             var parameter = CreateParameter();
             return left
@@ -80,7 +85,7 @@ namespace CRL.LambdaQuery
                     .Greater(value)
                     .ToLambda<Func<T, bool>>(parameter);
         }
-        public Expression<Func<T, bool>> Greater(MethodCallExpression left, object value)
+        public Expression<Func<T, bool>> Greater(Expression left, object value)
         {
             var parameter = CreateParameter();
             return left
@@ -104,7 +109,7 @@ namespace CRL.LambdaQuery
                     .Less(value)
                     .ToLambda<Func<T, bool>>(parameter);
         }
-        public Expression<Func<T, bool>> Less(MethodCallExpression left, object value)
+        public Expression<Func<T, bool>> Less(Expression left, object value)
         {
             var parameter = CreateParameter();
             return left
@@ -128,7 +133,7 @@ namespace CRL.LambdaQuery
                     .GreaterThan(value)
                     .ToLambda<Func<T, bool>>(parameter);
         }
-        public Expression<Func<T, bool>> GreaterThan(MethodCallExpression left, object value)
+        public Expression<Func<T, bool>> GreaterThan(Expression left, object value)
         {
             var parameter = CreateParameter();
             return left
@@ -152,7 +157,7 @@ namespace CRL.LambdaQuery
                     .LessThan(value)
                     .ToLambda<Func<T, bool>>(parameter);
         }
-        public Expression<Func<T, bool>> LessThan(MethodCallExpression left, object value)
+        public Expression<Func<T, bool>> LessThan(Expression left, object value)
         {
             var parameter = CreateParameter();
             return left

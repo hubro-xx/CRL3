@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace CRL.LambdaQuery
+namespace CRL.LambdaQuery.CRLExpression
 {
     public class CRLExpressionVisitor<T> where T : class, new()
     {
@@ -25,12 +25,12 @@ namespace CRL.LambdaQuery
         {
             var types = new ExpressionType[] { ExpressionType.Equal, ExpressionType.GreaterThan, ExpressionType.GreaterThanOrEqual, ExpressionType.LessThan, ExpressionType.LessThanOrEqual, ExpressionType.NotEqual };
             var leftPar = RouteExpressionHandler(left);
-            var isRight = types.Contains(type);
-            var rightPar = RouteExpressionHandler(right, isRight, level);
-            var e = new CRLExpression() { ExpressionType = type.ToString(), Left = leftPar, Right = rightPar, Type = isRight ? CRLExpressionType.Binary : CRLExpressionType.Tree };
+            var isBinary = types.Contains(type);
+            var rightPar = RouteExpressionHandler(right, level);
+            var e = new CRLExpression() { ExpressionType = type.ToString(), Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpressionType.Binary : CRLExpressionType.Tree };
             return e;
         }
-        CRLExpression RouteExpressionHandler(Expression exp, bool isRight = false, int level = 0)
+        CRLExpression RouteExpressionHandler(Expression exp, int level = 0)
         {
             if (exp is BinaryExpression)
             {
@@ -41,18 +41,17 @@ namespace CRL.LambdaQuery
             else if (exp is MemberExpression)
             {
                 MemberExpression mExp = (MemberExpression)exp;
-                if (isRight)//按表达式右边值
+                if (mExp.Expression != null && mExp.Expression.NodeType == ExpressionType.Parameter) //like b.Name==b.Name1 或b.Name
                 {
-                    //var obj = Expression.Lambda(mExp).Compile().DynamicInvoke();
-                    var obj = LambdaCompileCache.GetExpressionCacheValue(mExp);
-                    if (obj is Enum)
-                    {
-                        obj = (int)obj;
-                    }
-                    return new CRLExpression() { Type = CRLExpressionType.Value, Data = obj };
+                    return new CRLExpression() { Type = CRLExpressionType.Name, Data = mExp.Member.Name };
                 }
-                //return mExp.Member.Name;
-                return new CRLExpression() { Type = CRLExpressionType.Name, Data = mExp.Member.Name };
+                //var obj = Expression.Lambda(mExp).Compile().DynamicInvoke();
+                var obj = LambdaCompileCache.GetExpressionCacheValue(mExp);
+                if (obj is Enum)
+                {
+                    obj = (int)obj;
+                }
+                return new CRLExpression() { Type = CRLExpressionType.Value, Data = obj };
             }
             else if (exp is NewArrayExpression)
             {
@@ -69,14 +68,25 @@ namespace CRL.LambdaQuery
             }
             else if (exp is MethodCallExpression)
             {
-                if (isRight)
+                MethodCallExpression mcExp = (MethodCallExpression)exp;
+                if (mcExp.Object is MemberExpression)
                 {
-                    //return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
+                    var mExp = mcExp.Object as MemberExpression;
+                    if (mExp.Expression.NodeType != ExpressionType.Parameter)
+                    {
+                        //not like b.BarCode.Contains("abc")
+                        //按变量或常量编译值
+                        var obj = LambdaCompileCache.GetExpressionCacheValue(exp);
+                        return new CRLExpression() { Type = CRLExpressionType.Value, Data = obj };
+                    }
+                }
+                else if (mcExp.Object is ConstantExpression)
+                {
+                    //var cExp = mcExp.Object as ConstantExpression;
+                    //like b.BarCode == aa()
                     var obj = LambdaCompileCache.GetExpressionCacheValue(exp);
                     return new CRLExpression() { Type = CRLExpressionType.Value, Data = obj };
                 }
-                //按方法调用
-                MethodCallExpression mcExp = (MethodCallExpression)exp;
                 string methodName = mcExp.Method.Name;
 
                 string field = "";
@@ -112,7 +122,7 @@ namespace CRL.LambdaQuery
                 }
                 var methodCall = string.Format("{0}|{1}|{2}", field, methodName, string.Join(",", args));
                 return new CRLExpression() { Type = CRLExpressionType.MethodCall, Data = methodCall };
-                throw new Exception("暂不支持");
+                throw new NotSupportedException("暂不支持");
             }
             else if (exp is ConstantExpression)
             {
@@ -135,7 +145,7 @@ namespace CRL.LambdaQuery
             {
                 UnaryExpression ue = ((UnaryExpression)exp);
                 level += 1;
-                return RouteExpressionHandler(ue.Operand, isRight, level);
+                return RouteExpressionHandler(ue.Operand, level);
             }
             return null;
         }
@@ -149,14 +159,17 @@ namespace CRL.LambdaQuery
         {
             if (expression.Type == CRLExpressionType.Tree)
             {
+                //解析一个表达式树
                 return CreateLambdaTree(expression);
             }
             else if (expression.Type == CRLExpressionType.MethodCall)
             {
+                //方法
                 return CreateLambdaMethodCall(expression);
             }
             else
             {
+                //二元运算
                 return CreateLambdaBinary(expression);
             }
         }
@@ -180,48 +193,42 @@ namespace CRL.LambdaQuery
             var right = expression.Right;
             var creater = new LambdaCreater<T>();
             var type = expression.ExpressionType;
-            if (left.Type == CRLExpressionType.MethodCall)//按方法 如 Substring,Indexof
+
+            var dic = new Dictionary<string, ExpressionHandler>();
+            dic.Add("Equal", creater.Equal);
+            dic.Add("NotEqual", creater.NotEqual);
+            dic.Add("Greater", creater.Greater);
+            dic.Add("Less", creater.Less);
+            dic.Add("GreaterThan", creater.GreaterThan);
+            dic.Add("LessThan", creater.LessThan);
+            if (!dic.ContainsKey(type))
             {
-                var dic = new Dictionary<string, BinaryMethodHandler>();
-                dic.Add("Equal", creater.Equal);
-                dic.Add("NotEqual", creater.NotEqual);
-                dic.Add("Greater", creater.Greater);
-                dic.Add("Less", creater.Less);
-                dic.Add("GreaterThan", creater.GreaterThan);
-                dic.Add("LessThan", creater.LessThan);
-                if (!dic.ContainsKey(type))
-                {
-                    throw new Exception("没有对应的运算方法 " + type);
-                }
+                throw new Exception("没有对应的运算方法 " + type);
+            }
+
+            if (left.Type == CRLExpressionType.MethodCall)//按方法运算 如 b.NameSubstring,Indexof(0,1)=="123"
+            {
+                //按属性的子方法
                 var left2 = CreateLambdaMethodCall2(left);
                 var value = ObjectConvert.ConvertObject(left2.Type, right.Data);
                 return dic[type](left2, value);
             }
-            else
+            else//按属性运算 如b.Id==1
             {
-                var dic = new Dictionary<string, BinaryHandler>();
-                dic.Add("Equal", creater.Equal);
-                dic.Add("NotEqual", creater.NotEqual);
-                dic.Add("Greater", creater.Greater);
-                dic.Add("Less", creater.Less);
-                dic.Add("GreaterThan", creater.GreaterThan);
-                dic.Add("LessThan", creater.LessThan);
-                if (!dic.ContainsKey(type))
-                {
-                    throw new Exception("没有对应的运算方法 " + type);
-                }
-                return dic[type](left.Data.ToString(), right.Data);
+                //todo 暂不支持属性间比较  b=>b.Id>b.Number
+                var member = creater.CreatePropertyExpression(left.Data.ToString());
+                return dic[type](member, right.Data);
             }
         }
         Expression<Func<T, bool>> CreateLambdaMethodCall(CRLExpression expression)
         {
+            //表示方法调用
             var creater = new LambdaCreater<T>();
             var arry = expression.Data.ToString().Split('|');
             var propertyName = arry[0];
             var methodName = arry[1];
             var args = expression.Data.ToString().Substring(propertyName.Length + methodName.Length + 2);
             var dic = new Dictionary<string, MethodHandler>();
-            dic.Add("Like", creater.Contains);
             dic.Add("Contains", creater.Contains);
             dic.Add("StartsWith", creater.StartsWith);
             dic.Add("EndsWith", creater.EndsWith);
@@ -234,6 +241,7 @@ namespace CRL.LambdaQuery
         }
         internal MethodCallExpression CreateLambdaMethodCall2(CRLExpression expression)
         {
+            //表示二元运算的方法
             var creater = new LambdaCreater<T>();
             var arry = expression.Data.ToString().Split('|');
             var propertyName = arry[0];
@@ -252,8 +260,7 @@ namespace CRL.LambdaQuery
         #endregion
         delegate MethodCallExpression MethodResultHandler(string name, params object[] value);
         delegate Expression<Func<T, bool>> MethodHandler(string name, params object[] value);
-        delegate Expression<Func<T, bool>> BinaryHandler(string name, object value);
-        delegate Expression<Func<T, bool>> BinaryMethodHandler(MethodCallExpression left, object value);
+        delegate Expression<Func<T, bool>> ExpressionHandler(Expression left, object value);
     }
     
 }

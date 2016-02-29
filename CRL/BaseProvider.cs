@@ -111,7 +111,7 @@ namespace CRL
         {
             if (command.CommandType == CacheServer.CommandType.查询)
             {
-                var expression = LambdaQuery.CRLQueryExpression.FromJson(command.Data);
+                var expression = LambdaQuery.CRLExpression.CRLQueryExpression.FromJson(command.Data);
                 return QueryFromCache(expression);
             }
             else
@@ -135,8 +135,8 @@ namespace CRL
         {
             if (command.CommandType == CacheServer.CommandType.查询)
             {
-                var expression = LambdaQuery.CRLQueryExpression.FromJson(command.Data);
-                var _CRLExpression = new CRL.LambdaQuery.CRLExpressionVisitor<TModel>().CreateLambda(expression.Expression);
+                var expression = LambdaQuery.CRLExpression.CRLQueryExpression.FromJson(command.Data);
+                var _CRLExpression = new CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor<TModel>().CreateLambda(expression.Expression);
                 var query = GetLambdaQuery();
                 query.Where(_CRLExpression);
                 query.Page(expression.PageSize, expression.PageIndex);
@@ -158,9 +158,9 @@ namespace CRL
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        CacheServer.ResultData QueryFromCache(LambdaQuery.CRLQueryExpression expression)
+        CacheServer.ResultData QueryFromCache(LambdaQuery.CRLExpression.CRLQueryExpression expression)
         {
-            var _CRLExpression = new CRL.LambdaQuery.CRLExpressionVisitor<TModel>().CreateLambda(expression.Expression);
+            var _CRLExpression = new CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor<TModel>().CreateLambda(expression.Expression);
             int total;
             var data = QueryFromCacheBase(_CRLExpression, out total, expression.PageIndex, expression.PageSize);
             return new CacheServer.ResultData() { Total = total, JsonData = CoreHelper.StringHelper.SerializerToJson(data) };
@@ -279,7 +279,8 @@ namespace CRL
             total = data.Count();
             if (pageIndex > 0)
             {
-                var data2 = Base.CutList(data, pageIndex, pageSize);
+                //var data2 = Base.CutList(data, pageIndex, pageSize);
+                var data2 = data.Page(pageIndex, pageSize).ToList();
                 return data2;
             }
             return data.ToList();
@@ -301,8 +302,8 @@ namespace CRL
             var list = new Dictionary<string, TModel>();
             if (!TypeCache.ModelKeyCache.ContainsKey(type))
             {
-                var helper = GetDbHelper();//避开事务控制,使用新的连接
-                var list2 = helper.QueryList<TModel>(query, out dataCacheKey);
+                var db = GetDbHelper();//避开事务控制,使用新的连接
+                var list2 = db.QueryList<TModel>(query, out dataCacheKey);
                 list = ObjectConvert.ConvertToDictionary<TModel>(list2);
                 lock (lockObj)
                 {
@@ -330,8 +331,8 @@ namespace CRL
         /// <returns></returns>
         protected List<T> RunList<T>(string sp) where T : class, new()
         {
-            DBExtend helper = DBExtend;
-            return helper.RunList<T>(sp);
+            DBExtend db = DBExtend;
+            return db.RunList<T>(sp);
         }
         #endregion
     }

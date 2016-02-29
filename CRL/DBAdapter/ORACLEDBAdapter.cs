@@ -146,7 +146,6 @@ namespace CRL.DBAdapter
         /// <summary>
         /// 创建表
         /// </summary>
-        /// <param name="helper"></param>
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
         public override void CreateTable(List<Attribute.FieldAttribute> fields, string tableName)
@@ -265,7 +264,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
                         continue;
                     }
                 }
-                value = ObjectConvert.SetNullValue(value, info.PropertyType);
+                value = ObjectConvert.CheckNullValue(value, info.PropertyType);
                 sql1 += string.Format("{0},", info.KeyWordName);
                 sql2 += string.Format("@{0},", info.KeyWordName);
                 helper.AddParam(info.KeyWordName, value);

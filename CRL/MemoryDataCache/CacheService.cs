@@ -271,11 +271,11 @@ namespace CRL.MemoryDataCache
             if (cacheDatas.ContainsKey(key))
             {
                 MemoryDataCacheItem cacheItem = cacheDatas[key];
-                DBHelper sqlHelper = cacheItem.DBHelper;
-                sqlHelper.Params = cacheItem.Params;
+                DBHelper helper = cacheItem.DBHelper;
+                helper.Params = cacheItem.Params;
                 try
                 {
-                    var data = QueryData(key, cacheItem.Type, cacheItem.Query, sqlHelper);
+                    var data = QueryData(key, cacheItem.Type, cacheItem.Query, helper);
                     cacheItem.UpdatedData = data;
                     cacheItem.UpdateTime = DateTime.Now;
                     cacheItem.QueryCount += 1;

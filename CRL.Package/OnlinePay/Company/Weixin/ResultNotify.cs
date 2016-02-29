@@ -45,8 +45,8 @@ namespace CRL.Package.OnlinePay.Company.Weixin
                 //Log.Info(this.GetType().ToString(), "order query success : " + res.ToXml());
                 //page.Response.Write(res.ToXml());
                 //page.Response.End();
-                error = "订单查询失败";
-                return false;
+                error = "";
+                return true;
             }
         }
 

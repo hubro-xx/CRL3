@@ -8,15 +8,16 @@ using System.Text;
 
 namespace CRL
 {
-    public class ObjectConvert
+    internal class ObjectConvert
     {
+        static Dictionary<Type, Func<object, object>> nullCheckMethod = new Dictionary<Type, Func<object, object>>();
         /// <summary>
         /// 转化值,并处理默认值
         /// </summary>
         /// <param name="value"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal static object SetNullValue(object value, Type type = null)
+        internal static object CheckNullValue(object value, Type type = null)
         {
             if (type == null && value == null)
             {
@@ -27,6 +28,49 @@ namespace CRL
             {
                 type = value.GetType();
             }
+            if (nullCheckMethod.Count == 0)
+            {
+                nullCheckMethod.Add(typeof(string), (a) =>
+                {
+                    return a + "";
+                });
+                nullCheckMethod.Add(typeof(Enum), (a) =>
+                {
+                    return (int)a;
+                });
+                nullCheckMethod.Add(typeof(DateTime), (a) =>
+                {
+                    DateTime time = (DateTime)a;
+                    if (time.Year == 1)
+                    {
+                        a = DateTime.Now;
+                    }
+                    return a;
+                });
+                nullCheckMethod.Add(typeof(byte[]), (a) =>
+                {
+                    if (a == null)
+                        return 0;
+                    return a;
+                });
+                nullCheckMethod.Add(typeof(Guid), (a) =>
+                {
+                    if (a == null)
+                        return Guid.NewGuid().ToString();
+                    return a;
+                });
+
+            }
+            if (nullCheckMethod.ContainsKey(type))
+            {
+                return nullCheckMethod[type](value);
+            }
+            if (type.BaseType == typeof(Enum))
+            {
+                return nullCheckMethod[type.BaseType](value);
+            }
+            return value;
+            #region old
             if (type.BaseType == typeof(Enum))
             {
                 value = (int)value;
@@ -54,58 +98,84 @@ namespace CRL
                 value = value + "";
             }
             return value;
+            #endregion
         }
+        static Dictionary<Type, Func<object, object>> convertMethod = new Dictionary<Type, Func<object, object>>();
         /// <summary>
         /// 转换为为强类型
         /// </summary>
         /// <param name="type"></param>
-        /// <param name="obj"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
-        internal static object ConvertObject(Type type, object obj)
+        internal static object ConvertObject(Type type, object value)
         {
+            if (convertMethod.Count == 0)
+            {
+                convertMethod.Add(typeof(byte[]), (a) =>
+                {
+                    return (byte[])a;
+                });
+                convertMethod.Add(typeof(Guid), (a) =>
+                {
+                    return new Guid(a.ToString());
+                });
+                convertMethod.Add(typeof(Enum), (a) =>
+                {
+                    return Convert.ToInt32(a);
+                });
+            }
+            if (convertMethod.ContainsKey(type))
+            {
+                return convertMethod[type](value);
+            }
+            if (type.BaseType == typeof(Enum))
+            {
+                return convertMethod[type.BaseType](value);
+            }
+            return Convert.ChangeType(value, type);
             #region 类型转换
             if (type == typeof(Int32))
             {
-                obj = Convert.ToInt32(obj);
+                value = Convert.ToInt32(value);
             }
             else if (type == typeof(Int16))
             {
-                obj = Convert.ToInt16(obj);
+                value = Convert.ToInt16(value);
             }
             else if (type == typeof(Int64))
             {
-                obj = Convert.ToInt64(obj);
+                value = Convert.ToInt64(value);
             }
             else if (type == typeof(DateTime))
             {
-                obj = Convert.ToDateTime(obj);
+                value = Convert.ToDateTime(value);
             }
             else if (type == typeof(Decimal))
             {
-                obj = Convert.ToDecimal(obj);
+                value = Convert.ToDecimal(value);
             }
             else if (type == typeof(Double))
             {
-                obj = Convert.ToDouble(obj);
+                value = Convert.ToDouble(value);
             }
             else if (type == typeof(System.Byte[]))
             {
-                obj = (byte[])obj;
+                value = (byte[])value;
             }
             else if (type.BaseType == typeof(System.Enum))
             {
-                obj = Convert.ToInt32(obj);
+                value = Convert.ToInt32(value);
             }
             else if (type == typeof(System.Boolean))
             {
-                obj = Convert.ToBoolean(obj);
+                value = Convert.ToBoolean(value);
             }
             else if (type == typeof(Guid))
             {
-                obj = new Guid(obj.ToString());
+                value = new Guid(value.ToString());
             }
             #endregion
-            return obj;
+            return value;
         }
         /// <summary>
         /// 转换为为强类型

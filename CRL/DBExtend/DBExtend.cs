@@ -109,7 +109,7 @@ namespace CRL
         /// <param name="value"></param>
         public void AddParam(string name,object value)
         {
-            value = ObjectConvert.SetNullValue(value);
+            value = ObjectConvert.CheckNullValue(value);
             dbHelper.AddParam(name,value);
         }
         /// <summary>
@@ -119,7 +119,7 @@ namespace CRL
         /// <param name="value"></param>
         public void SetParam(string name, object value)
         {
-            value = ObjectConvert.SetNullValue(value);
+            value = ObjectConvert.CheckNullValue(value);
             dbHelper.SetParam(name, value);
         }
         /// <summary>
@@ -288,7 +288,7 @@ namespace CRL
             {
                 string name = pair.Key;
                 object value = pair.Value;
-                value = ObjectConvert.SetNullValue(value);
+                value = ObjectConvert.CheckNullValue(value);
                 if (name.StartsWith("$"))//直接按值拼接 c2["$SoldCount"] = "SoldCount+" + num;
                 {
                     name = name.Substring(1, name.Length - 1);

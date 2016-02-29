@@ -73,7 +73,28 @@ namespace CRL
     /// </summary>
     public static partial class ExtensionMethod
     {
-
+        /// <summary>
+        /// 字符串格式化
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static string Format(this string source, params object[] args)
+        {
+            return string.Format(source, args);
+        }
+        /// <summary>
+        /// 对集合进行分页
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="index"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> Page<T>(this IEnumerable<T> source, int index, int pageSize) where T : class, new()
+        {
+            return source.Skip((index - 1) * pageSize).Take(pageSize);
+        }
         #region 查询方法
         /// <summary>
         /// Like("%key%")
@@ -157,9 +178,9 @@ namespace CRL
             where TDest : class,new()
         {
             var destTypes = typeof(TDest).GetProperties().ToList();
-            destTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+            destTypes.RemoveAll(b => b.SetMethod == null || (b.SetMethod != null && b.SetMethod.Name == "set_Item"));
             List<PropertyInfo> sourceTypes = source.GetType().GetProperties().ToList();
-            sourceTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+            sourceTypes.RemoveAll(b => b.SetMethod == null || (b.SetMethod != null && b.SetMethod.Name == "set_Item"));
             var obj = ToType(sourceTypes, destTypes,source, typeof(TDest));
             return obj as TDest;
         }
@@ -188,9 +209,9 @@ namespace CRL
                             continue;
                         }
                         var sourceTypes2 = sourceInfo.PropertyType.GetProperties().ToList();
-                        sourceTypes2.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+                        sourceTypes2.RemoveAll(b => b.SetMethod == null || (b.SetMethod != null && b.SetMethod.Name == "set_Item"));
                         var destTypes2 = info.PropertyType.GetProperties().ToList();
-                        destTypes2.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+                        destTypes2.RemoveAll(b => b.SetMethod == null || (b.SetMethod != null && b.SetMethod.Name == "set_Item"));
                         value = ToType(sourceTypes2, destTypes2, value2, info.PropertyType);
                     }
                     info.SetValue(obj, value, null);
@@ -215,9 +236,9 @@ namespace CRL
                 return list;
             }
             var destTypes = typeof(TDest).GetProperties().ToList();
-            destTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+            destTypes.RemoveAll(b => b.SetMethod == null || (b.SetMethod != null && b.SetMethod.Name == "set_Item"));
             List<PropertyInfo> sourceTypes = source.First().GetType().GetProperties().ToList();
-            sourceTypes.RemoveAll(b => b.Name == "Item" || b.SetMethod == null);
+            sourceTypes.RemoveAll(b => b.SetMethod == null || (b.SetMethod != null && b.SetMethod.Name == "set_Item"));
 
             foreach (var item in source)
             {

@@ -96,6 +96,7 @@ EXECUTE  ' {1} ';
                 }
                 else
                 {
+                    //todo 只有数值型才能自增
                     columnType = " " + columnType + " primary key auto_increment";
                 }
             }
@@ -198,7 +199,6 @@ EXECUTE  ' {1} ';
         /// 获取插入语法
         /// </summary>
         /// <param name="obj"></param>
-        /// <param name="helper"></param>
         /// <returns></returns>
         public override object InsertObject(IModel obj)
         {
@@ -232,7 +232,7 @@ EXECUTE  ' {1} ';
                         continue;
                     }
                 }
-                value = ObjectConvert.SetNullValue(value, info.PropertyType);
+                value = ObjectConvert.CheckNullValue(value, info.PropertyType);
                 sql1 += string.Format("{0},", info.KeyWordName);
                 sql2 += string.Format("?{0},", name);
                 helper.AddParam(name, value);

@@ -39,5 +39,22 @@ namespace CRL.Sharding
             dbContext.UseSharding = true;
             return dbContext;
         }
+        /// <summary>
+        /// 插入对象
+        /// </summary>
+        /// <param name="p"></param>
+        public override void Add(TModel p)
+        {
+            //todo 判断主数据索引是不是在当前定位
+            var dataIndex = Convert.ToInt32(p.GetpPrimaryKeyValue());
+            SetLocation(dataIndex);
+            base.Add(p);
+        }
+        public override void BatchInsert(List<TModel> list, bool keepIdentity = false)
+        {
+            throw new Exception("暂不支持");
+            //todo 判断主数据索引是不是在当前定位
+            base.BatchInsert(list, keepIdentity);
+        }
     }
 }

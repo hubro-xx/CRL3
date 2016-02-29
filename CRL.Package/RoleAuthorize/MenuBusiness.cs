@@ -68,6 +68,10 @@ namespace CRL.Package.RoleAuthorize
             string cacheKey = string.Format("menu_{0}_{1}", userId, systemTypeId);
             userMenuCache.Remove(cacheKey);
         }
+        public void RemoveUserMenuCache()
+        {
+            userMenuCache.Clear();
+        }
         /// <summary>
         /// 获取用户菜单
         /// 如果显示导航菜单,请判断ShowInNav

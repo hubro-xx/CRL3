@@ -108,6 +108,27 @@ namespace CRL.LambdaQuery
             BaseQuery.AddInnerRelation(innerType, condition);
             return query2;
         }
-
+        /// <summary>
+        /// LeftJoin
+        /// 在当前关联基础上再创建关联
+        /// </summary>
+        /// <typeparam name="TJoin2"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQueryJoin<TJoin, TJoin2> LeftJoin<TJoin2>(Expression<Func<TJoin, TJoin2, bool>> expression) where TJoin2 : IModel, new()
+        {
+            return Join(expression, JoinType.Left);
+        }
+        /// <summary>
+        /// RightJoin
+        /// 在当前关联基础上再创建关联
+        /// </summary>
+        /// <typeparam name="TJoin2"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQueryJoin<TJoin, TJoin2> RightJoin<TJoin2>(Expression<Func<TJoin, TJoin2, bool>> expression) where TJoin2 : IModel, new()
+        {
+            return Join(expression, JoinType.Right);
+        }
     }
 }

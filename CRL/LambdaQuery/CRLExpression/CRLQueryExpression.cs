@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace CRL.LambdaQuery
+namespace CRL.LambdaQuery.CRLExpression
 {
-
-    public enum CRLExpressionType
-    {
-        Tree,
-        Binary,
-        Name,
-        Value,
-        MethodCall
-    }
     public class CRLQueryExpression
     {
         /// <summary>
@@ -30,11 +21,17 @@ namespace CRL.LambdaQuery
             get;
             set;
         }
+        /// <summary>
+        /// 分页用,每页大小
+        /// </summary>
         public int PageSize
         {
             get;
             set;
         }
+        /// <summary>
+        /// 分页用,页索引
+        /// </summary>
         public int PageIndex
         {
             get;
@@ -56,42 +53,4 @@ namespace CRL.LambdaQuery
         }
     }
     
-    public class CRLExpression
-    {
-        public override string ToString()
-        {
-            return CoreHelper.StringHelper.SerializerToJson(this);
-        }
-
-        public CRLExpression Left
-        {
-            get;
-            set;
-        }
-        public CRLExpression Right
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// 节点类型
-        /// </summary>
-        public CRLExpressionType Type
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// 数据
-        /// </summary>
-        public object Data
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// 左右操作类型
-        /// </summary>
-        public string ExpressionType;
-    }
 }

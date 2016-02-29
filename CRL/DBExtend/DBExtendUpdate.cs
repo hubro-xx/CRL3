@@ -160,13 +160,21 @@ namespace CRL
             return count;
         }
         /// <summary>
-        /// 按主键更新整个对象
+        /// 按匿名对象更新
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
-        /// <param name="item"></param>
-        public int UpdateById<TModel>(TModel item) where TModel : IModel,new()
+        /// <param name="expression"></param>
+        /// <param name="updateValue"></param>
+        /// <returns></returns>
+        public int Update<TModel>(Expression<Func<TModel, bool>> expression, dynamic updateValue) where TModel : IModel, new()
         {
-            return Update(item);//直接按差异更新
+            var properties = updateValue.GetType().GetProperties();
+            var c = new ParameCollection();
+            foreach (var p in properties)
+            {
+                c.Add(p.Name, p.GetValue(updateValue));
+            }
+            return Update(expression, c);
         }
         #endregion
     }

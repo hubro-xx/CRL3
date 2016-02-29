@@ -9,7 +9,7 @@ namespace CRL.CacheServer
     /// <summary>
     /// 连接池形式的Client
     /// </summary>
-    public class TcpPoolClient : CacheClientProxy
+    internal class TcpPoolClient : CacheClientProxy
     {
         string server;
         int port;

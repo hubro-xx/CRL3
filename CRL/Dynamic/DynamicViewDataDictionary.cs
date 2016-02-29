@@ -24,8 +24,12 @@ namespace CRL.Dynamic
 
         public override bool TryGetMember(System.Dynamic.GetMemberBinder binder, out object result)
         {
-            result = this.ViewData[binder.Name.ToLower()];
-            return true;
+            var a = ViewData.TryGetValue(binder.Name.ToLower(), out result);
+            if (!a)
+            {
+                throw new Exception(string.Format("动态字典Bag不存在索引值:{0}", binder.Name));
+            }
+            return a;
         }
 
         public override bool TrySetMember(System.Dynamic.SetMemberBinder binder, object value)

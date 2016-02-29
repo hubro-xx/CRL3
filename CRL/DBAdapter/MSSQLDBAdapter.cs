@@ -106,6 +106,7 @@ end", spName, script);
                 }
                 else
                 {
+                    //todo 只有数值型才能自增
                     columnType = columnType + " IDENTITY(1,1) ";
                 }
             }
@@ -234,7 +235,7 @@ end", spName, script);
                     {
                         continue;
                     }
-                    var value2 = ObjectConvert.SetNullValue(value,info.PropertyType);
+                    var value2 = ObjectConvert.CheckNullValue(value,info.PropertyType);
                     if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
                     {
                         if (value2 == null)
@@ -286,7 +287,7 @@ end", spName, script);
                         continue;
                     }
                 }
-                value = ObjectConvert.SetNullValue(value, info.PropertyType);
+                value = ObjectConvert.CheckNullValue(value, info.PropertyType);
                 sql1 += string.Format("{0},", info.KeyWordName);
                 sql2 += string.Format("@{0},", name);
                 helper.AddParam(name, value);

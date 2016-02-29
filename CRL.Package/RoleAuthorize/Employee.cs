@@ -11,7 +11,7 @@ namespace CRL.Package.RoleAuthorize
     [Attribute.Table(TableName = "Employee")]
     public class Employee : Person.Person
     {
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<Employee>();
             //123456

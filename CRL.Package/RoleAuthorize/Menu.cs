@@ -11,7 +11,7 @@ namespace CRL.Package.RoleAuthorize
     [Attribute.Table(TableName="Menu")]
     public sealed class Menu : Category.Category
     {
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<Menu>();
             list.Add(new Menu() { Name = "会员管理", SequenceCode = "01", DataType = 1 });

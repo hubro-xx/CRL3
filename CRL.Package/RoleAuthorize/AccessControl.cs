@@ -10,7 +10,7 @@ namespace CRL.Package.RoleAuthorize
     /// </summary>
     public sealed class AccessControl:IModelBase
     {
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             return base.GetInitData();
         }

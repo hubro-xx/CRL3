@@ -98,6 +98,7 @@
     <Compile Include="CacheServer\CacheClientProxy.cs" />
     <Compile Include="CacheServer\CacheService.cs" />
     <Compile Include="CacheServer\Command.cs" />
+    <Compile Include="CacheServer\HttpCacheClient.cs" />
     <Compile Include="CacheServer\TcpPoolClient.cs" />
     <Compile Include="CacheServer\TcpServer.cs" />
     <Compile Include="CacheServer\ResultData.cs" />
@@ -135,8 +136,10 @@
     <Compile Include="ExtensionMethod\Min.cs" />
     <Compile Include="ExtensionMethod\Sum.cs" />
     <Compile Include="IgnoreCaseDictionary.cs" />
-    <Compile Include="LambdaQuery\CRLExpression.cs" />
-    <Compile Include="LambdaQuery\CRLExpressionVisitor.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\CRLExpression.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\CRLExpressionType.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\CRLExpressionVisitor.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\CRLQueryExpression.cs" />
     <Compile Include="LambdaQuery\Distinct.cs" />
     <Compile Include="LambdaQuery\ExpressionVisitor.cs" />
     <Compile Include="LambdaQuery\ExecuteResult.cs" />

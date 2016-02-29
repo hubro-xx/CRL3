@@ -71,6 +71,7 @@ namespace CRL
 
         /// <summary>
         /// 当列创建时,可重写
+        /// 可处理在添加字段后数据的升级
         /// </summary>
         /// <param name="fieldName"></param>
         protected internal virtual void OnColumnCreated(string fieldName)
@@ -86,9 +87,6 @@ namespace CRL
         }
         #endregion
 
-        [System.Xml.Serialization.XmlIgnore]
-        [NonSerialized]
-        Dictionary<string, dynamic> Datas = new Dictionary<string, dynamic>();
 
         /// <summary>
         /// 是否检查重复插入,默认为true
@@ -103,6 +101,12 @@ namespace CRL
             }
         }
         #region 索引
+
+        [System.Xml.Serialization.XmlIgnore]
+        [NonSerialized]
+        Dictionary<string, dynamic> Datas = new Dictionary<string, dynamic>();
+
+
         /// <summary>
         /// 获取关联查询的值
         /// 不分区大小写
@@ -133,16 +137,16 @@ namespace CRL
         /// <summary>
         /// 检查索引
         /// </summary>
-        /// <param name="helper"></param>
+        /// <param name="db"></param>
         /// <returns></returns>
-        public void CheckIndexExists(DBExtend helper)
+        internal void CheckIndexExists(DBExtend db)
         {
-            var list = GetIndexScript(helper);
+            var list = GetIndexScript(db);
             foreach (var item in list)
             {
                 try
                 {
-                    helper.Execute(item);
+                    db.Execute(item);
                 }
                 catch (Exception ero)//出错,
                 {
@@ -150,9 +154,15 @@ namespace CRL
                 }
             }
         }
-        internal static string CreateColumn(DBExtend helper, Attribute.FieldAttribute item)
+        /// <summary>
+        /// 创建列
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        internal static string CreateColumn(DBExtend db, Attribute.FieldAttribute item)
         {
-            var dbAdapter = helper._DBAdapter;
+            var dbAdapter = db._DBAdapter;
             string result = "";
             if (string.IsNullOrEmpty(item.ColumnType))
             {
@@ -166,14 +176,21 @@ namespace CRL
             }
             try
             {
-                helper.Execute(str);
+                db.Execute(str);
                 if (!string.IsNullOrEmpty(indexScript))
                 {
-                    helper.Execute(indexScript);
+                    db.Execute(indexScript);
                 }
                 result = string.Format("创建字段:{0} {1} {2}\r\n", item.TableName, item.Name,item.PropertyType);
                 var model = System.Activator.CreateInstance(item.ModelType) as IModel;
-                model.OnColumnCreated(item.Name);
+                try
+                {
+                    model.OnColumnCreated(item.Name);
+                }
+                catch(Exception ero)
+                {
+                    result = string.Format("添加字段:{0} {1},升级数据时发生错误:{2}\r\n", item.TableName, item.Name, ero.Message);
+                }
                 CoreHelper.EventLog.Log(result, "", false);
             }
             catch (Exception ero)
@@ -186,23 +203,23 @@ namespace CRL
         /// <summary>
         /// 检查对应的字段是否存在,不存在则创建
         /// </summary>
-        /// <param name="helper"></param>
-        public string CheckColumnExists(DBExtend helper)
+        /// <param name="db"></param>
+        internal string CheckColumnExists(DBExtend db)
         {
             string result = "";
-            var dbAdapter = helper._DBAdapter;
+            var dbAdapter = db._DBAdapter;
             List<Attribute.FieldAttribute> columns = GetColumns(dbAdapter);
-            string tableName = TypeCache.GetTableName(this.GetType(),helper.dbContext);
+            string tableName = TypeCache.GetTableName(this.GetType(),db.dbContext);
             foreach (Attribute.FieldAttribute item in columns)
             {
                 string sql = dbAdapter.GetSelectTop(item.KeyWordName, "from " + tableName, "", 1);
                 try
                 {
-                    helper.Execute(sql);
+                    db.Execute(sql);
                 }
                 catch//出错,按没有字段算
                 {
-                    result += CreateColumn(helper, item);
+                    result += CreateColumn(db, item);
                     
                 }
             }
@@ -244,9 +261,9 @@ namespace CRL
             }
             return columns;
         }
-        internal List<string> GetIndexScript(DBExtend helper)
+        internal List<string> GetIndexScript(DBExtend db)
         {
-            var dbAdapter = helper._DBAdapter;
+            var dbAdapter = db._DBAdapter;
             List<string> list2 = new List<string>();
             List<Attribute.FieldAttribute> columns = GetColumns(dbAdapter);
             foreach (Attribute.FieldAttribute item in columns)
@@ -264,33 +281,33 @@ namespace CRL
         /// <summary>
         /// 创建表
         /// </summary>
-        /// <param name="helper"></param>
+        /// <param name="db"></param>
         /// <returns></returns>
-        public string CreateTable(DBExtend helper)
+        public string CreateTable(DBExtend db)
         {
             string msg;
-            CreateTable(helper, out msg);
+            CreateTable(db, out msg);
             return msg;
         }
         /// <summary>
         /// 创建表
         /// 会检查表是否存在,如果存在则检查字段
         /// </summary>
-        /// <param name="helper"></param>
+        /// <param name="db"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public bool CreateTable(DBExtend helper, out string message)
+        internal bool CreateTable(DBExtend db, out string message)
         {
-            var dbAdapter = helper._DBAdapter;
+            var dbAdapter = db._DBAdapter;
             message = "";
             //TypeCache.SetDBAdapterCache(GetType(),dbAdapter);
-            string tableName = TypeCache.GetTableName(GetType(),helper.dbContext);
+            string tableName = TypeCache.GetTableName(GetType(),db.dbContext);
             string sql = dbAdapter.GetSelectTop("0", "from " + tableName, "", 1);
             bool needCreate = false;
             try
             {
                 //检查表是否存在
-                helper.Execute(sql);
+                db.Execute(sql);
             }
             catch
             {
@@ -304,7 +321,7 @@ namespace CRL
                     List<Attribute.FieldAttribute> columns = GetColumns(dbAdapter);
                     dbAdapter.CreateTable(columns, tableName);
                     message = string.Format("创建表:{0}\r\n", tableName);
-                    CheckIndexExists(helper);
+                    CheckIndexExists(db);
                     return true;
                 }
                 catch (Exception ero)
@@ -318,7 +335,7 @@ namespace CRL
             }
             else
             {
-                message = CheckColumnExists(helper);
+                message = CheckColumnExists(db);
             }
             return true;
         }
@@ -426,6 +443,7 @@ namespace CRL
         /// 动态Bag,可用此取索引值
         /// 不区分大小写
         /// </summary>
+        [System.Xml.Serialization.XmlIgnore]
         public dynamic Bag
         {
             get

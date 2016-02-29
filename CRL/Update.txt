@@ -203,3 +203,8 @@
 	QueryItem按主键查询方法,参数类型改为object
 2016-01-25
 	增加列创建时的重写方法OnColumnCreated
+2016-02-26
+	优化CRLExpressionVisitor,统一二元运算解析
+2016-02-29
+	增加Update方法
+	Update<TOjbect>(Expression<Func<TModel, bool>> expression, TOjbect updateValue) where TOjbect : class

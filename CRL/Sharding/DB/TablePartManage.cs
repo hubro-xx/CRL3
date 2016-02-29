@@ -51,8 +51,8 @@ namespace CRL.Sharding.DB
         //            index += 1;
         //            dataBase.MainDataEndIndex = index;
         //            //tablePart.DataEndIndex = index;
-        //            dbHelper.Update(dataBase);
-        //            dbHelper.Update(tablePart);
+        //            DBHelper.Update(dataBase);
+        //            DBHelper.Update(tablePart);
         //        }
         //        return true;
         //    }, out error);

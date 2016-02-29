@@ -10,7 +10,7 @@ namespace CRL
     /// </summary>
     public class SummaryAnalysis
     {
-        public class FieldItem
+        class FieldItem
         {
             public string Remark;
             public string Name;
@@ -21,7 +21,7 @@ namespace CRL
                 return string.Format("{0} {1}", Name, Remark);
             }
         }
-        public static List<Type> GetInfoFromDll(Type[] currentTypes)
+        static List<Type> GetInfoFromDll(Type[] currentTypes)
         {
             List<Type> findTypes = new List<Type>();
             Dictionary<string, List<FieldItem>> fileds = new Dictionary<string, List<FieldItem>>();
@@ -51,7 +51,7 @@ namespace CRL
             }
             return findTypes.OrderBy(b => b.Name).ToList();
         }
-        public static Dictionary<string, List<FieldItem>> GetInfoFromXml(List<string> xmlFiles)
+        static Dictionary<string, List<FieldItem>> GetInfoFromXml(List<string> xmlFiles)
         {
             Dictionary<string, List<FieldItem>> list = new Dictionary<string, List<FieldItem>>();
             if (xmlFiles == null)
@@ -122,7 +122,7 @@ namespace CRL
             return list;
         }
 
-        public static Dictionary<Type, List<CRL.Attribute.FieldAttribute>> Merge(List<Type> types,Dictionary<string, List<FieldItem>> fields)
+        static Dictionary<Type, List<CRL.Attribute.FieldAttribute>> Merge(List<Type> types,Dictionary<string, List<FieldItem>> fields)
         {
             var result = new Dictionary<Type, List<CRL.Attribute.FieldAttribute>>();
             foreach(var type in types)
@@ -192,9 +192,17 @@ namespace CRL
                     string remark = p.Remark;
                     if (p.PropertyType.BaseType == typeof(Enum))
                     {
-                        var enumValues = Enum.GetNames(p.PropertyType);
-
-                        remark += p.Name + "[" + string.Join(",", enumValues) + "]";
+                        var enumValues = Enum.GetValues(p.PropertyType);
+                        string enumStr = "";
+                        foreach (var enu in enumValues)
+                        {
+                            enumStr += string.Format("{0}={1},",enu,Convert.ToInt32(enu));
+                        }
+                        if (enumStr.Length > 1)
+                        {
+                            enumStr = enumStr.Substring(0, enumStr.Length-1);
+                        }
+                        remark += p.Name + "[" + enumStr + "]";
                     }
                     if (p.FieldType == Attribute.FieldType.虚拟字段)
                     {

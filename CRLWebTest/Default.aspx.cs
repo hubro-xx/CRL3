@@ -48,7 +48,7 @@ namespace WebTest
             //query.Where(b => b.BarCode == aa());
             query.Where(b => b.BarCode.Contains("abc"));
             query.Join<Code.Member>((a, b) => a.UserId == b.Id)
-                .SelectAppendValue(b=>b.Mobile);
+                .SelectAppendValue(b => b.Mobile);
             //query.Join<Code.Member>((a, b) => a.UserId == b.Id);
             //query.Select<Code.Member>((a, b) => new { a.UserId, b.Mobile });
             //query.GroupBy<Code.Member>((a, b) => new { a.BarCode, b.Name });

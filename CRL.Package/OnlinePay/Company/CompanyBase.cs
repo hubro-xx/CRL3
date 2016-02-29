@@ -13,6 +13,9 @@ namespace CRL.Package.OnlinePay.Company
 	/// </summary>
 	public  abstract class CompanyBase
 	{
+        /// <summary>
+        /// 商户密钥
+        /// </summary>
         public string MerchantKey
         {
             get
@@ -20,7 +23,9 @@ namespace CRL.Package.OnlinePay.Company
                 return ChargeConfig.GetConfigKey(ThisCompanyType, ChargeConfig.DataType.Key);
             }
         }
-
+        /// <summary>
+        /// 商户编号
+        /// </summary>
         public string MerchantId
         {
             get
@@ -28,6 +33,9 @@ namespace CRL.Package.OnlinePay.Company
                 return ChargeConfig.GetConfigKey(ThisCompanyType, ChargeConfig.DataType.User);
             }
         }
+        /// <summary>
+        /// 跳转URL
+        /// </summary>
         public string ReturnUrl
         {
             get
@@ -35,6 +43,9 @@ namespace CRL.Package.OnlinePay.Company
                 return GetAbsUrl(ChargeConfig.GetConfigKey(ThisCompanyType, ChargeConfig.DataType.ReturnUrl));
             }
         }
+        /// <summary>
+        /// 通知URL
+        /// </summary>
         public string NotifyUrl
         {
             get
@@ -78,11 +89,10 @@ namespace CRL.Package.OnlinePay.Company
             return DateTime.Now.ToString("yyMMddHHmmssffff");
         }
 		/// <summary>
-		/// 生成订单实例
+        /// 生成订单实例
 		/// </summary>
-		/// <param name="money"></param>
+		/// <param name="amount"></param>
 		/// <param name="userId"></param>
-		/// <param name="userType"></param>
 		/// <returns></returns>
         public PayHistory CreateOrder(decimal amount, int userId)
         {

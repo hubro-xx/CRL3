@@ -39,7 +39,7 @@
                  @Html.Hidden("Id",Model.Id)
             </li>
             <li>
-                生日:@Html.TextBox("Birthday",Model.Birthday.ToShortDateString())
+                生日:@Html.TextBox("Birthday",Model.Birthday==null?"":Model.Birthday.Value.ToShortDateString())
             </li>
             <li>
                 性别:

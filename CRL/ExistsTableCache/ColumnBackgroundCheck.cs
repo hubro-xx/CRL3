@@ -80,7 +80,6 @@ namespace CRL.ExistsTableCache
                 {
                     IModel.SetColumnDbType(_DBAdapter, field);
                     string str = IModel.CreateColumn(db, field);
-                    model.OnColumnCreated(field.Name);
                 }
                 string val;
                 needCheks.TryRemove(item.Key, out val);

@@ -7,7 +7,7 @@ namespace CRL.Package.RoleAuthorize
 {
     public sealed class SystemType : IModelBase
     {
-        public override System.Collections.IList GetInitData()
+        protected override System.Collections.IList GetInitData()
         {
             var list = new List<SystemType>();
             list.Add(new SystemType() { Name = "默认系统" });

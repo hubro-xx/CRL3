@@ -11,15 +11,19 @@ namespace WebTest
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            //将lambda表达式转换可传输的json,并还原
+
             int m = 10;
-            var query = new CRL.LambdaQuery.CRLExpressionVisitor<Code.ProductData>();
-            //var re = query.Where(b => b.ProductName.Contains("22"));
-            var re = query.Where(b => b.ProductName.Substring(2)=="22");
+            var query = new CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor<Code.ProductData>();
+            var re = query.Where(b => b.ProductName.Substring(2) == "22" && b.Id > 10);
+            //var re = query.Where(b => b.ProductName.Substring(2)=="22");
             //var re = query.Where(b => b.ProductName.IndexOf("22")==1);
-            var obj = CRL.LambdaQuery.CRLQueryExpression.FromJson(re);
+
+            //还原
+            var obj = CRL.LambdaQuery.CRLExpression.CRLQueryExpression.FromJson(re);
             var expression = query.CreateLambda(obj.Expression);
             //re = CRL.CacheServer.CacheServer.Query(obj);
-            Response.Write(re);
+            TextBox1.Text = re.ToString();
         }
     }
 }

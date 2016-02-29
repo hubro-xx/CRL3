@@ -12,64 +12,27 @@ namespace CRL.LambdaQuery
 {
     public sealed partial class LambdaQuery<T> : LambdaQueryBase where T : IModel, new()
     {
-        #region join
-        /**
+        
         /// <summary>
-        /// Join,并返回筛选值
+        /// LeftJoin查询分支
         /// </summary>
-        /// <typeparam name="TJoin">关联类型</typeparam>
-        /// <param name="expression">关关表达式</param>
-        /// <param name="resultSelector">返回值,如果为空,则返回主表</param>
-        /// <param name="joinType">join类型,默认Inner</param>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        public LambdaQuery<T> Join<TJoin>(
-            Expression<Func<T, TJoin, bool>> expression,
-            Expression<Func<T, TJoin, object>> resultSelector = null, JoinType joinType = JoinType.Inner) where TJoin : IModel, new()
+        public LambdaQueryJoin<T, TJoin> LeftJoin<TJoin>(Expression<Func<T, TJoin, bool>> expression) where TJoin : IModel, new()
         {
-            QueryFields.Clear();
-            var innerType = typeof(TJoin);
-            //TypeCache.SetDBAdapterCache(innerType, dBAdapter);
-            string condition = FormatJoinExpression(expression);
-            var resultFields = new List<Attribute.FieldAttribute>();
-            if (resultSelector != null)
-            {
-                resultFields = GetSelectField(resultSelector.Body, innerType, false);
-                QueryFields = resultFields;
-            }
-            AddInnerRelation(innerType, condition);
-            return this;
+            return Join(expression, JoinType.Left);
         }
-
         /// <summary>
-        /// 存入关联值到对象内部索引
+        /// RightJoin查询分支
         /// </summary>
-        /// <typeparam name="TJoin">关联类型</typeparam>
-        /// <param name="expression">关联表达式</param>
-        /// <param name="resultSelector">选择的字段 如为null,则不返回</param>
-        /// <param name="joinType">join类型,默认Inner</param>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        public LambdaQuery<T> AppendJoinValue<TJoin>(
-           Expression<Func<T, TJoin, bool>> expression,
-           Expression<Func<TJoin, object>> resultSelector = null, JoinType joinType = JoinType.Inner) where TJoin : IModel, new()
+        public LambdaQueryJoin<T, TJoin> RightJoin<TJoin>(Expression<Func<T, TJoin, bool>> expression) where TJoin : IModel, new()
         {
-            var innerType = typeof(TJoin);
-            if (QueryFields.Count == 0)
-            {
-                SelectAll();
-            }
-            string condition = FormatJoinExpression(expression);
-            var resultFields = new List<Attribute.FieldAttribute>();
-            if (resultSelector != null)
-            {
-                resultFields = GetSelectField(resultSelector.Body, innerType, true);
-            }
-            QueryFields.AddRange(resultFields);
-            AddInnerRelation(innerType, condition);
-            return this;
+            return Join(expression, JoinType.Right);
         }
-        **/
-        #endregion 
-
         /// <summary>
         /// 创建一个JOIN查询分支
         /// </summary>

@@ -15,18 +15,18 @@ namespace CRL
     /// </summary>
     public class Base
     {
-        /// <summary>
-        /// 对集合进行分页
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="list"></param>
-        /// <param name="index">从1开始</param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        public static List<T> CutList<T>(IEnumerable<T> list, int index, int pageSize) where T : class, new()
-        {
-            return list.Skip((index - 1) * pageSize).Take(pageSize).ToList();
-        }
+        ///// <summary>
+        ///// 对集合进行分页
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="list"></param>
+        ///// <param name="index">从1开始</param>
+        ///// <param name="pageSize"></param>
+        ///// <returns></returns>
+        //public static List<T> CutList<T>(IEnumerable<T> list, int index, int pageSize) where T : class, new()
+        //{
+        //    return list.Skip((index - 1) * pageSize).Take(pageSize).ToList();
+        //}
 
         /// <summary>
         /// 获取查询字段,并自动转换虚拟字段
@@ -77,10 +77,10 @@ namespace CRL
         /// <summary>
         /// 检测所有对象
         /// </summary>
-        /// <param name="helper"></param>
+        /// <param name="db"></param>
         /// <param name="baseType"></param>
         /// <returns></returns>
-        public static string CheckAllModel(DBExtend helper, Type baseType)
+        internal static string CheckAllModel(DBExtend db, Type baseType)
         {
             string msg = "";
             //var dbcontext = new DbContext(dbHelper,null);
@@ -114,7 +114,7 @@ namespace CRL
                     {
                         object obj = System.Activator.CreateInstance(type);
                         CRL.IModel b = obj as CRL.IModel;
-                        msg += b.CreateTable(helper);
+                        msg += b.CreateTable(db);
                     }
                     catch { }
                 }
@@ -200,6 +200,10 @@ namespace CRL
             template = adpater.GetCreateSpScript(procedureName, template);
             return template;
         }
+        /// <summary>
+        /// 获取当前版本
+        /// </summary>
+        /// <returns></returns>
         public static string GetVersion()
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly().GetName();

@@ -10,7 +10,7 @@ namespace CRL
     /// <summary>
     /// 基本业务方法封装
     /// </summary>
-    /// <typeparam name="TModel"></typeparam>
+    /// <typeparam name="TModel">源对象</typeparam>
     public abstract class ProviderOrigin<TModel>
         where TModel : IModel, new()
     {
@@ -107,9 +107,9 @@ namespace CRL
         /// <returns></returns>
         public virtual string CreateTable()
         {
-            DBExtend helper = DBExtend;
+            DBExtend db = DBExtend;
             TModel obj1 = new TModel();
-            var str = obj1.CreateTable(helper);
+            var str = obj1.CreateTable(db);
             return str;
         }
         /// <summary>
@@ -117,9 +117,9 @@ namespace CRL
         /// </summary>
         public void CreateTableIndex()
         {
-            DBExtend helper = DBExtend;
+            DBExtend db = DBExtend;
             TModel obj1 = new TModel();
-            obj1.CheckIndexExists(helper);
+            obj1.CheckIndexExists(db);
         }
         #endregion
 
@@ -138,20 +138,20 @@ namespace CRL
         /// 添加一条记录[基本方法]
         /// </summary>
         /// <param name="p"></param>
-        public void Add(TModel p)
+        public virtual void Add(TModel p)
         {
-            DBExtend helper = DBExtend;
-            helper.InsertFromObj(p);
+            DBExtend db = DBExtend;
+            db.InsertFromObj(p);
         }
         /// <summary>
         /// 批量插入[基本方法]
         /// </summary>
         /// <param name="list"></param>
         /// <param name="keepIdentity">是否保持自增主键</param>
-        public void BatchInsert(List<TModel> list, bool keepIdentity = false)
+        public virtual void BatchInsert(List<TModel> list, bool keepIdentity = false)
         {
-            DBExtend helper = DBExtend;
-            helper.BatchInsert(list, keepIdentity);
+            DBExtend db = DBExtend;
+            db.BatchInsert(list, keepIdentity);
         }
         #endregion
 
@@ -163,7 +163,7 @@ namespace CRL
         /// <returns></returns>
         public TModel QueryItem(object id)
         {
-            DBExtend helper = DBExtend;
+            DBExtend db = DBExtend;
             var lambda = Base.GetQueryIdExpression<TModel>(id);
             return QueryItem(lambda);
         }
@@ -176,8 +176,8 @@ namespace CRL
         /// <returns></returns>
         public TModel QueryItem(Expression<Func<TModel, bool>> expression, bool idDest = true, bool compileSp = false)
         {
-            DBExtend helper = DBExtend;
-            return helper.QueryItem<TModel>(expression, idDest, compileSp);
+            DBExtend db = DBExtend;
+            return db.QueryItem<TModel>(expression, idDest, compileSp);
         }
         #endregion
 
@@ -189,11 +189,11 @@ namespace CRL
         /// <returns></returns>
         public int Delete(object id)
         {
-            var helper = DBExtend;
+            var db = DBExtend;
             var filed = TypeCache.GetTable(typeof(TModel)).PrimaryKey;
             string where = string.Format("{0}=@{0}", filed.Name);
-            helper.AddParam(filed.Name, id);
-            return helper.Delete<TModel>(where);
+            db.AddParam(filed.Name, id);
+            return db.Delete<TModel>(where);
         }
 
         /// <summary>
@@ -203,8 +203,8 @@ namespace CRL
         /// <returns></returns>
         public int Delete(Expression<Func<TModel, bool>> expression)
         {
-            DBExtend helper = DBExtend;
-            int n = helper.Delete<TModel>(expression);
+            DBExtend db = DBExtend;
+            int n = db.Delete<TModel>(expression);
             return n;
         }
         #endregion
@@ -216,8 +216,8 @@ namespace CRL
         /// <returns></returns>
         public List<TModel> QueryList()
         {
-            DBExtend helper = GetDbHelper();//避开事务控制,使用新的连接
-            return helper.QueryList<TModel>();
+            DBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            return db.QueryList<TModel>();
         }
         /// <summary>
         /// 指定条件查询[基本方法]
@@ -227,8 +227,8 @@ namespace CRL
         /// <returns></returns>
         public List<TModel> QueryList(Expression<Func<TModel, bool>> expression, bool compileSp = false)
         {
-            DBExtend helper = GetDbHelper();//避开事务控制,使用新的连接
-            return helper.QueryList<TModel>(expression, compileSp);
+            DBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            return db.QueryList<TModel>(expression, compileSp);
         }
         /**
         /// <summary>
@@ -238,8 +238,8 @@ namespace CRL
         /// <returns></returns>
         public List<TModel> QueryList(LambdaQuery<TModel> query)
         {
-            DBExtend helper = GetDbHelper();//避开事务控制,使用新的连接
-            return helper.QueryList<TModel>(query);
+            DBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            return db.QueryList<TModel>(query);
         }
         /// <summary>
         /// 返回动态对象的查询
@@ -248,8 +248,8 @@ namespace CRL
         /// <returns></returns>
         public List<dynamic> QueryDynamic(LambdaQuery<TModel> query)
         {
-            DBExtend helper = DBExtend;
-            return helper.QueryDynamic<TModel>(query);
+            DBExtend db = DBExtend;
+            return db.QueryDynamic<TModel>(query);
         }
         /// <summary>
         /// 返回指定类型
@@ -259,8 +259,8 @@ namespace CRL
         /// <returns></returns>
         public List<TResult> QueryDynamic<TResult>(LambdaQuery<TModel> query) where TResult : class,new()
         {
-            DBExtend helper = DBExtend;
-            return helper.QueryDynamic<TModel, TResult>(query);
+            DBExtend db = DBExtend;
+            return db.QueryDynamic<TModel, TResult>(query);
         }
         **/
         #endregion
@@ -276,8 +276,8 @@ namespace CRL
         /// <returns></returns>
         public List<TModel> Page(CRL.LambdaQuery<TModel> query)
         {
-            DBExtend helper = DBExtend;
-            return helper.Page<TModel, TModel>(query);
+            DBExtend db = DBExtend;
+            return db.Page<TModel, TModel>(query);
         }
         /// <summary>
         /// 分页,并返回指定类型
@@ -288,8 +288,8 @@ namespace CRL
         /// <returns></returns>
         public List<TResult> Page<TResult>(CRL.LambdaQuery<TModel> query) where TResult : class,new()
         {
-            DBExtend helper = DBExtend;
-            return helper.Page<TModel, TResult>(query);
+            DBExtend db = DBExtend;
+            return db.Page<TModel, TResult>(query);
         }
 
         /// <summary>
@@ -300,8 +300,8 @@ namespace CRL
         /// <returns></returns>
         public List<dynamic> PageDynamic(CRL.LambdaQuery<TModel> query)
         {
-            DBExtend helper = DBExtend;
-            return helper.Page(query);
+            DBExtend db = DBExtend;
+            return db.Page(query);
         }
          * */
         #endregion
@@ -314,8 +314,8 @@ namespace CRL
         /// <returns></returns>
         public int Update(TModel item)
         {
-            DBExtend helper = DBExtend;
-            return helper.Update(item);
+            DBExtend db = DBExtend;
+            return db.Update(item);
         }
 
         /// <summary>
@@ -326,8 +326,8 @@ namespace CRL
         /// <returns></returns>
         public int Update(Expression<Func<TModel, bool>> expression, TModel model)
         {
-            DBExtend helper = DBExtend;
-            int n = helper.Update<TModel>(expression, model);
+            DBExtend db = DBExtend;
+            int n = db.Update<TModel>(expression, model);
             return n;
         }
         /// <summary>
@@ -338,8 +338,21 @@ namespace CRL
         /// <returns></returns>
         public int Update(Expression<Func<TModel, bool>> expression, ParameCollection setValue)
         {
-            DBExtend helper = DBExtend;
-            int n = helper.Update<TModel>(expression, setValue);
+            DBExtend db = DBExtend;
+            int n = db.Update<TModel>(expression, setValue);
+            return n;
+        }
+        /// <summary>
+        /// 按匿名对象更新
+        /// </summary>
+        /// <typeparam name="TOjbect"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="updateValue"></param>
+        /// <returns></returns>
+        public int Update<TOjbect>(Expression<Func<TModel, bool>> expression, TOjbect updateValue) where TOjbect : class
+        {
+            var db = DBExtend;
+            int n = db.Update<TModel>(expression, updateValue);
             return n;
         }
         #endregion
@@ -356,12 +369,12 @@ namespace CRL
         /// <returns></returns>
         protected List<T> ExecListWithFormat<T>(string sql, ParameCollection parame, params Type[] types) where T : class, new()
         {
-            DBExtend helper = DBExtend;
+            DBExtend db = DBExtend;
             foreach (var p in parame)
             {
-                helper.AddParam(p.Key, p.Value);
+                db.AddParam(p.Key, p.Value);
             }
-            return helper.ExecList<T>(sql, types);
+            return db.ExecList<T>(sql, types);
         }
         /// <summary>
         /// 指定格式化更新[基本方法]
@@ -372,12 +385,12 @@ namespace CRL
         /// <returns></returns>
         protected int ExecuteWithFormat(string sql, ParameCollection parame, params Type[] types)
         {
-            DBExtend helper = DBExtend;
+            DBExtend db = DBExtend;
             foreach (var p in parame)
             {
-                helper.AddParam(p.Key, p.Value);
+                db.AddParam(p.Key, p.Value);
             }
-            return helper.Execute(sql, types);
+            return db.Execute(sql, types);
         }
         /// <summary>
         /// 指定格式化返回单个结果[基本方法]
@@ -388,12 +401,12 @@ namespace CRL
         /// <returns></returns>
         protected T ExecScalarWithFormat<T>(string sql, ParameCollection parame, params Type[] types)
         {
-            DBExtend helper = DBExtend;
+            DBExtend db = DBExtend;
             foreach (var p in parame)
             {
-                helper.AddParam(p.Key, p.Value);
+                db.AddParam(p.Key, p.Value);
             }
-            return helper.ExecScalar<T>(sql, types);
+            return db.ExecScalar<T>(sql, types);
         }
 
         #endregion
@@ -435,8 +448,8 @@ namespace CRL
         /// <returns></returns>
         public int Count(Expression<Func<TModel, bool>> expression, bool compileSp = false)
         {
-            DBExtend helper = GetDbHelper();//避开事务控制,使用新的连接
-            return helper.Count<TModel>(expression, compileSp);
+            DBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            return db.Count<TModel>(expression, compileSp);
         }
         /// <summary>
         /// sum 按表达式指定字段[基本方法]
@@ -448,8 +461,8 @@ namespace CRL
         /// <returns></returns>
         public TType Sum<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
-            DBExtend helper = GetDbHelper();//避开事务控制,使用新的连接
-            return helper.Sum<TType, TModel>(expression, field, compileSp);
+            DBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            return db.Sum<TType, TModel>(expression, field, compileSp);
         }
         /// <summary>
         /// 取最大值[基本方法]
@@ -461,8 +474,8 @@ namespace CRL
         /// <returns></returns>
         public TType Max<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
-            DBExtend helper = GetDbHelper();//避开事务控制,使用新的连接
-            return helper.Max<TType, TModel>(expression, field, compileSp);
+            DBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            return db.Max<TType, TModel>(expression, field, compileSp);
         }
         /// <summary>
         /// 取最小值[基本方法]
@@ -474,8 +487,8 @@ namespace CRL
         /// <returns></returns>
         public TType Min<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
-            DBExtend helper = GetDbHelper();//避开事务控制,使用新的连接
-            return helper.Min<TType, TModel>(expression, field, compileSp);
+            DBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            return db.Min<TType, TModel>(expression, field, compileSp);
         }
         #endregion
 
