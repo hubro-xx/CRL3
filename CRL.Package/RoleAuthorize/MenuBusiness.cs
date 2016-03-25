@@ -24,13 +24,17 @@ namespace CRL.Package.RoleAuthorize
                 return "";
             return item.SequenceCode;
         }
-        public Menu GetMenuByUrl(int systemTypeId)
+        public Menu GetMenuByUrl(int systemTypeId, string url = "")
         {
-            string url = System.Web.HttpContext.Current.Request.Path.ToLower();
+            if (string.IsNullOrEmpty(url))
+            {
+                url = System.Web.HttpContext.Current.Request.Path;
+            }
+            url = url.ToLower();
             var allCache = GetAllCache(systemTypeId);
             var items = allCache.Where(b => b.DataType == systemTypeId
                 && !string.IsNullOrEmpty(b.Url)
-                && url==b.Url.ToLower()
+                && url == b.Url.ToLower()
                 && b.ParentCode != "");
             return items.FirstOrDefault();
         }

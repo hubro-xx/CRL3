@@ -39,6 +39,17 @@ namespace CRL
                 return false;
             }
         }
+        /// <summary>
+        /// 是否启用缓存并行查询(耗CPU,但速度快),默认false
+        /// 当数据量大于10W时才会生效
+        /// </summary>
+        protected virtual bool CacheQueryAsParallel
+        {
+            get
+            {
+                return false;
+            }
+        }
         #endregion
 
         #region 创建缓存
@@ -126,32 +137,7 @@ namespace CRL
                 return new CacheServer.ResultData();
             }
         }
-        /// <summary>
-        /// 直接按查询数据
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public CacheServer.ResultData DeaDataQueryCommand(CacheServer.Command command)
-        {
-            if (command.CommandType == CacheServer.CommandType.查询)
-            {
-                var expression = LambdaQuery.CRLExpression.CRLQueryExpression.FromJson(command.Data);
-                var _CRLExpression = new CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor<TModel>().CreateLambda(expression.Expression);
-                var query = GetLambdaQuery();
-                query.Where(_CRLExpression);
-                query.Page(expression.PageSize, expression.PageIndex);
-                var data = query.ToList();
-                int total = query.RowCount;
-                return new CacheServer.ResultData() { Total = total, JsonData = CoreHelper.StringHelper.SerializerToJson(data) };
-            }
-            else
-            {
-                //更新缓存
-                //var item = (TModel)CoreHelper.SerializeHelper.SerializerFromJSON(command.Data, typeof(TModel), Encoding.UTF8);
-                //UpdateById(item);
-                return new CacheServer.ResultData();
-            }
-        }
+
         /// <summary>
         /// 使用CRLExpression从缓存中查询
         /// 仅在缓存接口部署
@@ -256,7 +242,7 @@ namespace CRL
                         var primaryKey = TypeCache.GetTable(typeof(TModel)).PrimaryKey.Name;
                         if (member.Member.Name.ToUpper() == primaryKey.ToUpper())
                         {
-                            var value = (string)LambdaCompileCache.GetExpressionCacheValue(binary.Right);
+                            var value = LambdaCompileCache.GetExpressionCacheValue(binary.Right).ToString();
                             //var value = (int)Expression.Lambda(binary.Right).Compile().DynamicInvoke();
                             var all = GetCache(CacheQuery());
                             if(all==null)
@@ -275,7 +261,16 @@ namespace CRL
             }
             #endregion
             var predicate = expression.Compile();
-            var data = AllCache.Where(predicate);
+            IEnumerable<TModel> data;
+            int cacheTotal = AllCache.Count();
+            if (CacheQueryAsParallel && cacheTotal > 100000)
+            {
+                data = AllCache.AsParallel().Where(predicate);
+            }
+            else
+            {
+                data = AllCache.Where(predicate);
+            }
             total = data.Count();
             if (pageIndex > 0)
             {

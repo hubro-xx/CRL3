@@ -157,6 +157,22 @@ namespace CRL
 
         #region 查询一项
         /// <summary>
+        /// 按排序查询一条
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="sortExpression"></param>
+        /// <param name="desc"></param>
+        /// <returns></returns>
+        public TModel QueryItem<TResult>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TResult>> sortExpression, bool desc = true)
+        {
+            var query = GetLambdaQuery();
+            query.Top(1);
+            query.Where(expression).OrderBy(sortExpression, desc);
+            var db = DBExtend;
+            return db.QueryList(query).FirstOrDefault();
+        }
+        /// <summary>
         /// 按主键查询一项[基本方法]
         /// </summary>
         /// <param name="id"></param>
@@ -178,34 +194,6 @@ namespace CRL
         {
             DBExtend db = DBExtend;
             return db.QueryItem<TModel>(expression, idDest, compileSp);
-        }
-        #endregion
-
-        #region 删除
-        /// <summary>
-        /// 按主键删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public int Delete(object id)
-        {
-            var db = DBExtend;
-            var filed = TypeCache.GetTable(typeof(TModel)).PrimaryKey;
-            string where = string.Format("{0}=@{0}", filed.Name);
-            db.AddParam(filed.Name, id);
-            return db.Delete<TModel>(where);
-        }
-
-        /// <summary>
-        /// 按条件删除[基本方法]
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public int Delete(Expression<Func<TModel, bool>> expression)
-        {
-            DBExtend db = DBExtend;
-            int n = db.Delete<TModel>(expression);
-            return n;
         }
         #endregion
 
@@ -263,6 +251,34 @@ namespace CRL
             return db.QueryDynamic<TModel, TResult>(query);
         }
         **/
+        #endregion
+
+        #region 删除
+        /// <summary>
+        /// 按主键删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public int Delete(object id)
+        {
+            var db = DBExtend;
+            var filed = TypeCache.GetTable(typeof(TModel)).PrimaryKey;
+            string where = string.Format("{0}=@{0}", filed.Name);
+            db.AddParam(filed.Name, id);
+            return db.Delete<TModel>(where);
+        }
+
+        /// <summary>
+        /// 按条件删除[基本方法]
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public int Delete(Expression<Func<TModel, bool>> expression)
+        {
+            DBExtend db = DBExtend;
+            int n = db.Delete<TModel>(expression);
+            return n;
+        }
         #endregion
 
         #region 分页

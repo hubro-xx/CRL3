@@ -21,11 +21,7 @@ namespace CRL.Attribute
         /// 当是主键时,是否保留原标识,和IsPrimaryKey一起用
         /// 在插入和生成表脚本时,会按此判断
         /// </summary>
-        public bool KeepIdentity
-        {
-            get;
-            set;
-        }
+        public bool KeepIdentity { get; set; }
         /// <summary>
         /// 是否为主键
         /// 名称为id自动为主键
@@ -73,12 +69,23 @@ namespace CRL.Attribute
         /// <summary>
         /// 索引类型
         /// </summary>
-        public FieldIndexType FieldIndexType;
+        public FieldIndexType FieldIndexType { get; set; }
+        bool mapingField = true;
         /// <summary>
         /// 是否映射该字段
         /// 为false时则不参与查询
         /// </summary>
-        public bool MapingField = true;
+        public bool MapingField
+        {
+            get
+            {
+                return mapingField;
+            }
+            set
+            {
+                mapingField = value;
+            }
+        }
         public override string ToString()
         {
             return string.Format("{0}.{1} |{2}", TableName, Name, QueryFullScript);
@@ -103,27 +110,7 @@ namespace CRL.Attribute
                 return Name;
             }
         }
-        //string aliasesName;
-        ///// <summary>
-        ///// 字段别名,带表名,关联字段查询时用
-        ///// like table1__name
-        ///// </summary>
-        //internal string AliasesName
-        //{
-        //    get
-        //    {
-        //        if (string.IsNullOrEmpty(aliasesName))
-        //        {
-        //            //映射名不为空则按映射名,否则按字段名
-        //            aliasesName = GetTableFieldFormat(TableName, MappingName);
-        //        }
-        //        return aliasesName;
-        //    }
-        //    set
-        //    {
-        //        aliasesName = value;
-        //    }
-        //}
+       
 
         string mapingName;
         /// <summary>
@@ -140,33 +127,7 @@ namespace CRL.Attribute
             set { mapingName = value; }
         }
 
-        ///// <summary>
-        ///// 字段完整查询语法
-        ///// like t1.Name as Order__Name
-        ///// </summary>
-        //internal string QueryFullName;
-
-        ///// <summary>
-        ///// 设置字段查询语法
-        ///// </summary>
-        ///// <param name="prefix">前缀</param>
-        ///// <param name="usePrefix">是否使用前缀</param>
-        ///// <param name="useAliasesName">是否使用别名 like as field1</param>
-        //internal void _SetFieldQueryScript(string prefix,bool usePrefix, bool useAliasesName)
-        //{
-        //    Prefix = prefix;
-        //    var s = usePrefix ? Prefix : "";
-        //    string script = s + KeyWordName;
-        //    if (useAliasesName)
-        //    {
-        //        script += " as " + AliasesName;
-        //    }
-        //    if (FieldType == Attribute.FieldType.虚拟字段)
-        //    {
-        //        script = string.Format("{0} as {1}", VirtualField, useAliasesName ? AliasesName : KeyWordName);
-        //    }
-        //    QueryFullName = script;
-        //}
+      
         /// <summary>
         /// 查询完整语句
         /// </summary>
@@ -245,11 +206,11 @@ namespace CRL.Attribute
         /// <summary>
         /// 默认值
         /// </summary>
-        public string DefaultValue;
+        public string DefaultValue { get; set; }
         /// <summary>
         /// 自定义数据库字段类型,如 varchar(50)
         /// </summary>
-        public string ColumnType;
+        public string ColumnType { get; set; }
         bool notNull;
         /// <summary>
         /// 不可为空,主键自动为不可为空
@@ -269,12 +230,13 @@ namespace CRL.Attribute
                 notNull = value;
             }
         }
+        int length = 30;
         /// <summary>
         /// 长度,超过3000字段类型将会设为ntext
         /// 若是需要指定长度,请赋值
         /// 默认30
         /// </summary>
-        public int Length = 30;
+        public int Length { get { return length; } set { length = value; } }
         /// <summary>
         /// 属性类型
         /// </summary>
@@ -286,28 +248,28 @@ namespace CRL.Attribute
         /// 如year($addtime)
         /// 字段前需加前辍$,以在关联查询时区分
         /// </summary>
-        public string VirtualField;
+        public string VirtualField { get; set; }
         /// <summary>
         /// 约束字段
         /// 格式:$CategoryCode[当前类型字段]=SequenceCode[关联表字段]
         /// </summary>
-        public string ConstraintField;
+        public string ConstraintField { get; set; }
         /// <summary>
         /// 子表查询附加条件
         /// 如:CategoryCode=1
         /// </summary>
-        public string Constraint;
+        public string Constraint { get; set; }
         /// <summary>
         /// 关联表类型
         /// 只是字段时使用
         /// typeof(ClassA)
         /// </summary>
-        public Type ConstraintType;
+        public Type ConstraintType { get; set; }
         /// <summary>
         /// 关联表要取出的字段
         /// 只是字段时使用
         /// </summary>
-        public string ConstraintResultField;
+        public string ConstraintResultField { get; set; }
         #endregion
         PropertyInfo propertyInfo;
         /// <summary>
@@ -350,12 +312,12 @@ namespace CRL.Attribute
             {
                 //oracle会出现类型转换问题
                 value = ObjectConvert.ConvertObject(propertyInfo.PropertyType, value);
-                propertyInfo.SetValue(obj, value, null);
             }
             catch(Exception ero)
             {
                 throw new Exception(ero.Message + " 在属性" + propertyInfo.Name + " " + propertyInfo.PropertyType);
             }
+            propertyInfo.SetValue(obj, value, null);
         }
     }
 

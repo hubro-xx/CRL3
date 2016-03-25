@@ -188,7 +188,16 @@ namespace CRL
         {
             if (source == null)
                 return null;
-            object obj = System.Activator.CreateInstance(toType);
+            object obj ;
+            //obj = System.Activator.CreateInstance(toType);
+            try
+            {
+                obj = System.Activator.CreateInstance(toType);
+            }
+            catch
+            {
+                throw new Exception(string.Format("{1}不能转换为{0},请检查属性定义", toType, source.GetType()));
+            }
             foreach (var info in destTypes)
             {
                 var sourceInfo = sourceTypes.Find(b => b.Name.ToLower() == info.Name.ToLower());

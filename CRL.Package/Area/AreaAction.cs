@@ -54,7 +54,6 @@ namespace CRL.Package.Area
                 }
                 return AreaAction.cache;
             }
-            set { AreaAction.cache = value; }
         }
         /// <summary>
         /// 根据父级获取所有子级

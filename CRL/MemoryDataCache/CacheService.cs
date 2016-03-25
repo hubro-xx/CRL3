@@ -160,6 +160,7 @@ namespace CRL.MemoryDataCache
             {
                 StarWatch();
             }
+            //更新缓存数据
             if (dataItem.UpdatedData != null)
             {
                 dataItem.Data = ObjectConvert.ConvertToDictionary<TItem>(dataItem.UpdatedData);
@@ -276,9 +277,11 @@ namespace CRL.MemoryDataCache
                 try
                 {
                     var data = QueryData(key, cacheItem.Type, cacheItem.Query, helper);
+                    //将新数据放放UpdateData中, 下次调用时填入Data
                     cacheItem.UpdatedData = data;
                     cacheItem.UpdateTime = DateTime.Now;
                     cacheItem.QueryCount += 1;
+                    cacheItem.Data = null;
                     return true;
                 }
                 catch { }
@@ -414,9 +417,11 @@ namespace CRL.MemoryDataCache
                         //重新给参数赋值
                         DBHelper helper = item.DBHelper;
                         helper.Params = item.Params;
+                        //将新数据放放UpdateData中, 下次调用时填入Data
                         var data = QueryData(item.Key, item.Type, item.TableName, helper);
                         cacheDatas[item.Key].UpdateTime = DateTime.Now;
                         cacheDatas[item.Key].UpdatedData = data;
+                        cacheDatas[item.Key].Data = null;
                     }
                     catch (Exception ero)
                     {

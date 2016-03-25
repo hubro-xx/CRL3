@@ -208,3 +208,11 @@
 2016-02-29
 	增加Update方法
 	Update<TOjbect>(Expression<Func<TModel, bool>> expression, TOjbect updateValue) where TOjbect : class
+2016-03-11
+	修改对象转换ToType<T,T2>错误判断
+2016-03-14
+	修改ObjectConvert.ConvertObject方法,Nullable转换错误
+	增加QueryItem按排序返回方法
+2016-03-19
+	优化权限控制标注,不需要再手写判断权限了 MenuAuthorAttribute
+	增加缓存查询并行查询开关CacheQueryAsParallel

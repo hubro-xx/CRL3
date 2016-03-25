@@ -132,6 +132,11 @@ namespace CRL
             {
                 return convertMethod[type.BaseType](value);
             }
+            if (type.FullName.StartsWith("System.Nullable"))
+            {
+                //Nullable<T> 可空属性
+                type = type.GenericTypeArguments[0];
+            }
             return Convert.ChangeType(value, type);
             #region 类型转换
             if (type == typeof(Int32))

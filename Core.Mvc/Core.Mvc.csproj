@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseController.cs" />
+    <Compile Include="MenuAuthorAttribute.cs" />
     <Compile Include="CustomActionResult.cs" />
     <Compile Include="CustomController.cs" />
     <Compile Include="HtmlExtensions.cs" />

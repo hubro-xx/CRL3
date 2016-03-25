@@ -61,6 +61,7 @@ namespace CRL
         /// 是否检测表结构,生产服务器可将此值设为FALSE
         /// </summary>
         public static bool CheckModelTableMaping = true;
+
     }
 
 
