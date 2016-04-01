@@ -157,10 +157,9 @@ namespace CRL.Package.Account
                     return false;
                 }
             }
-            int transactionId = 0;
             item.CurrentBalance = account.CurrentBalance + item.Amount;
             item.LastBalance = account.CurrentBalance;
-            transactionId = helper.InsertFromObj(item);
+            helper.InsertFromObj(item);
             //当前余额
             account.Cumulation(b => b.CurrentBalance, item.Amount);
             helper.Update(account);

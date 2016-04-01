@@ -29,9 +29,9 @@ namespace CRL.Package.DicConfig
             {
                 return 0;
             }
-            int id = base.Add(dic);
+            base.Add(dic);
             //ClearCache();
-            return id;
+            return dic.Id;
         }
         /// <summary>
         /// 取名称

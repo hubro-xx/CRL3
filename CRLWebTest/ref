@@ -464,7 +464,6 @@
             获取插入语法
             </summary>
             <param name="obj"></param>
-            <param name="helper"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.DBAdapter.MySQLDBAdapter.GetWithNolockFormat">
@@ -521,7 +520,6 @@
             <summary>
             创建表
             </summary>
-            <param name="helper"></param>
             <param name="fields"></param>
             <param name="tableName"></param>
         </member>
@@ -559,16 +557,6 @@
             基本方法
             </summary>
         </member>
-        <member name="M:CRL.Base.CutList``1(System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32)">
-            <summary>
-            对集合进行分页
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="list"></param>
-            <param name="index">从1开始</param>
-            <param name="pageSize"></param>
-            <returns></returns>
-        </member>
         <member name="M:CRL.Base.GetQueryFields(System.Collections.Generic.IEnumerable{CRL.Attribute.FieldAttribute})">
             <summary>
             获取查询字段,并自动转换虚拟字段
@@ -580,7 +568,7 @@
             <summary>
             检测所有对象
             </summary>
-            <param name="helper"></param>
+            <param name="db"></param>
             <param name="baseType"></param>
             <returns></returns>
         </member>
@@ -595,6 +583,12 @@
             <param name="templateParame"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.Base.GetVersion">
+            <summary>
+            获取当前版本
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CRL.BaseProvider`1">
             <summary>
             业务基类
@@ -606,7 +600,7 @@
             <summary>
             基本业务方法封装
             </summary>
-            <typeparam name="TModel"></typeparam>
+            <typeparam name="TModel">源对象</typeparam>
         </member>
         <member name="M:CRL.ProviderOrigin`1.#ctor">
             <summary>
@@ -673,6 +667,16 @@
             <param name="list"></param>
             <param name="keepIdentity">是否保持自增主键</param>
         </member>
+        <member name="M:CRL.ProviderOrigin`1.QueryItem``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            按排序查询一条
+            </summary>
+            <typeparam name="TResult"></typeparam>
+            <param name="expression"></param>
+            <param name="sortExpression"></param>
+            <param name="desc"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.ProviderOrigin`1.QueryItem(System.Object)">
             <summary>
             按主键查询一项[基本方法]
@@ -689,20 +693,6 @@
             <param name="compileSp"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.ProviderOrigin`1.Delete(System.Object)">
-            <summary>
-            按主键删除
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.ProviderOrigin`1.Delete(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            按条件删除[基本方法]
-            </summary>
-            <param name="expression"></param>
-            <returns></returns>
-        </member>
         <member name="M:CRL.ProviderOrigin`1.QueryList">
             <summary>
             返回全部结果[基本方法]
@@ -715,6 +705,20 @@
             </summary>
             <param name="expression"></param>
             <param name="compileSp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ProviderOrigin`1.Delete(System.Object)">
+            <summary>
+            按主键删除
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ProviderOrigin`1.Delete(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            按条件删除[基本方法]
+            </summary>
+            <param name="expression"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.ProviderOrigin`1.Update(`0)">
@@ -738,6 +742,15 @@
             </summary>
             <param name="expression">条件</param>
             <param name="setValue">值</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ProviderOrigin`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},``0)">
+            <summary>
+            按匿名对象更新
+            </summary>
+            <typeparam name="TOjbect"></typeparam>
+            <param name="expression"></param>
+            <param name="updateValue"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.ProviderOrigin`1.ExecListWithFormat``1(System.String,CRL.ParameCollection,System.Type[])">
@@ -879,14 +892,7 @@
             <param name="command"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.BaseProvider`1.DeaDataQueryCommand(CRL.CacheServer.Command)">
-            <summary>
-            直接按查询数据
-            </summary>
-            <param name="command"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.BaseProvider`1.QueryFromCache(CRL.LambdaQuery.CRLQueryExpression)">
+        <member name="M:CRL.BaseProvider`1.QueryFromCache(CRL.LambdaQuery.CRLExpression.CRLQueryExpression)">
             <summary>
             使用CRLExpression从缓存中查询
             仅在缓存接口部署
@@ -950,6 +956,12 @@
             是否从远程查询缓存
             </summary>
         </member>
+        <member name="P:CRL.BaseProvider`1.CacheQueryAsParallel">
+            <summary>
+            是否启用缓存并行查询(耗CPU,但速度快),默认false
+            当数据量大于10W时才会生效
+            </summary>
+        </member>
         <member name="P:CRL.BaseProvider`1.AllCache">
             <summary>
             获取当前对象缓存,不指定条件
@@ -958,17 +970,6 @@
         <member name="T:CRL.Attribute.FieldAttribute">
             <summary>
             字段属性设置
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.FieldIndexType">
-            <summary>
-            索引类型
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.MapingField">
-            <summary>
-            是否映射该字段
-            为false时则不参与查询
             </summary>
         </member>
         <member name="F:CRL.Attribute.FieldAttribute.Name">
@@ -1018,58 +1019,9 @@
             主表名
             </summary>
         </member>
-        <member name="F:CRL.Attribute.FieldAttribute.DefaultValue">
-            <summary>
-            默认值
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.ColumnType">
-            <summary>
-            自定义数据库字段类型,如 varchar(50)
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.Length">
-            <summary>
-            长度,超过3000字段类型将会设为ntext
-            若是需要指定长度,请赋值
-            默认30
-            </summary>
-        </member>
         <member name="F:CRL.Attribute.FieldAttribute.PropertyType">
             <summary>
             属性类型
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.VirtualField">
-            <summary>
-            自动转换虚拟字段
-            如year($addtime)
-            字段前需加前辍$,以在关联查询时区分
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.ConstraintField">
-            <summary>
-            约束字段
-            格式:$CategoryCode[当前类型字段]=SequenceCode[关联表字段]
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.Constraint">
-            <summary>
-            子表查询附加条件
-            如:CategoryCode=1
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.ConstraintType">
-            <summary>
-            关联表类型
-            只是字段时使用
-            typeof(ClassA)
-            </summary>
-        </member>
-        <member name="F:CRL.Attribute.FieldAttribute.ConstraintResultField">
-            <summary>
-            关联表要取出的字段
-            只是字段时使用
             </summary>
         </member>
         <member name="M:CRL.Attribute.FieldAttribute.SetPropertyInfo(System.Reflection.PropertyInfo)">
@@ -1109,6 +1061,17 @@
             字段类型
             </summary>
         </member>
+        <member name="P:CRL.Attribute.FieldAttribute.FieldIndexType">
+            <summary>
+            索引类型
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.MapingField">
+            <summary>
+            是否映射该字段
+            为false时则不参与查询
+            </summary>
+        </member>
         <member name="P:CRL.Attribute.FieldAttribute.KeyWordName">
             <summary>
             关键字处理后的名称(字段名) 
@@ -1119,9 +1082,58 @@
             映射名称,在查询时用 如 new{Name1=b.Name}
             </summary>
         </member>
+        <member name="P:CRL.Attribute.FieldAttribute.DefaultValue">
+            <summary>
+            默认值
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.ColumnType">
+            <summary>
+            自定义数据库字段类型,如 varchar(50)
+            </summary>
+        </member>
         <member name="P:CRL.Attribute.FieldAttribute.NotNull">
             <summary>
             不可为空,主键自动为不可为空
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.Length">
+            <summary>
+            长度,超过3000字段类型将会设为ntext
+            若是需要指定长度,请赋值
+            默认30
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.VirtualField">
+            <summary>
+            自动转换虚拟字段
+            如year($addtime)
+            字段前需加前辍$,以在关联查询时区分
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.ConstraintField">
+            <summary>
+            约束字段
+            格式:$CategoryCode[当前类型字段]=SequenceCode[关联表字段]
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.Constraint">
+            <summary>
+            子表查询附加条件
+            如:CategoryCode=1
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.ConstraintType">
+            <summary>
+            关联表类型
+            只是字段时使用
+            typeof(ClassA)
+            </summary>
+        </member>
+        <member name="P:CRL.Attribute.FieldAttribute.ConstraintResultField">
+            <summary>
+            关联表要取出的字段
+            只是字段时使用
             </summary>
         </member>
         <member name="T:CRL.DbContext">
@@ -1639,12 +1651,14 @@
             <param name="setValue">值</param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.UpdateById``1(``0)">
+        <member name="M:CRL.DBExtend.Update``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Object)">
             <summary>
-            按主键更新整个对象
+            按匿名对象更新
             </summary>
             <typeparam name="TModel"></typeparam>
-            <param name="item"></param>
+            <param name="expression"></param>
+            <param name="updateValue"></param>
+            <returns></returns>
         </member>
         <member name="M:CRL.DBExtend.ExecDynamicList(System.String,System.Type[])">
             <summary>
@@ -2028,6 +2042,24 @@
             <param name="resultSelector"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.ExtensionMethod.Format(System.String,System.Object[])">
+            <summary>
+            字符串格式化
+            </summary>
+            <param name="source"></param>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ExtensionMethod.Page``1(System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32)">
+            <summary>
+            对集合进行分页
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="source"></param>
+            <param name="index"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.ExtensionMethod.Like(System.String,System.String)">
             <summary>
             Like("%key%")
@@ -2148,46 +2180,76 @@
             <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.LambdaQuery.CRLQueryExpression.FromJson(System.String)">
+        <member name="T:CRL.LambdaQuery.CRLExpression.CRLExpression">
             <summary>
-            CRLQueryExpression json
-            </summary>
-            <param name="json"></param>
-            <returns></returns>
-        </member>
-        <member name="P:CRL.LambdaQuery.CRLQueryExpression.Type">
-            <summary>
-            对象类型,FullName
+            CRLExpression节点
             </summary>
         </member>
-        <member name="F:CRL.LambdaQuery.CRLExpression.ExpressionType">
+        <member name="F:CRL.LambdaQuery.CRLExpression.CRLExpression.ExpressionType">
             <summary>
             左右操作类型
             </summary>
         </member>
-        <member name="P:CRL.LambdaQuery.CRLExpression.Type">
+        <member name="P:CRL.LambdaQuery.CRLExpression.CRLExpression.Left">
+            <summary>
+            左节点
+            </summary>
+        </member>
+        <member name="P:CRL.LambdaQuery.CRLExpression.CRLExpression.Right">
+            <summary>
+            右节点
+            </summary>
+        </member>
+        <member name="P:CRL.LambdaQuery.CRLExpression.CRLExpression.Type">
             <summary>
             节点类型
             </summary>
         </member>
-        <member name="P:CRL.LambdaQuery.CRLExpression.Data">
+        <member name="P:CRL.LambdaQuery.CRLExpression.CRLExpression.Data">
             <summary>
             数据
             </summary>
         </member>
-        <member name="M:CRL.LambdaQuery.CRLExpressionVisitor`1.Where(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Int32,System.Int32)">
+        <member name="T:CRL.LambdaQuery.CRLExpression.CRLExpressionType">
+            <summary>
+            节点类型
+            </summary>
+        </member>
+        <member name="M:CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor`1.Where(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Int32,System.Int32)">
             <summary>
             返回CRLQueryExpression json格式查询
             </summary>
             <param name="expression"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.LambdaQuery.CRLExpressionVisitor`1.CreateLambda(CRL.LambdaQuery.CRLExpression)">
+        <member name="M:CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor`1.CreateLambda(CRL.LambdaQuery.CRLExpression.CRLExpression)">
             <summary>
             转换为Lambda表达式
             </summary>
             <param name="expression"></param>
             <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.CRLExpression.CRLQueryExpression.FromJson(System.String)">
+            <summary>
+            CRLQueryExpression json
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="P:CRL.LambdaQuery.CRLExpression.CRLQueryExpression.Type">
+            <summary>
+            对象类型,FullName
+            </summary>
+        </member>
+        <member name="P:CRL.LambdaQuery.CRLExpression.CRLQueryExpression.PageSize">
+            <summary>
+            分页用,每页大小
+            </summary>
+        </member>
+        <member name="P:CRL.LambdaQuery.CRLExpression.CRLQueryExpression.PageIndex">
+            <summary>
+            分页用,页索引
+            </summary>
         </member>
         <member name="T:CRL.LambdaQuery.LambdaQuery`1">
             <summary>
@@ -2348,6 +2410,22 @@
             设置group having条件
             like b => b.Number.SUM() > 1
             </summary>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQuery`1.LeftJoin``1(System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}})">
+            <summary>
+            LeftJoin查询分支
+            </summary>
+            <typeparam name="TJoin"></typeparam>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQuery`1.RightJoin``1(System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}})">
+            <summary>
+            RightJoin查询分支
+            </summary>
+            <typeparam name="TJoin"></typeparam>
             <param name="expression"></param>
             <returns></returns>
         </member>
@@ -3056,6 +3134,7 @@
         <member name="M:CRL.IModel.OnColumnCreated(System.String)">
             <summary>
             当列创建时,可重写
+            可处理在添加字段后数据的升级
             </summary>
             <param name="fieldName"></param>
         </member>
@@ -3069,14 +3148,22 @@
             <summary>
             检查索引
             </summary>
-            <param name="helper"></param>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.IModel.CreateColumn(CRL.DBExtend,CRL.Attribute.FieldAttribute)">
+            <summary>
+            创建列
+            </summary>
+            <param name="db"></param>
+            <param name="item"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.IModel.CheckColumnExists(CRL.DBExtend)">
             <summary>
             检查对应的字段是否存在,不存在则创建
             </summary>
-            <param name="helper"></param>
+            <param name="db"></param>
         </member>
         <member name="M:CRL.IModel.GetColumns(CRL.DBAdapter.DBAdapterBase)">
             <summary>
@@ -3088,7 +3175,7 @@
             <summary>
             创建表
             </summary>
-            <param name="helper"></param>
+            <param name="db"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.IModel.CreateTable(CRL.DBExtend,System.String@)">
@@ -3096,7 +3183,7 @@
             创建表
             会检查表是否存在,如果存在则检查字段
             </summary>
-            <param name="helper"></param>
+            <param name="db"></param>
             <param name="message"></param>
             <returns></returns>
         </member>
@@ -3200,6 +3287,24 @@
             <typeparam name="TJoin2">再关联的类型</typeparam>
             <param name="expression">关联语法</param>
             <param name="joinType">关联类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQueryJoin`2.LeftJoin``1(System.Linq.Expressions.Expression{System.Func{`1,``0,System.Boolean}})">
+            <summary>
+            LeftJoin
+            在当前关联基础上再创建关联
+            </summary>
+            <typeparam name="TJoin2"></typeparam>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQueryJoin`2.RightJoin``1(System.Linq.Expressions.Expression{System.Func{`1,``0,System.Boolean}})">
+            <summary>
+            RightJoin
+            在当前关联基础上再创建关联
+            </summary>
+            <typeparam name="TJoin2"></typeparam>
+            <param name="expression"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.LambdaQuery.MethodAnalyze.Count(System.String,System.Linq.Expressions.ExpressionType,System.Int32@,CRL.LambdaQuery.AddParameHandler,System.Object[])">
@@ -3378,7 +3483,7 @@
             更新的项
             </summary>
         </member>
-        <member name="M:CRL.ObjectConvert.SetNullValue(System.Object,System.Type)">
+        <member name="M:CRL.ObjectConvert.CheckNullValue(System.Object,System.Type)">
             <summary>
             转化值,并处理默认值
             </summary>
@@ -3391,7 +3496,7 @@
             转换为为强类型
             </summary>
             <param name="type"></param>
-            <param name="obj"></param>
+            <param name="value"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.ObjectConvert.ConvertObject``1(System.Object)">
@@ -3432,7 +3537,6 @@
             <summary>
             键值的集合,不区分大小写
             如果不需要以参数形式处理,名称前加上$ 如 c2["$SoldCount"]="SoldCount+" + num;
-            分页参数仅在分页时才会用到,查询缓存参数则相反
             </summary>
         </member>
         <member name="T:CRL.ExpressionDealDataHandler">
@@ -3481,11 +3585,6 @@
             是否检测表结构,生产服务器可将此值设为FALSE
             </summary>
         </member>
-        <member name="F:CRL.Attribute.TableAttribute.Type">
-            <summary>
-            对象类型
-            </summary>
-        </member>
         <member name="F:CRL.Attribute.TableAttribute.Fields">
             <summary>
             所有字段
@@ -3506,6 +3605,11 @@
             自增主键
             </summary>
         </member>
+        <member name="P:CRL.Attribute.TableAttribute.Type">
+            <summary>
+            对象类型
+            </summary>
+        </member>
         <member name="T:CRL.Sharding.BaseProvider`1">
             <summary>
             分表数据管理实现
@@ -3522,6 +3626,12 @@
             使用主数据索引定位库
             </summary>
             <param name="_mainDataIndex"></param>
+        </member>
+        <member name="M:CRL.Sharding.BaseProvider`1.Add(`0)">
+            <summary>
+            插入对象
+            </summary>
+            <param name="p"></param>
         </member>
         <member name="T:CRL.Sharding.DBService">
             <summary>
@@ -3676,6 +3786,11 @@
         <member name="P:CRL.Sharding.DB.TablePart.MainDataEndIndex">
             <summary>
             主数据结束索引值
+            </summary>
+        </member>
+        <member name="T:CRL.Sharding.Location">
+            <summary>
+            数据定位
             </summary>
         </member>
         <member name="T:CRL.Sharding.UnionType">

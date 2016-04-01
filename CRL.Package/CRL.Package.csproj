@@ -205,12 +205,6 @@
     <Compile Include="TradeType\TradeTypeManage.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CRL\CRL.csproj">
-      <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
-      <Name>CRL</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\area.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -218,6 +212,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CRL\CRL.csproj">
+      <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
+      <Name>CRL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

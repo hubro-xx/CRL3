@@ -61,8 +61,7 @@ namespace CRL.Package.Category
             //helper.Clear();
             category.SequenceCode = newCode;
             category.ParentCode = parentSequenceCode;
-            int id = helper.InsertFromObj( category);
-            category.Id = id;
+            helper.InsertFromObj( category);
             //ClearCache();
             return category;
         }

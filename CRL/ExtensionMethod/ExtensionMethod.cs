@@ -306,5 +306,19 @@ namespace CRL
         {
             return Convert.ToInt32(e);
         }
+
+                /// <summary>
+        /// 判断类型是否为集合类型
+        /// </summary>
+        /// <param name="type">要处理的类型</param>
+        /// <returns>是返回True，不是返回False</returns>
+        public static bool IsEnumerable(this Type type)
+        {
+            if (type == typeof(string))
+            {
+                return false;
+            }
+            return typeof(IEnumerable).IsAssignableFrom(type);
+        }
     }
 }
