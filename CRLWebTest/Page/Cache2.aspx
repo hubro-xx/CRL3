@@ -41,7 +41,7 @@
     <pre>
     //实现客户端调用
     //有多个服务器添加多个
-    CRL.CacheServerSetting.AddClientProxy("127.0.0.1", 1129);
+    CRL.CacheServerSetting.AddTcpServerListen("127.0.0.1", 1129);
     CRL.CacheServerSetting.Init();
     </pre>
     启用远端缓存查询,重写ProductDataManage属性

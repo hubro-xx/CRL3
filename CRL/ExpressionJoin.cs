@@ -79,16 +79,16 @@ namespace CRL
         /// <returns></returns>
         public IEnumerable<T> Where(IEnumerable<T> list)
         {
-            var query = list.Where(currentExpression.Compile());
+            var result = list.Where(currentExpression.Compile());
             try
             {
-                query.Count();
+                result.Count();
             }
             catch
             {
                 return new List<T>();
             }
-            return query;
+            return result;
         }
         /// <summary>
         /// 动态排序

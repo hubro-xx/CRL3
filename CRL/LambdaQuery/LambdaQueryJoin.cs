@@ -25,7 +25,18 @@ namespace CRL.LambdaQuery
             BaseQuery = query;
         }
         LambdaQueryBase BaseQuery;
-        
+
+        /// <summary>
+        /// 按TJoin追加条件
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQueryJoin<T, TJoin> Where(Expression<Func<TJoin, bool>> expression)
+        {
+            string condition = BaseQuery.FormatExpression(expression.Body);
+            BaseQuery.AddInnerRelationCondition(typeof(TJoin), condition);
+            return this;
+        }
         /// <summary>
         /// 按关联对象选择查询字段
         /// 可多次调用,不要重复

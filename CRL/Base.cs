@@ -15,18 +15,6 @@ namespace CRL
     /// </summary>
     public class Base
     {
-        ///// <summary>
-        ///// 对集合进行分页
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="list"></param>
-        ///// <param name="index">从1开始</param>
-        ///// <param name="pageSize"></param>
-        ///// <returns></returns>
-        //public static List<T> CutList<T>(IEnumerable<T> list, int index, int pageSize) where T : class, new()
-        //{
-        //    return list.Skip((index - 1) * pageSize).Take(pageSize).ToList();
-        //}
 
         /// <summary>
         /// 获取查询字段,并自动转换虚拟字段
@@ -39,18 +27,6 @@ namespace CRL
             foreach (Attribute.FieldAttribute info in typeArry)
             {
                 str += string.Format("{0},", info.QueryFullScript);
-                //if (info.FieldType == Attribute.FieldType.虚拟字段)
-                //{
-                //    str += string.Format("{0} as {1},", info.VirtualField, info.AliasesName);
-                //}
-                //else if (string.IsNullOrEmpty(info.QueryFullName))
-                //{
-                //    str += string.Format("{0},", info.KeyWordName); 
-                //}
-                //else
-                //{
-                //    str += string.Format("{0},", info.QueryFullName);
-                //}
             }
             if (str.Length > 1)
             {
@@ -75,53 +51,31 @@ namespace CRL
             return lambda;
         }
         /// <summary>
-        /// 检测所有对象
+        /// 按程序集查找定义过的MODEL
         /// </summary>
-        /// <param name="db"></param>
         /// <param name="baseType"></param>
         /// <returns></returns>
-        internal static string CheckAllModel(DBExtend db, Type baseType)
+        public static Dictionary<Attribute.TableAttribute,DBExtend> GetAllModel(Type baseType)
         {
-            string msg = "";
+            //string msg = "";
             //var dbcontext = new DbContext(dbHelper,null);
             //var helper = new CRL.DBExtend(dbcontext);
             var assembyle = System.Reflection.Assembly.GetAssembly(baseType);
             Type[] types = assembyle.GetTypes();
-            List<Type> findTypes = new List<Type>();
-            var typeCRL = typeof(CRL.IModel);
+            var findTypes = new Dictionary<Attribute.TableAttribute,DBExtend>();
+            var typeCRL = typeof(CRL.IProvider);
             foreach (var type in types)
             {
-                if (type.IsClass)
+                if (typeCRL.IsAssignableFrom(type))
                 {
-                    var type1 = type.BaseType;
-                    while (type1.BaseType != null)
-                    {
-                        if (type1.BaseType == typeCRL || type1 == typeCRL)
-                        {
-                            findTypes.Add(type);
-                            break;
-                        }
-                        type1 = type1.BaseType;
-                    }
+                    var obj = System.Activator.CreateInstance(type) as IProvider;
+                    var table = TypeCache.GetTable(obj.ModelType);
+                    var pro = type.GetProperty("DBExtend", BindingFlags.Instance | BindingFlags.NonPublic);
+                    var db = pro.GetValue(obj) as DBExtend;
+                    findTypes.Add(table, db);
                 }
             }
-
-            try
-            {
-                foreach (var type in findTypes)
-                {
-                    try
-                    {
-                        object obj = System.Activator.CreateInstance(type);
-                        CRL.IModel b = obj as CRL.IModel;
-                        msg += b.CreateTable(db);
-                    }
-                    catch { }
-                }
-            }
-            catch (Exception ero) { }
-            CoreHelper.EventLog.Log(msg);
-            return msg;
+            return findTypes;
         }
 
         /// <summary>
@@ -158,16 +112,6 @@ namespace CRL
             {
                 string key = p.Key.Replace("@","");
                 var t = p.Value.GetType();
-                //if (t.IsValueType)
-                //{
-                //    t = t.GenericTypeArguments[0];
-                //}
-
-                //if (!typeMappint.ContainsKey(t))
-                //{
-                //    throw new Exception(string.Format("找不到对应的字段类型映射 {0} 在 {1}", t, adpater));
-                //}
-                //var par = typeMappint[t];
                 var par = adpater.GetDBColumnType(t);
                 if (t == typeof(System.String))
                 {
@@ -208,6 +152,10 @@ namespace CRL
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly().GetName();
             return assembly.Version.ToString();
+        }
+        internal static string FormatFieldPrefix(Type type, string fieldName)
+        {
+            return "{" + type.FullName + "}" + fieldName;
         }
     }
 }

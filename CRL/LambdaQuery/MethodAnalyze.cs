@@ -64,30 +64,44 @@ namespace CRL.LambdaQuery
         }
         public string StringLike(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
         {
-            string str = args[0].ToString();
-            return StringLikeFull(field, nodeType, ref parIndex, addParame, "%{0}%", str);
+            var args1 = args[0];
+            return StringLikeFull(field, nodeType, ref parIndex, addParame, "%{0}%", args1);
         }
         public string StringLikeLeft(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
         {
-            string str = args[0].ToString();
-            str = str.Replace("%", "");
-            return StringLikeFull(field, nodeType, ref parIndex, addParame, "%{0}", str);
+            //string str = args[0].ToString();
+            //str = str.Replace("%", "");
+            var args1 = args[0];
+            return StringLikeFull(field, nodeType, ref parIndex, addParame, "%{0}", args1);
         }
         public string StringLikeRight(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
         {
-            string str = args[0].ToString();
-            str = str.Replace("%","");
-            return StringLikeFull(field, nodeType, ref parIndex, addParame, "{0}%", str);
+            //string str = args[0].ToString();
+            //str = str.Replace("%","");
+            var args1 = args[0];
+            return StringLikeFull(field, nodeType, ref parIndex, addParame, "{0}%", args1);
         }
         string StringLikeFull(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, string likeFormat,object args)
         {
             string parName = string.Format("@like{0}" , parIndex);
             parIndex += 1;
-            if (!args.ToString().Contains("%"))
+
+            if (args is ExpressionValueObj)
             {
-                args = string.Format(likeFormat, args);
+                parName = args.ToString();
+                //if (!parName.ToString().Contains("%"))
+                //{
+                //    parName = string.Format(likeFormat, parName);
+                //}
             }
-            addParame(parName, args);
+            else
+            {
+                if (!args.ToString().Contains("%"))
+                {
+                    args = string.Format(likeFormat, args);
+                }
+                addParame(parName, args);
+            }
             if (nodeType == ExpressionType.Equal)
             {
                 return dBAdapter.StringLikeFormat(field, parName);
@@ -101,7 +115,15 @@ namespace CRL.LambdaQuery
         public string StringContains(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
         {
             string parName = string.Format("@contrains{0}", parIndex);
-            addParame(parName, args[0]);
+            var args1 = args[0];
+            if (args1 is ExpressionValueObj)
+            {
+                parName = args1.ToString();
+            }
+            else
+            {
+                addParame(parName, args1);
+            }
             parIndex += 1;
             if (nodeType == ExpressionType.Equal)
             {
@@ -116,10 +138,26 @@ namespace CRL.LambdaQuery
         public string Between(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
         {
             string parName = string.Format("@between{0}", parIndex);
-            addParame(parName, args[0]);
+            var args1 = args[0];
+            var args2 = args[1];
+            if (args1 is ExpressionValueObj)
+            {
+                parName = args1.ToString();
+            }
+            else
+            {
+                addParame(parName, args1);
+            }
             parIndex += 1;
             string parName2 = string.Format("@between{0}", parIndex);
-            addParame(parName2, args[1]);
+            if (args2 is ExpressionValueObj)
+            {
+                parName2 = args2.ToString();
+            }
+            else
+            {
+                addParame(parName2, args2);
+            }
             parIndex += 1;
             if (nodeType == ExpressionType.Equal)
             {
@@ -134,7 +172,15 @@ namespace CRL.LambdaQuery
         public string DateTimeDateDiff(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
         {
             string parName = string.Format("@DateDiff{0}", parIndex);
-            addParame(parName, args[1]);
+            var args1 = args[0];
+            if (args1 is ExpressionValueObj)
+            {
+                parName = args1.ToString();
+            }
+            else
+            {
+                addParame(parName, args[1]);
+            }
             parIndex += 1;
             //DateDiff(2015/2/5 17:59:44,t1.AddTime,@DateDiff1)>1 
             return dBAdapter.DateDiffFormat(field, args[0].ToString(), parName);
@@ -237,9 +283,16 @@ namespace CRL.LambdaQuery
         {
             string parName = string.Format("@equalEnum{0}", parIndex);
             parIndex += 1;
-            var obj = args[0];
-            obj = ObjectConvert.ConvertObject(obj.GetType(), obj);
-            addParame(parName, obj);
+            var args1 = args[0];
+            if (args1 is ExpressionValueObj)
+            {
+                parName = args1.ToString();
+            }
+            else
+            {
+                args1 = ObjectConvert.ConvertObject(args1.GetType(), args1);
+                addParame(parName, args1);
+            }
             if (nodeType == ExpressionType.Equal)
             {
                 return string.Format("{0}={1}", field, parName);
@@ -254,7 +307,15 @@ namespace CRL.LambdaQuery
             var par = args[0].ToString();
             string parName = string.Format("@StartsWith{0}", parIndex);
             parIndex += 1;
-            addParame(parName, par);
+            var args1 = args[0];
+            if (args1 is ExpressionValueObj)
+            {
+                parName = args1.ToString();
+            }
+            else
+            {
+                addParame(parName, par);
+            }
             var str = dBAdapter.SubstringFormat(field, 0, par.Length);
             if (nodeType == ExpressionType.Equal)
             {

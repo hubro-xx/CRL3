@@ -39,6 +39,10 @@ namespace CRL.Attribute
             get;
             set;
         }
+        public FieldAttribute GetPrimaryKey()
+        {
+            return PrimaryKey;
+        }
         /// <summary>
         /// 对象类型
         /// </summary>

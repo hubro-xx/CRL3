@@ -24,6 +24,9 @@ namespace RoleControl
 
             CRL.SettingConfig.GetDbAccess = (type) =>
             {
+                var connString = ConnectionManage.GetCurrent();
+                return new CoreHelper.SqlHelper(connString);
+
                 string dbName = CoreHelper.CustomSetting.GetConfigKey("dbName");
                 return CreateDbHelper(dbName);
             };

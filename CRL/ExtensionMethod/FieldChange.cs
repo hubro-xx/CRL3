@@ -34,7 +34,7 @@ namespace CRL
                 }
                 else
                 {
-                    value = LambdaCompileCache.GetExpressionCacheValue(right);
+                    value = LambdaCompileCache.GetParameExpressionValue(right);
                     //value = Expression.Lambda(right).Compile().DynamicInvoke();
                 }
                 obj.SetChanges(name, value);

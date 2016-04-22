@@ -34,7 +34,8 @@ namespace WebTest
                     }
                 }
                 else
-                {//可按type区分数据库
+                {
+                    //可按type区分数据库
                     var type2 = dbLocation.ManageType;
                     return WebTest.Code.LocalSqlHelper.TestConnection;
                 }
@@ -50,7 +51,7 @@ namespace WebTest
             //实现缓存客户端调用
             //有多个服务器添加多个
             //要使用缓存服务,需要设置ProductDataManage.QueryCacheFromRemote 为 true
-            CRL.CacheServerSetting.AddClientProxy("127.0.0.1", 1129);
+            CRL.CacheServerSetting.AddTcpServerListen("127.0.0.1", 1129);
             CRL.CacheServerSetting.Init();
         }
 

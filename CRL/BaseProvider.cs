@@ -242,7 +242,7 @@ namespace CRL
                         var primaryKey = TypeCache.GetTable(typeof(TModel)).PrimaryKey.Name;
                         if (member.Member.Name.ToUpper() == primaryKey.ToUpper())
                         {
-                            var value = LambdaCompileCache.GetExpressionCacheValue(binary.Right).ToString();
+                            var value = LambdaCompileCache.GetParameExpressionValue(binary.Right).ToString();
                             //var value = (int)Expression.Lambda(binary.Right).Compile().DynamicInvoke();
                             var all = GetCache(CacheQuery());
                             if(all==null)

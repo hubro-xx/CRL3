@@ -18,19 +18,15 @@ namespace Core.Mvc
     /// </summary>
     public class MenuAuthorAttribute : AuthorizeAttribute
     {
-        int systemId = 1;
-        /// <summary>
-        /// 菜单系统编号,默认1
-        /// </summary>
-        public virtual int SystemId
+        static int CurrentSystemId
         {
             get
             {
-                return systemId;
-            }
-            set
-            {
-                systemId = value;
+                if (!CoreHelper.CustomSetting.ContainsKey("CurrentSystemId"))
+                {
+                    return 1;
+                }
+                return Convert.ToInt32(CoreHelper.CustomSetting.GetConfigKey("CurrentSystemId"));
             }
         }
         protected override bool AuthorizeCore(HttpContextBase httpContext)
@@ -49,7 +45,7 @@ namespace Core.Mvc
                 return false;
 
             var user = CRL.Package.Person.Person.ConverFromArry(userTicket);
-            bool a = CRL.Package.RoleAuthorize.AccessControlBusiness.Instance.CheckAccess(SystemId, user.Id);
+            bool a = CRL.Package.RoleAuthorize.AccessControlBusiness.Instance.CheckAccess(CurrentSystemId, user.Id);
             //a = false;
             isMenuCheck = true;
             return a;

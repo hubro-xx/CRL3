@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var connections = RoleControl.ConnectionManage.GetConnections();
+    if(!Request.IsLocal)
+    {
+        connections = new List<string>();
+    }
+}
+<!DOCTYPE html>
 <html lang="zh">
     <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -17,10 +24,18 @@
                     <p class="site-title">@Html.ActionLink("权限管理", "Index", "Home")</p>
                 </div>
                 <div class="float-right">
+                    
+                    <a href="/Connection">数据连接</a>:
+                    <select onchange="window.location = '/Connection/Change?returnUrl=@Html.Raw(Server.UrlEncode(Request.Url.ToString()))&index=' + this.value" style="width:350px">
+                        @for (int i = 0; i < connections.Count;i++ )
+                        {
+                            <option value="@i" @Html.Raw(i == RoleControl.ConnectionManage.index ? "selected" : "")>@connections[i]</option>
+                        }
+                    </select>
                     切换系统:<select onchange="window.location='/home/ChangeSystem?id='+this.value">
                         @foreach (var item in CRL.Package.RoleAuthorize.SystemTypeBusiness.Instance.SystemTypes)
                         {
-                            <option value="@item.Id" @Html.Raw(item.Id == RoleControl.Models.BaseController.currentSystemId?"selected":"")>@item.Name</option>
+                            <option value="@item.Id" @Html.Raw(item.Id == RoleControl.Models.BaseController.currentSystemId ? "selected" : "")>@item.Name</option>
                         }
                     </select>
                     @if(Request.IsAuthenticated)

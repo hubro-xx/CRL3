@@ -31,7 +31,7 @@
         </member>
         <member name="M:CRL.CacheServerSetting.AddCacheServerDealDataRule(System.Type,CRL.ExpressionDealDataHandler)">
             <summary>
-            清加数据处理规则
+            服务端清加数据处理规则
             </summary>
             <param name="type"></param>
             <param name="handler"></param>
@@ -41,9 +41,9 @@
             缓存客户端代理
             </summary>
         </member>
-        <member name="M:CRL.CacheServerSetting.AddClientProxy(System.String,System.Int32)">
+        <member name="M:CRL.CacheServerSetting.AddTcpServerListen(System.String,System.Int32)">
             <summary>
-            添加TCP客户端代理
+            添加服务端监听
             </summary>
             <param name="host"></param>
             <param name="port"></param>
@@ -51,6 +51,11 @@
         <member name="M:CRL.CacheServerSetting.Init">
             <summary>
             初始服务端设置,会访问所有服务端获取设置
+            </summary>
+        </member>
+        <member name="M:CRL.CacheServerSetting.Dispose">
+            <summary>
+            释放客户端连接
             </summary>
         </member>
         <member name="T:CRL.CacheServer.CacheClientProxy">
@@ -564,11 +569,10 @@
             <param name="typeArry"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.Base.CheckAllModel(CRL.DBExtend,System.Type)">
+        <member name="M:CRL.Base.GetAllModel(System.Type)">
             <summary>
-            检测所有对象
+            按程序集查找定义过的MODEL
             </summary>
-            <param name="db"></param>
             <param name="baseType"></param>
             <returns></returns>
         </member>
@@ -601,6 +605,11 @@
             基本业务方法封装
             </summary>
             <typeparam name="TModel">源对象</typeparam>
+        </member>
+        <member name="P:CRL.IProvider.ModelType">
+            <summary>
+            关联对象类型
+            </summary>
         </member>
         <member name="M:CRL.ProviderOrigin`1.#ctor">
             <summary>
@@ -751,6 +760,15 @@
             <typeparam name="TOjbect"></typeparam>
             <param name="expression"></param>
             <param name="updateValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ProviderOrigin`1.RelationUpdate``1(System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}},CRL.ParameCollection)">
+            <summary>
+            关联更新
+            </summary>
+            <typeparam name="TJoin"></typeparam>
+            <param name="expression"></param>
+            <param name="updateValue">要区别字段,需加前辍$ 如 $Num</param>
             <returns></returns>
         </member>
         <member name="M:CRL.ProviderOrigin`1.ExecListWithFormat``1(System.String,CRL.ParameCollection,System.Type[])">
@@ -1660,6 +1678,16 @@
             <param name="updateValue"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.DBExtend.RelationUpdate``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}},CRL.ParameCollection)">
+            <summary>
+            关联更新
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="TJoin"></typeparam>
+            <param name="expression"></param>
+            <param name="updateValue">要区别字段,需加前辍$ 如 $Num</param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.DBExtend.ExecDynamicList(System.String,System.Type[])">
             <summary>
             返回dynamic集合
@@ -2161,6 +2189,13 @@
             <param name="e"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.ExtensionMethod.IsEnumerable(System.Type)">
+            <summary>
+            判断类型是否为集合类型
+            </summary>
+            <param name="type">要处理的类型</param>
+            <returns>是返回True，不是返回False</returns>
+        </member>
         <member name="T:CRL.IgnoreCaseDictionary`1">
             <summary>
             不区分大小的字典
@@ -2310,6 +2345,13 @@
             获取别名,如t1.
             </summary>
             <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQueryBase.FormatExpression(System.Linq.Expressions.Expression)">
+            <summary>
+            转换为SQL条件，并提取参数
+            </summary>
+            <param name="expressionBody"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.LambdaQuery.LambdaQuery`1.DistinctBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
@@ -2505,6 +2547,16 @@
             使用函数格式化字段
             </summary>
         </member>
+        <member name="F:CRL.LambdaQuery.LambdaQuery`1.PageSize">
+            <summary>
+            分页每页大小
+            </summary>
+        </member>
+        <member name="F:CRL.LambdaQuery.LambdaQuery`1.PageIndex">
+            <summary>
+            分页索引
+            </summary>
+        </member>
         <member name="F:CRL.LambdaQuery.LambdaQuery`1.Having">
             <summary>
             group having
@@ -2649,13 +2701,6 @@
             <typeparam name="TInner"></typeparam>
             <param name="outField"></param>
             <param name="innerField"></param>
-            <param name="expression"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.LambdaQuery.LambdaQuery`1.FormatExpression(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            转换为SQL条件，并提取参数
-            </summary>
             <param name="expression"></param>
             <returns></returns>
         </member>
@@ -2956,6 +3001,13 @@
             尾匹配
             </summary>
         </member>
+        <member name="M:CRL.LambdaQuery.LambdaCompileCache.GetParameExpressionValue(System.Linq.Expressions.Expression)">
+            <summary>
+            获取用作参数的表达式值
+            </summary>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.LambdaQuery.LambdaCreater`1.Equal(System.String,System.Object)">
             <summary>
             创建等于运算lambda表达式
@@ -3182,6 +3234,7 @@
             <summary>
             创建表
             会检查表是否存在,如果存在则检查字段
+            创建失败则抛出异常
             </summary>
             <param name="db"></param>
             <param name="message"></param>
@@ -3247,6 +3300,13 @@
             关联查询分支
             </summary>
             <param name="query"></param>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQueryJoin`2.Where(System.Linq.Expressions.Expression{System.Func{`1,System.Boolean}})">
+            <summary>
+            按TJoin追加条件
+            </summary>
+            <param name="expression"></param>
+            <returns></returns>
         </member>
         <member name="M:CRL.LambdaQuery.LambdaQueryJoin`2.Select(System.Linq.Expressions.Expression{System.Func{`0,`1,System.Object}})">
             <summary>

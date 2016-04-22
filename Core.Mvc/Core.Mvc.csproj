@@ -30,6 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Debug\Core.Mvc.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -66,7 +67,7 @@
     <Compile Include="CustomController.cs" />
     <Compile Include="HtmlExtensions.cs" />
     <Compile Include="PageObj.cs" />
-    <Compile Include="HtmlHelper.cs" />
+    <Compile Include="ControllHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

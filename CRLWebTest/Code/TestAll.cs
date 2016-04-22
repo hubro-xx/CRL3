@@ -20,6 +20,7 @@ namespace WebTest.Code
             query.Where(b => b.Id < b.Number);//直接比较可以解析通过
             query.Where(b => b.ProductName.Contains("122"));//包含字符串
             query.Where(b => !b.ProductName.Contains("122"));//不包含字符串
+            query.Where(b => b.CategoryName.Contains(b.BarCode));//支持属性调用了
             query.Where(b => b.ProductName.In("111", "222"));//string in
             query.Where(b => b.AddTime.Between(DateTime.Now, DateTime.Now));//在时间段内
             query.Where(b => b.AddTime.DateDiff(DatePart.dd, DateTime.Now) > 1);//时间比较
@@ -40,8 +41,9 @@ namespace WebTest.Code
             #region 关联
             //索引值
             query = ProductDataManage.Instance.GetLambdaQuery();
-            query.Join<Code.Member>((a, b) => a.UserId == b.Id && a.BarCode.Contains("1"))
+            var join = query.Join<Code.Member>((a, b) => a.UserId == b.Id && a.BarCode.Contains("1"))
                 .SelectAppendValue(b => b.Mobile).OrderBy(b => b.Id, true);
+            join.Where(b => b.AccountNo == "123");//按join追加条件
             var list2 = query.ToList();
             foreach (var item in list2)
             {
@@ -140,6 +142,13 @@ namespace WebTest.Code
             p = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0);
             p.UserId += 1;
             Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
+
+            //关联更新
+
+            c = new CRL.ParameCollection();
+            c["UserId"] = "$UserId";//order.userid=product.userid
+            c["Remark"] = "2222";//order.remark=2222
+            Code.OrderManage.Instance.RelationUpdate<ProductData>((a, b) => a.Id == b.Id && b.Number > 10, c);
             #endregion
 
             #region 缓存更新
@@ -149,8 +158,8 @@ namespace WebTest.Code
             Code.ProductDataManage.Instance.Update(item);
             item = Code.ProductDataManage.Instance.QueryItemFromCache(1);
             var item2 = Code.ProductDataManage.Instance.QueryItem(1);
-            var a = item.SupplierName == item2.SupplierName && item.SupplierName == guid;
-            if (!a)
+            var a2 = item.SupplierName == item2.SupplierName && item.SupplierName == guid;
+            if (!a2)
             {
                 throw new Exception("更新缓存失败");
             }

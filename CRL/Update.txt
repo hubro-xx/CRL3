@@ -216,3 +216,14 @@
 2016-03-19
 	优化权限控制标注,不需要再手写判断权限了 MenuAuthorAttribute
 	增加缓存查询并行查询开关CacheQueryAsParallel
+2016-04-14
+	增加权限系统数据库切换
+	增加Core.Mvc对查询直接返回分页对象的扩展方法public static PageObj<T> ToPageObj<T>(this CRL.LambdaQuery.LambdaQuery<T> query) 
+	使查询方法表达式支持属性访问参数如 b=>b.Name.Like(b.Code)
+2016-04-15
+	Join查询分支增加Where方法,以累加条件
+2016-04-19
+	增加关联更新RelationUpdate,解决多表关联更新
+2016-04-22
+	修改属性表达式解析的一个错误
+	BaseControl增加缓存管理和对象管理的方法

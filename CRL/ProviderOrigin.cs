@@ -11,9 +11,16 @@ namespace CRL
     /// 基本业务方法封装
     /// </summary>
     /// <typeparam name="TModel">源对象</typeparam>
-    public abstract class ProviderOrigin<TModel>
+    public abstract class ProviderOrigin<TModel>:IProvider
         where TModel : IModel, new()
     {
+        public Type ModelType
+        {
+            get
+            {
+                return typeof(TModel);
+            }
+        }
         /// <summary>
         /// 基本业务方法封装
         /// </summary>
@@ -371,6 +378,19 @@ namespace CRL
             int n = db.Update<TModel>(expression, updateValue);
             return n;
         }
+        /// <summary>
+        /// 关联更新
+        /// </summary>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="updateValue">要区别字段,需加前辍$ 如 $Num</param>
+        /// <returns></returns>
+        public int RelationUpdate<TJoin>(Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)
+            where TJoin : IModel, new()
+        {
+            var db = DBExtend;
+            return db.RelationUpdate<TModel, TJoin>(expression, updateValue);
+        }
         #endregion
 
         #region 格式化命令查询
@@ -567,5 +587,13 @@ namespace CRL
             return true;
         }
         #endregion
+    }
+
+    public interface IProvider
+    {
+        /// <summary>
+        /// 关联对象类型
+        /// </summary>
+        Type ModelType { get; }
     }
 }

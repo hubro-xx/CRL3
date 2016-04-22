@@ -121,8 +121,14 @@ namespace CRL.LambdaQuery
         /// </summary>
         internal string __FieldFunctionFormat = "";
 
-        internal int __PageSize = 0;
-        internal int __PageIndex = 0;
+        /// <summary>
+        /// 分页每页大小
+        /// </summary>
+        public int PageSize = 0;
+        /// <summary>
+        /// 分页索引
+        /// </summary>
+        public int PageIndex = 0;
 
         /// <summary>
         /// group having
@@ -168,8 +174,8 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQuery<T> Page(int pageSize = 15, int pageIndex = 1)
         {
-            __PageSize = pageSize;
-            __PageIndex = pageIndex;
+            PageSize = pageSize;
+            PageIndex = pageIndex;
             __CompileSp = pageSize > 0;
             return this;
         }
@@ -263,7 +269,7 @@ namespace CRL.LambdaQuery
             //{
             //    SelectAll();
             //}
-            string condition = FormatExpression(expression);
+            string condition = FormatExpression(expression.Body);
             this.Condition += string.IsNullOrEmpty(Condition) ? condition : " and " + condition;
             return this;
         }
@@ -324,7 +330,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQuery<T> Or(Expression<Func<T, bool>> expression)
         {
-            string condition1 = FormatExpression(expression);
+            string condition1 = FormatExpression(expression.Body);
             this.Condition = string.Format("({0}) or {1}", Condition, condition1);
             return this;
         }
@@ -429,20 +435,20 @@ Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
 
         #region 获取解析值
         
-        /// <summary>
-        /// 转换为SQL条件，并提取参数
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        internal string FormatExpression(Expression<Func<T, bool>> expression)
-        {
-            string condition;
-            if (expression == null)
-                return "";
-            condition = __Visitor.RouteExpressionHandler(expression.Body);
-            condition = ReplacePrefix(condition);
-            return condition;
-        }
+        ///// <summary>
+        ///// 转换为SQL条件，并提取参数
+        ///// </summary>
+        ///// <param name="expression"></param>
+        ///// <returns></returns>
+        //internal string FormatExpression(Expression<Func<T, bool>> expression)
+        //{
+        //    string condition;
+        //    if (expression == null)
+        //        return "";
+        //    condition = __Visitor.RouteExpressionHandler(expression.Body);
+        //    condition = ReplacePrefix(condition);
+        //    return condition;
+        //}
 
         /// <summary>
         /// 获取查询字段字符串,按条件排除

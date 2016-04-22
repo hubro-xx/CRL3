@@ -14,9 +14,21 @@ namespace WebTest
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
-            TestGuid();
+            Code.OrderManage.Instance.TestRelationUpdate();
+            //TestGuid();
             //TestAllQuery();
+        }
+        void TestJoin()
+        {
+            int id = 10;
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            var join = query.Join<Code.Order>((a, b) => a.Id == b.Id);
+            join.SelectAppendValue(b => b.OrderId);
+            join.Where(b => b.OrderId == "222");
+            var sql = query.PrintQuery();
+            var result = query.ToList();
+            Response.Write(sql);
+            Response.End();
         }
         void TestGuid()
         {

@@ -261,6 +261,7 @@ namespace CRL.LambdaQuery
             }
             foreach (var type in __Prefixs.Keys)
             {
+                //将完整名称替换成别名
                 condition = condition.Replace("{" + type + "}", GetPrefix(type));
             }
             return condition;
@@ -279,6 +280,21 @@ namespace CRL.LambdaQuery
             }
         }
 
+        /// <summary>
+        /// 转换为SQL条件，并提取参数
+        /// </summary>
+        /// <param name="expressionBody"></param>
+        /// <returns></returns>
+        internal string FormatExpression(Expression expressionBody)
+        {
+            string condition;
+            if (expressionBody == null)
+                return "";
+            condition = __Visitor.RouteExpressionHandler(expressionBody);
+            condition = ReplacePrefix(condition);
+            return condition;
+        }
+
         internal string FormatJoinExpression(Expression expressionBody)
         {
             string condition;
@@ -289,7 +305,10 @@ namespace CRL.LambdaQuery
             condition = ReplacePrefix(condition);
             return condition;
         }
-
+        internal void AddInnerRelationCondition(Type inner, string condition)
+        {
+            __Relations[inner] += "  and " + condition;
+        }
         internal void AddInnerRelation(Type inner, string condition)
         {
             if (__Relations.ContainsKey(inner))

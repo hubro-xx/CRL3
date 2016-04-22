@@ -36,7 +36,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQuery<T> GroupHaving(Expression<Func<T, bool>> expression)
         {
-            string condition = FormatExpression(expression);
+            string condition = FormatExpression(expression.Body);
             Having += string.IsNullOrEmpty(Having) ? condition : " and " + condition;
             return this;
         }

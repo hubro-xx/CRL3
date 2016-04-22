@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="config\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>

@@ -75,7 +75,7 @@ namespace CRL.ExistsTableCache
                         needCreates.Add(field);
                     }
                 }
-                var model = System.Activator.CreateInstance(item.Key) as IModel;
+                //var model = System.Activator.CreateInstance(item.Key) as IModel;
                 foreach (var field in needCreates)
                 {
                     IModel.SetColumnDbType(_DBAdapter, field);
@@ -83,8 +83,6 @@ namespace CRL.ExistsTableCache
                 }
                 string val;
                 needCheks.TryRemove(item.Key, out val);
-               
-               
             }
         }
     }

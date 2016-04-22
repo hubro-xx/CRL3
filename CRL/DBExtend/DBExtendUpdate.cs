@@ -144,7 +144,7 @@ namespace CRL
                 throw new Exception("更新时发生错误,参数值为空 ParameCollection setValue");
             }
             LambdaQuery<TModel> query = new LambdaQuery<TModel>(dbContext, false);
-            string condition = query.FormatExpression(expression);
+            string condition = query.FormatExpression(expression.Body);
             //foreach (var n in query.QueryParames)
             //{
             //    AddParam(n.Key, n.Value);
@@ -175,6 +175,48 @@ namespace CRL
                 c.Add(p.Name, p.GetValue(updateValue));
             }
             return Update(expression, c);
+        }
+        /// <summary>
+        /// 关联更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="updateValue">要区别字段,需加前辍$ 如 $Num</param>
+        /// <returns></returns>
+        public int RelationUpdate<T, TJoin>(Expression<Func<T, TJoin, bool>> expression, ParameCollection updateValue)
+            where T : IModel, new()
+            where TJoin : IModel, new()
+        {
+            var query = new LambdaQuery<T>(dbContext);
+            query.Join<TJoin>(expression);
+            var conditions = query.FormatJoinExpression(expression.Body);
+            conditions = query.ReplacePrefix(conditions);
+            conditions = conditions.Replace("t1.", TypeCache.GetTableName(typeof(T), dbContext) + ".");
+            query.FillParames(this);
+            var str = "";
+            foreach (var pair in updateValue)
+            {
+                string name = pair.Key;
+                string value = pair.Value.ToString();
+                if (value.Contains("$"))
+                {
+                    //右边字段需加前辍
+                    value = value.Replace("$", "t2.");
+                }
+                else
+                {
+                    string parame = string.Format("@{0}", name, dbContext.parIndex);
+                    AddParam(name, value);
+                    dbContext.parIndex += 1;
+                    value = parame;
+                }
+                str += string.Format("{0}={1},", name, value);
+            }
+            str = str.Substring(0, str.Length - 1);
+            string sql = string.Format("update {0} set {2} from {1} t2 where {3}", TypeCache.GetTableName(typeof(T), dbContext)
+                , TypeCache.GetTableName(typeof(TJoin), dbContext), str, conditions);
+            return Execute(sql);
         }
         #endregion
     }

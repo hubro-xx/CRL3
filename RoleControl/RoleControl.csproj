@@ -131,8 +131,10 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ConnectionManage.cs" />
     <Compile Include="Controllers\AccessControlController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ConnectionController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MenuController.cs" />
@@ -221,6 +223,7 @@
     <Content Include="Config\CustomSetting.config" />
     <Content Include="DBConnection\RoleAuthorize.config" />
     <Content Include="packages.config" />
+    <Content Include="Config\LocalConnection.config" />
     <None Include="Properties\PublishProfiles\CRL.pubxml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
@@ -265,6 +268,7 @@
     <Content Include="Views\Department\Index.cshtml" />
     <Content Include="Views\Department\Part.cshtml" />
     <Content Include="Views\Department\Import.cshtml" />
+    <Content Include="Views\Connection\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

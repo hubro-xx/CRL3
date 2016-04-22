@@ -1,0 +1,11 @@
+﻿
+@{
+    ViewBag.Title = "数据连接";
+    string connections = ViewBag.connections;
+}
+
+<h2>@ViewBag.Title</h2>
+<form action="/Connection/Index" method="post">
+    <textarea cols="20" id="txt" name="txt" rows="20">@connections</textarea>
+    <input type="submit" value="保存" />
+</form>

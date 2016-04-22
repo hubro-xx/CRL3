@@ -83,7 +83,7 @@ namespace CRL
         public List<TItem> QueryList<TItem>(LambdaQuery<TItem> query, out string cacheKey) where TItem : IModel, new()
         {
             CheckTableCreated<TItem>();
-            if (query.__PageSize > 0)//按分页
+            if (query.PageSize > 0)//按分页
             {
                 cacheKey = "";
                 return Page<TItem, TItem>(query);
@@ -201,7 +201,7 @@ namespace CRL
             query.__FieldFunctionFormat = string.Format("{0}({1}) as Total", functionType, "{0}");
             query.Where(expression);
             var result = QueryScalar(query);
-            if (result == null)
+            if (result == null || result is DBNull)
             {
                 return default(TType);
             }

@@ -14,6 +14,14 @@ namespace WebTest.Code
         {
             get { return new OrderManage(); }
         }
+        public void TestRelationUpdate()
+        {
+            var db = DBExtend;
+            var c = new CRL.ParameCollection();
+            c["UserId"] = "$UserId";//order.userid=product.userid
+            c["Remark"] = "2222";//order.remark=2222
+            RelationUpdate<ProductData>((a, b) => a.Id == b.Id && b.Number > 10, c);
+        }
         public bool TransactionTest2(out string error)
         {
             var db = DBExtend;

@@ -45,7 +45,7 @@ namespace CRL
         public int Delete<TModel>(Expression<Func<TModel, bool>> expression) where TModel : IModel, new()
         {
             LambdaQuery<TModel> query = new LambdaQuery<TModel>(dbContext, false);
-            string condition = query.FormatExpression(expression);
+            string condition = query.FormatExpression(expression.Body);
             query.FillParames(this);
             return Delete<TModel>(condition);
         }

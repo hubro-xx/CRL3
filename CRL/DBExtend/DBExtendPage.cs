@@ -62,8 +62,8 @@ namespace CRL
             var condition = query.GetQueryConditions();
             condition = _DBAdapter.SqlFormat(condition);
             query.FillParames(this);
-            var pageIndex = query.__PageIndex;
-            var pageSize = query.__PageSize;
+            var pageIndex = query.PageIndex;
+            var pageSize = query.PageSize;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             AddParam("pageIndex", pageIndex);
@@ -116,8 +116,8 @@ namespace CRL
             condition = _DBAdapter.SqlFormat(condition);
             query.FillParames(this);
 
-            var pageIndex = query.__PageIndex;
-            var pageSize = query.__PageSize;
+            var pageIndex = query.PageIndex;
+            var pageSize = query.PageSize;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             string countSql = string.Format("select count(*) from {0}", condition);
@@ -172,8 +172,8 @@ namespace CRL
             conditions = _DBAdapter.SqlFormat(conditions);
 
             query.FillParames(this);
-            var pageIndex = query.__PageIndex;
-            var pageSize = query.__PageSize;
+            var pageIndex = query.PageIndex;
+            var pageSize = query.PageSize;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             AddParam("pageIndex", pageIndex);
@@ -224,8 +224,8 @@ namespace CRL
             condition = _DBAdapter.SqlFormat(condition);
 
             query.FillParames(this);
-            var pageIndex = query.__PageIndex;
-            var pageSize = query.__PageSize;
+            var pageIndex = query.PageIndex;
+            var pageSize = query.PageSize;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
 

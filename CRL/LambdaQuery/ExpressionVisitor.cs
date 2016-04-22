@@ -77,6 +77,7 @@ namespace CRL.LambdaQuery
         
         public string RouteExpressionHandler(Expression exp, ExpressionType nodeType= ExpressionType.Equal)
         {
+            //todo 解析不了不带运算符的一元运算 如 b=>b.IsNew
             if (exp is BinaryExpression)
             {
                 BinaryExpression be = (BinaryExpression)exp;
@@ -104,14 +105,14 @@ namespace CRL.LambdaQuery
                         }
                         return filed.VirtualField;
                     }
-                    var field = "{" + type.FullName + "}" + fieldName;//格式化为别名
+                    var field = Base.FormatFieldPrefix(type,fieldName);//格式化为别名
                     if (nodeType == ExpressionType.Not)//like b=!b.IsNew
                     {
-                        field += ExpressionTypeCast(nodeType) +1;
+                        field += ExpressionTypeCast(nodeType) + 1;
                     }
                     return field;
                 }
-                var obj = LambdaCompileCache.GetExpressionCacheValue(mExp);
+                var obj = LambdaCompileCache.GetParameExpressionValue(mExp);
                 if (obj is Enum)
                 {
                     obj = (int)obj;
@@ -141,7 +142,7 @@ namespace CRL.LambdaQuery
                     {
                         //not like b.BarCode.Contains("abc")
                         //按变量或常量编译值
-                        var obj = LambdaCompileCache.GetExpressionCacheValue(exp);
+                        var obj = LambdaCompileCache.GetParameExpressionValue(exp);
                         return obj + "";
                     }
                 }
@@ -149,7 +150,7 @@ namespace CRL.LambdaQuery
                 {
                     //var cExp = mcExp.Object as ConstantExpression;
                     //like b.BarCode == aa()
-                    var obj = LambdaCompileCache.GetExpressionCacheValue(exp);
+                    var obj = LambdaCompileCache.GetParameExpressionValue(exp);
                     return obj + "";
                 }
                 var _DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(dbContext);
@@ -176,27 +177,27 @@ namespace CRL.LambdaQuery
                     field = mcExp.Object.ToString().Split('.')[1];
                     var mExpression = mcExp.Object as MemberExpression;
                     var type = mExpression.Expression.Type;
-                    field = "{" + type.FullName + "}" + field;
-                    var obj = LambdaCompileCache.GetExpressionCacheValue(mcExp.Arguments[0]);
+                    field = Base.FormatFieldPrefix(type, field);
+                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[0]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[0]).Compile().DynamicInvoke());
                 }
                 
                 if (mcExp.Arguments.Count > 1)
                 {
-                    var obj = LambdaCompileCache.GetExpressionCacheValue(mcExp.Arguments[1]);
+                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[1]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[1]).Compile().DynamicInvoke());
                 }
                 if (mcExp.Arguments.Count > 2)
                 {
-                    var obj = LambdaCompileCache.GetExpressionCacheValue(mcExp.Arguments[2]);
+                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[2]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[2]).Compile().DynamicInvoke());
                 }
                 if (mcExp.Arguments.Count > 3)
                 {
-                    var obj = LambdaCompileCache.GetExpressionCacheValue(mcExp.Arguments[3]);
+                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[3]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[3]).Compile().DynamicInvoke());
                 }

@@ -94,6 +94,10 @@ namespace CRL.Attribute
         /// 属性名称
         /// </summary>
         internal string Name;
+        public string GetName()
+        {
+            return Name;
+        }
 
         /// <summary>
         /// 对象类型
@@ -241,7 +245,10 @@ namespace CRL.Attribute
         /// 属性类型
         /// </summary>
         internal Type PropertyType;
-        
+        public Type GetPropertyType()
+        {
+            return PropertyType;
+        }
         #region 约束 自动关查询时用
         /// <summary>
         /// 自动转换虚拟字段

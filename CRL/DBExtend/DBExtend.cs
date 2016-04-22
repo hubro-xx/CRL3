@@ -596,13 +596,13 @@ namespace CRL
                     }
                 }
                 string msg;
-                var a = obj.CreateTable(db, out msg);
+                obj.CreateTable(db, out msg);
                 //RecoveryParams();
-                if (!a)
-                {
-                    return;
-                    throw new Exception(msg);
-                }
+                //if (!a)
+                //{
+                //    return;
+                //    throw new Exception(msg);
+                //}
                 cacheInstance.SaveTable(dbName, table, tableName);
                 if (initDatas != null)
                 {

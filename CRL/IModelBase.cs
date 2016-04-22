@@ -254,7 +254,7 @@ namespace CRL
             var columns = new List<CRL.Attribute.FieldAttribute>();
             foreach (var info in typeArry)
             {
-                if (info.FieldType == Attribute.FieldType.虚拟字段)
+                if (info.FieldType != Attribute.FieldType.数据库字段)
                     continue;
                 SetColumnDbType(dbAdapter, info);
                 columns.Add(info);
@@ -292,11 +292,12 @@ namespace CRL
         /// <summary>
         /// 创建表
         /// 会检查表是否存在,如果存在则检查字段
+        /// 创建失败则抛出异常
         /// </summary>
         /// <param name="db"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal bool CreateTable(DBExtend db, out string message)
+        internal void CreateTable(DBExtend db, out string message)
         {
             var dbAdapter = db._DBAdapter;
             message = "";
@@ -322,22 +323,22 @@ namespace CRL
                     dbAdapter.CreateTable(columns, tableName);
                     message = string.Format("创建表:{0}\r\n", tableName);
                     CheckIndexExists(db);
-                    return true;
+                    //return true;
                 }
                 catch (Exception ero)
                 {
                     message = "创建表时发生错误 类型{0} {1}\r\n";
                     message = string.Format(message, GetType(), ero.Message);
                     throw new Exception(message);
-                    return false;
+                    //return false;
                 }
-                CoreHelper.EventLog.Log(message, "", false);
+                //CoreHelper.EventLog.Log(message, "", false);
             }
             else
             {
                 message = CheckColumnExists(db);
             }
-            return true;
+            //return false;
         }
 
         #endregion
