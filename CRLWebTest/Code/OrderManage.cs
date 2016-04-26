@@ -17,6 +17,7 @@ namespace WebTest.Code
         public void TestRelationUpdate()
         {
             var db = DBExtend;
+            //参数会按拼接处理
             var c = new CRL.ParameCollection();
             c["UserId"] = "$UserId";//order.userid=product.userid
             c["Remark"] = "2222";//order.remark=2222

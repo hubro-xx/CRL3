@@ -38,7 +38,10 @@ namespace CRL.ExistsTableCache
             #region watch
             while (true)
             {
-                DoCheck();
+                try
+                {
+                    DoCheck();
+                }catch{}
                 Thread.Sleep(10000);
             }
             #endregion
@@ -52,8 +55,8 @@ namespace CRL.ExistsTableCache
             var list = new Dictionary<Type, string>(needCheks);
             foreach(var item in list)
             {
-                var db = dBExtends[item.Value];
-                var table=TypeCache.GetTable(item.Key);
+                var db = dBExtends[item.Value];//todo 线程安全,对象在别的地方被使用过了,导至异常
+                var table = TypeCache.GetTable(item.Key);
                 var _DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(db.dbContext);
                 var sql = _DBAdapter.GetTableFields(table.TableName);
                 var allFileds = db.ExecDictionary<string, int>(sql);

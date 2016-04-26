@@ -57,9 +57,8 @@ namespace CRL
         /// <returns></returns>
         public static Dictionary<Attribute.TableAttribute,DBExtend> GetAllModel(Type baseType)
         {
-            //string msg = "";
-            //var dbcontext = new DbContext(dbHelper,null);
-            //var helper = new CRL.DBExtend(dbcontext);
+            //var assemblies = System.Web.Compilation.BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
+            //var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             var assembyle = System.Reflection.Assembly.GetAssembly(baseType);
             Type[] types = assembyle.GetTypes();
             var findTypes = new Dictionary<Attribute.TableAttribute,DBExtend>();

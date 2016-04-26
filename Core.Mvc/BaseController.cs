@@ -330,26 +330,30 @@ setTimeout('goUrl()', 3300)</script>";
             html += @"
 <table border='1' style='width:100%'>
     <tr>
+        <td style='width:40px'>操作</td>
         <td>KEY</td>
         <td>数据类型</td>
+        <td>行数</td>
         <td>过期(分)</td>
         <td>上次更新</td>
-        <td width='200'>查询</td>
-        <td width='100'>参数</td>
-        <td width='40'>操作</td>
+        <td style='width:200px'>查询</td>
+        <td style='width:100px'>参数</td>
+
     </tr>";
             foreach (var item in caches)
             {
                 string part = @"<tr>
+                <td><a href='?key={0}'>更新</a></td>
         <td>{0}</td>
         <td>{1}</td>
         <td>{2}</td>
         <td>{3}</td>
         <td>{4}</td>
         <td>{5}</td>
-        <td><a href='?key={0}'>更新</a></td>
+        <td>{6}</td>
+
     </tr>";
-                part = string.Format(part, item.Key, item.DataType, item.TimeOut, item.UpdateTime, item.TableName, item.Params);
+                part = string.Format(part, item.Key, item.DataType,item.RowCount, item.TimeOut, item.UpdateTime, item.TableName, item.Params);
                 html += part;
             }
 
@@ -409,6 +413,43 @@ setTimeout('goUrl()', 3300)</script>";
                 part = string.Format(part, item.Type.FullName, item.TableName, primaryKey.GetName() + "(" + primaryKey.GetPropertyType() + ")");
                 html += part;
             }
+            return Content(html);
+        }
+        #endregion
+        #region 自定义错误
+        static Exception GetInnerException(Exception exp)
+        {
+            if (exp.InnerException != null)
+            {
+                exp = exp.InnerException;
+                return GetInnerException(exp);
+            }
+            return exp;
+        }
+
+        public ActionResult _CustomError()
+        { 
+            var ero = RouteData.Values["httpException"] as Exception;
+            if (Request.IsAjaxRequest())
+            {
+                return JsonResult(false, "服务器内部错误:" + ero.Message);
+            }
+            var errorCode = RouteData.Values["errorCode"] as String;
+            string html = Properties.Resources.erro;
+            html = html.Replace("[charset]", Request.ContentEncoding.WebName);
+            ero = GetInnerException(ero);
+            if (ero != null)
+            {
+                string erroDetail = ero.StackTrace + "";
+                erroDetail = erroDetail.Replace("\r\n", "<br>");
+                erroDetail = Server.HtmlEncode(erroDetail);
+                html = html.Replace("[TIME]", DateTime.Now.ToString());
+                html = html.Replace("[ERRO_CODE]", errorCode);
+                html = html.Replace("[URL]", Request.Url.ToString());
+                html = html.Replace("[ERRO_TITLE]", Server.HtmlEncode(ero.Message));
+                html = html.Replace("[ERRO_MESSAGE]", erroDetail);
+            }
+
             return Content(html);
         }
         #endregion

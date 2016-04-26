@@ -19,12 +19,26 @@
         <asp:Button ID="Button4" runat="server" OnClick="Button4_Click" Text="插入测试" />
         <asp:Label ID="Label1" runat="server"></asp:Label>
         <br />
-        <asp:Button ID="Button3" runat="server" Text="查找会员" OnClick="Button3_Click" />
 
+        <asp:Button ID="Button3" runat="server" Text="查找会员" OnClick="Button3_Click" />
+    <pre>
+    var id = Convert.ToInt32(TextBox1.Text);
+    var list = Code.Sharding.MemberManage.Instance.SetLocation(id).QueryList(b => b.Id == id);
+    </pre>
     
         <asp:Button ID="Button2" runat="server" Text="查找订单" OnClick="Button2_Click" />
+    <pre>
+    var id  = Convert.ToInt32(TextBox1.Text);
+    var list = Code.Sharding.OrderManage.Instance.SetLocation(id).QueryList(b => b.MemberId == id);
+    </pre>
         <asp:Button ID="Button5" runat="server" OnClick="Button5_Click" Text="联合查询当前库" />
-        <br />
+     <pre>
+    var id = Convert.ToInt32(TextBox1.Text);
+    var orderManage = Code.Sharding.OrderManage.Instance.SetLocation(id);
+    var query = orderManage.GetLambdaQuery();
+    query.ShardingUnion(UnionType.UnionAll);
+    var list = query.ToList();
+     </pre>
     <asp:GridView ID="GridView1" runat="server">
     </asp:GridView>
 

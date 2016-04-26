@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -27,5 +28,11 @@ namespace Shopping.Web
             //检查票据,设置登录状态
             CoreHelper.FormAuthentication.AuthenticationSecurity.CheckTicket();
         }
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            Core.Mvc.CustomError.HandleError(Context);
+            
+        }
+
     }
 }

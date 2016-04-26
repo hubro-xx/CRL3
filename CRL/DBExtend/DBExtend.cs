@@ -22,10 +22,7 @@ namespace CRL
         /// </summary>
         internal bool OnUpdateNotifyCacheServer = false;
         internal Guid GUID;
-        ///// <summary>
-        ///// 绑定类对象类型
-        ///// </summary>
-        //internal Type ModelManageType;
+
         DBExtend backgroundDBExtend;
         /// <summary>
         /// 仅用来检查表结构

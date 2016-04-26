@@ -350,7 +350,10 @@ namespace CRL
             foreach (var item in list)
             {
                 var keyValue = (item as IModel).GetpPrimaryKeyValue();
-                dic.Add(keyValue, item as TItem);
+                if (!dic.ContainsKey(keyValue))
+                {
+                    dic.Add(keyValue, item as TItem);
+                }
             }
             return dic;
         }

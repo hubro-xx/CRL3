@@ -53,15 +53,42 @@ namespace CRL.Package.Product
             get;
             set;
         }
+
+        string _ProductImage;
         /// <summary>
         /// 产品图片
         /// </summary>
-        [Attribute.Field(Length = 800)]
+        [CRL.Attribute.Field(Length = 800)]
         public string ProductImage
         {
-            get;
-            set;
+            get
+            {
+                var arry = (_ProductImage + "").Split(',');
+                if (arry.Length > 1)
+                {
+                    return arry[0];
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            set
+            {
+                _ProductImage = value;
+            }
         }
+        /// <summary>
+        /// 图片集合
+        /// </summary>
+        public List<string> ProductImages
+        {
+            get
+            {
+                return (_ProductImage + "").Split(',').ToList();
+            }
+        }
+
         /// <summary>
         /// 备注
         /// </summary>

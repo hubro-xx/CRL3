@@ -226,4 +226,7 @@
 	增加关联更新RelationUpdate,解决多表关联更新
 2016-04-22
 	修改属性表达式解析的一个错误
-	BaseControl增加缓存管理和对象管理的方法
+	BaseController增加缓存管理和对象管理的方法
+2016-04-25
+	BaseController增加统一错误捕获方法
+	修改后台字段检查线程异常问题

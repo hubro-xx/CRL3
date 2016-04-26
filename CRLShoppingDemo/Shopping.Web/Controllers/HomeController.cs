@@ -20,6 +20,8 @@ namespace Shopping.Web.Controllers
 
         public ActionResult Index()
         {
+            //var a = 0;
+            //int b = 10 / a;
             return View();
         }
         [AllowAnonymous]

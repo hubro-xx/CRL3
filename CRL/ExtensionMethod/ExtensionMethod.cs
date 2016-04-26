@@ -8,66 +8,7 @@ using System.Collections;
 using CRL.LambdaQuery;
 namespace CRL
 {
-    #region 比较时间格式
-    /// <summary>
-    /// 比较时间格式
-    /// </summary>
-    public enum DatePart
-    {
-        /// <summary>
-        /// 年
-        /// </summary>
-        yy,
-        /// <summary>
-        /// 季度
-        /// </summary>
-        qq,
-        /// <summary>
-        /// 月
-        /// </summary>
-        mm,
-        /// <summary>
-        /// 年中的日
-        /// </summary>
-        dy,
-        /// <summary>
-        /// 日
-        /// </summary>
-        dd,
-        /// <summary>
-        /// 周
-        /// </summary>
-        ww,
-        /// <summary>
-        /// 星期
-        /// </summary>
-        dw,
-        /// <summary>
-        /// 小时
-        /// </summary>
-        hh,
-        /// <summary>
-        /// 分
-        /// </summary>
-        mi,
-        /// <summary>
-        /// 秒
-        /// </summary>
-        ss,
-        /// <summary>
-        /// 毫秒
-        /// </summary>
-        ms,
-        /// <summary>
-        /// 微妙
-        /// </summary>
-        mcs,
-        /// <summary>
-        /// 纳秒
-        /// </summary>
-        ns
-    }
-    #endregion
+    
     /// <summary>
     /// 查询扩展方法,请引用CRL命名空间
     /// </summary>
@@ -321,4 +262,65 @@ namespace CRL
             return typeof(IEnumerable).IsAssignableFrom(type);
         }
     }
+
+    #region 比较时间格式
+    /// <summary>
+    /// 比较时间格式
+    /// </summary>
+    public enum DatePart
+    {
+        /// <summary>
+        /// 年
+        /// </summary>
+        yy,
+        /// <summary>
+        /// 季度
+        /// </summary>
+        qq,
+        /// <summary>
+        /// 月
+        /// </summary>
+        mm,
+        /// <summary>
+        /// 年中的日
+        /// </summary>
+        dy,
+        /// <summary>
+        /// 日
+        /// </summary>
+        dd,
+        /// <summary>
+        /// 周
+        /// </summary>
+        ww,
+        /// <summary>
+        /// 星期
+        /// </summary>
+        dw,
+        /// <summary>
+        /// 小时
+        /// </summary>
+        hh,
+        /// <summary>
+        /// 分
+        /// </summary>
+        mi,
+        /// <summary>
+        /// 秒
+        /// </summary>
+        ss,
+        /// <summary>
+        /// 毫秒
+        /// </summary>
+        ms,
+        /// <summary>
+        /// 微妙
+        /// </summary>
+        mcs,
+        /// <summary>
+        /// 纳秒
+        /// </summary>
+        ns
+    }
+    #endregion
 }

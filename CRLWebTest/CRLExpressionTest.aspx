@@ -11,6 +11,8 @@
     <form id="form1" runat="server">
     <div>
     
+        <asp:TextBox ID="TextBox1" runat="server" Height="234px" TextMode="MultiLine" Width="405px"></asp:TextBox>
+    
         <br />
     
     </div>
