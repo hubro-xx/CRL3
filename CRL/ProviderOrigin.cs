@@ -286,6 +286,18 @@ namespace CRL
             int n = db.Delete<TModel>(expression);
             return n;
         }
+        /// <summary>
+        /// 按关联对象删除
+        /// </summary>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public int Delete<TJoin>(Expression<Func<TModel, TJoin, bool>> expression) where TJoin : IModel, new()
+        {
+            DBExtend db = DBExtend;
+            int n = db.Delete<TModel, TJoin>(expression);
+            return n;
+        }
         #endregion
 
         #region 分页

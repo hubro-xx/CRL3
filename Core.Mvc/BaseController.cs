@@ -90,7 +90,7 @@ namespace Core.Mvc
                 throw new Exception("请不要重复提交表单");
             }
         }
-        
+        #region 自定义Result
         /// <summary>
         /// 自动返回上一页
         /// </summary>
@@ -214,54 +214,17 @@ setTimeout('goUrl()', 3300)</script>";
         {
             return JsonResult(result, message, "");
         }
+        #endregion
 
-        protected ActionResult DecryptImg(string file)
+        #region 图片上传
+        protected ActionResult _UploadImageView(bool multiple, string folder, string uploadType)
         {
-            if (string.IsNullOrEmpty(file))
-            {
-                //Response.StatusCode = 500;
-                return Content("缺少参数");
-            }
-            string path = file.Replace("/", @"\");
-            if (!path.StartsWith(@"\"))
-            {
-                path = @"\" + path;
-            }
-            string path2 = CoreHelper.ImageUpload.Upload.BaseFolder + path;
-            System.Drawing.Image bmp = null;
-            try
-            {
-                bmp = CoreHelper.ImageUpload.FileEncrypt.DecryptImg(path2);
-            }
-            catch
-            {
-                //Response.StatusCode = 404;
-                return Content("没找到文件");
-            }
-            Bitmap bmp2 = new Bitmap(bmp);
-            MemoryStream ms = new MemoryStream();
-            try
-            {
-                bmp2.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                Response.ClearContent();
-                Response.ContentType = "image/Jpeg";
-                Response.BinaryWrite(ms.ToArray());
-            }
-            catch (Exception ero)
-            {
-                //Response.StatusCode = 500;
-                return Content(ero.Message);
-            }
-            finally
-            {
-                bmp.Dispose();
-                //显式释放资源
-                bmp2.Dispose();
-                ms.Dispose();
-            }
-            return null;
+            string html = Properties.Resources.upload;
+            html = html.Replace("[addFile]", multiple ? "<input type='button' onclick='add()' value='增加' />" : "");
+            html = html.Replace("[folder]", folder);
+            html = html.Replace("[uploadType]", uploadType);
+            return Content(html);
         }
-
         /// <summary>
         /// 上传图片方法
         /// 使用服务需配置服务地址
@@ -270,10 +233,10 @@ setTimeout('goUrl()', 3300)</script>";
         /// <param name="folder"></param>
         /// <param name="saveFile"></param>
         /// <param name="error"></param>
-        /// <param name="useService"></param>
         /// <returns></returns>
-        protected bool UploadImage(HttpPostedFileBase postFile, string folder,out string saveFile, out string error, bool useService)
+        protected bool _UploadImage(HttpPostedFileBase postFile, string folder,out string saveFile, out string error)
         {
+            var useService = CoreHelper.CustomSetting.GetConfigKey("uploadUseService") == "1";
             //string saveFile;
             bool a;
             var stream = postFile.InputStream;
@@ -281,12 +244,16 @@ setTimeout('goUrl()', 3300)</script>";
             if (useService)
             {
                 var u = new CoreHelper.ImageUpload.UploadService();
-                u.UploadFolder = "HeadImg";
-                u.MaxSize = 500;
                 a = u.UploadFile(stream, fileName, out saveFile, out error);
             }
             else
             {
+                a = CoreHelper.ImageUpload.Upload.CheckFile(stream, postFile.FileName, out error);
+                if (!a)
+                {
+                    saveFile = "";
+                    return false;
+                }
                 byte[] data = new byte[stream.Length];
                 stream.Read(data, 0, data.Length);
                 a = CoreHelper.ImageUpload.Upload.SaveFile(data, folder, 0, out error, out saveFile);
@@ -297,10 +264,10 @@ setTimeout('goUrl()', 3300)</script>";
         /// 生成缩略图方法
         /// </summary>
         /// <param name="file"></param>
-        /// <param name="useService"></param>
         /// <param name="thumbnailMode"></param>
-        protected void MakeThumbImage(string file, bool useService, params int[] thumbnailMode)
+        protected void MakeThumbImage(string file, params int[] thumbnailMode)
         {
+            var useService = CoreHelper.CustomSetting.GetConfigKey("uploadUseService") == "1";
             if (useService)
             {
                 var u = new CoreHelper.ImageUpload.UploadService();
@@ -311,6 +278,8 @@ setTimeout('goUrl()', 3300)</script>";
                 CoreHelper.ImageUpload.Upload.MakeThumbImage(file, thumbnailMode);
             }
         }
+        #endregion
+
         #region 控制台
         /// <summary>
         /// 缓存管理
@@ -416,6 +385,7 @@ setTimeout('goUrl()', 3300)</script>";
             return Content(html);
         }
         #endregion
+
         #region 自定义错误
         static Exception GetInnerException(Exception exp)
         {

@@ -85,5 +85,24 @@ namespace Core.Mvc.Properties {
                 return ResourceManager.GetString("erro", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 &lt;script src=&quot;/Scripts/jquery-1.8.2.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+        ///&lt;script type=&quot;text/javascript&quot;&gt;
+        ///    function add() {
+        ///        var str = &apos;&lt;input name=&quot;uploadpic&quot; type=&quot;file&quot; /&gt;&apos;;
+        ///        $(&quot;#divAppend&quot;).append(&quot;&quot;, str);
+        ///    }
+        ///&lt;/script&gt;
+        ///&lt;form action=&quot;/handler/UploadImage&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;
+        ///    &lt;div id=&quot;divAppend&quot;&gt;&lt;input name=&quot;uploadpic&quot; type=&quot;file&quot; accept=&quot;.jpg,.jpeg,.gif,.bmp,.png&quot; /&gt;&lt;/div&gt;
+        ///    &lt;input id=&quot;folder&quot; name=&quot;folder&quot; type=&quot;hidden&quot; value=&quot;product&quot; /&gt;
+        ///    &lt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string upload {
+            get {
+                return ResourceManager.GetString("upload", resourceCulture);
+            }
+        }
     }
 }

@@ -437,10 +437,16 @@ end
         {
             throw new NotImplementedException();
         }
-        internal override string PageSqlFormat(string fields, string rowOver, string condition, int start, int end, string sort)
+        public override string PageSqlFormat(string fields, string rowOver, string condition, int start, int end, string sort)
         {
             string sql = "SELECT {0} FROM {1} order by {4} limit {2},{3} ";
             return string.Format(sql, fields, condition, start, end, sort);
+        }
+        public override string GetRelationUpdateSql(string t1, string t2, string condition, string setValue)
+        {
+            string sql = string.Format("update {0} t1, {1} t2 set {2} where {3}", KeyWordFormat(t1)
+                  , KeyWordFormat(t2), setValue, condition);
+            return sql;
         }
     }
 }

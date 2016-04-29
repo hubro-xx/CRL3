@@ -7,5 +7,6 @@
     <pre>
     Code.ProductDataManage.Instance.Delete(b => b.Id == 0);//按条件删除
     Code.ProductDataManage.Instance.Delete(1);//按主键删除
+    Code.OrderManage.Instance.Delete&lt;Code.ProductData>((a, b) => a.UserId == b.Id);//关联ProductData删除
     </pre>
 </asp:Content>

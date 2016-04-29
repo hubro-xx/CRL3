@@ -253,6 +253,11 @@ namespace CRL.LambdaQuery
             }
             return __Prefixs[type];
         }
+        /// <summary>
+        /// 替换别名
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <returns></returns>
         internal string ReplacePrefix(string condition)
         {
             if (string.IsNullOrEmpty(condition))

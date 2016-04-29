@@ -493,5 +493,9 @@ end
         {
             throw new NotImplementedException();
         }
+        public override string GetRelationUpdateSql(string t1, string t2, string condition, string setValue)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

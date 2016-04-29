@@ -316,10 +316,37 @@ namespace CRL.DBAdapter
         /// <param name="end"></param>
         /// <param name="sort"></param>
         /// <returns></returns>
-        internal virtual string PageSqlFormat(string fields, string rowOver, string condition,int start,int end,string sort)
+        public virtual string PageSqlFormat(string fields, string rowOver, string condition,int start,int end,string sort)
         {
             string sql = "SELECT * FROM (select {0},ROW_NUMBER() OVER ( Order by {1} ) AS RowNumber From {2}) T WHERE T.RowNumber BETWEEN {3} AND {4} order by RowNumber";
             return string.Format(sql, fields, rowOver, condition, start, end);
+        }
+        /// <summary>
+        /// 获取关联更新语名
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="condition"></param>
+        /// <param name="setValue"></param>
+        /// <returns></returns>
+        public virtual string GetRelationUpdateSql(string t1, string t2, string condition,string setValue)
+        {
+            string sql = string.Format("update t1 set {2} from {0} t1, {1} t2 where {3}", KeyWordFormat(t1)
+                  , KeyWordFormat(t2), setValue, condition);
+            return sql;
+        }
+        /// <summary>
+        /// 获取关联删除语句
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public virtual string GetRelationDeleteSql(string t1, string t2, string condition)
+        {
+            string table = string.Format("{0} t1,{1} t2", KeyWordFormat(t1), KeyWordFormat(t2));
+            string sql = string.Format("delete t1 from {0} where {1}", table, condition);
+            return sql;
         }
     }
 }

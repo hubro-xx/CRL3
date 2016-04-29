@@ -190,9 +190,9 @@ namespace CRL
         {
             var query = new LambdaQuery<T>(dbContext);
             query.Join<TJoin>(expression);
-            var conditions = query.FormatJoinExpression(expression.Body);
-            conditions = query.ReplacePrefix(conditions);
-            conditions = conditions.Replace("t1.", TypeCache.GetTableName(typeof(T), dbContext) + ".");
+            var condition = query.FormatJoinExpression(expression.Body);
+            condition = query.ReplacePrefix(condition);
+            //conditions = conditions.Replace("t1.", TypeCache.GetTableName(typeof(T), dbContext) + ".");
             query.FillParames(this);
             var str = "";
             foreach (var pair in updateValue)
@@ -211,12 +211,15 @@ namespace CRL
                     dbContext.parIndex += 1;
                     value = parame;
                 }
-                str += string.Format("{0}={1},", name, value);
+                str += string.Format("t1.{0}={1},", name, value);
             }
             str = str.Substring(0, str.Length - 1);
-            string sql = string.Format("update {0} set {2} from {1} t2 where {3}", TypeCache.GetTableName(typeof(T), dbContext)
-                , TypeCache.GetTableName(typeof(TJoin), dbContext), str, conditions);
-            return Execute(sql);
+            var t1 = TypeCache.GetTableName(typeof(T), dbContext);
+            var t2 = TypeCache.GetTableName(typeof(TJoin), dbContext);
+            string sql = _DBAdapter.GetRelationUpdateSql(t1, t2, condition, str);
+            var n = Execute(sql);
+            ClearParame();
+            return n;
         }
         #endregion
     }

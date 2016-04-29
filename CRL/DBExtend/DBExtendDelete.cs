@@ -49,6 +49,30 @@ namespace CRL
             query.FillParames(this);
             return Delete<TModel>(condition);
         }
+
+        /// <summary>
+        /// 关联删除
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public int Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
+            where TModel : IModel, new()
+            where TJoin : IModel, new()
+        {
+            var query = new LambdaQuery<TModel>(dbContext);
+            query.Join<TJoin>(expression);
+            var condition = query.FormatJoinExpression(expression.Body);
+            condition = query.ReplacePrefix(condition);
+            query.FillParames(this);
+            var t1 = TypeCache.GetTableName(typeof(TModel), dbContext);
+            var t2 = TypeCache.GetTableName(typeof(TJoin), dbContext);
+            string sql = _DBAdapter.GetRelationDeleteSql(t1, t2, condition);
+            int n = dbHelper.Execute(sql);
+            ClearParame();
+            return n;
+        }
         #endregion
     }
 }
