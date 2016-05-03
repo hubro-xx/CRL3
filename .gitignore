@@ -190,9 +190,7 @@ FakesAssemblies/
 
 
 #upload
-/MPYF.Web/upload/
-
-/MPYF.Web/upload
+/config/
 /.vs
 .vs
 
