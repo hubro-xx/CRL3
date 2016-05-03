@@ -35,14 +35,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CoreHelper">
-      <HintPath>..\ref\CoreHelper.dll</HintPath>
+      <HintPath>..\packages\CoreHelper.dll</HintPath>
     </Reference>
     <Reference Include="Interop.CHINAPNRLib">
-      <HintPath>..\ref\Interop.CHINAPNRLib.dll</HintPath>
+      <HintPath>..\packages\Interop.CHINAPNRLib.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="LitJson">
-      <HintPath>..\ref\LitJson.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\ref\Newtonsoft.Json.dll</HintPath>

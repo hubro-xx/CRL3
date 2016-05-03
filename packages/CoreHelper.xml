@@ -1,0 +1,3866 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CoreHelper</name>
+    </assembly>
+    <members>
+        <member name="T:CoreHelper.CustomSetting">
+            <summary>
+            获取自定义配置值
+            /CustomSetting.config
+            文本 key=value
+            </summary>
+        </member>
+        <member name="M:CoreHelper.CustomSetting.ContainsKey(System.String)">
+            <summary>
+            是否包含有键值
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.CustomSetting.GetConfigKey(System.String)">
+            <summary>
+            获取自定义配置值
+            如果值用[]包括，则按加密过处理
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.CustomSetting.GetDESEncrypValue(System.String)">
+            <summary>
+            DES加密的内容
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.CustomSetting.GetUnDESEncrypValue(System.String)">
+            <summary>
+            DES解密的内容
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.CustomSetting.Clear">
+            <summary>
+            清空缓存
+            </summary>
+        </member>
+        <member name="M:CoreHelper.CustomSetting.GetConnectionString(System.String)">
+            <summary>
+            获取数据连接字符串,默认路径d:\DBConnection
+            会自动识是否加密过
+            </summary>
+            <param name="connectionName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.CBC.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            cbc加密
+            </summary>
+            <param name="data"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.Encrypt.RSAKeyConvert">
+            <summary>
+            RSA密钥格式转换
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSAKeyConvert.RSAPrivateKeyJava2DotNet(System.Byte[])">
+            <summary>
+            RSA私钥格式转换，java->.net
+            </summary>
+            <param name="privateKeyInfoData">java生成的RSA私钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSAKeyConvert.RSAPrivateKeyDotNet2Java(System.String)">
+            <summary>
+            RSA私钥格式转换，.net->java
+            </summary>
+            <param name="privateKey">.net生成的私钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSAKeyConvert.RSAPublicKeyJava2DotNet(System.Byte[])">
+            <summary>
+            RSA公钥格式转换，java->.net
+            </summary>
+            <param name="keyInfoData">java生成的公钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSAKeyConvert.RSAPublicKeyDotNet2Java(System.String)">
+            <summary>
+            RSA公钥格式转换，.net->java
+            </summary>
+            <param name="publicKey">.net生成的公钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.ECB.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            ECB解密
+            </summary>
+            <param name="encryptedDataBytes"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.ECB.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            ECB加密
+            </summary>
+            <param name="data"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSA.createKeyPair">
+            <summary>
+            生成公钥、私钥
+            </summary>
+            <returns>公钥、私钥，公钥键"PUBLIC",私钥键"PRIVATE"</returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSA.RSAEncrypt(System.String,System.String)">
+            <summary>
+            RSA加密
+            </summary>
+            <param name="publickey"></param>
+            <param name="content"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSA.RSADecrypt(System.String,System.Byte[])">
+            <summary>
+            RSA解密
+            </summary>
+            <param name="privatekey"></param>
+            <param name="content"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSA.SignatureFormatter(System.String,System.Byte[])">
+            <summary>
+            进行签名
+            </summary>
+            <param name="privatekey">私钥</param>
+            <param name="rgbHash">需签名的数据</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.RSA.SignatureDeformatter(System.String,System.Byte[],System.Byte[])">
+            <summary>
+            签名验证
+            </summary>
+            <param name="publickey">公钥</param>
+            <param name="rgbHash">Hash描述</param>
+            <param name="rgbSignature">签名后的结果</param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.Encrypt.TripleDES">
+            <summary>
+            3DES双倍长
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Encrypt.TripleDES.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            3des加密
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Encrypt.TripleDES.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            3des解密
+            </summary>
+        </member>
+        <member name="T:CoreHelper.Encrypt.TripleDES2">
+            <summary>
+            3des2倍长
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Encrypt.TripleDES2.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            3des二倍长加密
+            </summary>
+            <param name="data"></param>
+            <param name="key"></param>
+            <param name="iv"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.TripleDES2.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            3des二倍长解密
+            </summary>
+            <param name="data"></param>
+            <param name="key"></param>
+            <param name="iv"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.Extensions.BooleanExtensions">
+            <summary>
+            布尔值<see cref="T:System.Boolean"/>类型的扩展辅助操作类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.BooleanExtensions.ToLower(System.Boolean)">
+            <summary>
+            把布尔值转换为小写字符串
+            </summary>
+        </member>
+        <member name="T:CoreHelper.Extensions.CollectionExtensions">
+            <summary>
+            集合扩展方法类
+            </summary>
+        </member>
+        <member name="T:CoreHelper.Extensions.DateTimeExtensions">
+            <summary>
+            时间扩展操作类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.DateTimeExtensions.IsWeekend(System.DateTime)">
+            <summary>
+            当前时间是否周末
+            </summary>
+            <param name="dateTime">时间点</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.DateTimeExtensions.IsWeekday(System.DateTime)">
+            <summary>
+            当前时间是否工作日
+            </summary>
+            <param name="dateTime">时间点</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.EnumExtensions.ToDescription(System.Enum)">
+            <summary>
+            获取枚举项上的<see cref="!:DescriptionAttribute"/>特性的文字描述
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.EnumExtensions.ToInt(System.Enum)">
+            <summary>
+            枚举转换为INT
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.Extensions.ExceptionExtensions">
+            <summary>
+            异常操作扩展
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.ExceptionExtensions.FormatMessage(System.Exception,System.Boolean)">
+            <summary>
+            格式化异常消息
+            </summary>
+            <param name="e">异常对象</param>
+            <param name="isHideStackTrace">是否隐藏异常规模信息</param>
+            <returns>格式化后的异常信息字符串</returns>
+        </member>
+        <member name="T:CoreHelper.Extensions.ExpressionExtensions">
+            <summary>
+            Expression表达式扩展操作类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.ExpressionExtensions.Compose``1(System.Linq.Expressions.Expression{``0},System.Linq.Expressions.Expression{``0},System.Func{System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Linq.Expressions.Expression})">
+            <summary>
+            以特定的条件运行组合两个Expression表达式
+            </summary>
+            <typeparam name="T">表达式的主实体类型</typeparam>
+            <param name="first">第一个Expression表达式</param>
+            <param name="second">要组合的Expression表达式</param>
+            <param name="merge">组合条件运算方式</param>
+            <returns>组合后的表达式</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.ExpressionExtensions.And``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}})">
+            <summary>
+            以 Expression.AndAlso 组合两个Expression表达式
+            </summary>
+            <typeparam name="T">表达式的主实体类型</typeparam>
+            <param name="first">第一个Expression表达式</param>
+            <param name="second">要组合的Expression表达式</param>
+            <returns>组合后的表达式</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.ExpressionExtensions.Or``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}})">
+            <summary>
+            以 Expression.OrElse 组合两个Expression表达式
+            </summary>
+            <typeparam name="T">表达式的主实体类型</typeparam>
+            <param name="first">第一个Expression表达式</param>
+            <param name="second">要组合的Expression表达式</param>
+            <returns>组合后的表达式</returns>
+        </member>
+        <member name="T:CoreHelper.Extensions.LinqToXmlExtensions">
+            <summary>
+            Xml 扩展操作类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.LinqToXmlExtensions.ToXElement(System.Xml.XmlNode)">
+            <summary>
+            将XmlNode转换为XElement
+            </summary>
+            <returns> XElment对象 </returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.LinqToXmlExtensions.ToXmlNode(System.Xml.Linq.XElement)">
+            <summary>
+            将XElement转换为XmlNode
+            </summary>
+            <returns> 转换后的XmlNode </returns>
+        </member>
+        <member name="T:CoreHelper.Extensions.ObjectExtensions">
+            <summary>
+            基类型<see cref="T:System.Object"/>扩展辅助操作类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.ObjectExtensions.ConvertTo(System.Object,System.Type)">
+            <summary>
+            把对象类型转换为指定类型
+            </summary>
+            <param name="value"></param>
+            <param name="conversionType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.ObjectExtensions.ConvertTo``1(System.Object)">
+            <summary>
+            把对象类型转化为指定类型
+            </summary>
+            <typeparam name="T"> 动态类型 </typeparam>
+            <param name="value"> 要转化的源对象 </param>
+            <returns> 转化后的指定类型的对象，转化失败引发异常。 </returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.ObjectExtensions.ConvertTo``1(System.Object,``0)">
+            <summary>
+            把对象类型转化为指定类型，转化失败时返回指定的默认值
+            </summary>
+            <typeparam name="T"> 动态类型 </typeparam>
+            <param name="value"> 要转化的源对象 </param>
+            <param name="defaultValue"> 转化失败返回的指定默认值 </param>
+            <returns> 转化后的指定类型对象，转化失败时返回指定的默认值 </returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.ObjectExtensions.IsBetween``1(System.IComparable{``0},``0,``0,System.Boolean,System.Boolean)">
+            <summary>
+            判断当前值是否介于指定范围内
+            </summary>
+            <typeparam name="T"> 动态类型 </typeparam>
+            <param name="value"> 动态类型对象 </param>
+            <param name="start"> 范围起点 </param>
+            <param name="end"> 范围终点 </param>
+            <param name="leftEqual"> 是否可等于上限（默认等于） </param>
+            <param name="rightEqual"> 是否可等于下限（默认等于） </param>
+            <returns> 是否介于 </returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.ObjectExtensions.ToJsonString``1(``0)">
+            <summary>
+            将对象序列化为JSON字符串，不支持存在循环引用的对象
+            </summary>
+            <typeparam name="T">动态类型</typeparam>
+            <param name="value">动态类型对象</param>
+            <returns>JSON字符串</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.ObjectExtensions.ToDynamic(System.Object)">
+            <summary>
+            将对象[主要是匿名对象]转换为dynamic
+            </summary>
+        </member>
+        <member name="T:CoreHelper.Extensions.RandomExtensions">
+            <summary>
+            随机数<see cref="T:System.Random"/>类型的扩展辅助操作类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.NextBoolean(System.Random)">
+            <summary>
+            返回随机布尔值
+            </summary>
+            <param name="random"></param>
+            <returns>随机布尔值</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.NextEnum``1(System.Random)">
+            <summary>
+            返回指定枚举类型的随机枚举值
+            </summary>
+            <param name="random"></param>
+            <returns>指定枚举类型的随机枚举值</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.NextBytes(System.Random,System.Int32)">
+            <summary>
+            返回随机数填充的指定长度的数组
+            </summary>
+            <param name="random"></param>
+            <param name="length">数组长度</param>
+            <returns>随机数填充的指定长度的数组</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.NextItem``1(System.Random,``0[])">
+            <summary>
+            返回数组中的随机元素
+            </summary>
+            <typeparam name="T">元素类型</typeparam>
+            <param name="random"></param>
+            <param name="items">元素数组</param>
+            <returns>元素数组中的某个随机项</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.NextDateTime(System.Random,System.DateTime,System.DateTime)">
+            <summary>
+            返回指定时间段内的随机时间值
+            </summary>
+            <param name="random"></param>
+            <param name="minValue">时间范围的最小值</param>
+            <param name="maxValue">时间范围的最大值</param>
+            <returns>指定时间段内的随机时间值</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.NextDateTime(System.Random)">
+            <summary>
+            返回随机时间值
+            </summary>
+            <param name="random"></param>
+            <returns>随机时间值</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.GetRandomNumberString(System.Random,System.Int32)">
+            <summary>
+            获取指定的长度的随机数字字符串
+            </summary>
+            <param name="random"></param>
+            <param name="length">要获取随机数长度</param>
+            <returns>指定长度的随机数字符串</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.GetRandomLetterString(System.Random,System.Int32)">
+            <summary>
+            获取指定的长度的随机字母字符串
+            </summary>
+            <param name="random"></param>
+            <param name="length">要获取随机数长度</param>
+            <returns>指定长度的随机字母组成字符串</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.RandomExtensions.GetRandomLetterAndNumberString(System.Random,System.Int32)">
+            <summary>
+            获取指定的长度的随机字母和数字字符串
+            </summary>
+            <param name="random"></param>
+            <param name="length">要获取随机数长度</param>
+            <returns>指定长度的随机字母和数字组成字符串</returns>
+        </member>
+        <member name="T:CoreHelper.Extensions.StringExtensions">
+            <summary>
+            字符串<see cref="T:System.String"/>类型的扩展辅助操作类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsMatch(System.String,System.String)">
+            <summary>
+            指示所指定的正则表达式在指定的输入字符串中是否找到了匹配项
+            </summary>
+            <param name="value">要搜索匹配项的字符串</param>
+            <param name="pattern">要匹配的正则表达式模式</param>
+            <returns>如果正则表达式找到匹配项，则为 true；否则，为 false</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.Match(System.String,System.String)">
+            <summary>
+            在指定的输入字符串中搜索指定的正则表达式的第一个匹配项
+            </summary>
+            <param name="value">要搜索匹配项的字符串</param>
+            <param name="pattern">要匹配的正则表达式模式</param>
+            <returns>一个对象，包含有关匹配项的信息</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.Matches(System.String,System.String)">
+            <summary>
+            在指定的输入字符串中搜索指定的正则表达式的所有匹配项的字符串集合
+            </summary>
+            <param name="value"> 要搜索匹配项的字符串 </param>
+            <param name="pattern"> 要匹配的正则表达式模式 </param>
+            <returns> 一个集合，包含有关匹配项的字符串值 </returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsEmail(System.String)">
+            <summary>
+            是否电子邮件
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsIpAddress(System.String)">
+            <summary>
+            是否是IP地址
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsNumeric(System.String)">
+            <summary>
+            是否是整数
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsUnicode(System.String)">
+            <summary>
+            是否是Unicode字符串
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsUrl(System.String)">
+            <summary>
+            是否Url字符串
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsIdentityCard(System.String)">
+            <summary>
+            是否身份证号，验证如下3种情况：
+            1.身份证号码为15位数字；
+            2.身份证号码为18位数字；
+            3.身份证号码为17位数字+1个字母
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsMobileNumber(System.String,System.Boolean)">
+            <summary>
+            是否手机号码
+            </summary>
+            <param name="value"></param>
+            <param name="isRestrict">是否按严格格式验证</param>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsNullOrEmpty(System.String)">
+            <summary>
+            指示指定的字符串是 null 还是 System.String.Empty 字符串
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsNullOrWhiteSpace(System.String)">
+            <summary>
+            指示指定的字符串是 null、空还是仅由空白字符组成。
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.FormatWith(System.String,System.Object[])">
+            <summary>
+            为指定格式的字符串填充相应对象来生成字符串
+            </summary>
+            <param name="format">字符串格式，占位符以{n}表示</param>
+            <param name="args">用于填充占位符的参数</param>
+            <returns>格式化后的字符串</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.ReverseString(System.String)">
+            <summary>
+            将字符串反转
+            </summary>
+            <param name="value">要反转的字符串</param>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.IsImageFile(System.String)">
+            <summary>
+            判断指定路径是否图片文件
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.Split(System.String,System.String,System.Boolean)">
+            <summary>
+            以指定字符串作为分隔符将指定字符串分隔成数组
+            </summary>
+            <param name="value">要分割的字符串</param>
+            <param name="strSplit">字符串类型的分隔符</param>
+            <param name="removeEmptyEntries">是否移除数据中元素为空字符串的项</param>
+            <returns>分割后的数据</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.TextLength(System.String)">
+            <summary>
+            支持汉字的字符串长度，汉字长度计为2
+            </summary>
+            <param name="value">参数字符串</param>
+            <returns>当前字符串的长度，汉字长度为2</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.FromJsonString``1(System.String)">
+            <summary>
+            将JSON字符串还原为对象
+            </summary>
+            <typeparam name="T">要转换的目标类型</typeparam>
+            <param name="json">JSON字符串 </param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.ToBytes(System.String,System.Text.Encoding)">
+            <summary>
+            将字符串转换为<see cref="T:System.Byte"/>[]数组，默认编码为<see cref="P:System.Text.Encoding.UTF8"/>
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.StringExtensions.ToString(System.Byte[],System.Text.Encoding)">
+            <summary>
+            将<see cref="T:System.Byte"/>[]数组转换为字符串，默认编码为<see cref="P:System.Text.Encoding.UTF8"/>
+            </summary>
+        </member>
+        <member name="T:CoreHelper.Extensions.TypeExtensions">
+            <summary>
+            类型<see cref="T:System.Type"/>辅助扩展方法类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.IsNullableType(System.Type)">
+            <summary>
+            判断类型是否为Nullable类型
+            </summary>
+            <param name="type"> 要处理的类型 </param>
+            <returns> 是返回True，不是返回False </returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.GetNonNummableType(System.Type)">
+            <summary>
+            由类型的Nullable类型返回实际类型
+            </summary>
+            <param name="type"> 要处理的类型对象 </param>
+            <returns> </returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.GetUnNullableType(System.Type)">
+            <summary>
+            通过类型转换器获取Nullable类型的基础类型
+            </summary>
+            <param name="type"> 要处理的类型对象 </param>
+            <returns> </returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.ToDescription(System.Type,System.Boolean)">
+            <summary>
+            获取类型的Description特性描述信息
+            </summary>
+            <param name="type">类型对象</param>
+            <param name="inherit">是否搜索类型的继承链以查找描述特性</param>
+            <returns>返回Description特性描述信息，如不存在则返回类型的全名</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.ToDescription(System.Reflection.MemberInfo,System.Boolean)">
+            <summary>
+            获取成员元数据的Description特性描述信息
+            </summary>
+            <param name="member">成员元数据对象</param>
+            <param name="inherit">是否搜索成员的继承链以查找描述特性</param>
+            <returns>返回Description特性描述信息，如不存在则返回成员的名称</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.HasAttribute``1(System.Reflection.MemberInfo,System.Boolean)">
+            <summary>
+            检查指定指定类型成员中是否存在指定的Attribute特性
+            </summary>
+            <typeparam name="T">要检查的Attribute特性类型</typeparam>
+            <param name="memberInfo">要检查的类型成员</param>
+            <param name="inherit">是否从继承中查找</param>
+            <returns>是否存在</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.GetAttribute``1(System.Reflection.MemberInfo,System.Boolean)">
+            <summary>
+            从类型成员获取指定Attribute特性
+            </summary>
+            <typeparam name="T">Attribute特性类型</typeparam>
+            <param name="memberInfo">类型类型成员</param>
+            <param name="inherit">是否从继承中查找</param>
+            <returns>存在返回第一个，不存在返回null</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.GetAttributes``1(System.Reflection.MemberInfo,System.Boolean)">
+            <summary>
+            从类型成员获取指定Attribute特性
+            </summary>
+            <typeparam name="T">Attribute特性类型</typeparam>
+            <param name="memberInfo">类型类型成员</param>
+            <param name="inherit">是否从继承中查找</param>
+            <returns>返回所有指定Attribute特性的数组</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.IsEnumerable(System.Type)">
+            <summary>
+            判断类型是否为集合类型
+            </summary>
+            <param name="type">要处理的类型</param>
+            <returns>是返回True，不是返回False</returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.IsGenericAssignableFrom(System.Type,System.Type)">
+            <summary>
+            判断当前泛型类型是否可由指定类型的实例填充
+            </summary>
+            <param name="genericType">泛型类型</param>
+            <param name="type">指定类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Extensions.TypeExtensions.IsAsync(System.Reflection.MethodInfo)">
+            <summary>
+            方法是否是异步
+            </summary>
+        </member>
+        <member name="T:CoreHelper.FormAuthentication.AuthenticationSecurity">
+            <summary>
+            Form验证，Cookie有效期通过CheckTicket进行限制
+            </summary>
+        </member>
+        <member name="M:CoreHelper.FormAuthentication.AuthenticationSecurity.GetUserData``1">
+            <summary>
+            获取存在SESSION的自定义数据
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.FormAuthentication.AuthenticationSecurity.SetUserData``1(``0)">
+            <summary>
+            设置当前SESSION的自定义数据
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+        </member>
+        <member name="M:CoreHelper.FormAuthentication.AuthenticationSecurity.CheckTicket(System.Boolean,System.String)">
+            <summary>
+            检测票据
+            </summary>
+            <param name="expires">
+            是否过期,过期会自动把过期时间延长20分钟,会造成COOKIE重写,需和SetTicket参数一致
+            如果域名为全域名则为FALSE
+            </param>
+        </member>
+        <member name="M:CoreHelper.FormAuthentication.AuthenticationSecurity.SetTicket(CoreHelper.FormAuthentication.IUser,System.String,System.Boolean)">
+            <summary>
+            设置票据
+            </summary>
+            <param name="user">IUser</param>
+            <param name="rules">组</param>
+            <param name="expires">是否过期,如果设置了域,则为false</param>
+        </member>
+        <member name="M:CoreHelper.FormAuthentication.AuthenticationSecurity.SetTicket(CoreHelper.FormAuthentication.IUser,System.String,System.Int32)">
+            <summary>
+            设置票据
+            </summary>
+            <param name="user">IUser</param>
+            <param name="rules">组</param>
+            <param name="minute">过期分钟,0为不过期</param>
+        </member>
+        <member name="M:CoreHelper.FormAuthentication.AuthenticationSecurity.LoginOut">
+            <summary>
+            清空当前Cookie信息
+            </summary>
+        </member>
+        <member name="M:CoreHelper.FormAuthentication.AuthenticationSecurity.LoginOut(System.String)">
+            <summary>
+            清空当前Cookie信息并跳转
+            </summary>
+            <param name="returnUrl"></param>
+        </member>
+        <member name="P:CoreHelper.FormAuthentication.AuthenticationSecurity.SessionVerified">
+            <summary>
+            Session是否验证通过
+            在Cookie验证通过时,验证此值,能保证是从网站上登录,并且以Session方式验证通过
+            </summary>
+        </member>
+        <member name="T:CoreHelper.ConcurrentControl">
+            <summary>
+            内存锁控制并发
+            可以控制30秒内不会重复
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ConcurrentControl.Check(System.String)">
+            <summary>
+            检测当前键在阻止队列中,是否可用
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ConcurrentControl.Check(System.String,System.Int32)">
+            <summary>
+            检测当前键在阻止队列中,是否可用
+            false则在阻止中
+            </summary>
+            <param name="key"></param>
+            <param name="second">秒</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ConcurrentControl.Remove(System.String)">
+            <summary>
+            移除锁记录
+            在确定不需要锁时移除
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="F:CoreHelper.DBHelper.ExecuteTime">
+            <summary>
+            语句执行时间
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBHelper.AutoFormatWithNolock">
+            <summary>
+            是否自动把查询加上WithNolock
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBHelper._conn">
+            <summary>
+            开启事务的CONN
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBHelper.LogQueryCount">
+            <summary>
+            是否记录查询统计
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBHelper.LogError">
+            <summary>
+            是否记录错误日志
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBHelper.ConnectionString">
+            <summary>
+            连接串
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DBHelper.ClearParams">
+            <summary>
+            清除参数
+            在重复执行SQL时需调用进而重新设定新参数
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DBHelper.AddParam(System.String,System.Object)">
+            <summary>
+            添加一个参数
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CoreHelper.DBHelper.SetParam(System.String,System.Object)">
+            <summary>
+            设置参数,没有就添加,有就更新
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CoreHelper.DBHelper.FormatWithNolock(System.String)">
+            <summary>
+            format为加上 with(nolock)
+            </summary>
+            <param name="sql"></param>
+            <returns></returns>
+        </member>
+        <member name="F:CoreHelper.DBHelper.OutParams">
+            <summary>
+            新的输出参数集合
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DBHelper.GetReturnValue">
+            <summary>
+            获取存储过程的return值,如果没有则为0
+            sql没有
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.AddOutParam(System.String,System.Object)">
+            <summary>
+            添加一个输出参数
+            此参数只支持能转换为string类型
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CoreHelper.DBHelper.GetOutParam(System.String)">
+            <summary>
+            获取OUTPUT的值
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="F:CoreHelper.DBHelper.CountStartTime">
+            <summary>
+            统计开始时间
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBHelper.ExecuteCmdCount">
+            <summary>
+            缓存的查询语句执行次数
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DBHelper.AddQueryCmdCache(System.Data.Common.DbCommand)">
+            <summary>
+            增加到缓存
+            </summary>
+            <param name="cmd"></param>
+        </member>
+        <member name="M:CoreHelper.DBHelper.GetExecuteCmdsCount(System.Int32)">
+            <summary>
+            获取以排过序的统计结果
+            </summary>
+            <param name="min">过滤最小次数</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.ClearExecuteCmdsCount">
+            <summary>
+            清空统计缓存
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DBHelper.SaveExecuteCmdsCount">
+            <summary>
+            保存统计结果
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBHelper.CurrentDataReadCommand">
+            <summary>
+            使用DataReader时,上次Command
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DBHelper.Execute(System.String)">
+            <summary>
+            执行一条sql语句，返回影响行数
+            </summary>
+            <param name="sql">sql语句</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.Run(System.String)">
+            <summary>
+            执行一个存储过程，返回影响行数
+            </summary>
+            <param name="sp">存储过程</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.ExecDataTable(System.String)">
+            <summary>
+            执行一条sql语句，返回DataTable
+            </summary>
+            <param name="sql">sql语句</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.RunDataTable(System.String)">
+            <summary>
+            执行一个存储过程，返回DataTable
+            </summary>
+            <param name="sp">存储过程</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.ExecDataSet(System.String)">
+            <summary>
+            执行一条sql语句，返回DataSet
+            </summary>
+            <param name="sql"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.RunDataSet(System.String)">
+            <summary>
+            执行一个存储过程，返回DataSet
+            </summary>
+            <param name="sp">存储过程</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.ExecScalar(System.String)">
+            <summary>
+            执行一条sql语句，返回首行首列
+            </summary>
+            <param name="sql">sql语句</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.RunScalar(System.String)">
+            <summary>
+            执行一个存储过程，返回首行首列
+            </summary>
+            <param name="sp">存储过程</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.ExecDataReader(System.String)">
+            <summary>
+            执行一条sql语句，返回DbDataReader
+            </summary>
+            <param name="sql">sql语句</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.RunDataReader(System.String)">
+            <summary>
+            执行一个存储过程，返回DbDataReader
+            </summary>
+            <param name="sp">存储过程</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.DBHelper.BeginTran">
+            <summary>
+            开始事务,调用事务必须调用CommitTran()提交事务或者调用RollbackTran()回滚事务
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DBHelper.CommitTran">
+            <summary>
+            提交事务
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DBHelper.RollbackTran">
+            <summary>
+            回滚事务事务
+            </summary>
+        </member>
+        <member name="P:CoreHelper.DBHelper.DatabaseName">
+            <summary>
+            数据库名
+            </summary>
+        </member>
+        <member name="P:CoreHelper.DBHelper.Params">
+            <summary>
+            输入参数
+            不推荐直接访问此属性,用AddParam方法代替
+            </summary>
+        </member>
+        <member name="P:CoreHelper.DBHelper.CurrentDBType">
+            <summary>
+            当前数据库类型
+            </summary>
+        </member>
+        <member name="T:CoreHelper.LocalCookie">
+            <summary>
+            存取加密的COOKIE健值集合
+            </summary>
+        </member>
+        <member name="M:CoreHelper.LocalCookie.#ctor">
+            <summary>
+            以默认COOKIE名构造
+            </summary>
+        </member>
+        <member name="M:CoreHelper.LocalCookie.#ctor(System.String)">
+            <summary>
+            指定COOKIE名构造
+            </summary>
+            <param name="_cookieName"></param>
+        </member>
+        <member name="M:CoreHelper.LocalCookie.GetAll">
+            <summary>
+            获取所有值
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.LocalCookie.SetExpire(System.DateTime)">
+            <summary>
+            设置Cookie有效期
+            </summary>
+            <param name="time"></param>
+        </member>
+        <member name="M:CoreHelper.LocalCookie.Remove(System.String)">
+            <summary>
+            移除一个健值
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="M:CoreHelper.LocalCookie.Clear">
+            <summary>
+            清除此COOKIE
+            </summary>
+        </member>
+        <member name="P:CoreHelper.LocalCookie.Item(System.String)">
+            <summary>
+            根据键名取COOKIE值
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.DelegateCache">
+            <summary>
+            自定义委托和过期时间,实现缓存
+            </summary>
+        </member>
+        <member name="M:CoreHelper.DelegateCache.Init``1(System.String,System.Double,CoreHelper.GetDataHandler{``0})">
+            <summary>
+            初始缓存信息
+            </summary>
+            <param name="key"></param>
+            <param name="minute">过期时间,单位分</param>
+            <param name="handler">委托</param>
+        </member>
+        <member name="M:CoreHelper.DelegateCache.Remove(System.String)">
+            <summary>
+            移除
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="T:CoreHelper.MemoryDataCache">
+            <summary>
+            数据缓存组件
+            此组件会按参数缓存查询结果,在后台自动进行更新
+            </summary>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.GetCacheTable(System.String,System.Int32,CoreHelper.DBHelper)">
+            <summary>
+            获取缓存table
+            缓存在进程重启后才失效
+            </summary>
+            <param name="tableName">表名或查询语句,存储过程前加exec </param>
+            <param name="timeOut">失效分钟</param>
+            <param name="helper">DBHelper对象,如果Params有值,则按参数缓存,慎用,会造成大量缓存</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.Clear">
+            <summary>
+            清空缓存
+            </summary>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.RemoveCache(System.String)">
+            <summary>
+            根据键移除一个缓存
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.UpdateCache(System.String)">
+            <summary>
+            根据键更新一个缓存
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.GetCacheList">
+            <summary>
+            获取缓存列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.StarWatch">
+            <summary>
+            启动线程监视
+            </summary>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.StopWatch">
+            <summary>
+            停止线程监视
+            </summary>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.Filter(System.Data.DataTable,System.String)">
+            <summary>
+            筛选结果
+            </summary>
+            <param name="dt"></param>
+            <param name="filter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MemoryDataCache.CutTable(System.Data.DataTable,System.Int32,System.Int32,System.String,System.String,System.Int32@)">
+            <summary>
+            对数据表进行分页查询
+            </summary>
+            <param name="table"></param>
+            <param name="index"></param>
+            <param name="pageSize"></param>
+            <param name="filter"></param>
+            <param name="sort"></param>
+            <param name="total"></param>
+            <returns></returns>
+        </member>
+        <member name="P:CoreHelper.MemoryDataCache.CacheCount">
+            <summary>
+            获取缓存数量
+            </summary>
+        </member>
+        <member name="T:CoreHelper.MemoryDataCache.MemoryDataCacheItem">
+            <summary>
+            缓存的查询的项
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MemoryDataCache.MemoryDataCacheItem.TimeOut">
+            <summary>
+            超时时间分
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MemoryDataCache.MemoryDataCacheItem.UpdateTime">
+            <summary>
+            更新时间
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MemoryDataCache.MemoryDataCacheItem.UseTime">
+            <summary>
+            使用时间,如果一定时间内没有使用,将不会进行更新或被移除
+            </summary>
+        </member>
+        <member name="T:CoreHelper.MemoryDataCache.QueryItem">
+            <summary>
+            查询的项
+            </summary>
+        </member>
+        <member name="T:CoreHelper.MemoryDataCache.UpdateItem">
+            <summary>
+            更新的项
+            </summary>
+        </member>
+        <member name="T:CoreHelper.PageNavigation">
+            <summary>
+            Get分页导航
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.CurrentEncoding">
+            <summary>
+            参数编码
+            </summary>
+        </member>
+        <member name="M:CoreHelper.PageNavigation.#ctor">
+            <summary>
+            默认构造函数
+            </summary>
+        </member>
+        <member name="M:CoreHelper.PageNavigation.#ctor(System.String)">
+            <summary>
+            通过后辍名构造函数
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="M:CoreHelper.PageNavigation.SetPageStyle(CoreHelper.PageNavigation.PageStyle)">
+            <summary>
+            设置分页样式
+            </summary>
+            <param name="pageStyle"></param>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.ParameName">
+            <summary>
+            传值参数名
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.PageNavigationFormat">
+            <summary>
+            链接FORMAT表达式,like page_{0}
+            不会自动加上?连接符
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.FirstPageText">
+            <summary>
+            首页按钮文字
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.LastPageText">
+            <summary>
+            尾页按钮文字
+            {0}将被替换成值
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.NextPageText">
+            <summary>
+            下一页按钮文字
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.PrevPageText">
+            <summary>
+            上一页按钮文字
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.JumpText">
+            <summary>
+            跳转到第几页文字
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.FnFormat">
+            <summary>
+            首页,上一页替换表达式
+            默认为{0} {1}
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.NlFormat">
+            <summary>
+            下一页,尾页替换表达式
+            默认为{0} {1}
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.ShowCurrentBeforPage">
+            <summary>
+            在可见页范围内,是否显示首页或尾页连接
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.ShowEllipsis">
+            <summary>
+            是否显示分页省略符
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.IndexCenter">
+            <summary>
+            是否将当前页置于导航条中间
+            </summary>
+        </member>
+        <member name="F:CoreHelper.PageNavigation.ShowJump">
+            <summary>
+            是否显示快速跳转提交
+            </summary>
+        </member>
+        <member name="M:CoreHelper.PageNavigation.GetPageIndex(System.Web.HttpContext)">
+            <summary>
+            获取传入的页值
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.PageNavigation.GetPageNavigation(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            获取分页导航代码
+            </summary>
+            <param name="index"></param>
+            <param name="total"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.PageNavigation.GetParams(System.Int32)">
+            <summary>
+            计算分页链接
+            </summary>
+            <param name="pageIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.Rmb">
+            
+            <summary>
+            Rmb 人民币转换为大写。
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Rmb.CmycurD(System.Decimal)">
+            
+            <summary>
+            转换人民币大小金额
+            </summary>
+            <param name="num">金额</param>
+            <returns>返回大写形式</returns>
+        </member>
+        <member name="M:CoreHelper.Rmb.CmycurD(System.String)">
+            
+            <summary>
+            一个重载，将字符串先转换成数字在调用CmycurD(decimal num)
+            </summary>
+            <param name="num">用户输入的金额，字符串形式未转成decimal</param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.ServerDataCache">
+            <summary>
+            按当前用户,在服务器端存取数据
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ServerDataCache.#ctor">
+            <summary>
+            以默认名称构造
+            按当前用户,在服务器端存取数据
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ServerDataCache.#ctor(System.String)">
+            <summary>
+            指定名称构造
+            按当前用户,在服务器端存取数据
+            </summary>
+            <param name="__modleName"></param>
+        </member>
+        <member name="M:CoreHelper.ServerDataCache.Remove(System.String)">
+            <summary>
+            移除一个健值
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="M:CoreHelper.ServerDataCache.Clear">
+            <summary>
+            清除此缓存
+            </summary>
+        </member>
+        <member name="P:CoreHelper.ServerDataCache.Item(System.String)">
+            <summary>
+            根据键名取值
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.TimeHelper">
+            <summary>
+            时间操作
+            </summary>
+        </member>
+        <member name="M:CoreHelper.TimeHelper.DateDiff(CoreHelper.TimeHelper.DateInterval,System.DateTime,System.DateTime)">
+            <summary>
+            比较时间差,同SQL,ASP里datediff
+            </summary>
+            <param name="Interval"></param>
+            <param name="date1"></param>
+            <param name="date2"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.TimeHelper.DateInterval">
+            <summary>
+            时间对比间隔枚举
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.Year">
+            <summary>
+            年
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.Quarter">
+            <summary>
+            季度
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.Month">
+            <summary>
+            月
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.DayOfYear">
+            <summary>
+            一年第几天
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.Day">
+            <summary>
+            天
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.WeekOfYear">
+            <summary>
+            一年第几周
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.Weekday">
+            <summary>
+            一周第几天
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.Hour">
+            <summary>
+            时
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.Minute">
+            <summary>
+            分
+            </summary>
+        </member>
+        <member name="F:CoreHelper.TimeHelper.DateInterval.Second">
+            <summary>
+            秒
+            </summary>
+        </member>
+        <member name="T:CoreHelper.VerifyImage">
+            <summary>
+            图形验证码生成和判断
+            </summary>
+        </member>
+        <member name="M:CoreHelper.VerifyImage.DrawImage">
+            <summary>
+            以默认名称输出验证码
+            </summary>
+        </member>
+        <member name="M:CoreHelper.VerifyImage.DrawImage(System.String)">
+            <summary>
+            以自定义名称输出验证码
+            </summary>
+            <param name="sessionName"></param>
+        </member>
+        <member name="M:CoreHelper.VerifyImage.Check(System.String,System.String@)">
+            <summary>
+            以默认名称对比验证码
+            </summary>
+            <param name="input"></param>
+            <param name="error"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.VerifyImage.Check(System.String,System.String,System.String@)">
+            <summary>
+            以自定义名称对比验证码
+            </summary>
+            <param name="sessionName"></param>
+            <param name="input"></param>
+            <param name="error"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.Encrypt.MAC">
+            <summary>
+            计算MAC
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Encrypt.MAC.Get_ANSI_X99_MAC(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            ansi x9.9 MAC计算
+            </summary>
+            <param name="data"></param>
+            <param name="key"></param>
+            <param name="iv"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.MAC.Get_ECB_DES_MAC(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            ECB_DES_MAC计算
+            银联8583协议
+            </summary>
+            <param name="data"></param>
+            <param name="key"></param>
+            <param name="iv"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.MAC.ByteToHex(System.Byte[])">
+            <summary>
+            BYTE转16进制
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.MAC.HexToByte(System.String)">
+            <summary>
+            16进制转BYTE
+            </summary>
+            <param name="hexString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.MAC.pinBlock(System.String,System.String)">
+            <summary>
+            pinBlock计算
+            strCardNo长度需大于12位
+            </summary>
+            <param name="strPassword"></param>
+            <param name="strCardNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.MAC.getPassFromPinBlock(System.String,System.Byte[])">
+            <summary>
+            从PINBLOCK中反转密码
+            </summary>
+            <param name="strCardNo"></param>
+            <param name="bytesPinBlock"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Encrypt.MAC.str2bcd(System.String)">
+            <summary>
+            10进制串转为BCD码
+            </summary>
+            <param name="strTemp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageHelper.CutImg(System.Drawing.Image,System.Int32,System.Int32,CoreHelper.ImageHelper.CutMode,System.Boolean,System.Boolean)">
+            <summary>
+            裁剪图片
+            </summary>
+            <param name="originalImage"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+            <param name="mode"></param>
+            <param name="autoFill">是否填充到宽高</param>
+            <param name="HightMode">是否高质量</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageHelper.MakeThumbImage(System.String,System.Int32)">
+            <summary>
+            生成指定个数缩略图
+            </summary>
+            <param name="file"></param>
+            <param name="thumbnailMode">大于10则按值进行分割算宽高</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageHelper.MakeWaterMark(System.Drawing.Image,System.Drawing.Image)">
+            <summary>
+            加上水印
+            </summary>
+            <param name="source"></param>
+            <param name="waterMarkImage"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.ImageHelper.CutMode">
+            <summary>
+            裁剪模式
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageHelper.CutMode.WIDTH">
+            <summary>
+            指定宽，高按比例   
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageHelper.CutMode.HEIGHT">
+            <summary>
+            指定高，宽按比例
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageHelper.CutMode.WIDTH_HEIGHT">
+            <summary>
+            指定高宽缩放（可能变形）   
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageHelper.CutMode.CUT">
+            <summary>
+            指定高宽裁减（不变形）
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageHelper.CutMode.AUTO">
+            <summary>
+            自动
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.FileEncrypt.Encrypt(System.Byte[],System.Byte[])">
+            <summary>
+            加密
+            </summary>
+            <param name="sourceDataBytes"></param>
+            <param name="keys"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.FileEncrypt.Decrypt(System.Byte[],System.Byte[])">
+            <summary>
+            解密
+            </summary>
+            <param name="encryptedDataBytes"></param>
+            <param name="keys"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.FileEncrypt.EncryptImg(System.String,System.Boolean)">
+            <summary>
+            加密图片
+            </summary>
+            <param name="imgFile"></param>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.FileEncrypt.DecryptImg(System.String,System.Boolean)">
+            <summary>
+            解密图片
+            </summary>
+            <param name="imgFile"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.FileEncrypt.BatchEncryptImg(System.String)">
+            <summary>
+            批量加密
+            </summary>
+            <param name="folder"></param>
+        </member>
+        <member name="T:CoreHelper.ImageUpload.IUploadService">
+            <summary>
+            上传服务
+            继承实现此上传服务
+            </summary>
+        </member>
+        <member name="T:CoreHelper.ImageUpload.Upload">
+            <summary>
+            上传,直接写文件到路径
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.Upload.MaxSize">
+            <summary>
+            文件最大值,KB
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.Upload.MaxWidth">
+            <summary>
+            最大宽
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.Upload.MaxHeight">
+            <summary>
+            最大高
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.Upload.MinWidth">
+            <summary>
+            最小宽
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.Upload.MinHeight">
+            <summary>
+            最小高
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.Upload.UploadFileType">
+            <summary>
+            上传文件类型
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.Upload.CheckFile(System.IO.Stream,System.String,System.String@)">
+            <summary>
+            验证上传数据
+            </summary>
+            <param name="stream"></param>
+            <param name="fileName"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.Upload.SaveFile(System.Byte[],System.String,System.Int32,System.String@,System.String@)">
+            <summary>
+            通过BYTE数据保存
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.Upload.MakeThumbImage(System.String,System.Int32[])">
+            <summary>
+            生成缩略图
+            </summary>
+            <param name="fileName"></param>
+            <param name="thumbnailMode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.Upload.DeleteFile(System.String)">
+            <summary>
+            删除文件
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="P:CoreHelper.ImageUpload.Upload.BaseFolder">
+            <summary>
+            上传路径
+            </summary>
+        </member>
+        <member name="T:CoreHelper.ImageUpload.UploadService">
+            <summary>
+            上传服务封装
+            请配置app.config服务地址
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.UploadService.UploadFolder">
+            <summary>
+            上传目录
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.UploadService.MaxSize">
+            <summary>
+            文件最大值,KB
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.UploadService.MaxWidth">
+            <summary>
+            最大宽
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.UploadService.MaxHeight">
+            <summary>
+            最大高
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.UploadService.MinWidth">
+            <summary>
+            最小宽
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.UploadService.MinHeight">
+            <summary>
+            最小高
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImageUpload.UploadService.UploadFileType">
+            <summary>
+            上传文件类型
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.UploadService.CheckFile(System.IO.Stream,System.String,System.String@)">
+            <summary>
+            验证上传数据
+            </summary>
+            <param name="stream"></param>
+            <param name="fileName"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.UploadService.UploadFile(System.IO.Stream,System.String,System.String@,System.String@)">
+            <summary>
+            上传文件
+            </summary>
+            <param name="stream"></param>
+            <param name="fileName">文件名,用来判断文件类型</param>
+            <param name="saveFile"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.UploadService.UploadFile(System.Byte[],System.String@)">
+            <summary>
+            上传
+            </summary>
+            <param name="data"></param>
+            <param name="saveFile"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.UploadService.MakeThumbImage(System.String,System.Int32[])">
+            <summary>
+            生成缩略图
+            </summary>
+            <param name="fileName"></param>
+            <param name="thumbnailMode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.UploadService.DeleteFile(System.String)">
+            <summary>
+            删除文件
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImageUpload.UploadService.EncryptImg(System.String,System.String@)">
+            <summary>
+            加密
+            </summary>
+            <param name="file"></param>
+            <param name="error"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.ImitateWebRequest">
+            <summary>
+            模拟WEB请求,并附带上COOKIE
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.#ctor(System.String,System.Text.Encoding)">
+            <summary>
+            创建附带COOKIE的请求
+            </summary>
+            <param name="_cookieName">指定识别同一网站的COOKIE名</param>
+            <param name="_encoding"></param>
+        </member>
+        <member name="F:CoreHelper.ImitateWebRequest.ContentEncoding">
+            <summary>
+            返回内容编码
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImitateWebRequest.Accept">
+            <summary>
+            设置HTTP标头的值
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImitateWebRequest.ContentType">
+            <summary>
+            设置内容类型
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ImitateWebRequest.RequestWidthCookie">
+            <summary>
+            请求是是否附加上Cookie
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.AddCoolie(System.Net.Cookie)">
+            <summary>
+            附加COOKIE
+            </summary>
+            <param name="cookie"></param>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.CleanCookie(System.String)">
+            <summary>
+            清除COOKIE
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.GetCurrentCookie">
+            <summary>
+            获取当前COOKIE
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.GetSource(System.String)">
+            <summary>
+            请求内容
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.Get(System.String)">
+            <summary>
+            请求内容
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.Post(System.String,System.String)">
+            <summary>
+            POST内容
+            </summary>
+            <param name="url"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.Post(System.String,System.String,System.String@)">
+            <summary>
+            POST内容,并返回跳转后的URL
+            </summary>
+            <param name="url"></param>
+            <param name="data"></param>
+            <param name="now_url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.SetCer(System.String,System.String)">
+            <summary>
+            设置证书
+            </summary>
+            <param name="_certFile"></param>
+            <param name="_certPasswd"></param>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.CreateWebRequest(System.String,System.String)">
+            <summary>
+            创建请求
+            </summary>
+            <param name="url"></param>
+            <param name="postData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ImitateWebRequest.GetStream(System.String)">
+            <summary>
+            获取请求Stream
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.LocalIpcChannel.IpcChannelClient">
+            <summary>
+            客户端,负责发送消息
+            </summary>
+        </member>
+        <member name="T:CoreHelper.MakeHtml.Core">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.Start(System.Collections.Generic.List{CoreHelper.MakeHtml.RulerItem})">
+            <summary>
+            启动
+            </summary>
+            <param name="rulers"></param>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.Start(System.Collections.Generic.List{CoreHelper.MakeHtml.RulerItem},System.Text.Encoding)">
+            <summary>
+            指定编码,启动
+            会替换掉RulerItem的Encoding
+            </summary>
+            <param name="rulers"></param>
+            <param name="currentEncoding"></param>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.Stop">
+            <summary>
+            停止
+            </summary>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.GetRulers">
+            <summary>
+            获取规则
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.StaticFromRequest(System.Web.HttpContext)">
+            <summary>
+            被动执行入口,仅在GLOBAL中布署
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.StaticFileByDomain(System.String,System.String,System.String)">
+            <summary>
+            指定域名,按规则名执行,跨域调用这个方法
+            确定指定域名上布署过此框架,规则名正确
+            获取当前域名用RequestHelper.GetCurrentHost()
+            </summary>
+            <param name="domain"></param>
+            <param name="rulerName"></param>
+            <param name="data">自定义参数,需先设置好替换符</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.StaticFile(System.Web.HttpContext,System.String,System.String)">
+            <summary>
+            指定规则名和自定义参数数据(如果有)执行
+            </summary>
+            <param name="context"></param>
+            <param name="rulerName"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.StaticFile(System.Web.HttpContext,System.String)">
+            <summary>
+            根据规则名执行
+            </summary>
+            <param name="context"></param>
+            <param name="rulerName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.StaticFile(System.Web.HttpContext,System.Int32)">
+            <summary>
+            根据规则索引值执行
+            </summary>
+            <param name="context"></param>
+            <param name="index"></param>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.StaticFile(System.Web.HttpContext,CoreHelper.MakeHtml.RulerItem)">
+            <summary>
+            根据规则对象执行
+            </summary>
+            <param name="context"></param>
+            <param name="r"></param>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.DeleteStaticFile(System.String,System.String)">
+            <summary>
+            删除根据规则生成的文件
+            </summary>
+            <param name="rulerName"></param>
+            <param name="data"></param>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.Core.CheckStaticExists(System.Web.HttpContext,System.String,System.String)">
+            <summary>
+            检查没有生成静态文件,没有则生成
+            </summary>
+            <param name="context"></param>
+            <param name="rulerName"></param>
+            <param name="data"></param>
+        </member>
+        <member name="T:CoreHelper.MakeHtml.RulerItem">
+            <summary>
+            生成规则
+            </summary>
+        </member>
+        <!-- 对于成员“M:CoreHelper.MakeHtml.RulerItem.#ctor(System.String)”忽略有格式错误的 XML 注释 -->
+        <member name="F:CoreHelper.MakeHtml.RulerItem.CustomParameHandler">
+            <summary>
+            获取动态参数值的委托
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MakeHtml.RulerItem.Name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <!-- 对于成员“F:CoreHelper.MakeHtml.RulerItem.OriginalFile”忽略有格式错误的 XML 注释 -->
+        <member name="F:CoreHelper.MakeHtml.RulerItem.HtmlFile">
+            <summary>
+            生成静态文件路径
+            如果OriginalFile为动态参数,替换符为{0}
+            如index_{0}.html
+            网站默认目录为static
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MakeHtml.RulerItem.ReplaceRulers">
+            <summary>
+            替换规则
+            比如分页链接
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MakeHtml.RulerItem.ExpirationTime">
+            <summary>
+            过期时间,分
+            如果设为0,则为被动模式,只有调用时才处理
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MakeHtml.RulerItem.LastUpdateTime">
+            <summary>
+            上次更新时间
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MakeHtml.RulerItem.CDNCacheFile">
+            <summary>
+            CDN缓存文件地址,替换符为{0},以/开头 /static/detail/123.html
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MakeHtml.RulerItem.Encoding">
+            <summary>
+            页面编码
+            </summary>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.RulerItem.SetAspxReplaceRuler">
+            <summary>
+            设置ASPX页面INPUT域默认替换规则
+            并更正确确的请求路径
+            </summary>
+        </member>
+        <member name="F:CoreHelper.MakeHtml.RulerItem.Data">
+            <summary>
+            动态参数值,多个,号隔开
+            </summary>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.RulerItem.ToString">
+            <summary>
+            toString
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.MakeHtml.RulerItem.GetRulerResult">
+            <summary>
+            获取规则生成的结果
+            </summary>
+            <returns>string[2]</returns>
+        </member>
+        <member name="P:CoreHelper.MakeHtml.RulerItem.RulerType">
+            <summary>
+            规则说明
+            </summary>
+        </member>
+        <member name="T:CoreHelper.MakeHtml.RulerItem.FileItem">
+            <summary>
+            一项
+            </summary>
+        </member>
+        <member name="T:CoreHelper.EventLog">
+            <summary>
+            写日志
+            不想自动记录Context信息请调用Log(string message, string typeName, false)
+            </summary>
+        </member>
+        <member name="F:CoreHelper.EventLog.UseContext">
+            <summary>
+            是否使用上下文信息写日志
+            </summary>
+        </member>
+        <member name="M:CoreHelper.EventLog.CreateFolder(System.String)">
+            <summary>
+            检查目录并建立
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="M:CoreHelper.EventLog.Log(System.String,System.String,System.Boolean)">
+            <summary>
+            自定义文件名前辍写入日志
+            </summary>
+            <param name="message"></param>
+            <param name="typeName"></param>
+            <param name="useContext"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.Log(CoreHelper.EventLog.LogItem,System.String)">
+            <summary>
+            指定日志类型名生成日志
+            </summary>
+            <param name="logItem"></param>
+            <param name="typeName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.Log(CoreHelper.EventLog.LogItem,System.String,System.Boolean)">
+            <summary>
+            指定日志类型名生成日志
+            </summary>
+            <param name="logItem"></param>
+            <param name="typeName"></param>
+            <param name="useContext">是否使用当前上下文信息</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.Log(System.String,System.Boolean)">
+            <summary>
+            生成日志,默认文件名
+            </summary>
+            <param name="message"></param>
+            <param name="sendToServer">是否发送到服务器</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.Log(System.String)">
+            <summary>
+            生成日志,默认文件名
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.Error(System.String)">
+            <summary>
+            生成日志,文件名以Error开头
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.Info(System.String)">
+            <summary>
+            生成日志,文件名以Info开头
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.Debug(System.String)">
+            <summary>
+            生成日志,文件名以Debug开头
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.WriteLog(System.String)">
+            <summary>
+            在当前网站目录生成日志
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:CoreHelper.EventLog.WriteLog(System.String,CoreHelper.EventLog.LogItem,System.String)">
+            <summary>
+            指定路径,文件名,写入日志
+            </summary>
+            <param name="path"></param>
+            <param name="logItem"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.SendToServer(System.String,System.String,System.String,System.String)">
+            <summary>
+            把日志发送到消息服务端
+            </summary>
+            <param name="domain"></param>
+            <param name="requestUrl"></param>
+            <param name="detail"></param>
+            <param name="logName"></param>
+        </member>
+        <member name="M:CoreHelper.EventLog.SendToServer(System.String,System.String)">
+            <summary>
+            使用当前Context信息把日志发送到服务端
+            </summary>
+            <param name="detail"></param>
+            <param name="logName"></param>
+        </member>
+        <member name="M:CoreHelper.EventLog.GetSecondFolder">
+            <summary>
+            获取日志二级目录
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.EventLog.GetLogFolder">
+            <summary>
+            获取日志绝对目录
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.EventLog.LogItemArry">
+            <summary>
+            项集合
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ExceptionHelper.InnerLogException(System.Exception)">
+            <summary>
+            内部记录日志
+            </summary>
+            <param name="ero"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ExceptionHelper.WriteException(System.Exception)">
+            <summary>
+            页面输出并写入错误日志
+            </summary>
+            <param name="ero"></param>
+        </member>
+        <member name="T:CoreHelper.Reflection.MethodHandler">
+            <summary>
+            方法委托
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="T:CoreHelper.Reflection.MethodCache">
+            <summary>
+            方法缓存实例,包函方法所在的类型,参数
+            此缓存只适用用对执行结果要求性不高的逻辑
+            能反复执行,执行不成功也不影响业务
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Reflection.MethodCache.ToString">
+            <summary>
+            获取参数集合字符串
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.Key">
+            <summary>
+            唯一KEY
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.NeedFix">
+            <summary>
+            是否需要手动执行
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.MaxErrorTimes">
+            <summary>
+            最大出错次数,达到后就移除
+            0则不限次数
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.NextExecuteTime">
+            <summary>
+            上次执行时间
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.ErrorTimes">
+            <summary>
+            执行出错次数
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.MethodHandler">
+            <summary>
+            方法委托,如果此值不为空,则按此种方式
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.ClassType">
+            <summary>
+            类型
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.MethodName">
+            <summary>
+            方法名
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Reflection.MethodCache.Parameters">
+            <summary>
+            参数集合
+            </summary>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.GetIP">
+            <summary>
+            获得当前页面客户端的IP
+            </summary>
+            <returns>当前页面客户端的IP</returns>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.GetCdnIP">
+            <summary>
+            获取CDN转发时客户端原始IP
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.GetServerIp">
+            <summary>
+            获取服务器第一个IP
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.SetSoapHead(System.Object,System.String)">
+            <summary>
+            设置不同类型SoapHead的值
+            </summary>
+            <param name="_head"></param>
+            <param name="key"></param>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.GetCurrentHost">
+            <summary>
+            返回当前http主机名
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.GetCurrentHost(System.String)">
+            <summary>
+            返回当前http主机名
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.GetParameUrl(System.String,System.Collections.Generic.SortedDictionary{System.String,System.String},System.Text.Encoding)">
+            <summary>
+            生成签名参数
+            </summary>
+            <param name="key"></param>
+            <param name="parmes"></param>
+            <param name="encoding"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.VerifyData(System.String,System.Collections.Generic.SortedDictionary{System.String,System.String},System.String@,System.Text.Encoding)">
+            <summary>
+            验证数据
+            </summary>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.GetRequestParame(System.Collections.Specialized.NameValueCollection,System.String)">
+            <summary>
+            从集合中获取指定的参数
+            </summary>
+            <param name="cc"></param>
+            <param name="pars"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.RequestHelper.GetFilePath(System.String)">
+            <summary>
+            获取工作目录路径,IIS则为网站根目录,程序为程序所在目录
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="P:CoreHelper.RequestHelper.IsRemote">
+            <summary>
+            是否为远程服务器,DEBUG用
+            </summary>
+        </member>
+        <member name="P:CoreHelper.RequestHelper.IsSaveIp">
+            <summary>
+            是否为公司IP或内网请求
+            </summary>
+        </member>
+        <member name="T:CoreHelper.StringHelper">
+            <summary>
+            字符串加密类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetChineseDate(System.String,System.Boolean)">
+            <summary>
+            得到日期的汉字显示
+            </summary>
+            <param name="date">格式为：2011-10-05</param>
+            <param name="isTraditional">是否繁体字显示</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetChineseDate(System.String)">
+            <summary>
+            得到日期的汉字显示
+            </summary>
+            <param name="date">格式为：2011-10-05</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.ByteToHex(System.Byte[])">
+            <summary>
+            BYTE转16进制
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.HexToByte(System.String)">
+            <summary>
+            16进制转BYTE
+            </summary>
+            <param name="hexString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.EncryptMD5(System.String,System.Text.Encoding)">
+            <summary>
+            MD5加密
+            </summary>
+            <param name="instr">要加密的字体串</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.Encrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            DES加密
+            </summary>
+            <param name="sourceDataBytes"></param>
+            <param name="key"></param>
+            <param name="iv"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
+            <summary>
+            DES解密
+            </summary>
+            <param name="data"></param>
+            <param name="key"></param>
+            <param name="iv"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.Encrypt(System.String,System.String)">
+            <summary>
+            加密字符串,返回16进制字符串
+            </summary>
+            <param name="sourceData"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.Decrypt(System.String,System.String)">
+            <summary>
+            解密 传入16进制字符串
+            </summary>
+            <param name="sourceData"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsInStrs(System.String,System.String)">
+            <summary>
+            判断字符串是否在一个以‘_ , |’隔开的字符串里
+            </summary>
+            <param name="str">目标字符串</param>
+            <param name="strs">要查找的字符串</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsInParams(System.String,System.String[])">
+            <summary>
+            判断字符串是否在一个数组里
+            </summary>
+            <param name="str">目标字符串</param>
+            <param name="strs">要查找的字符串数组</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsNullOrEmpty(System.String)">
+            <summary>
+            是否是null或空字符串
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsNotNullAndEmpty(System.String)">
+            <summary>
+            是否不为空字符串也不是null
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsDigital(System.String)">
+            <summary>
+            判断字符串里每个字符是否是十进制
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsInteger(System.String)">
+            <summary>
+            是否是Integer
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsDouble(System.String)">
+            <summary>
+            是否是double
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsSingle(System.String)">
+            <summary>
+            是否是single
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsIP(System.String)">
+            <summary>
+            是否是ip地址
+            </summary>
+            <param name="ip"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsCellPhone(System.String)">
+            <summary>
+            是否是手机号
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsPhone(System.String)">
+            <summary>
+            是否是固话号
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsEmail(System.String)">
+            <summary>
+            是否是邮箱地址
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsIDCard(System.String)">
+            <summary>
+            是否是中国公民身份证号
+            </summary>
+            <param name="Id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetX(System.Int32)">
+            <summary>
+            根据区位得到首字母
+            </summary>
+            <param name="GBCode">区位</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetOneIndex(System.String)">
+            <summary>
+            得到单个汉字首字母大写
+            </summary>
+            <param name="OneIndexTxt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetChineseIndex(System.String)">
+            <summary>
+            得到汉字字符串的首字母大写
+            </summary>
+            <param name="IndexTxt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetChineseSpell(System.String)">
+            <summary>
+            得到汉字的拼音字符串
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.FillZero(System.String,System.Int32)">
+            <summary>
+            前补0
+            </summary>
+            <param name="value">字符串</param>
+            <param name="size">总长度</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.InterceptString(System.String,System.Int32)">
+            <summary>
+            截取字符串
+            </summary>
+            <param name="str">原字符串</param>
+            <param name="number">截取数量</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.InterceptStringEndDot(System.String,System.Int32)">
+            <summary>
+            截取字符串，以“.”结束
+            </summary>
+            <param name="str">原字符串</param>
+            <param name="number">截取数量</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.IsIn(System.String,System.String[])">
+            <summary>
+            判断字符串是否在几个字符之中
+            </summary>
+            <param name="str">要判断的字符串</param>
+            <param name="strs">几个字符串，就是范围</param>
+            <returns>如果在返回true，否则返回false</returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetCheckCode(System.Int32)">
+            <summary>
+            得到随机数
+            </summary>
+            <param name="count">个数</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetChineseNumber(System.Int32,System.Boolean)">
+            <summary>
+            得到0-10的汉字显示
+            </summary>
+            <param name="number"></param>
+            <param name="isTraditional"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.GetChineseNumber(System.String,System.Boolean)">
+            <summary>
+            得到0-10的汉字显示
+            </summary>
+            <param name="number">数字</param>
+            <param name="isTraditional">是否是繁体</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.ToJSON(System.Data.DataTable)">
+            <summary>
+            根据DataTable生成json对象数组格式
+            </summary>
+            <param name="dt">DataTable</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.ToJSON(System.Data.DataRow)">
+            <summary>
+            根据DataRow生成json对象格式
+            </summary>
+            <param name="dr">DataRow</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.ToJSON(System.Object)">
+            <summary>
+            根据对象生成json对象格式
+            </summary>
+            <param name="obj">对象</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.ToJSON``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            根据对象集合生成json对象数组格式
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+            <param name="list">对象集合</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.SerializerToJson(System.Object)">
+            <summary>
+            把对象序列化成JSON,支持层级
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.StringHelper.SerializerFromJSON(System.Byte[],System.Type)">
+            <summary>
+            把JSON串转换成的BYTE转换成对象
+            </summary>
+            <param name="data"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.HttpRequest.HttpPost(System.String,System.String,System.Text.Encoding,System.String,System.String)">
+            <summary>
+            http post
+            </summary>
+            <param name="url"></param>
+            <param name="data"></param>
+            <param name="enc"></param>
+            <param name="contentType"></param>
+            <param name="proxyHost">代理</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.HttpRequest.HttpGet(System.String,System.Text.Encoding)">
+            <summary>
+            指定编码GET
+            </summary>
+            <param name="url"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.HttpRequest.HttpGet(System.String,System.String,System.Text.Encoding)">
+            <summary>
+            
+            </summary>
+            <param name="url"></param>
+            <param name="proxyHost">代理地址</param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.XmlType">
+            <summary>
+            xml文档类型 0 xml文件 1 xml值
+            </summary>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.GetNode(System.String,System.String,CoreHelper.XmlType)">
+            <summary>
+            根据xml文档类型和节点路径获取xml节点
+            </summary>
+            <param name="value">节点路径 例:/root/username</param>
+            <param name="xmlValue">xml文件名或者xml文档</param>
+            <param name="type">xml文档类型 参照XmlType</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.GetNodeList(System.String,System.String,CoreHelper.XmlType)">
+            <summary>
+            通过xml内容路径获取xml节点列表
+            </summary>
+            <param name="value">节点路径 例:/root/username</param>
+            <param name="xmlValue">xml文件名或者xml文档</param>
+            <param name="type">xml文档类型 参照XmlType</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.GetNodeValue(System.String,System.String,CoreHelper.XmlType)">
+            <summary>
+            通过xml文件路径获取某个节点的值
+            </summary>
+            <param name="path">节点路径 例:/root/username</param>
+            <param name="xmlValue">xml文件名或者xml文档</param>
+            <param name="type">xml文档类型 参照XmlType</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.GetAttributeValue(System.String,System.String,System.String,CoreHelper.XmlType)">
+            <summary>
+            通过xml内容获取某个节点的某个属性的值
+            </summary>
+            <param name="path">节点路径 例:/root/username</param>
+            <param name="attribute">属性名</param>
+            <param name="xmlValue">xml文件名或者xml文档</param>
+            <param name="type">xml文档类型 参照XmlType</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.GetDataSet(System.String)">
+            <summary>
+            通过xml路径读取xml内容至DataSet中
+            </summary>
+            <param name="strXmlPath">xml文档路径</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.GetDataTable(System.String,System.String)">
+            <summary>
+            通过临时XmlValue加载至DataTable中，自动生成DataTable架构
+            </summary>
+            <param name="strXmlValue">xml文档</param>
+            <param name="xpath">节点路径 例:/root/username</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.InsertNode(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            插入包含属性的节点
+            </summary>
+            <param name="xmlValue">xml文件名或者xml文档</param>
+            <param name="xpath">节点路径 例:/root/username</param>
+            <param name="element">节点名称</param>
+            <param name="value">节点值</param>
+            <param name="attribute">属性名称</param>
+            <param name="attValue">属性值</param>
+            <param name="type">xml文档类型 参照XmlType</param>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.InsertAttribute(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            为节点插入属性
+            </summary>
+            <param name="xmlValue">xml文件名或者xml文档</param>
+            <param name="xpath">节点路径 例:/root/username</param>
+            <param name="element">节点名称</param>
+            <param name="attribute">属性名称</param>
+            <param name="attValue">属性值</param>
+            <param name="type">xml文档类型 参照XmlType</param>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.UpdateNode(System.String,System.String,System.String,System.String)">
+            <summary>
+            更新节点值
+            </summary>
+            <param name="xmlPath">xml文件路径</param>
+            <param name="xpath">节点路径 例:/root/username</param>
+            <param name="element">节点名称</param>
+            <param name="value">节点值</param>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.UpdateAttribute(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            更新节点属性值
+            </summary>
+            <param name="xmlPath">xml文件路径</param>
+            <param name="xpath">节点路径 例:/root/username</param>
+            <param name="element">节点名称</param>
+            <param name="attribute">属性名称</param>
+            <param name="attValue">属性值</param>
+        </member>
+        <member name="M:CoreHelper.XmlHelper.DeleteNode(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            删除具有某属性的节点
+            </summary>
+            <param name="xmlPath">xml文件路径</param>
+            <param name="xpath">节点路径 例:/root/username</param>
+            <param name="element">节点名称</param>
+            <param name="attribute">属性名称</param>
+            <param name="attValue">属性值</param>
+        </member>
+        <member name="M:CoreHelper.ExtensionMethod.ToCamel(System.String)">
+            <summary>
+            首字母小写
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:CoreHelper.ExtensionMethod.ToPascal(System.String)">
+             <summary>
+            首字母大写
+             </summary>
+             <param name="str"></param>
+             <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ExtensionMethod.To32MD5(System.String)">
+            <summary>
+            得到大写
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.CookieHelper">
+            <summary>
+            操作Cookie的帮助类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.CookieHelper.AddCookies(System.String,System.String)">
+            <summary>
+            添加一个新的Cookie到HttpCookes集合
+            </summary>
+            <param name="strCookName">Cookie的名称</param>
+            <param name="strCookValue">Cookie的值</param>
+        </member>
+        <member name="M:CoreHelper.CookieHelper.AddCookies(System.String,System.String,System.DateTime)">
+            <summary>
+            添加一个Cookie到HttpCookes集合并设置其过期时间
+            </summary>
+            <param name="strCookName">cookie名称</param>
+            <param name="strCookValue">cookie值</param>
+            <param name="dtExpires">过期时间</param>
+        </member>
+        <member name="M:CoreHelper.CookieHelper.AddCookies(System.String,System.String,System.DateTime,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="strCookName"></param>
+            <param name="strCookValue"></param>
+            <param name="dtExpires"></param>
+            <param name="domain">Cookie域</param>
+        </member>
+        <member name="M:CoreHelper.CookieHelper.DelCookies(System.String)">
+            <summary>
+            删除指定的Cookie
+            </summary>
+            <param name="strCookName">Cookie名称</param>
+        </member>
+        <member name="M:CoreHelper.CookieHelper.GetCookieValue(System.String)">
+            <summary>
+            获取指定Cookie的值
+            </summary>
+            <param name="strCookName">Cookie名称</param>
+            <returns></returns>
+        </member>
+        <member name="T:CoreHelper.DBType">
+            <summary>
+            数据库类型
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBType.MSSQL">
+            <summary>
+            ms sql
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBType.MSSQL2000">
+            <summary>
+            ms sql2000
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBType.ACCESS">
+            <summary>
+            ms access
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBType.MYSQL">
+            <summary>
+            mysql
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBType.ORACLE">
+            <summary>
+            oracle
+            </summary>
+        </member>
+        <member name="T:CoreHelper.EmailHelper">
+            <summary>
+            发送Email帮助类，需要实例化
+            </summary>
+        </member>
+        <member name="M:CoreHelper.EmailHelper.SendToEmailOld">
+            <summary>
+            用UTF8编码发
+            </summary>
+        </member>
+        <member name="M:CoreHelper.EmailHelper.SendToEmailOld(System.Text.Encoding)">
+            <summary>
+            用指定的编码发
+            </summary>
+            <param name="encoding">编码</param>
+        </member>
+        <member name="M:CoreHelper.EmailHelper.SendToEMail">
+            <summary>
+            用UTF8编码发
+            </summary>
+        </member>
+        <member name="M:CoreHelper.EmailHelper.SendToEMail(System.Text.Encoding)">
+            <summary>
+            用指定的编码发
+            </summary>
+            <param name="encoding">编码</param>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.ServerPort">
+            <summary>
+            服务端口号
+            </summary>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.FromName">
+            <summary>
+            发信人邮箱
+            </summary>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.EmailPwd">
+            <summary>
+            发信人邮箱密码
+            </summary>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.ToName">
+            <summary>
+            收信人邮箱
+            </summary>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.Subject">
+            <summary>
+            邮件标题
+            </summary>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.MailBody">
+            <summary>
+            邮件内容
+            </summary>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.MailBodyHtml">
+            <summary>
+            邮件内容是否是html格式
+            </summary>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.SmtpServer">
+            <summary>
+            Smtp服务
+            </summary>
+        </member>
+        <member name="P:CoreHelper.EmailHelper.MailAttachment">
+            <summary>
+            附件上传控件
+            </summary>
+        </member>
+        <member name="T:CoreHelper.ExportHelper">
+            <summary>
+            导出操作类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.ToExcel(System.Data.DataTable)">
+            <summary>
+            将DataTable里的数据呈现到Excel
+            </summary>
+            <param name="dt"></param>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.ToExcel(System.Data.DataTable,System.String)">
+            <summary>
+            重载,将DataTable里的数据呈现到Excel
+            </summary>
+            <param name="dt"></param>
+            <param name="fileName">文件名</param>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.ToWord(System.Data.DataTable)">
+            <summary>
+            将DataTable里的数据呈现到Word
+            </summary>
+            <param name="dt">DataTable</param>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.GetExcelData(System.String)">
+            <summary>
+            得到Excel文件的数据
+            </summary>
+            <param name="SavePath">文件路径</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.GetExcelData(System.String,System.String,System.String)">
+            <summary>
+            得到Excel文件的数据
+            </summary>
+            <param name="file">Excel文件路径</param>
+            <param name="sheet">Excel工作表名</param>
+            <param name="cols">工作表第一行的字段(全部为*)</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.GetExcelTableName(System.String)">
+            <summary>
+             得到Excel文件的工作表名(第三列为表名)
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.GetExcelData(System.String,System.String)">
+            <summary>
+            得到Excel文件的数据
+            </summary>
+            <param name="file">Excel文件路径</param>
+            <param name="sheet">Excel工作表名</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.ExcelToSql(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Excel数据导入数据库
+            </summary>
+            <param name="file">Excel文件</param>
+            <param name="sheet">Excel工作表名</param>
+            <param name="cols">工作表第一行的字段(全部为*)</param>
+            <param name="table">数据库表名</param>
+            <param name="fields">数据库表字段</param>
+            <param name="staticFields">特定的列值，格式为：name:'小明',age:23，如果没有则为string.Empty</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.ExcelToSql(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Excel数据导入数据库
+            </summary>
+            <param name="file">Excel文件</param>
+            <param name="sheet">Excel工作表名</param>
+            <param name="table">数据库表名</param>
+            <param name="fields">数据库表字段</param>
+            <param name="staticFields">特定的列值，格式为：name:'小明',age:23，如果没有则为string.Empty</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.GetTxtData(System.String)">
+            <summary>
+            Txt导出Datatable
+            </summary>
+            <param name="path">文件路径</param>
+            <returns>datatable</returns>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.GetTxtDataAll(System.String)">
+            <summary>
+            Txt导出Datatable
+            </summary>
+            <param name="path">文件路径</param>
+            <returns>datatable</returns>
+        </member>
+        <member name="M:CoreHelper.ExportHelper.GetTxtDataAll(System.String,System.Text.Encoding,System.Char)">
+            <summary>
+            Txt导出Datatable
+            </summary>
+            <param name="path">文件路径</param>
+            <returns>datatable</returns>
+        </member>
+        <member name="T:CoreHelper.Reflection.DynamicVisitor">
+            <summary>
+            动态访问执行者
+            实现委托或反射形式执行方法
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Reflection.DynamicVisitor.Execute(CoreHelper.Reflection.MethodCache,System.String@)">
+            <summary>
+            执行一个方法缓存
+            </summary>
+            <param name="methodCache"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Reflection.DynamicVisitor.Execute(System.Type,System.String,System.Object[])">
+            <summary>
+            通过类型实例执行方法
+            </summary>
+            <param name="type"></param>
+            <param name="methodName"></param>
+            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.Reflection.DynamicVisitor.ExecuteAndRemoveCache(CoreHelper.Reflection.MethodCache)">
+            <summary>
+            执行后并移除一个方法缓存
+            </summary>
+        </member>
+        <member name="F:CoreHelper.Reflection.DynamicVisitor.MechodCaches">
+            <summary>
+            方法缓存集合
+            </summary>
+        </member>
+        <member name="M:CoreHelper.Reflection.DynamicVisitor.AddMechodCacheByHandler(CoreHelper.Reflection.MethodHandler,System.Object[])">
+            <summary>
+            通过委托方法添加方法缓存
+            </summary>
+            <param name="handler">委托</param>
+            <param name="parames">委托的参数,按顺序</param>
+        </member>
+        <member name="M:CoreHelper.Reflection.DynamicVisitor.AddMechodCache(CoreHelper.Reflection.MethodCache)">
+            <summary>
+            添加一个方法缓存
+            </summary>
+            <param name="methodCache"></param>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.BinarySerialize(System.Object,System.IO.Stream)">
+            <summary>
+            把对象用二进制格式序列化到流
+            </summary>
+            <param name="obj">对象</param>
+            <param name="stream">目标流</param>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.BinarySerialize(System.Object,System.String)">
+            <summary>
+            把对象用二进制格式序列化到文件
+            </summary>
+            <param name="obj">对象</param>
+            <param name="file">对象的类型</param>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.BinaryDeserialize``1(System.IO.Stream)">
+            <summary>
+            从流反序列化对象
+            </summary>
+            <typeparam name="T">对象的类型</typeparam>
+            <param name="stream">流</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.BinaryDeserialize``1(System.String)">
+            <summary>
+            从文件反序列化对象
+            </summary>
+            <typeparam name="T">对象的类型</typeparam>
+            <param name="file">文件路径</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.SoapSerialize(System.Object,System.IO.Stream)">
+            <summary>
+            把对象用Soap格式格式序列化到流
+            </summary>
+            <param name="obj">对象</param>
+            <param name="stream">目标流</param>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.SoapSerialize(System.Object,System.String)">
+            <summary>
+            把对象用Soap格式格式序列化到文件
+            </summary>
+            <param name="obj">流</param>
+            <param name="file">文件路径</param>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.SoapDeserialize``1(System.IO.Stream)">
+            <summary>
+            从流反序列化对象
+            </summary>
+            <typeparam name="T">对象的类型</typeparam>
+            <param name="stream">流</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.SoapDeserialize``1(System.String)">
+            <summary>
+            从流反序列化对象
+            </summary>
+            <typeparam name="T">对象的类型</typeparam>
+            <param name="file">文件路径</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.XmlSerialize(System.Object,System.IO.Stream)">
+            <summary>
+            把对象用Xml格式格式序列化到流
+            </summary>
+            <param name="obj">对象</param>
+            <param name="stream">流</param>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.XmlSerialize(System.Object,System.String)">
+            <summary>
+            把对象用Xml格式格式序列化到文件
+            </summary>
+            <param name="obj">对象</param>
+            <param name="file">文件</param>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.XmlDeserialize``1(System.IO.Stream)">
+            <summary>
+            从流反序列化对象
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+            <param name="stream">流</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.XmlDeserialize``1(System.String)">
+            <summary>
+            从文件反序列化对象
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+            <param name="file">文件</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.Clone``1(``0)">
+            <summary>
+            利用序列化克隆对象
+            </summary>
+            <typeparam name="T">对象的类型</typeparam>
+            <param name="source">原对象</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.SerializerToJson(System.Object)">
+            <summary>
+            把对象序列化成JSON,支持层级
+            使用UTF8编码,系统显示通用为此编码
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.SerializerToJson(System.Object,System.Text.Encoding)">
+            <summary>
+            把对象序列化成JSON,支持层级
+            指定编码,如果要反序列化,则要用相同的编码
+            </summary>
+            <param name="source"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.SerializerFromJSON(System.Byte[],System.Type)">
+            <summary>
+            把经过编码转换的JSON转换成对象
+            </summary>
+            <param name="data"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SerializeHelper.SerializerFromJSON(System.String,System.Type,System.Text.Encoding)">
+            <summary>
+            指定编码转换对象
+            </summary>
+            <param name="json"></param>
+            <param name="type"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="F:CoreHelper.StringCommon.RegEmail">
+            <summary>
+            邮箱正则表达式
+            </summary>
+        </member>
+        <member name="F:CoreHelper.StringCommon.RegTelephone">
+            <summary>
+            固话号正则表达式
+            </summary>
+        </member>
+        <member name="F:CoreHelper.StringCommon.RegCellphone">
+            <summary>
+            手机号正则表达式
+            </summary>
+        </member>
+        <member name="F:CoreHelper.StringCommon.RegIp">
+            <summary>
+            ip地址表达式
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SqlHelper.#ctor(System.String)">
+            <summary>
+            根据参数类型实例化
+            </summary>
+            <param name="_connectionString">内容</param>
+        </member>
+        <member name="M:CoreHelper.SqlHelper.TablesPage(System.String,System.String,System.String,System.Boolean,System.Int32,System.Int32,System.String,System.Int32@)">
+            <summary>
+            新的分页存储过程，更改原来查询结果排序错误
+            以前传入排序参数可能不兼容，会导致语法错误
+            </summary>
+            <param name="tableName">要显示的表或多个表的连接</param>
+            <param name="fields">要显示的字段列表</param>
+            <param name="sortfield">排序字段</param>
+            <param name="singleSortType">排序方法，false为升序，true为降序</param>
+            <param name="pageSize">每页显示的记录个数</param>
+            <param name="pageIndex">要显示那一页的记录</param>
+            <param name="condition">查询条件,不需where</param>
+            <param name="count">查询到的记录数</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SqlHelper.InsertFromDataTable(System.Data.DataTable,System.String,System.Boolean)">
+            <summary>
+            根据表插入记录,dataTable需按查询生成结构
+            </summary>
+            <param name="dataTable"></param>
+            <param name="tableName"></param>
+            <param name="keepIdentity"></param>
+        </member>
+        <member name="T:CoreHelper.Properties.Resources">
+            <summary>
+              一个强类型的资源类，用于查找本地化的字符串等。
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Properties.Resources.ResourceManager">
+            <summary>
+              返回此类使用的缓存的 ResourceManager 实例。
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Properties.Resources.Culture">
+            <summary>
+              使用此强类型资源类，为所有资源查找
+              重写当前线程的 CurrentUICulture 属性。
+            </summary>
+        </member>
+        <member name="P:CoreHelper.Properties.Resources.erroHtml">
+             <summary>
+               查找类似 &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+            &lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+            &lt;head&gt;
+            &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=gb2312&quot; /&gt;
+            &lt;title&gt;网页出错了&lt;/title&gt;
+            &lt;link rel=&quot;stylesheet&quot; href=&quot;/content/error.css&quot; /&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+            &lt;div class=&quot;error&quot;&gt;
+              &lt;ul&gt;
+                &lt;li&gt;
+                  &lt;h1&gt;程序产生一些异常,无法继续浏览,请刷新或重试&lt;/h1&gt;
+                &lt;/li&gt;
+                &lt;li&gt;
+                  &lt;h2&gt;异常描述：[ERRO_TITLE]&lt;/h2&gt;
+                &lt;/li&gt;
+                &lt;li&gt;
+                  &lt;h3&gt;错误代码：[ER [字符串的其余部分被截断]&quot;; 的本地化字符串。
+             </summary>
+        </member>
+        <member name="P:CoreHelper.Properties.Resources.smsIllegalChar">
+             <summary>
+               查找类似  发论公
+             专制
+            .bkbck.com
+            《12个春秋》
+            001工程
+            0721-57616
+            1061086.com
+            114票务网
+            15hne.com
+            17大
+            18大
+            21世纪中国基金会
+            4．25事件
+            4006618965
+            4008885897
+            6.4.运动
+            6+1
+            610办
+            610洗脑班
+            6228482382128956810
+            6-4tianwang
+            64运动
+            6a6.net
+            7.4中山公园
+            70字通道
+            71集会
+            71游行
+            722十周年法轮功
+            89-64cdjp
+            995.hk
+            9评
+            A片
+            bignews
+            bitch
+            boc.cn
+            boxun
+            B样
+            call5.me
+            ccvvy.com
+            CDMA
+            chinaliberal
+            chinamz
+            chinesenewsnet
+            comcast.net
+            creaders
+            dafa
+            dajiyuan
+            df&apos;d
+            dfdz
+            DICK
+            dpp
+            dpp大法
+            erdaoqiao
+            EstaZolam
+            E周刊
+            fa lun
+            fa piao
+            falu
+            falun
+            falunda [字符串的其余部分被截断]&quot;; 的本地化字符串。
+             </summary>
+        </member>
+        <!-- 对于成员“P:CoreHelper.Properties.Resources.sp_TablesPageNew”忽略有格式错误的 XML 注释 -->
+        <member name="T:CoreHelper.QuartzScheduler.QuartzJob">
+            <summary>
+            任务接口
+            优先使用Cron表达式,如果为空,则使用重复规则
+            </summary>
+        </member>
+        <member name="F:CoreHelper.QuartzScheduler.QuartzJob.CronExpression">
+            <summary>
+            Cron表达式,如果为空,则按重复间隔
+            </summary>
+        </member>
+        <member name="F:CoreHelper.QuartzScheduler.QuartzJob.RepeatInterval">
+            <summary>
+            重复间隔
+            </summary>
+        </member>
+        <member name="F:CoreHelper.QuartzScheduler.QuartzJob.RepeatCount">
+            <summary>
+            重复次数,-1为不限次数
+            </summary>
+        </member>
+        <member name="M:CoreHelper.QuartzScheduler.QuartzJob.DoWork">
+            <summary>
+            执行的任务委托
+            </summary>
+        </member>
+        <member name="T:CoreHelper.QuartzScheduler.QuartzWorker">
+            <summary>
+            QuartzWorker自动任务
+            </summary>
+        </member>
+        <member name="M:CoreHelper.QuartzScheduler.QuartzWorker.AddWork(CoreHelper.QuartzScheduler.QuartzJob[])">
+            <summary>
+            添加任务
+            </summary>
+            <param name="jobs"></param>
+        </member>
+        <member name="M:CoreHelper.QuartzScheduler.QuartzWorker.AddWork(CoreHelper.QuartzScheduler.QuartzJob)">
+            <summary>
+            添加一个任务
+            </summary>
+            <param name="job"></param>
+        </member>
+        <member name="M:CoreHelper.QuartzScheduler.QuartzWorker.Start">
+            <summary>
+            开始运行
+            </summary>
+        </member>
+        <member name="M:CoreHelper.QuartzScheduler.QuartzWorker.Stop">
+            <summary>
+            停止运行
+            </summary>
+        </member>
+        <member name="T:CoreHelper.CoreConfig">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:CoreHelper.CoreConfig.EncryptKey">
+            <summary>
+            Encrypt密钥
+            </summary>
+        </member>
+        <member name="P:CoreHelper.CoreConfig.UploadFolderMapping">
+            <summary>
+            上传目录映射
+            </summary>
+        </member>
+        <member name="P:CoreHelper.CoreConfig.LastUpdateTime">
+            <summary>
+            上次更新时间
+            </summary>
+        </member>
+        <member name="P:CoreHelper.CoreConfig.LogMsgId">
+            <summary>
+            日志消息ID
+            </summary>
+        </member>
+        <member name="P:CoreHelper.CoreConfig.Instance">
+            <summary>
+            实例
+            </summary>
+        </member>
+        <member name="T:CoreHelper.logService.LogItem">
+            <remarks/>
+        </member>
+        <member name="P:CoreHelper.logService.LogItem.Domain">
+            <remarks/>
+        </member>
+        <member name="P:CoreHelper.logService.LogItem.MsgId">
+            <remarks/>
+        </member>
+        <member name="P:CoreHelper.logService.LogItem.Time">
+            <remarks/>
+        </member>
+        <member name="P:CoreHelper.logService.LogItem.Detail">
+            <remarks/>
+        </member>
+        <member name="P:CoreHelper.logService.LogItem.LogName">
+            <remarks/>
+        </member>
+        <member name="P:CoreHelper.logService.LogItem.RequestUrl">
+            <remarks/>
+        </member>
+        <member name="P:CoreHelper.logService.LogItem.Folder">
+            <remarks/>
+        </member>
+        <member name="T:CoreHelper.SocketUtil.DataTransmit">
+            <summary>
+            辅助传输对象
+            </summary>
+        </member>
+        <member name="T:CoreHelper.SocketUtil.IDataTransmit">
+            <summary>
+            传输对象接口
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.IDataTransmit.Send(System.Byte[])">
+            <summary>
+            发送二进制数据
+            </summary>
+            <param name="bin">二进制数据</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.IDataTransmit.Send(System.Byte[],System.Boolean)">
+            <summary>
+            发送数据,并指定发送完成后是否关掉SOCKET
+            </summary>
+            <param name="bin"></param>
+            <param name="sendAndClose"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.IDataTransmit.Send(System.String)">
+            <summary>
+            发送文本
+            </summary>
+            <param name="text">文本内容</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.IDataTransmit.Start">
+            <summary>
+            开始接收数据
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.IDataTransmit.Stop">
+            <summary>
+            停止并断开连接
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.IDataTransmit.Connected">
+            <summary>
+            是否已连接
+            </summary>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.IDataTransmit.ConnectFail">
+            <summary>
+            连接失败事件
+            </summary>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.IDataTransmit.ConnectSucceed">
+            <summary>
+            连接成功事件
+            </summary>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.IDataTransmit.DisConnected">
+            <summary>
+            断开连接事件
+            </summary>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.IDataTransmit.ReceiveData">
+            <summary>
+            接收到数据事件
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.IDataTransmit.RemoteEndPoint">
+            <summary>
+            获取远程终结点
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.IDataTransmit.TcpSocket">
+            <summary>
+            Socket对象.
+            </summary>
+        </member>
+        <member name="F:CoreHelper.SocketUtil.DataTransmit.BagSize">
+            <summary>
+            缓存大小
+            </summary>
+        </member>
+        <member name="F:CoreHelper.SocketUtil.DataTransmit.SendAndClose">
+            <summary>
+            发送完成后是否断掉
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.#ctor">
+            <summary>
+            默认构造函数
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.#ctor(System.String,System.Int32)">
+            <summary>
+            使用指定的IP地址和端口构造实例
+            </summary>
+            <param name="ip">IP地址</param>
+            <param name="port">端口</param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.#ctor(System.Net.EndPoint)">
+            <summary>
+            客户端调用此构造函数
+            </summary>
+            <param name="ipEndPoint">在连接的服务器端网络地址</param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.#ctor(System.Net.Sockets.Socket)">
+            <summary>
+            服务器端调用
+            </summary>
+            <param name="client">服务器监听连接得到的Socket对象</param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.Stop">
+            <summary>
+            停止传输，断开连接
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.Start">
+            <summary>
+            开始接收数据
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.receiveCallback(System.IAsyncResult)">
+            <summary>
+            接收数据回调函数
+            </summary>
+            <param name="ar"></param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.Send(System.String)">
+            <summary>
+            发送文本
+            </summary>
+            <param name="text">文本内容</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.Send(System.Byte[])">
+            <summary>
+            发送数据
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.Send(System.Byte[],System.Boolean)">
+            <summary>
+            发送并指定完成后是否关掉SOCKET
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.OnConnectSucceed">
+            <summary>
+            触发连接成功事件
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.OnConnectFail(System.Exception)">
+            <summary>
+            触发连接失败事件
+            </summary>
+            <param name="err"></param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.OnDisConnected(System.Exception)">
+            <summary>
+            触发连接断开事件
+            </summary>
+            <param name="err"></param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.DataTransmit.OnReceiveData(System.Object)">
+            <summary>
+            触发接收数据事件
+            </summary>
+            <param name="bin"></param>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.DataTransmit.ConnectSucceed">
+            <summary>
+            连接成功事件
+            </summary>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.DataTransmit.ConnectFail">
+            <summary>
+            连接失败事件
+            </summary>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.DataTransmit.DisConnected">
+            <summary>
+            断开连接事件
+            </summary>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.DataTransmit.ReceiveData">
+            <summary>
+            接收到数据事件
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.DataTransmit.TcpSocket">
+            <summary>
+            获取或设置 Socket 对象
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.DataTransmit.RemoteEndPoint">
+            <summary>
+            获取远程终结点
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.DataTransmit.Connected">
+            <summary>
+            Socket是否已连接
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.DataTransmit.ErrorCode">
+            <summary>
+            Socket错误代码
+            </summary>
+        </member>
+        <member name="T:CoreHelper.SocketUtil.TcpService">
+            <summary>
+            TCP连接服务器端,接受多客户的TCP连接
+            </summary>
+        </member>
+        <member name="T:CoreHelper.SocketUtil.TcpService`1">
+            <summary>
+            TCP连接服务器端,接受多客户的TCP连接
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService`1.#ctor(System.Int32,System.Int32,System.String)">
+            <summary>
+            使用指定端口、最大客户连接数、IP地址构造实例
+            </summary>
+            <param name="port">监听的端口号</param>
+            <param name="maxsockets">最大客户连接量</param>
+            <param name="ip">IP地址</param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService`1.#ctor(System.Int32)">
+            <summary>
+            使用指定端口构造实例
+            </summary>
+            <param name="port">监听的端口</param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService`1.Start(System.Int32)">
+            <summary>
+            启动服务器程序,开始监听客户端请求
+            </summary>
+            <param name="backlog">挂起连接队列的最大长度。</param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService`1.Start">
+            <summary> 
+            启动服务器程序,开始监听客户端请求
+            </summary> 
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService`1.Stop">
+            <summary>
+            关闭侦听器。
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService`1.DisConnectAll">
+            <summary>
+            断开所有客户端连接
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService`1.Close">
+            <summary>
+            关闭侦听器并断开所有客户端连接
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService`1.Keepalive(System.Int32,System.Int32,System.Int32)">
+            <summary>
+             得到tcp_keepalive结构值
+            </summary>
+            <param name="onoff">是否启用Keep-Alive</param>
+            <param name="keepalivetime">多长时间后开始第一次探测（单位：毫秒）</param>
+            <param name="keepaliveinterval">探测时间间隔（单位：毫秒）</param>
+            <returns></returns>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.TcpService`1.Connected">
+            <summary>
+            客户端连接事件
+            </summary>
+        </member>
+        <member name="E:CoreHelper.SocketUtil.TcpService`1.DisConnect">
+            <summary>
+            客户端断开事件
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.TcpService`1.Active">
+            <summary>
+            是否处于活动状态，即自动接收客户端连接
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.TcpService`1.ListenPort">
+            <summary>
+            获取监听端口号
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.TcpService`1.ConnectCount">
+            <summary>
+            获取当前客户连接数
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.TcpService`1.Session">
+            <summary>
+            获取与客户连接的所有Socket
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService.#ctor(System.Int32,System.Int32,System.String)">
+            <summary>
+            使用指定端口、最大客户连接数、IP地址构造实例
+            </summary>
+            <param name="port">监听的端口号</param>
+            <param name="maxsockets">最大客户连接量</param>
+            <param name="ip">IP地址</param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpService.#ctor(System.Int32)">
+            <summary>
+            使用指定端口构造实例
+            </summary>
+            <param name="port">监听的端口</param>
+        </member>
+        <member name="T:CoreHelper.SocketUtil.NetEventHandler">
+            <summary>
+            网络通讯事件模型委托
+            </summary>
+            <param name="sender"></param>
+            <param name="e">TcpClient</param>
+        </member>
+        <member name="T:CoreHelper.SocketUtil.NetEventArgs">
+            <summary>
+            网络事件参数
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.NetEventArgs.#ctor(System.Object)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="EventArg"></param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.NetEventArgs.ToString">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.NetEventArgs.EventArg">
+            <summary>
+            事件参数
+            </summary>
+        </member>
+        <member name="T:CoreHelper.SocketUtil.TcpClient">
+            <summary>
+            TcpClient 工具类
+            </summary>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpClient.#ctor(System.String,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="ip">IP 地址</param>
+            <param name="port">端口</param>
+            <param name="tryTimes">重试次数</param>
+            <param name="longConnection">是否长连接</param>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpClient.Send(System.Byte[])">
+            <summary>
+            发送数据
+            </summary>
+            <param name="sendData">待发送的数据</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpClient.SendAndReceive(System.Byte[])">
+            <summary>
+            发送数据并接收数据
+            </summary>
+            <param name="sendData">待发送的数据</param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.SocketUtil.TcpClient.Dispose">
+            <summary>
+            释放连接
+            </summary>
+        </member>
+        <member name="P:CoreHelper.SocketUtil.TcpClient.LastException">
+            <summary>
+            获取最后的错误信息
+            </summary>
+        </member>
+        <member name="T:CoreHelper.ThreadSplit`1">
+            <summary>
+            线程分割处理 
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ThreadSplit`1.prodress">
+            <summary>
+            线程数
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ThreadSplit`1.threadTask">
+            <summary>
+            每线程任务数
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ThreadSplit`1.OnWork">
+            <summary>
+            一项正在执行
+            </summary>
+        </member>
+        <member name="F:CoreHelper.ThreadSplit`1.OnFinish">
+            <summary>
+            当全部执行完成时
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ThreadSplit`1.#ctor(System.Collections.Generic.List{`0})">
+            <summary>
+            构造5个线程分割
+            </summary>
+            <param name="_arry"></param>
+        </member>
+        <member name="M:CoreHelper.ThreadSplit`1.#ctor(System.Collections.Generic.List{`0},System.Int32)">
+            <summary>
+            构造线程分割
+            </summary>
+            <param name="_arry">要处理的数据</param>
+            <param name="_progress">线程数,如果为0则为5</param>
+        </member>
+        <member name="M:CoreHelper.ThreadSplit`1.Start">
+            <summary>
+            启动线程
+            </summary>
+        </member>
+        <member name="M:CoreHelper.ThreadSplit`1.AddFailed(`0)">
+            <summary>
+            添加任务到失败队列,主线程执行完成,再次运行
+            </summary>
+            <param name="item"></param>
+        </member>
+    </members>
+</doc>

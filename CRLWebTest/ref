@@ -314,6 +314,25 @@
             <param name="sort"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.DBAdapter.DBAdapterBase.GetRelationUpdateSql(System.String,System.String,System.String,System.String)">
+            <summary>
+            获取关联更新语名
+            </summary>
+            <param name="t1"></param>
+            <param name="t2"></param>
+            <param name="condition"></param>
+            <param name="setValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBAdapter.DBAdapterBase.GetRelationDeleteSql(System.String,System.String,System.String)">
+            <summary>
+            获取关联删除语句
+            </summary>
+            <param name="t1"></param>
+            <param name="t2"></param>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
         <member name="P:CRL.DBAdapter.DBAdapterBase.CanCompileSP">
             <summary>
             是否支持编译存储过程
@@ -727,6 +746,14 @@
             <summary>
             按条件删除[基本方法]
             </summary>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ProviderOrigin`1.Delete``1(System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}})">
+            <summary>
+            按关联对象删除
+            </summary>
+            <typeparam name="TJoin"></typeparam>
             <param name="expression"></param>
             <returns></returns>
         </member>
@@ -1474,6 +1501,15 @@
             指定条件删除
             </summary>
             <typeparam name="TModel"></typeparam>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.Delete``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}})">
+            <summary>
+            关联删除
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TJoin"></typeparam>
             <param name="expression"></param>
             <returns></returns>
         </member>

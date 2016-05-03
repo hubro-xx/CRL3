@@ -1,0 +1,16 @@
+
+<script type="text/javascript">
+    function add() {
+        var str = '<input name="uploadpic" type="file" />';
+		var newNode = document.createElement("p");
+		newNode.innerHTML =str; 
+        document.getElementById("divAppend").appendChild(newNode);
+    }
+</script>
+<form action="?" method="post" enctype="multipart/form-data">
+    <div id="divAppend"><input name="uploadpic" type="file" accept=".jpg,.jpeg,.gif,.bmp,.png" /></div>
+    <input id="folder" name="folder" type="hidden" value="[folder]" />
+    <input id="uploadType" name="uploadType" type="hidden" value="[uploadType]" />
+	[addFile]
+    <input type="submit" name="submit" value="ÉÏ´«" />
+</form>
