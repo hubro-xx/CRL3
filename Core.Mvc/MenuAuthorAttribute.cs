@@ -1,3 +1,10 @@
+/**
+* CRL å¿«é€Ÿå¼€å‘æ¡†æ¶ V3.1
+* Copyright (c) 2016 Hubro All rights reserved.
+* GitHub https://github.com/hubro-xx/CRL3
+* ä¸»é¡µ http://www.cnblogs.com/hubro
+* åœ¨çº¿æ–‡æ¡£ http://crl.changqidongli.com/
+*/
 using System;
 
 using System.Collections.Generic;
@@ -14,7 +21,7 @@ using System.Xml.Linq;
 namespace Core.Mvc
 {
     /// <summary>
-    /// ×Ô¶¨Òå²Ëµ¥È¨ÏŞÑéÖ¤
+    /// ï¿½Ô¶ï¿½ï¿½ï¿½Ëµï¿½È¨ï¿½ï¿½ï¿½ï¿½Ö¤
     /// </summary>
     public class MenuAuthorAttribute : AuthorizeAttribute
     {
@@ -59,12 +66,12 @@ namespace Core.Mvc
             string url = Request.Url.Scheme + "://" + Request.Url.Authority + System.Web.Security.FormsAuthentication.LoginUrl;
             if (Request.IsAjaxRequest())
             {
-                filterContext.Result = new JsonResult() { Data = new { Result = false, Message = "Ã»ÓĞÈ¨ÏŞ½øĞĞ´Ë²Ù×÷,ÇëÁªÏµ¹ÜÀíÔ±·ÖÅäÈ¨ÏŞ" } };
+                filterContext.Result = new JsonResult() { Data = new { Result = false, Message = "Ã»ï¿½ï¿½È¨ï¿½Ş½ï¿½ï¿½Ğ´Ë²ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½" } };
                 return;
             }
             if (isMenuCheck)
             {
-                var message = string.Format("Ã»ÓĞÈ¨ÏŞ½øĞĞ´Ë²Ù×÷,ÇëÁªÏµ¹ÜÀíÔ±·ÖÅäÈ¨ÏŞ \nµØÖ·:[{0}]", Request.Path);
+                var message = string.Format("Ã»ï¿½ï¿½È¨ï¿½Ş½ï¿½ï¿½Ğ´Ë²ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½ \nï¿½ï¿½Ö·:[{0}]", Request.Path);
                 filterContext.Result = new ContentResult() { Content = message };
             }
             else

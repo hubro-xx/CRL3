@@ -1,4 +1,11 @@
-﻿using System;
+/**
+* CRL 快速开发框架 V3.1
+* Copyright (c) 2016 Hubro All rights reserved.
+* GitHub https://github.com/hubro-xx/CRL3
+* 主页 http://www.cnblogs.com/hubro
+* 在线文档 http://crl.changqidongli.com/
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,6 +60,24 @@ namespace CRL.Package.OnlinePay.Company.Weixin
             WxPayData unifiedOrderResult = jsApiPay.GetUnifiedOrderResult(order);
             var wxJsApiParam = jsApiPay.GetJsApiParameters();//获取H5调起JS API参数                    
             return wxJsApiParam;
+        }
+        /// <summary>
+        /// 扫码支付,返回二维码支付链接
+        /// 按此链接生成二维码
+        /// </summary>
+        /// <param name="order"></param>
+        /// <returns></returns>
+        public string GetCodePayUrl(PayHistory order)
+        {
+            BaseSubmit(order);
+            JsApiPay jsApiPay = new JsApiPay(System.Web.HttpContext.Current);
+            jsApiPay.openid = order.TagData;//传入OPENID
+            jsApiPay.total_fee = Convert.ToInt32(order.Amount * 100);
+            //JSAPI支付预处理
+            WxPayData unifiedOrderResult = jsApiPay.GetUnifiedOrderResult(order);
+            //var wxJsApiParam = jsApiPay.GetJsApiParameters();//获取H5调起JS API参数                    
+            //return wxJsApiParam;
+            return unifiedOrderResult.GetValue("code_url").ToString();
         }
 
         protected override string OnNotify(System.Web.HttpContext context)
