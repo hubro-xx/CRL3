@@ -32,7 +32,7 @@ namespace CRL.MemoryDataCache
         static Thread thread;
 
         static object lockObj = new object();
-        internal static ConcurrentDictionary<string, MemoryDataCacheItem> cacheDatas = new ConcurrentDictionary<string, MemoryDataCacheItem>();
+        static ConcurrentDictionary<string, MemoryDataCacheItem> cacheDatas = new ConcurrentDictionary<string, MemoryDataCacheItem>();
         /// <summary>
         /// 缓存类型的KEY
         /// </summary>

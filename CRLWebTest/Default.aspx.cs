@@ -21,6 +21,7 @@ namespace WebTest
 
         protected void Page_Load(object sender, EventArgs e)
         {
+
             //Code.OrderManage.Instance.TestRelationUpdate();
             //TestGuid();
             //TestAllQuery();

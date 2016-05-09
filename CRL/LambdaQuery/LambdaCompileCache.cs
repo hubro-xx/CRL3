@@ -31,28 +31,9 @@ namespace CRL.LambdaQuery
                 ConstantExpression cExp = (ConstantExpression)expression;
                 return cExp.Value;
             }
-            else if (expression is MemberExpression)//按属性访问
-            {
-                var m = expression as MemberExpression;
-                if (m.Expression != null)
-                {
-                    if (m.Expression.NodeType == ExpressionType.Parameter)
-                    {
-                        return new ExpressionValueObj { Value = Base.FormatFieldPrefix(m.Expression.Type, m.Member.Name), IsMember = true };
-                    }
-                }
-            }
             //按编译
             return Expression.Lambda(expression).Compile().DynamicInvoke();
         }
     }
-    internal class ExpressionValueObj
-    {
-        public object Value;
-        public bool IsMember;
-        public override string ToString()
-        {
-            return Value + "";
-        }
-    }
+
 }

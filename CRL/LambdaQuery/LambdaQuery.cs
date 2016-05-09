@@ -37,7 +37,7 @@ namespace CRL.LambdaQuery
             __MainType = typeof(T);
             __DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(_dbContext);
             __UseTableAliasesName = _useTableAliasesName;
-            __Visitor = new ExpressionVisitor(_dbContext);
+            __Visitor = new ExpressionVisitor(__DBAdapter);
             //TypeCache.SetDBAdapterCache(typeof(T), dBAdapter);
             GetPrefix(typeof(T));
             QueryTableName = TypeCache.GetTableName(typeof(T), __DbContext);
@@ -224,7 +224,7 @@ namespace CRL.LambdaQuery
             foreach(var item in fields)
             {
                 //item.SetFieldQueryScript(aliasName, true, false);
-                item.SetFieldQueryScript2(true, false, "");
+                item.SetFieldQueryScript2(__DBAdapter, true, false, "");
             }
             __QueryFields = fields;
             return this;

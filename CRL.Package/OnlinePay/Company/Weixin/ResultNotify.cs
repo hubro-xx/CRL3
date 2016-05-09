@@ -24,36 +24,36 @@ namespace CRL.Package.OnlinePay.Company.Weixin
         {
         }
 
-        public override bool ProcessNotify(out string error, out string out_trade_no)
+        public override WxPayData ProcessNotify()
         {
+            WxPayData res = new WxPayData();
             WxPayData notifyData = GetNotifyData();
-            out_trade_no = "";
+            var out_trade_no = "";
             //检查支付结果中transaction_id是否存在
             if (!notifyData.IsSet("transaction_id"))
             {
-                error = "支付结果中微信订单号不存在";
-                return false;
+                res.SetValue("return_code", "FAIL");
+                res.SetValue("return_msg", "支付结果中微信订单号不存在");
+                return res;
             }
             out_trade_no = notifyData.GetValue("out_trade_no").ToString() ;
+            res.SetValue("out_trade_no", out_trade_no);
             string transaction_id = notifyData.GetValue("transaction_id").ToString();
 
             //查询订单，判断订单真实性
             if (!QueryOrder(transaction_id))
             {
-                error = "订单查询失败";
-                return false;
+                res.SetValue("return_code", "FAIL");
+                res.SetValue("return_msg", "订单查询失败");
+                return res;
             }
             //查询订单成功
             else
             {
-                //WxPayData res = new WxPayData();
-                //res.SetValue("return_code", "SUCCESS");
-                //res.SetValue("return_msg", "OK");
-                //Log.Info(this.GetType().ToString(), "order query success : " + res.ToXml());
-                //page.Response.Write(res.ToXml());
-                //page.Response.End();
-                error = "";
-                return true;
+
+                res.SetValue("return_code", "SUCCESS");
+                res.SetValue("return_msg", "OK");
+                return res;
             }
         }
 

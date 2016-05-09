@@ -150,18 +150,22 @@ namespace CRL.Attribute
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="_DBAdapter"></param>
         /// <param name="usePrefix">是否使用字段前辍 如 t1.Name</param>
         /// <param name="withTablePrefix">是否生按表生成前辍,关联时用 如Table__Name</param>
         /// <param name="mapingName">别名,空则按字段名,没有AS</param>
         /// <param name="fieldName">自定义查询字段名,空则按Name</param>
-        internal void SetFieldQueryScript2(bool usePrefix, bool withTablePrefix, string mapingName,string fieldName="")
+        internal void SetFieldQueryScript2(DBAdapter.DBAdapterBase _DBAdapter, bool usePrefix, bool withTablePrefix, string mapingName,string fieldName="")
         {
             string query = "";
             if (usePrefix)
             {
                 query += "{" + ModelType.FullName + "}";
             }
-            fieldName = string.IsNullOrEmpty(fieldName) ? Name : fieldName;
+            if (string.IsNullOrEmpty(fieldName))
+            {
+                fieldName = _DBAdapter.KeyWordFormat(Name);
+            }
             //判断虚拟字段
             if (FieldType == Attribute.FieldType.虚拟字段)
             {

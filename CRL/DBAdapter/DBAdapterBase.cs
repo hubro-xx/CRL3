@@ -218,7 +218,7 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public abstract string SpParameFormat(string name,string type,bool output);
         /// <summary>
-        /// 关键字格式化,可能会增加后辍
+        /// 关键字格式化,如SQL为 [field]
         /// </summary>
         public abstract string KeyWordFormat(string value);
         /// <summary>

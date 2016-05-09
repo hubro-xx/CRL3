@@ -13,11 +13,11 @@ using System.Text;
 namespace CRL.ExistsTableCache
 {
     [Serializable]
-    internal class ExistsTableCache
+    internal class ExistsTableCache : CoreHelper.ICoreConfig<ExistsTableCache>
     {
         #region 属性
-        List<DataBase> dataBase = new List<DataBase>();
-        public List<DataBase> DataBase
+        Dictionary<string, DataBase> dataBase = new Dictionary<string, DataBase>();
+        public Dictionary<string, DataBase> DataBase
         {
             get { return dataBase; }
             set { dataBase = value; }
@@ -36,16 +36,17 @@ namespace CRL.ExistsTableCache
         /// <param name="tables"></param>
         public void InitTable(string dbName, List<string> tables)
         {
-            var db = DataBase.Find(b => b.Name == dbName);
-            if (db == null)
+            DataBase db;
+            if (!DataBase.ContainsKey(dbName))
             {
                 db = new DataBase() { Name = dbName };
-                DataBase.Add(db);
+                DataBase.Add(dbName, db);
             }
-            var tableCache = new List<Table>();
+            db = DataBase[dbName];
+            var tableCache = new Dictionary<string, Table>();
             foreach (var item in tables)
             {
-                tableCache.Add(new Table() { Name = item.ToLower() });
+                tableCache.Add(item.ToLower(), new Table() { Name = item.ToLower() });
             }
             db.Tables = tableCache;
         }
@@ -58,8 +59,10 @@ namespace CRL.ExistsTableCache
         public Table GetTable(string dbName, string tableName)
         {
             tableName = tableName.ToLower();
-            var db = DataBase.Find(b => b.Name == dbName);
-            return db.Tables.Find(b => b.Name == tableName);
+            var db = DataBase[dbName];
+            Table tb;
+            db.Tables.TryGetValue(tableName, out tb);
+            return tb;
         }
         /// <summary>
         /// 保存表字段
@@ -79,9 +82,9 @@ namespace CRL.ExistsTableCache
                     fields2.Add(b.Name.ToLower());
                 });
                 var tb = new Table() { Name = tableName, Fields = fields2 };
-                var db = DataBase.Find(b => b.Name == dbName);
-                db.Tables.RemoveAll(b => b.Name == tableName);
-                db.Tables.Add(tb);
+                var db = DataBase[dbName];
+                db.Tables.Remove(tableName);
+                db.Tables.Add(tableName,tb);
             }
             Save();
         }
@@ -132,67 +135,6 @@ namespace CRL.ExistsTableCache
             }
             return returns;
         }
-        
-        private static ExistsTableCache instance;
-        /// <summary>
-        /// 实例
-        /// </summary>
-        internal static ExistsTableCache Instance
-        {
-            get
-            {
-                if (instance == null)
-                    instance = FromFile();
-                return instance;
-            }
-            set
-            {
-                instance = value;
-            }
-        }
-        const string confgiFile = @"\config\TableCache.config";
-        #region 初始
-        public static ExistsTableCache FromFile()
-        {
-            var file = CoreHelper.RequestHelper.GetFilePath(confgiFile);
-            var folder = CoreHelper.RequestHelper.GetFilePath(@"\config");
-            if (!System.IO.Directory.Exists(folder))
-            {
-                System.IO.Directory.CreateDirectory(folder);
-            }
-            ExistsTableCache cache = null;
-            var server = CoreHelper.RequestHelper.GetServerIp();
-            if (System.IO.File.Exists(file))
-            {
-                try
-                {
-                    //cache = CoreHelper.SerializeHelper.BinaryDeserialize<ExistsTableCache>(file);
-                    //cache = CoreHelper.SerializeHelper.XmlDeserialize<ExistsTableCache>(file);
-                    var json = System.IO.File.ReadAllText(file);
-                    cache = (ExistsTableCache)CoreHelper.SerializeHelper.SerializerFromJSON(json, typeof(ExistsTableCache), Encoding.UTF8);
-                    //不是同一服务器创建的缓存则重建
-                    if (cache.Server != server)
-                    {
-                        //cache = new ExistsTableCache() { Server = server };
-                    }
-                }
-                catch { }
-            }
-            if (cache == null)
-                cache = new ExistsTableCache() { Server = server };
-            return cache;
-        }
-        public void Save()
-        {
-            var file = CoreHelper.RequestHelper.GetFilePath(confgiFile);
-            lock (lockObj)
-            {
-                //CoreHelper.SerializeHelper.BinarySerialize(this, file);
-                var json = CoreHelper.SerializeHelper.SerializerToJson(this, Encoding.UTF8);
-                System.IO.File.WriteAllText(file,json);
-                //CoreHelper.EventLog.Log("保存CoreConfig");
-            }
-        }
-        #endregion
+
     }
 }

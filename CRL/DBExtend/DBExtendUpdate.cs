@@ -32,7 +32,8 @@ namespace CRL
                     if (f.IsPrimaryKey || f.FieldType == Attribute.FieldType.虚拟字段)
                         continue;
                     var value = item.Value;
-                    //如果表示值为被追求 名称为$name
+                    //如果表示值为被追加 名称为$name
+                    //使用Cumulation扩展方法后按此处理
                     if (key != item.Key)//按$name=name+'123123'
                     {
                         if (value.ToString().IsNumber())

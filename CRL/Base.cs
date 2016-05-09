@@ -159,9 +159,13 @@ namespace CRL
             var assembly = System.Reflection.Assembly.GetExecutingAssembly().GetName();
             return assembly.Version.ToString();
         }
-        internal static string FormatFieldPrefix(Type type, string fieldName)
+        internal static string FormatFieldPrefix2(Type type, string fieldName)
         {
             return "{" + type.FullName + "}" + fieldName;
+        }
+        internal static string FormatFieldPrefix(DBAdapter.DBAdapterBase dBAdapter, Type type, string fieldName)
+        {
+            return "{" + type.FullName + "}" + dBAdapter.KeyWordFormat(fieldName);
         }
     }
 }

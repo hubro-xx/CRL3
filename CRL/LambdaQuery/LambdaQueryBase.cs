@@ -74,7 +74,7 @@ namespace CRL.LambdaQuery
                         var methodQuery = getSelectMethodCall(item);
                         var f = allFilds[__MainType].First().Value.Clone();
                         //f.QueryFullName = methodQuery + " as " + memberName;
-                        f.SetFieldQueryScript2(false, withTablePrefix, memberName, methodQuery);
+                        f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, memberName, methodQuery);
                         resultFields.Add(f);
                     }
                     else if (item is BinaryExpression)
@@ -82,7 +82,7 @@ namespace CRL.LambdaQuery
                         var field = getSeletctBinary(item);
                         var f = allFilds[__MainType].First().Value.Clone();
                         //f.QueryFullName = string.Format("{0} as {1}", field, memberName);
-                        f.SetFieldQueryScript2(false, withTablePrefix, memberName, field);
+                        f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, memberName, field);
                         resultFields.Add(f);
                     }
                     else if (item is ConstantExpression)//常量
@@ -95,7 +95,7 @@ namespace CRL.LambdaQuery
                             value = string.Format("'{0}'", value);
                         }
                         //f.QueryFullName = string.Format("{0} as {1}", value, memberName);
-                        f.SetFieldQueryScript2(false, withTablePrefix, memberName, value);
+                        f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, memberName, value);
                         resultFields.Add(f);
                     }
                     else if (item is MemberExpression)
@@ -105,13 +105,13 @@ namespace CRL.LambdaQuery
                         if (memberName != memberExpression.Member.Name)//按有别名算
                         {
                             //f.QueryFullName = string.Format("t1.{0} as {1}", f.Name, memberName);
-                            f.SetFieldQueryScript2(true, withTablePrefix, memberName);
+                            f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix, memberName);
                         }
                         else
                         {
                             var aliasName = GetPrefix(memberExpression.Expression.Type);
                             //f.SetFieldQueryScript(aliasName, true, false);
-                            f.SetFieldQueryScript2(true, withTablePrefix, "");
+                            f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix, "");
                         }
                         resultFields.Add(f);
                     }
@@ -129,7 +129,7 @@ namespace CRL.LambdaQuery
                 var f = allFilds[__MainType].First().Value.Clone();
                 var methodQuery = getSelectMethodCall(expressionBody);
                 //f.QueryFullName = methodQuery;
-                f.SetFieldQueryScript2(false, withTablePrefix, "", methodQuery);
+                f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, "", methodQuery);
                 resultFields.Add(f);
                 #endregion
             }
@@ -138,7 +138,7 @@ namespace CRL.LambdaQuery
                 var field = getSeletctBinary(expressionBody);
                 var f = allFilds[__MainType].First().Value.Clone();
                 //f.QueryFullName = string.Format("{0}", field);
-                f.SetFieldQueryScript2(false, withTablePrefix, "", field);
+                f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, "", field);
                 resultFields.Add(f);
             }
             else if (expressionBody is ConstantExpression)
@@ -146,7 +146,7 @@ namespace CRL.LambdaQuery
                 var constant = (ConstantExpression)expressionBody;
                 var f = allFilds[__MainType].First().Value.Clone();
                 //f.QueryFullName = string.Format("{0}", constant.Value);
-                f.SetFieldQueryScript2(false, withTablePrefix, "", constant.Value + "");
+                f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, "", constant.Value + "");
                 resultFields.Add(f);
             }
             else if (expressionBody is UnaryExpression)
@@ -170,7 +170,7 @@ namespace CRL.LambdaQuery
                 var aliasName = GetPrefix(mExp.Expression.Type);
                 var f = allFilds[mExp.Expression.Type][mExp.Member.Name].Clone();
                 //f.SetFieldQueryScript(aliasName, true, false);
-                f.SetFieldQueryScript2(true, withTablePrefix, "");
+                f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix, "");
                 resultFields.Add(f);
             }
             else
@@ -287,7 +287,7 @@ namespace CRL.LambdaQuery
             foreach (var item in all)
             {
                 //item.SetFieldQueryScript(aliasName, true, false);
-                item.SetFieldQueryScript2(true, false, "");
+                item.SetFieldQueryScript2(__DBAdapter, true, false, "");
                 __QueryFields.Add(item);
             }
         }

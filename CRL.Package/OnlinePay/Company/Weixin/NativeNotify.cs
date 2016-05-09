@@ -24,17 +24,19 @@ namespace CRL.Package.OnlinePay.Company.Weixin
 
         }
 
-        public override bool ProcessNotify(out string error, out string out_trade_no)
+        public override WxPayData ProcessNotify()
         {
+            WxPayData res = new WxPayData();
             WxPayData notifyData = GetNotifyData();
-            out_trade_no = "";
             //检查openid和product_id是否返回
             if (!notifyData.IsSet("openid") || !notifyData.IsSet("product_id"))
             {
-                error = "回调数据异常";
-                return false;
+                res.SetValue("return_code", "FAIL");
+                res.SetValue("return_msg", "回调数据异常");
+                return res;
             }
-            out_trade_no = notifyData.GetValue("out_trade_no").ToString();
+            var out_trade_no = notifyData.GetValue("out_trade_no").ToString();
+            res.SetValue("out_trade_no", out_trade_no);
             //调统一下单接口，获得下单结果
             string openid = notifyData.GetValue("openid").ToString();
             string product_id = notifyData.GetValue("product_id").ToString();
@@ -45,36 +47,32 @@ namespace CRL.Package.OnlinePay.Company.Weixin
             }
             catch(Exception ex)//若在调统一下单接口时抛异常，立即返回结果给微信支付后台
             {
-                error = "统一下单失败";
-                return false;
-                
+                res.SetValue("return_code", "FAIL");
+                res.SetValue("return_msg", "统一下单失败");
+                return res;
             }
 
             //若下单失败，则立即返回结果给微信支付后台
             if (!unifiedOrderResult.IsSet("appid") || !unifiedOrderResult.IsSet("mch_id") || !unifiedOrderResult.IsSet("prepay_id"))
             {
-                error = "统一下单失败";
-                return false;
-                
+                res.SetValue("return_code", "FAIL");
+                res.SetValue("return_msg", "统一下单失败");
+                return res;
             }
-            error = "";
-            return true;
-                
-            ////统一下单成功,则返回成功结果给微信支付后台
-            //WxPayData data = new WxPayData();
-            //data.SetValue("return_code", "SUCCESS");
-            //data.SetValue("return_msg", "OK");
-            //data.SetValue("appid", WxPayConfig.APPID);
-            //data.SetValue("mch_id", WxPayConfig.MCHID);
-            //data.SetValue("nonce_str", WxPayApi.GenerateNonceStr());
-            //data.SetValue("prepay_id", unifiedOrderResult.GetValue("prepay_id"));
-            //data.SetValue("result_code", "SUCCESS");
-            //data.SetValue("err_code_des", "OK");
-            //data.SetValue("sign", data.MakeSign());
 
-            //Log.Info(this.GetType().ToString(), "UnifiedOrder success , send data to WeChat : " + data.ToXml());
-            //page.Response.Write(data.ToXml());
-            //page.Response.End();
+            //统一下单成功,则返回成功结果给微信支付后台
+            WxPayData data = new WxPayData();
+            data.SetValue("return_code", "SUCCESS");
+            data.SetValue("return_msg", "OK");
+            data.SetValue("appid", WxPayConfig.APPID);
+            data.SetValue("mch_id", WxPayConfig.MCHID);
+            data.SetValue("nonce_str", WxPayApi.GenerateNonceStr());
+            data.SetValue("prepay_id", unifiedOrderResult.GetValue("prepay_id"));
+            data.SetValue("result_code", "SUCCESS");
+            data.SetValue("err_code_des", "OK");
+            data.SetValue("sign", data.MakeSign());
+            Log.Info(this.GetType().ToString(), "UnifiedOrder success , send data to WeChat : " + data.ToXml());
+            return data;
         }
 
         private WxPayData UnifiedOrder(string openId,string productId)

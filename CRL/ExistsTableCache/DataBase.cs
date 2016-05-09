@@ -21,7 +21,7 @@ namespace CRL.ExistsTableCache
             get;
             set;
         }
-        public List<Table> Tables
+        public Dictionary<string,Table> Tables
         {
             get;
             set;

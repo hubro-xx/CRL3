@@ -160,8 +160,8 @@ namespace CRL.Package.OnlinePay.Company.Weixin
             {
                 if (pair.Value == null)
                 {
-                    Log.Error(this.GetType().ToString(), "WxPayData内部含有值为null的字段!");
-                    throw new WxPayException("WxPayData内部含有值为null的字段!");
+                    Log.Error(this.GetType().ToString(), "WxPayData内部含有值为null的字段!"+pair.Key);
+                    throw new WxPayException("WxPayData内部含有值为null的字段!"+pair.Key);
                 }
 
                 if (pair.Key != "sign" && pair.Value.ToString() != "")

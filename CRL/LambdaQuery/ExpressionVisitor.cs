@@ -16,9 +16,11 @@ namespace CRL.LambdaQuery
     internal class ExpressionVisitor
     {
         DbContext dbContext;
-        public ExpressionVisitor(DbContext _dbContext)
+        DBAdapter.DBAdapterBase __DBAdapter;
+        public ExpressionVisitor(DBAdapter.DBAdapterBase _DBAdapter)
         {
-            dbContext = _dbContext;
+            __DBAdapter = _DBAdapter;
+            dbContext = _DBAdapter.dbContext;
         }
         /// <summary>
         /// 处理后的查询参数
@@ -112,14 +114,14 @@ namespace CRL.LambdaQuery
                         }
                         return filed.VirtualField;
                     }
-                    var field = Base.FormatFieldPrefix(type,fieldName);//格式化为别名
+                    var field = Base.FormatFieldPrefix(__DBAdapter,type, fieldName);//格式化为别名
                     if (nodeType == ExpressionType.Not)//like b=!b.IsNew
                     {
                         field += ExpressionTypeCast(nodeType) + 1;
                     }
                     return field;
                 }
-                var obj = LambdaCompileCache.GetParameExpressionValue(mExp);
+                var obj = GetParameExpressionValue(mExp);
                 if (obj is Enum)
                 {
                     obj = (int)obj;
@@ -149,7 +151,7 @@ namespace CRL.LambdaQuery
                     {
                         //not like b.BarCode.Contains("abc")
                         //按变量或常量编译值
-                        var obj = LambdaCompileCache.GetParameExpressionValue(exp);
+                        var obj = GetParameExpressionValue(exp);
                         return obj + "";
                     }
                 }
@@ -157,7 +159,7 @@ namespace CRL.LambdaQuery
                 {
                     //var cExp = mcExp.Object as ConstantExpression;
                     //like b.BarCode == aa()
-                    var obj = LambdaCompileCache.GetParameExpressionValue(exp);
+                    var obj = GetParameExpressionValue(exp);
                     return obj + "";
                 }
                 var _DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(dbContext);
@@ -184,27 +186,27 @@ namespace CRL.LambdaQuery
                     field = mcExp.Object.ToString().Split('.')[1];
                     var mExpression = mcExp.Object as MemberExpression;
                     var type = mExpression.Expression.Type;
-                    field = Base.FormatFieldPrefix(type, field);
-                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[0]);
+                    field = Base.FormatFieldPrefix(__DBAdapter,type, field);
+                    var obj = GetParameExpressionValue(mcExp.Arguments[0]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[0]).Compile().DynamicInvoke());
                 }
                 
                 if (mcExp.Arguments.Count > 1)
                 {
-                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[1]);
+                    var obj = GetParameExpressionValue(mcExp.Arguments[1]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[1]).Compile().DynamicInvoke());
                 }
                 if (mcExp.Arguments.Count > 2)
                 {
-                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[2]);
+                    var obj = GetParameExpressionValue(mcExp.Arguments[2]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[2]).Compile().DynamicInvoke());
                 }
                 if (mcExp.Arguments.Count > 3)
                 {
-                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[3]);
+                    var obj = GetParameExpressionValue(mcExp.Arguments[3]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[3]).Compile().DynamicInvoke());
                 }
@@ -291,6 +293,36 @@ namespace CRL.LambdaQuery
                     throw new InvalidCastException("不支持的运算符");
             }
         }
-
+        object GetParameExpressionValue(Expression expression)
+        {
+            //只能处理常量
+            if (expression is ConstantExpression)
+            {
+                ConstantExpression cExp = (ConstantExpression)expression;
+                return cExp.Value;
+            }
+            else if (expression is MemberExpression)//按属性访问
+            {
+                var m = expression as MemberExpression;
+                if (m.Expression != null)
+                {
+                    if (m.Expression.NodeType == ExpressionType.Parameter)
+                    {
+                        return new ExpressionValueObj { Value = Base.FormatFieldPrefix(__DBAdapter, m.Expression.Type, m.Member.Name), IsMember = true };
+                    }
+                }
+            }
+            //按编译
+            return Expression.Lambda(expression).Compile().DynamicInvoke();
+        }
+    }
+    internal class ExpressionValueObj
+    {
+        public object Value;
+        public bool IsMember;
+        public override string ToString()
+        {
+            return Value + "";
+        }
     }
 }

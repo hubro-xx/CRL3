@@ -296,11 +296,11 @@ namespace CRL
                 if (name.StartsWith("$"))//直接按值拼接 c2["$SoldCount"] = "SoldCount+" + num;
                 {
                     name = name.Substring(1, name.Length - 1);
-                    setString += string.Format(" {0}={1},", name, value);
+                    setString += string.Format(" {0}={1},", _DBAdapter.KeyWordFormat(name), value);
                 }
                 else
                 {
-                    setString += string.Format(" {0}=@{0},", name);
+                    setString += string.Format(" {0}=@{1},", _DBAdapter.KeyWordFormat(name), name);
                     dbHelper.AddParam(name, value);
                 }
             }
@@ -569,7 +569,7 @@ namespace CRL
             var cacheInstance =CRL.ExistsTableCache.ExistsTableCache.Instance;
             var table = TypeCache.GetTable(type);
             DBExtend db;
-            if (cacheInstance.DataBase.Find(b => b.Name == dbName) == null)
+            if (!cacheInstance.DataBase.ContainsKey(dbName))
             {
                 db = GetBackgroundDBExtend();
                 #region 初始表

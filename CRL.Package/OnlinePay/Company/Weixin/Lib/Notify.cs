@@ -70,11 +70,9 @@ namespace CRL.Package.OnlinePay.Company.Weixin
         }
 
         //派生类需要重写这个方法，进行不同的回调处理
-        public virtual bool ProcessNotify(out string error, out string out_trade_no)
+        public virtual WxPayData ProcessNotify()
         {
-            error = "";
-            out_trade_no = "";
-            return false;
+            return null;
         }
     }
 }

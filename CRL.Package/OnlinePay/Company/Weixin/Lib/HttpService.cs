@@ -59,10 +59,12 @@ namespace CRL.Package.OnlinePay.Company.Weixin
                 request.Timeout = timeout * 1000;
 
                 //设置代理服务器
-                WebProxy proxy = new WebProxy();                          //定义一个网关对象
-                proxy.Address = new Uri(WxPayConfig.PROXY_URL);              //网关服务器端口:端口
-                request.Proxy = proxy;
-
+                if (!string.IsNullOrEmpty(WxPayConfig.PROXY_URL))
+                {
+                    WebProxy proxy = new WebProxy();                          //定义一个网关对象
+                    proxy.Address = new Uri(WxPayConfig.PROXY_URL);              //网关服务器端口:端口
+                    request.Proxy = proxy;
+                }
                 //设置POST的数据类型和长度
                 request.ContentType = "text/xml";
                 byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);

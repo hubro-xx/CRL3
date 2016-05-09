@@ -39,6 +39,7 @@ namespace WebTest
             p.Change(b => b.BarCode);//表示值被更改了
             p.Change(b => b.BarCode, "123");//通过参数赋值
             p.Change(b => b.BarCode == "123");//通过表达式赋值
+            p.Cumulation(b => b.ProductName, "1");
             Code.ProductDataManage.Instance.Update(b => b.Id == 4, p);//指定查询更新
 
             //当对象是查询创建则能自动识别
