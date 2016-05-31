@@ -74,6 +74,10 @@ namespace WebTest.Code
             query = ProductDataManage.Instance.GetLambdaQuery();
             query.In<Code.Member>(b => b.UserId, b => b.Id, (a, b) => a.SupplierId == "10" && b.Name == "123");
             var sql2 = query.PrintQuery();
+            //按exists
+            query = ProductDataManage.Instance.GetLambdaQuery();
+            query.Exists<Code.Order>(b => b.UserId, (a, b) => a.SupplierId == "10" && b.Status == 2);
+            sql2 = query.PrintQuery();
             #endregion
 
             #region GROUP

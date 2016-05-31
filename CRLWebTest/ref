@@ -281,7 +281,7 @@
         </member>
         <member name="M:CRL.DBAdapter.DBAdapterBase.KeyWordFormat(System.String)">
             <summary>
-            关键字格式化,可能会增加后辍
+            关键字格式化,如SQL为 [field]
             </summary>
         </member>
         <member name="M:CRL.DBAdapter.DBAdapterBase.SqlFormat(System.String)">
@@ -1037,10 +1037,11 @@
             查询的完整字段名,t1.Name
             </summary>
         </member>
-        <member name="M:CRL.Attribute.FieldAttribute.SetFieldQueryScript2(System.Boolean,System.Boolean,System.String,System.String)">
+        <member name="M:CRL.Attribute.FieldAttribute.SetFieldQueryScript2(CRL.DBAdapter.DBAdapterBase,System.Boolean,System.Boolean,System.String,System.String)">
             <summary>
             
             </summary>
+            <param name="_DBAdapter"></param>
             <param name="usePrefix">是否使用字段前辍 如 t1.Name</param>
             <param name="withTablePrefix">是否生按表生成前辍,关联时用 如Table__Name</param>
             <param name="mapingName">别名,空则按字段名,没有AS</param>
@@ -2383,6 +2384,13 @@
             <param name="type"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.LambdaQuery.LambdaQueryBase.ReplacePrefix(System.String)">
+            <summary>
+            替换别名
+            </summary>
+            <param name="condition"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.LambdaQuery.LambdaQueryBase.FormatExpression(System.Linq.Expressions.Expression)">
             <summary>
             转换为SQL条件，并提取参数
@@ -2693,6 +2701,26 @@
             <summary>
             按当前条件累加OR条件
             </summary>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQuery`1.Exists``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}})">
+            <summary>
+            按查询exists
+            等效为exixts(select field from table2)
+            </summary>
+            <typeparam name="TInner"></typeparam>
+            <param name="innerField"></param>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQuery`1.NotExists``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}})">
+            <summary>
+            按查询not exists
+            等效为not exixts(select field from table2)
+            </summary>
+            <typeparam name="TInner"></typeparam>
+            <param name="innerField"></param>
             <param name="expression"></param>
             <returns></returns>
         </member>
@@ -3474,7 +3502,7 @@
             <summary>
             更新缓存中的一项
             </summary>
-            <param name="key"></param>
+            <param name="typeKey"></param>
             <param name="obj"></param>
             <param name="c"></param>
             <param name="checkInsert"></param>
@@ -3930,11 +3958,6 @@
             <param name="table"></param>
             <param name="tableName"></param>
             <returns></returns>
-        </member>
-        <member name="P:CRL.ExistsTableCache.ExistsTableCache.Instance">
-            <summary>
-            实例
-            </summary>
         </member>
         <member name="F:CRL.TypeCache.ModelKeyCache">
             <summary>

@@ -57,7 +57,13 @@ namespace CRL
         public static Attribute.TableAttribute GetTable(Type type)
         {
             if (typeCache.ContainsKey(type))
-                return typeCache[type];
+            {
+                var result= typeCache[type];
+                if (result.Fields.Count > 0)
+                {
+                    return result;
+                }
+            }
             object[] objAttrs = type.GetCustomAttributes(typeof(Attribute.TableAttribute), true);
             Attribute.TableAttribute des;
             if (objAttrs == null || objAttrs.Length == 0)

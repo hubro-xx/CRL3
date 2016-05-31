@@ -16,6 +16,7 @@ namespace CRL.LambdaQuery
     {
         Left,
         Inner,
-        Right
+        Right,
+        Full
     }
 }

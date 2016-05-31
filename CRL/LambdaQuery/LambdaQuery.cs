@@ -343,6 +343,34 @@ namespace CRL.LambdaQuery
         }
         #endregion
 
+        #region exists
+        /// <summary>
+        /// 按查询exists
+        /// 等效为exixts(select field from table2)
+        /// </summary>
+        /// <typeparam name="TInner"></typeparam>
+        /// <param name="innerField"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> Exists<TInner>(Expression<Func<TInner, object>> innerField,
+Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
+        {
+            return InnerSelect<TInner>(null, innerField, expression, "exists");
+        }
+        /// <summary>
+        /// 按查询not exists
+        /// 等效为not exixts(select field from table2)
+        /// </summary>
+        /// <typeparam name="TInner"></typeparam>
+        /// <param name="innerField"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> NotExists<TInner>(Expression<Func<TInner, object>> innerField,
+Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
+        {
+            return InnerSelect<TInner>(null, innerField, expression, "not exists");
+        }
+        #endregion
         #region select值判断
         /// <summary>
         /// 按查询in
@@ -404,15 +432,18 @@ Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
         LambdaQuery<T> InnerSelect<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
     Expression<Func<T, TInner, bool>> expression, string type) where TInner : IModel, new()
         {
-            MemberExpression m1, m2;
+            MemberExpression m1 = null, m2;
             //object 会生成UnaryExpression表达式 Convert(b=>b.UserId)
-            if (outField.Body is UnaryExpression)
+            if (outField != null)//兼容exists 可能为空
             {
-                m1 = (outField.Body as UnaryExpression).Operand as MemberExpression;
-            }
-            else
-            {
-                m1 = outField.Body as MemberExpression;
+                if (outField.Body is UnaryExpression)
+                {
+                    m1 = (outField.Body as UnaryExpression).Operand as MemberExpression;
+                }
+                else
+                {
+                    m1 = outField.Body as MemberExpression;
+                }
             }
             if (innerField.Body is UnaryExpression)
             {
@@ -422,8 +453,11 @@ Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
             {
                 m2 = innerField.Body as MemberExpression;
             }
-
-            string field1 = string.Format("{0}{1}", GetPrefix(), __DBAdapter.KeyWordFormat(m1.Member.Name));
+            string field1 = "";
+            if (outField != null)
+            {
+                field1 = string.Format("{0}{1}", GetPrefix(), __DBAdapter.KeyWordFormat(m1.Member.Name));
+            }
             string field2 = string.Format("{0}{1}", GetPrefix(typeof(TInner)), __DBAdapter.KeyWordFormat(m2.Member.Name));
             //var visitor2 = new ExpressionVisitor<TInner>(dbContext);
             //string condition = visitor2.RouteExpressionHandler(expression.Body);

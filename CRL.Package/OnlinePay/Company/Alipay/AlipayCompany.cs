@@ -87,11 +87,139 @@ namespace CRL.Package.OnlinePay.Company.Alipay
 
 		#endregion
 
+        /// <summary>
+        /// 获取支付宝POST过来通知消息，并以“参数名=参数值”的形式组成数组
+        /// </summary>
+        /// <returns>request回来的信息组成的数组</returns>
+        public SortedDictionary<string, string> GetRequestPost(HttpContext context)
+        {
+            int i = 0;
+            SortedDictionary<string, string> sArray = new SortedDictionary<string, string>();
+            NameValueCollection coll;
+            //Load Form variables into NameValueCollection variable.
+            coll = context.Request.Form;
+
+            // Get names of all forms into a string array.
+            String[] requestItem = coll.AllKeys;
+
+            for (i = 0; i < requestItem.Length; i++)
+            {
+                sArray.Add(requestItem[i], context.Request.Form[requestItem[i]]);
+            }
+
+            return sArray;
+        }
+        /// <summary>
+        /// 获取通知,按具体需求重写
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected override string OnNotify(HttpContext context)
+        {
+            SortedDictionary<string, string> sPara = GetRequestPost(context);
+
+            if (sPara.Count > 0)//判断是否有带返回参数
+            {
+                Notify aliNotify = new Notify();
+                bool verifyResult = aliNotify.Verify(sPara, context.Request.Form["notify_id"], context.Request.Form["sign"]);
+
+                if (verifyResult)//验证成功
+                {
+                    string strOrderNO = context.Request.Form["out_trade_no"];//订单号
+
+                    string strPrice = context.Request.Form["total_fee"];//金额
+                    string trade_no = context.Request.Form["trade_no"];//支付宝订单号
+
+                    string notify_type = context.Request.Form["notify_type"];
+                    string trade_status = context.Request.Form["trade_status"];//交易状态
+                    string refund_status = context.Request.Form["refund_status"];//退款状态
+                    string gmt_refund = context.Request.Form["refund_status"];//退款时间
+
+                    if (notify_type == "trade_status_sync")
+                    {
+                        #region 支付&退款
+                        if (trade_status == "WAIT_BUYER_PAY")//   判断支付状态_等待买家付款（文档中有枚举表可以参考）            
+                        {
+                            Log("WAIT_BUYER_PAY" + strOrderNO);
+                            context.Response.Write("success");     //返回给支付宝消息，成功，请不要改写这个success
+                        }//支付状态成功并且退款通知为NULL
+                        else if ((trade_status == "TRADE_FINISHED" || trade_status == "TRADE_SUCCESS") && string.IsNullOrEmpty(refund_status))
+                        {
+                            #region 支付处理
+                            PayHistory order = OnlinePayBusiness.Instance.GetOrder(strOrderNO, ThisCompanyType);
+                            order.SpBillno = trade_no;
+                            Confirm(order, GetType(), Convert.ToDecimal(strPrice));
+                            #endregion
+                            //context.Response.Write("success");     //返回给支付宝消息，成功，请不要改写这个success
+                            return "success";
+                        }
+                        else if (refund_status == "REFUND_SUCCESS")//退款成功
+                        {
+                            #region 退款处理
+                            Log("收到退款通知:" + strOrderNO);
+                            PayHistory order = OnlinePayBusiness.Instance.GetOrder(strOrderNO, ThisCompanyType);
+                            BaseRefundOrder(order);
+                            #endregion
+                            //context.Response.Write("success");
+                            return "success";
+                        }
+                        else
+                        {
+                            //context.Response.Write("fail");
+                            return "fail";
+                        }
+                        #endregion
+                    }
+                    else if (notify_type == "batch_trans_notify")
+                    {
+                        #region 批量付款通知
+                        /***
+                    string batch_no = context.Request.Form["batch_no"];
+                    string success_details = context.Request.Form["success_details"];
+                    string fail_details = context.Request.Form["success_details"];
+                    List<BatchPayItem> arry1 = BatchPayItem.FromDetail(success_details);
+                    List<BatchPayItem> arry2 = BatchPayItem.FromDetail(fail_details);
+                    foreach(BatchPayItem a in arry1)
+                    {
+                        HotelBookModel.AccountHistory item = new HotelBookModel.AccountHistory();
+                        item.OrderId = a.OrderNo;
+                        item.Status = HotelBookModel.AccountHistory.AccountStatus.Success;
+                        item.Remark = "转帐成功:" + a.Remark;
+                        item.BatchNo = batch_no;
+                        AccountHistoryAction.UpdateStatus(item);
+                    } 
+                    foreach (BatchPayItem a in arry2)
+                    {
+                        HotelBookModel.AccountHistory item = new HotelBookModel.AccountHistory();
+                        item.OrderId = a.OrderNo;
+                        item.Status = HotelBookModel.AccountHistory.AccountStatus.Fail;
+                        item.Remark = "转帐失败:" + a.Remark;
+                        item.BatchNo = batch_no;
+                        AccountHistoryAction.UpdateStatus(item);
+                    }
+                    context.Response.Write("success");
+                     * **/
+                        #endregion
+                        return "success";
+                    }
+
+                }
+                else//验证失败
+                {
+                    return "fail";
+                }
+            }
+            else
+            {
+                return "无通知参数";
+            }
+            return "fail";
+        }
 		/// <summary>
 		/// 获取通知,按具体需求重写
 		/// </summary>
 		/// <param name="context"></param>
-        protected override string OnNotify(HttpContext context)
+        protected string OnNotify2(HttpContext context)
 		{
 			alipayNotifyURL = alipayNotifyURL + "&partner=" + partner + "&notify_id=" + context.Request.Form["notify_id"];
 

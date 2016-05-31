@@ -19,6 +19,7 @@ using System.IO.Compression;
 using CoreHelper;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 
 namespace CRL.MemoryDataCache
 {
@@ -51,22 +52,32 @@ namespace CRL.MemoryDataCache
             return new List<string>();
         }
 
+        internal static void DeleteCacheItem<TItem>(string typeKey, string[] ids) where TItem : IModel
+        {
+            if (!cacheDatas.ContainsKey(typeKey))
+                return;
+            var data = cacheDatas[typeKey].Data as Dictionary<string, TItem>;
+            foreach (var id in ids)
+            {
+                data.Remove(id);
+            }
+        }
         /// <summary>
         /// 更新缓存中的一项
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="typeKey"></param>
         /// <param name="obj"></param>
         /// <param name="c"></param>
         /// <param name="checkInsert"></param>
-        internal static void UpdateCacheItem<TItem>(string key, TItem obj, ParameCollection c = null, bool checkInsert = false) where TItem : IModel
+        internal static void UpdateCacheItem<TItem>(string typeKey, TItem obj, ParameCollection c = null, bool checkInsert = false) where TItem : IModel
         {
             if (obj == null)
             {
                 throw new Exception("obj is null");
             }
-            if (!cacheDatas.ContainsKey(key))
+            if (!cacheDatas.ContainsKey(typeKey))
                 return;
-            var data = cacheDatas[key].Data as Dictionary<string, TItem>;
+            var data = cacheDatas[typeKey].Data as Dictionary<string, TItem>;
             var keyValue = obj.GetpPrimaryKeyValue();
             if (!data.ContainsKey(keyValue))
             {

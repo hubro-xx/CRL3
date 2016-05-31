@@ -81,5 +81,14 @@ namespace CRL
             return n;
         }
         #endregion
+
+        void DeleteCacheItem<TModel>(string[] ids) where TModel : IModel, new()
+        {
+            var updateModel = MemoryDataCache.CacheService.GetCacheTypeKey(typeof(TModel));
+            foreach (var key in updateModel)
+            {
+                MemoryDataCache.CacheService.DeleteCacheItem<TModel>(key, ids);
+            }
+        }
     }
 }

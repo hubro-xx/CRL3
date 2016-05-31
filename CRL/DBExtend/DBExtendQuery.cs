@@ -118,7 +118,7 @@ namespace CRL
                 else//生成储过程
                 {
                     string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-                    reader = dbHelper.RunDataReader(sql);
+                    reader = dbHelper.RunDataReader(sp);
                 }
                 query.ExecuteTime += dbHelper.ExecuteTime;
                 list = ObjectConvert.DataReaderToList<TItem>(reader, out runTime, true);

@@ -29,6 +29,8 @@ namespace CRL.Package.OnlinePay.Company.Alipay
                 return ChargeConfig.GetConfigKey(CompanyType.支付宝, ChargeConfig.DataType.Key);
             }
         }
+        //支付宝的公钥，无需修改该值
+        public static string Public_key = @"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRAFljhNhgPdyPuBV64bfQNN1PjbCzkIM6qRdKBoLPXmKKMiFYnkd6rAoprih3/PrQEB/VsW8OoM8fxn67UDYuyBTqA23MML9q1+ilIZwBC2AQ2UBVOrFXfFl75p6/B5KsiNG9zpgmLCUYuLkxpLQIDAQAB";
         public static string Input_charset = ChargeConfig.Charset;
         public static string Sign_type = "MD5";
     }

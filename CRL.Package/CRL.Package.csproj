@@ -87,6 +87,7 @@
     <Compile Include="OnlinePay\Company\Alipay\AlipayNotify.cs" />
     <Compile Include="OnlinePay\Company\Alipay\AlipaySubmit.cs" />
     <Compile Include="OnlinePay\Company\Alipay\Config.cs" />
+    <Compile Include="OnlinePay\Company\Alipay\RSA.cs" />
     <Compile Include="OnlinePay\Company\Bill99\Banks.cs" />
     <Compile Include="OnlinePay\Company\Bill99\Bill99Company.cs" />
     <Compile Include="OnlinePay\Company\Bill99\Bill99Util.cs" />

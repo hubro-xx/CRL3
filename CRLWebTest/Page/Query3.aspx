@@ -55,19 +55,21 @@
         }
     </pre>
 
-    <asp:Button ID="Button4" runat="server" Text="关联值查询" OnClick="Button4_Click" />
+    <asp:Button ID="Button4" runat="server" Text="in查询" OnClick="Button4_Click" />
     <pre>
          var query = Code.ProductDataManage.Instance.GetLamadaQuery();
             query.Where(b => b.ProductId == "0");
             //等效为 product.UserId in(select UserId from order where product.SupplierId=10 and order.status=2)
             query.In&lt;Code.Order&gt;(b => b.UserId, b => b.UserId, (a, b) => a.SupplierId == "10" && b.Status == 2);
     </pre>
-    除了in,还有not in,关系为
+    除了in,还有not in,exists等,关系为
     <pre>
 In          in
 NotIn       not in
 Equal       =
 NotEqual    !=
+Exists      exists
+NotExists   not exists
     </pre>
-    <asp:Button ID="Button3" runat="server" Text="Button" OnClick="Button3_Click" />
+    <asp:Button ID="Button3" runat="server" Text="返回匿名对象" OnClick="Button3_Click" />
 </asp:Content>
