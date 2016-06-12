@@ -13,11 +13,21 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using CRL;
 
 namespace Core.Mvc
 {
     public class CustomError
     {
+        static Exception GetInnerException(Exception exp)
+        {
+            if (exp.InnerException != null)
+            {
+                exp = exp.InnerException;
+                return GetInnerException(exp);
+            }
+            return exp;
+        }
         /// <summary>
         /// 处理输出错误
         /// </summary>
@@ -28,21 +38,35 @@ namespace Core.Mvc
             //{
             //    return;
             //}
+           
             var exception = context.Server.GetLastError();
-            var httpException = new HttpException(null, exception);
-
-            var routeData = new RouteData();
-            routeData.Values.Add("controller", "Home");
-            routeData.Values.Add("action", "_CustomError");
-            routeData.Values.Add("httpException", httpException);
             string errorCode = CoreHelper.ExceptionHelper.InnerLogException(exception);
-            routeData.Values.Add("errorCode", errorCode);
-
+            if (new HttpRequestWrapper(context.Request).IsAjaxRequest())
+            {
+                var result = new BaseController.DealResult() { Result = false, Data = "服务器内部错误:" + exception.Message };
+                context.Response.ContentType = "application/json";
+                context.Response.Write(CoreHelper.SerializeHelper.SerializerToJson(result));
+                context.Response.End();
+                return;
+            }
+            string html = Properties.Resources.erro;
+            html = html.Replace("[charset]", context.Request.ContentEncoding.WebName);
+            if (exception != null)
+            {
+                string erroDetail = exception.StackTrace + "";
+                erroDetail = erroDetail.Replace("\r\n", "<br>");
+                erroDetail = context.Server.HtmlEncode(erroDetail);
+                html = html.Replace("[TIME]", DateTime.Now.ToString());
+                html = html.Replace("[ERRO_CODE]", errorCode);
+                html = html.Replace("[URL]", context.Request.Url.ToString());
+                html = html.Replace("[ERRO_TITLE]", context.Server.HtmlEncode(exception.Message));
+                html = html.Replace("[ERRO_MESSAGE]", erroDetail);
+            }
             context.Server.ClearError();
-            var errorController = ControllerBuilder.Current.GetControllerFactory().CreateController(
-                new RequestContext(new HttpContextWrapper(context), routeData), "Home");
-
-            errorController.Execute(new RequestContext(new HttpContextWrapper(context), routeData));
+            context.Response.ContentType = "text/html";
+            context.Response.Write(html);
+            context.Response.End();
+            return;
         }
     }
 }

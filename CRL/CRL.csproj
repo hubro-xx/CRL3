@@ -125,6 +125,7 @@
     <Compile Include="ExtensionMethod\In.cs" />
     <Compile Include="ExtensionMethod\Max.cs" />
     <Compile Include="ExtensionMethod\Min.cs" />
+    <Compile Include="ExtensionMethod\QueryExtension.cs" />
     <Compile Include="ExtensionMethod\Sum.cs" />
     <Compile Include="IgnoreCaseDictionary.cs" />
     <Compile Include="LambdaQuery\CRLExpression\CRLExpression.cs" />
@@ -132,8 +133,8 @@
     <Compile Include="LambdaQuery\CRLExpression\CRLExpressionVisitor.cs" />
     <Compile Include="LambdaQuery\CRLExpression\CRLQueryExpression.cs" />
     <Compile Include="LambdaQuery\Distinct.cs" />
-    <Compile Include="LambdaQuery\ExpressionVisitor.cs" />
     <Compile Include="LambdaQuery\ExecuteResult.cs" />
+    <Compile Include="LambdaQuery\ExpressionVisitor.cs" />
     <Compile Include="LambdaQuery\Extensions.cs">
       <SubType>Code</SubType>
     </Compile>

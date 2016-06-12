@@ -57,29 +57,40 @@ namespace CRL
             return Delete<TModel>(condition);
         }
 
+       
+
         /// <summary>
-        /// 关联删除
+        /// 按完整查询条件进行删除
+        /// goup语法不支持,其它支持
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <typeparam name="TJoin"></typeparam>
-        /// <param name="expression"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public int Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
-            where TModel : IModel, new()
-            where TJoin : IModel, new()
+        public int Delete<T>(LambdaQuery<T> query) where T : IModel, new()
         {
-            var query = new LambdaQuery<TModel>(dbContext);
-            query.Join<TJoin>(expression);
-            var condition = query.FormatJoinExpression(expression.Body);
-            condition = query.ReplacePrefix(condition);
+            if (query.__GroupFields.Count > 0)
+            {
+                throw new Exception("delete不支持group查询");
+            }
+            query._IsRelationUpdate = true;
+            var conditions = query.GetQueryConditions(false).Trim();
+            conditions = conditions.Substring(5);
+            string table = query.QueryTableName;
+            table = query.__DBAdapter.KeyWordFormat(table);
             query.FillParames(this);
-            var t1 = TypeCache.GetTableName(typeof(TModel), dbContext);
-            var t2 = TypeCache.GetTableName(typeof(TJoin), dbContext);
-            string sql = _DBAdapter.GetRelationDeleteSql(t1, t2, condition);
-            int n = dbHelper.Execute(sql);
-            ClearParame();
-            return n;
+            if (query.__Relations.Count > 0)
+            {
+                var kv = query.__Relations.First();
+                var t1 = query.QueryTableName;
+                var t2 = TypeCache.GetTableName(kv.Key, query.__DbContext);
+                var join = kv.Value;
+                join = join.Substring(join.IndexOf(" on ") + 3);
+                string sql = query.__DBAdapter.GetRelationDeleteSql(t1, t2, join + " and " + conditions);
+                return Execute(sql);
+            }
+            return Delete<T>(conditions);
         }
+
         #endregion
 
         void DeleteCacheItem<TModel>(string[] ids) where TModel : IModel, new()

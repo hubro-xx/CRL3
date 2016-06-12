@@ -231,9 +231,13 @@
 	BaseController增加统一错误捕获方法
 	修改后台字段检查线程异常问题
 2016-04-29
-	增加关联删除方法
+	增加关联删除方法 Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
 2016-05-06
 	修改微信支付接口一些错误
 	查询字段作了关键字处理,再也不用提心关键字了,手写的除外
 2016-05-30
 	增加Exists查询方法
+2016-06-12
+	修改微信支付通知路径错误
+	优化了关联更新和删除,使能用完整的Query表示条件
+	增加扩展方法Delete<T>(this LambdaQuery<T> query) Update<T>(this LambdaQuery<T> query, ParameCollection updateValue)

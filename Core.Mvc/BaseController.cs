@@ -224,6 +224,18 @@ setTimeout('goUrl()', 3300)</script>";
         #endregion
 
         #region 图片上传
+        /// <summary>
+        /// 上传最大高度
+        /// </summary>
+        protected int _MaxUploadHeight = 2048;
+        /// <summary>
+        /// 上传最大宽度
+        /// </summary>
+        protected int _MaxUploadWidth = 2048;
+        /// <summary>
+        /// 上传文件大小KB
+        /// </summary>
+        protected int _MaxUploadSize = 2048;
         protected ActionResult _UploadImageView(bool multiple, string folder, string uploadType)
         {
             string html = Properties.Resources.upload;
@@ -251,10 +263,16 @@ setTimeout('goUrl()', 3300)</script>";
             if (useService)
             {
                 var u = new CoreHelper.ImageUpload.UploadService();
+                u.MaxWidth = _MaxUploadWidth;
+                u.MaxHeight = _MaxUploadHeight;
+                u.MaxSize = _MaxUploadSize;
                 a = u.UploadFile(stream, fileName, out saveFile, out error);
             }
             else
             {
+                CoreHelper.ImageUpload.Upload.MaxWidth = _MaxUploadWidth;
+                CoreHelper.ImageUpload.Upload.MaxHeight = _MaxUploadHeight;
+                CoreHelper.ImageUpload.Upload.MaxSize = _MaxUploadSize;
                 a = CoreHelper.ImageUpload.Upload.CheckFile(stream, postFile.FileName, out error);
                 if (!a)
                 {
@@ -393,42 +411,6 @@ setTimeout('goUrl()', 3300)</script>";
         }
         #endregion
 
-        #region 自定义错误
-        static Exception GetInnerException(Exception exp)
-        {
-            if (exp.InnerException != null)
-            {
-                exp = exp.InnerException;
-                return GetInnerException(exp);
-            }
-            return exp;
-        }
-
-        public ActionResult _CustomError()
-        { 
-            var ero = RouteData.Values["httpException"] as Exception;
-            if (Request.IsAjaxRequest())
-            {
-                return JsonResult(false, "服务器内部错误:" + ero.Message);
-            }
-            var errorCode = RouteData.Values["errorCode"] as String;
-            string html = Properties.Resources.erro;
-            html = html.Replace("[charset]", Request.ContentEncoding.WebName);
-            ero = GetInnerException(ero);
-            if (ero != null)
-            {
-                string erroDetail = ero.StackTrace + "";
-                erroDetail = erroDetail.Replace("\r\n", "<br>");
-                erroDetail = Server.HtmlEncode(erroDetail);
-                html = html.Replace("[TIME]", DateTime.Now.ToString());
-                html = html.Replace("[ERRO_CODE]", errorCode);
-                html = html.Replace("[URL]", Request.Url.ToString());
-                html = html.Replace("[ERRO_TITLE]", Server.HtmlEncode(ero.Message));
-                html = html.Replace("[ERRO_MESSAGE]", erroDetail);
-            }
-
-            return Content(html);
-        }
-        #endregion
+        
     }
 }

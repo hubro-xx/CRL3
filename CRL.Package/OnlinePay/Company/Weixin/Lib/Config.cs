@@ -34,12 +34,32 @@ namespace CRL.Package.OnlinePay.Company.Weixin
         public static string SSLCERT_PATH = ChargeConfig.GetConfigKey(CompanyType.微信, ChargeConfig.DataType.CertFile);
         public static string SSLCERT_PASSWORD = ChargeConfig.GetConfigKey(CompanyType.微信, ChargeConfig.DataType.CertFilePass);
 
-
+        public static string CurrentHost
+        {
+            get
+            {
+                string url = HttpContext.Current.Request.Url.ToString();
+                string[] arry = url.Split('/');
+                string host = arry[2];
+                string url1 = arry[0] + "//" + host;
+                //todo 更改主机URL
+                
+                return url1;
+            }
+        }
+        public static string GetAbsUrl(string url)
+        {
+            if (url.StartsWith("http"))
+            {
+                return url;
+            }
+            return CurrentHost + url;
+        }
 
         //=======【支付结果通知url】===================================== 
         /* 支付结果通知回调url，用于商户接收支付结果
         */
-        public static string NOTIFY_URL = ChargeConfig.GetConfigKey(CompanyType.微信, ChargeConfig.DataType.NotifyUrl);
+        public static string NOTIFY_URL = GetAbsUrl(ChargeConfig.GetConfigKey(CompanyType.微信, ChargeConfig.DataType.NotifyUrl));
 
         //=======【商户系统后台机器IP】===================================== 
         /* 此参数可手动配置也可在程序中自动获取

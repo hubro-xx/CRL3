@@ -47,12 +47,13 @@ namespace WebTest
             p.UserId += 1;//只会更新UserId
             Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
 
-            //关联更新
+            //使用完整查询关联更新
+            var query = Code.OrderManage.Instance.GetLambdaQuery();
+            query.Join<Code.ProductData>((a, b) => a.Id == b.Id && b.Number > 10);
             c = new CRL.ParameCollection();
-            //参数会按拼接处理
             c["UserId"] = "$UserId";//order.userid=product.userid
             c["Remark"] = "2222";//order.remark=2222
-            Code.OrderManage.Instance.RelationUpdate<Code.ProductData>((a, b) => a.Id == b.Id && b.Number > 10, c);
+            Code.OrderManage.Instance.Update(query, c);
             //等效语句为 update order set userid=ProductData.userid,remark='2222' from ProductData where order.id=ProductData.id and ProductData.number<10
         }
     }

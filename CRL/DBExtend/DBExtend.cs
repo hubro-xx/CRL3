@@ -279,34 +279,7 @@ namespace CRL
             });
         }
         #endregion
-        /// <summary>
-        /// 格式化为更新值查询
-        /// </summary>
-        /// <param name="setValue"></param>
-        /// <returns></returns>
-        string ForamtSetValue<T>(ParameCollection setValue) where T : IModel
-        {
-            string tableName = TypeCache.GetTableName(typeof(T),dbContext);
-            string setString = "";
-            foreach (var pair in setValue)
-            {
-                string name = pair.Key;
-                object value = pair.Value;
-                value = ObjectConvert.CheckNullValue(value);
-                if (name.StartsWith("$"))//直接按值拼接 c2["$SoldCount"] = "SoldCount+" + num;
-                {
-                    name = name.Substring(1, name.Length - 1);
-                    setString += string.Format(" {0}={1},", _DBAdapter.KeyWordFormat(name), value);
-                }
-                else
-                {
-                    setString += string.Format(" {0}=@{1},", _DBAdapter.KeyWordFormat(name), name);
-                    dbHelper.AddParam(name, value);
-                }
-            }
-            setString = setString.Substring(0, setString.Length - 1);
-            return setString;
-        }
+
         /// <summary>
         /// 通过关键类型,格式化SQL语句
         /// </summary>

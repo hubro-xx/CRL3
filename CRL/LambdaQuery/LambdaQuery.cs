@@ -114,7 +114,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 查询的表名
         /// </summary>
-        string QueryTableName = "";
+        internal string QueryTableName = "";
         /// <summary>
         /// 条件
         /// </summary>
@@ -559,13 +559,17 @@ Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
             fields = ReplacePrefix(fields);
             return fields;
         }
+
+        /// <summary>
+        /// 是否为关联更新/删除
+        /// </summary>
+        internal bool _IsRelationUpdate = false;
         /// <summary>
         /// 获取查询条件串,带表名
         /// </summary>
         /// <returns></returns>
-        internal string GetQueryConditions()
+        internal string GetQueryConditions(bool withTableName = true)
         {
-            string join = string.Join(" ", __Relations.Values);
             string where = Condition;
             where = string.IsNullOrEmpty(where) ? " 1=1 " : where;
             #region group判断
@@ -583,8 +587,20 @@ Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
                 where += " having " + Having;
             }
             #endregion
-
-            var part = string.Format("{0} t1 {1}  {2}  where {3}", __DBAdapter.KeyWordFormat(QueryTableName), __DBAdapter.GetWithNolockFormat(), join, where);
+            string part = "";
+            if (withTableName)
+            {
+                part += string.Format("{0} t1 {1}", __DBAdapter.KeyWordFormat(QueryTableName), __DBAdapter.GetWithNolockFormat());
+            }
+            if (_IsRelationUpdate)
+            {
+                part += string.Format(" where {0}",  where);
+            }
+            else
+            {
+                string join = string.Join(" ", __Relations.Values);
+                part += string.Format(" {0}  where {1}", join, where);
+            }
             part = ReplacePrefix(part);
             return part;
         }

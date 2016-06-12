@@ -23,12 +23,12 @@ namespace WebTest.Code
         }
         public void TestRelationUpdate()
         {
-            var db = DBExtend;
-            //参数会按拼接处理
+            var query = GetLambdaQuery();
+            query.Join<ProductData>((a, b) => a.Id == b.Id && b.Number > 10);
             var c = new CRL.ParameCollection();
             c["UserId"] = "$UserId";//order.userid=product.userid
             c["Remark"] = "2222";//order.remark=2222
-            RelationUpdate<ProductData>((a, b) => a.Id == b.Id && b.Number > 10, c);
+            Update(query, c);
         }
         public bool TransactionTest2(out string error)
         {

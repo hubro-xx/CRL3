@@ -336,10 +336,10 @@ namespace CRL.DBAdapter
         /// <param name="condition"></param>
         /// <param name="setValue"></param>
         /// <returns></returns>
-        public virtual string GetRelationUpdateSql(string t1, string t2, string condition,string setValue)
+        public virtual string GetRelationUpdateSql(string t1, string t2, string condition, string setValue)
         {
-            string sql = string.Format("update t1 set {2} from {0} t1, {1} t2 where {3}", KeyWordFormat(t1)
-                  , KeyWordFormat(t2), setValue, condition);
+            string table = string.Format("{0} t1,{1} t2", KeyWordFormat(t1), KeyWordFormat(t2));
+            string sql = string.Format("update t1 set {0} from {1} where {2}", setValue, table, condition);
             return sql;
         }
         /// <summary>

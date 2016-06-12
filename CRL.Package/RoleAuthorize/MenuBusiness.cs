@@ -203,7 +203,7 @@ namespace CRL.Package.RoleAuthorize
         public void SaveFavMenus(Dictionary<string, int> dic, int systemTypeId, int userId)
         {
             string name = string.Format("{0}_{1}.txt", systemTypeId, userId);
-            string folder = System.Web.HttpContext.Current.Server.MapPath("/log/userMenuCache/");
+            string folder = System.Web.HttpContext.Current.Server.MapPath("/config/userMenuCache/");
             CoreHelper.EventLog.CreateFolder(folder);
             string fileName = folder + name;
             string str = "";
@@ -216,7 +216,7 @@ namespace CRL.Package.RoleAuthorize
         public Dictionary<string, int> GetFavMenuDic(int systemTypeId, int userId)
         {
             string name = string.Format("{0}_{1}.txt", systemTypeId, userId);
-            string folder = System.Web.HttpContext.Current.Server.MapPath("/log/userMenuCache/");
+            string folder = System.Web.HttpContext.Current.Server.MapPath("/config/userMenuCache/");
             string fileName = folder + name;
             string menus = "";
             if (System.IO.File.Exists(fileName))

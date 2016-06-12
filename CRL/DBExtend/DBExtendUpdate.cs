@@ -16,6 +16,48 @@ namespace CRL
 {
     public sealed partial class DBExtend
     {
+        /// <summary>
+        /// 格式化为更新值查询
+        /// </summary>
+        /// <param name="setValue"></param>
+        /// <returns></returns>
+        string ForamtSetValue<T>(ParameCollection setValue) where T : IModel
+        {
+            string tableName = TypeCache.GetTableName(typeof(T), dbContext);
+            string setString = "";
+            foreach (var pair in setValue)
+            {
+                string name = pair.Key;
+                object value = pair.Value;
+                value = ObjectConvert.CheckNullValue(value);
+
+                if (name.StartsWith("$"))//直接按值拼接 c2["$SoldCount"] = "SoldCount+" + num;
+                {
+                    name = name.Substring(1, name.Length - 1);
+                    setString += string.Format(" {0}={1},", _DBAdapter.KeyWordFormat(name), value);
+                }
+                else
+                {
+                    if (value.ToString().Contains("$"))//当是关联更新
+                    {
+                        //右边字段需加前辍
+                        value = value.ToString().Replace("$", "t2.");
+                        name = string.Format("t1.{0}", name);
+                    }
+                    else
+                    {
+                        string parame = string.Format("@{0}", name, dbContext.parIndex);
+                        AddParam(name, value);
+                        dbContext.parIndex += 1;
+                        value = parame;
+                    }
+                    setString += string.Format(" {0}={1},", name, value);
+
+                }
+            }
+            setString = setString.Substring(0, setString.Length - 1);
+            return setString;
+        }
         #region update
         ParameCollection GetUpdateField<TModel>(TModel obj) where TModel : IModel, new()
         {
@@ -82,7 +124,7 @@ namespace CRL
         /// <param name="setValue"></param>
         /// <param name="where"></param>
         /// <returns></returns>
-        private int Update<TModel>(ParameCollection setValue, string where) where TModel : IModel,new()
+        internal int Update<TModel>(ParameCollection setValue, string where) where TModel : IModel,new()
         {
             CheckTableCreated<TModel>();
             Type type = typeof(TModel);
@@ -153,10 +195,6 @@ namespace CRL
             }
             LambdaQuery<TModel> query = new LambdaQuery<TModel>(dbContext, false);
             string condition = query.FormatExpression(expression.Body);
-            //foreach (var n in query.QueryParames)
-            //{
-            //    AddParam(n.Key, n.Value);
-            //}
             query.FillParames(this);
             var count = Update<TModel>(setValue, condition);
             System.Threading.Tasks.Task.Run(() =>
@@ -184,51 +222,48 @@ namespace CRL
             }
             return Update(expression, c);
         }
+
+
         /// <summary>
-        /// 关联更新
+        /// 按完整查询条件进行更新
+        /// goup语法不支持,其它支持
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TJoin"></typeparam>
-        /// <param name="expression"></param>
-        /// <param name="updateValue">要区别字段,需加前辍$ 如 $Num</param>
+        /// <param name="query"></param>
+        /// <param name="updateValue"></param>
         /// <returns></returns>
-        public int RelationUpdate<T, TJoin>(Expression<Func<T, TJoin, bool>> expression, ParameCollection updateValue)
-            where T : IModel, new()
-            where TJoin : IModel, new()
+        public int Update<T>(LambdaQuery<T> query, ParameCollection updateValue) where T : IModel, new()
         {
-            var query = new LambdaQuery<T>(dbContext);
-            query.Join<TJoin>(expression);
-            var condition = query.FormatJoinExpression(expression.Body);
-            condition = query.ReplacePrefix(condition);
-            //conditions = conditions.Replace("t1.", TypeCache.GetTableName(typeof(T), dbContext) + ".");
-            query.FillParames(this);
-            var str = "";
-            foreach (var pair in updateValue)
+            if (query.__GroupFields.Count > 0)
             {
-                string name = pair.Key;
-                string value = pair.Value.ToString();
-                if (value.Contains("$"))
-                {
-                    //右边字段需加前辍
-                    value = value.Replace("$", "t2.");
-                }
-                else
-                {
-                    string parame = string.Format("@{0}", name, dbContext.parIndex);
-                    AddParam(name, value);
-                    dbContext.parIndex += 1;
-                    value = parame;
-                }
-                str += string.Format("t1.{0}={1},", name, value);
+                throw new Exception("update不支持group查询");
             }
-            str = str.Substring(0, str.Length - 1);
-            var t1 = TypeCache.GetTableName(typeof(T), dbContext);
-            var t2 = TypeCache.GetTableName(typeof(TJoin), dbContext);
-            string sql = _DBAdapter.GetRelationUpdateSql(t1, t2, condition, str);
-            var n = Execute(sql);
-            ClearParame();
-            return n;
+            query._IsRelationUpdate = true;
+            var conditions = query.GetQueryConditions(false).Trim();
+            conditions = conditions.Substring(5);
+            string table = query.QueryTableName;
+            table = query.__DBAdapter.KeyWordFormat(table);
+            query.FillParames(this);
+            var properties = updateValue.GetType().GetProperties();
+
+            if (query.__Relations.Count > 0)
+            {
+                string setString = ForamtSetValue<T>(updateValue);
+                var kv = query.__Relations.First();
+                var t1 = query.QueryTableName;
+                var t2 = TypeCache.GetTableName(kv.Key, query.__DbContext);
+                var join = query.__Relations[kv.Key];
+                join = join.Substring(join.IndexOf(" on ") + 3);
+                string sql = query.__DBAdapter.GetRelationUpdateSql(t1, t2, join + " and " + conditions, setString);
+                return Execute(sql);
+            }
+            else
+            {
+                conditions = conditions.Replace("t1.","");
+            }
+            return Update<T>(updateValue, conditions);
         }
+
         #endregion
     }
 }

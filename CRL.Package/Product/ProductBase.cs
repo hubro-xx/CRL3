@@ -77,7 +77,7 @@ namespace CRL.Package.Product
                 }
                 else
                 {
-                    return "";
+                    return _ProductImage;
                 }
             }
             set

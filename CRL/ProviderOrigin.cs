@@ -294,16 +294,28 @@ namespace CRL
             return n;
         }
         /// <summary>
-        /// 按关联对象删除
+        /// 按完整查询删除
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int Delete(LambdaQuery<TModel> query)
+        {
+            DBExtend db = DBExtend;
+            int n = db.Delete(query);
+            return n;
+        }
+        /// <summary>
+        /// 关联删除
         /// </summary>
         /// <typeparam name="TJoin"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public int Delete<TJoin>(Expression<Func<TModel, TJoin, bool>> expression) where TJoin : IModel, new()
+        public int Delete<TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
+            where TJoin : IModel, new()
         {
-            DBExtend db = DBExtend;
-            int n = db.Delete<TModel, TJoin>(expression);
-            return n;
+            var query = GetLambdaQuery();
+            query.Join<TJoin>(expression);
+            return Delete(query);
         }
         #endregion
 
@@ -398,17 +410,29 @@ namespace CRL
             return n;
         }
         /// <summary>
+        /// 按完整查询条件更新
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="updateValue">要按字段值更新,需加前辍$ 如 c["UserId"] = "$UserId"</param>
+        /// <returns></returns>
+        public int Update(LambdaQuery<TModel> query, ParameCollection updateValue)
+        {
+            var db = DBExtend;
+            return db.Update(query, updateValue);
+        }
+        /// <summary>
         /// 关联更新
         /// </summary>
         /// <typeparam name="TJoin"></typeparam>
         /// <param name="expression"></param>
-        /// <param name="updateValue">要区别字段,需加前辍$ 如 $Num</param>
+        /// <param name="updateValue">要按字段值更新,需加前辍$ 如 c["UserId"] = "$UserId"</param>
         /// <returns></returns>
-        public int RelationUpdate<TJoin>(Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)
+        public int Update<TJoin>(Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)
             where TJoin : IModel, new()
         {
-            var db = DBExtend;
-            return db.RelationUpdate<TModel, TJoin>(expression, updateValue);
+            var query = GetLambdaQuery();
+            query.Join<TJoin>(expression);
+            return Update(query, updateValue);
         }
         #endregion
 

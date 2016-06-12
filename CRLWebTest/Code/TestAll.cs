@@ -155,14 +155,21 @@ namespace WebTest.Code
             Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
 
             //关联更新
-
+            var query = Code.OrderManage.Instance.GetLambdaQuery();
+            query.Join<ProductData>((a, b) => a.Id == b.Id && b.Number > 10);
             c = new CRL.ParameCollection();
             c["UserId"] = "$UserId";//order.userid=product.userid
             c["Remark"] = "2222";//order.remark=2222
-            Code.OrderManage.Instance.RelationUpdate<ProductData>((a, b) => a.Id == b.Id && b.Number > 10, c);
+            Code.OrderManage.Instance.Update(query, c);
+            //关联删除
+            var query2 = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query2.Where(b => b.Id == 10);
+            query2.Join<Code.Member>((a, b) => a.SupplierId == "10" && b.Name == "123");
+            Code.ProductDataManage.Instance.Delete(query2);
             #endregion
 
             #region 缓存更新
+            //按编号为1的数据
             var item = Code.ProductDataManage.Instance.QueryItemFromCache(1);
             var guid = Guid.NewGuid().ToString().Substring(0,8);
             item.Change(b => b.SupplierName, guid);
