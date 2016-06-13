@@ -57,7 +57,21 @@ namespace CRL
             return Delete<TModel>(condition);
         }
 
-       
+        /// <summary>
+        /// 关联删除
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public int Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
+            where TModel : IModel, new()
+            where TJoin : IModel, new()
+        {
+            var query = new LambdaQuery<TModel>(dbContext);
+            query.Join<TJoin>(expression);
+            return Delete(query);
+        }
 
         /// <summary>
         /// 按完整查询条件进行删除

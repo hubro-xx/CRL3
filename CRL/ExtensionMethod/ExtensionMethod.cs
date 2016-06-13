@@ -254,8 +254,11 @@ namespace CRL
         {
             return Convert.ToInt32(e);
         }
-
-                /// <summary>
+        public static int ToInt(this String s)
+        {
+            return Convert.ToInt32(s);
+        }
+        /// <summary>
         /// 判断类型是否为集合类型
         /// </summary>
         /// <param name="type">要处理的类型</param>
@@ -267,6 +270,18 @@ namespace CRL
                 return false;
             }
             return typeof(IEnumerable).IsAssignableFrom(type);
+        }
+        /// <summary>
+        /// 判断参数为空
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="name"></param>
+        internal static void CheckNull(this object obj, object name)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException(name.ToString());
+            }
         }
     }
 

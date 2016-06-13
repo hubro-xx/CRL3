@@ -313,9 +313,7 @@ namespace CRL
         public int Delete<TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
             where TJoin : IModel, new()
         {
-            var query = GetLambdaQuery();
-            query.Join<TJoin>(expression);
-            return Delete(query);
+            return DBExtend.Delete(expression);
         }
         #endregion
 
@@ -430,9 +428,10 @@ namespace CRL
         public int Update<TJoin>(Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)
             where TJoin : IModel, new()
         {
-            var query = GetLambdaQuery();
-            query.Join<TJoin>(expression);
-            return Update(query, updateValue);
+            return DBExtend.Update(expression, updateValue);
+            //var query = GetLambdaQuery();
+            //query.Join<TJoin>(expression);
+            //return Update(query, updateValue);
         }
         #endregion
 

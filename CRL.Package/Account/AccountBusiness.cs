@@ -44,7 +44,11 @@ namespace CRL.Package.Account
         /// <returns></returns>
         public AccountDetail GetAccount(int account, Enum accountType, Enum transactionType)
         {
-            return GetAccount(account.ToString(), accountType.ToInt(), transactionType.ToInt());
+            return GetAccount(account, accountType.ToInt(), transactionType.ToInt());
+        }
+        public AccountDetail GetAccount(string account, int accountType, int transactionType)
+        {
+            return GetAccount(account.ToInt(), accountType, transactionType);
         }
         /// <summary>
         /// 取得帐户信息,没有则创建(实时)
@@ -53,7 +57,7 @@ namespace CRL.Package.Account
         /// <param name="accountType"></param>
         /// <param name="transactionType"></param>
         /// <returns></returns>
-        public AccountDetail GetAccount(string account, int accountType, int transactionType)
+        public AccountDetail GetAccount(int account, int accountType, int transactionType)
         {
             var info = QueryItem(b => b.Account == account && b.TransactionType == transactionType && b.AccountType == accountType);
             if (info == null)
@@ -97,11 +101,11 @@ namespace CRL.Package.Account
         /// </summary>
         /// <param name="accountId"></param>
         /// <returns></returns>
-        public string GetAccountNoFromCache(int accountId)
+        public int GetAccountNoFromCache(int accountId)
         {
             var info = GetAccountFromCache(accountId);
             if (info == null)
-                return null;
+                return 0;
             return info.Account;
         }
         /// <summary>
@@ -113,7 +117,11 @@ namespace CRL.Package.Account
         /// <returns></returns>
         public int GetAccountId(int account, Enum accountType, Enum transactionType)
         {
-            return GetAccountId(account.ToString(), accountType.ToInt(), transactionType.ToInt());
+            return GetAccountId(account, accountType.ToInt(), transactionType.ToInt());
+        }
+        public int GetAccountId(string account, int accountType, int transactionType)
+        {
+            return GetAccountId(account, accountType, transactionType);
         }
         /// <summary>
         /// 取得帐户ID(从缓存)
@@ -122,7 +130,7 @@ namespace CRL.Package.Account
         /// <param name="accountType">帐号类型,用以区分不同渠道用户</param>
         /// <param name="transactionType"></param>
         /// <returns></returns>
-        public int GetAccountId(string account,int accountType, int transactionType)
+        public int GetAccountId(int account,int accountType, int transactionType)
         {
             int id = 0;
             foreach (var item in detailInfoCache.Values)

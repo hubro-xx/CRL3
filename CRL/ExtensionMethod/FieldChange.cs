@@ -76,10 +76,7 @@ namespace CRL
         /// <param name="value"></param>
         public static void Change<T, TKey>(this T obj, Expression<Func<T, TKey>> expression, TKey value) where T : CRL.IModel, new()
         {
-            if (obj == null)
-            {
-                throw new ArgumentNullException(typeof(T).ToString());
-            }
+            obj.CheckNull(typeof(T));
             MemberExpression mExp = (MemberExpression)expression.Body;
             string name = mExp.Member.Name;
             obj.SetChanges(name, value);

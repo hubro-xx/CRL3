@@ -749,9 +749,16 @@
             <param name="expression"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.ProviderOrigin`1.Delete(CRL.LambdaQuery.LambdaQuery{`0})">
+            <summary>
+            按完整查询删除
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.ProviderOrigin`1.Delete``1(System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}})">
             <summary>
-            按关联对象删除
+            关联删除
             </summary>
             <typeparam name="TJoin"></typeparam>
             <param name="expression"></param>
@@ -789,13 +796,21 @@
             <param name="updateValue"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.ProviderOrigin`1.RelationUpdate``1(System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}},CRL.ParameCollection)">
+        <member name="M:CRL.ProviderOrigin`1.Update(CRL.LambdaQuery.LambdaQuery{`0},CRL.ParameCollection)">
+            <summary>
+            按完整查询条件更新
+            </summary>
+            <param name="query"></param>
+            <param name="updateValue">要按字段值更新,需加前辍$ 如 c["UserId"] = "$UserId"</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ProviderOrigin`1.Update``1(System.Linq.Expressions.Expression{System.Func{`0,``0,System.Boolean}},CRL.ParameCollection)">
             <summary>
             关联更新
             </summary>
             <typeparam name="TJoin"></typeparam>
             <param name="expression"></param>
-            <param name="updateValue">要区别字段,需加前辍$ 如 $Num</param>
+            <param name="updateValue">要按字段值更新,需加前辍$ 如 c["UserId"] = "$UserId"</param>
             <returns></returns>
         </member>
         <member name="M:CRL.ProviderOrigin`1.ExecListWithFormat``1(System.String,CRL.ParameCollection,System.Type[])">
@@ -1329,13 +1344,6 @@
             <typeparam name="TItem"></typeparam>
             <param name="newObj"></param>
         </member>
-        <member name="M:CRL.DBExtend.ForamtSetValue``1(CRL.ParameCollection)">
-            <summary>
-            格式化为更新值查询
-            </summary>
-            <param name="setValue"></param>
-            <returns></returns>
-        </member>
         <member name="M:CRL.DBExtend.AutoFormat(System.String,System.Type[])">
             <summary>
             通过关键类型,格式化SQL语句
@@ -1505,13 +1513,13 @@
             <param name="expression"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Delete``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}})">
+        <member name="M:CRL.DBExtend.Delete``1(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
-            关联删除
+            按完整查询条件进行删除
+            goup语法不支持,其它支持
             </summary>
-            <typeparam name="TModel"></typeparam>
-            <typeparam name="TJoin"></typeparam>
-            <param name="expression"></param>
+            <typeparam name="T"></typeparam>
+            <param name="query"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.DBExtend.BatchInsert``1(System.Collections.Generic.List{``0},System.Boolean)">
@@ -1671,6 +1679,13 @@
             <typeparam name="TItem"></typeparam>
             <param name="list"></param>
         </member>
+        <member name="M:CRL.DBExtend.ForamtSetValue``1(CRL.ParameCollection)">
+            <summary>
+            格式化为更新值查询
+            </summary>
+            <param name="setValue"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.DBExtend.Update``1(CRL.ParameCollection,System.String)">
             <summary>
             指定拼接条件更新
@@ -1715,14 +1730,24 @@
             <param name="updateValue"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.RelationUpdate``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}},CRL.ParameCollection)">
+        <member name="M:CRL.DBExtend.Update``1(CRL.LambdaQuery.LambdaQuery{``0},CRL.ParameCollection)">
+            <summary>
+            按完整查询条件进行更新
+            goup语法不支持,其它支持
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <param name="updateValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.Update``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}},CRL.ParameCollection)">
             <summary>
             关联更新
             </summary>
-            <typeparam name="T"></typeparam>
+            <typeparam name="TModel"></typeparam>
             <typeparam name="TJoin"></typeparam>
             <param name="expression"></param>
-            <param name="updateValue">要区别字段,需加前辍$ 如 $Num</param>
+            <param name="updateValue"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.DBExtend.ExecDynamicList(System.String,System.Type[])">
@@ -2081,6 +2106,25 @@
             <param name="resultSelector"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.ExtensionMethod.Delete``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            按完整查询条件进行删除
+            goup语法不支持
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ExtensionMethod.Update``1(CRL.LambdaQuery.LambdaQuery{``0},CRL.ParameCollection)">
+            <summary>
+            按完整查询条件进行更新
+            goup语法不支持
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="query"></param>
+            <param name="updateValue"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.ExtensionMethod.SUM``1(``0)">
             <summary>
             表示SUM此字段
@@ -2232,6 +2276,13 @@
             </summary>
             <param name="type">要处理的类型</param>
             <returns>是返回True，不是返回False</returns>
+        </member>
+        <member name="M:CRL.ExtensionMethod.CheckNull(System.Object,System.Object)">
+            <summary>
+            判断参数为空
+            </summary>
+            <param name="obj"></param>
+            <param name="name"></param>
         </member>
         <member name="T:CRL.IgnoreCaseDictionary`1">
             <summary>
@@ -2775,7 +2826,12 @@
             <param name="removes"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.LambdaQuery.LambdaQuery`1.GetQueryConditions">
+        <member name="F:CRL.LambdaQuery.LambdaQuery`1._IsRelationUpdate">
+            <summary>
+            是否为关联更新/删除
+            </summary>
+        </member>
+        <member name="M:CRL.LambdaQuery.LambdaQuery`1.GetQueryConditions(System.Boolean)">
             <summary>
             获取查询条件串,带表名
             </summary>

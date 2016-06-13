@@ -228,11 +228,11 @@ namespace CRL
         /// 按完整查询条件进行更新
         /// goup语法不支持,其它支持
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TModel"></typeparam>
         /// <param name="query"></param>
         /// <param name="updateValue"></param>
         /// <returns></returns>
-        public int Update<T>(LambdaQuery<T> query, ParameCollection updateValue) where T : IModel, new()
+        public int Update<TModel>(LambdaQuery<TModel> query, ParameCollection updateValue) where TModel : IModel, new()
         {
             if (query.__GroupFields.Count > 0)
             {
@@ -248,7 +248,7 @@ namespace CRL
 
             if (query.__Relations.Count > 0)
             {
-                string setString = ForamtSetValue<T>(updateValue);
+                string setString = ForamtSetValue<TModel>(updateValue);
                 var kv = query.__Relations.First();
                 var t1 = query.QueryTableName;
                 var t2 = TypeCache.GetTableName(kv.Key, query.__DbContext);
@@ -261,7 +261,24 @@ namespace CRL
             {
                 conditions = conditions.Replace("t1.","");
             }
-            return Update<T>(updateValue, conditions);
+            return Update<TModel>(updateValue, conditions);
+        }
+
+        /// <summary>
+        /// 关联更新
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="updateValue"></param>
+        /// <returns></returns>
+        public int Update<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)
+            where TModel : IModel, new()
+            where TJoin : IModel, new()
+        {
+            var query = new LambdaQuery<TModel>(dbContext);
+            query.Join<TJoin>(expression);
+            return Update(query, updateValue);
         }
 
         #endregion

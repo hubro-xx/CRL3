@@ -44,7 +44,7 @@ namespace CRL.Package.PayComponent
                 var accountInstance = new Account.AccountBusiness<PayTransManage>();
                 if (b.OperateType == Account.OperateType.支出)
                 {
-                    var account = accountInstance.GetAccount(b.UserId.ToString(), b.AccountType, b.TransactionType);
+                    var account = accountInstance.GetAccount(b.UserId, b.AccountType, b.TransactionType);
                     if (account.AvailableBalance < b.Amount)
                     {
                         error = string.Format("账户余额不足{0} {1}", b.TransactionType, account.AvailableBalance);
@@ -65,7 +65,7 @@ namespace CRL.Package.PayComponent
                 {
                     continue;
                 }
-                var account = accountInstance.GetAccountId(item.UserId.ToString(), item.AccountType, item.TransactionType);
+                var account = accountInstance.GetAccountId(item.UserId, item.AccountType, item.TransactionType);
                 Account.Transaction ts = new Account.Transaction() { AccountId = account, Amount = item.Amount, OperateType = item.OperateType, TradeType = item.TradeType, OutOrderId = item.OutOrderId, Remark = item.Remark,TransactionType = (int)item.TransactionType};
                 trans.Add(ts);
             }
@@ -113,7 +113,7 @@ namespace CRL.Package.PayComponent
                 {
                     continue;
                 }
-                var account = accountInstance.GetAccountId(item.UserId.ToString(), item.AccountType, item.TransactionType);
+                var account = accountInstance.GetAccountId(item.UserId, item.AccountType, item.TransactionType);
                 var operateType = item.OperateType == Account.OperateType.收入 ? Account.OperateType.支出 : Account.OperateType.收入;
                 Account.Transaction ts = new Account.Transaction() { AccountId = account, Amount = item.Amount, OperateType = operateType, TradeType = item.TradeTypeCancel, OutOrderId = item.OutOrderId, Remark = remark };
                 trans.Add(ts);

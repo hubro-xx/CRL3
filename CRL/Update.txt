@@ -241,3 +241,4 @@
 	修改微信支付通知路径错误
 	优化了关联更新和删除,使能用完整的Query表示条件
 	增加扩展方法Delete<T>(this LambdaQuery<T> query) Update<T>(this LambdaQuery<T> query, ParameCollection updateValue)
+	帐户模块帐号改为int AccountDetail.Account

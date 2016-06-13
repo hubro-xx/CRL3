@@ -33,7 +33,7 @@ namespace CRL.Package.Account
         /// 对应的帐号
         /// </summary>
         [Attribute.Field(FieldIndexType = Attribute.FieldIndexType.非聚集)]
-        public string Account
+        public int Account
         {
             get;
             set;
