@@ -272,11 +272,11 @@ namespace CRL
             return typeof(IEnumerable).IsAssignableFrom(type);
         }
         /// <summary>
-        /// 判断参数为空
+        /// 判断值为空
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="name"></param>
-        internal static void CheckNull(this object obj, object name)
+        public static void CheckNull(this object obj, object name)
         {
             if (obj == null)
             {

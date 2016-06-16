@@ -161,6 +161,10 @@ namespace WebTest.Code
             c["UserId"] = "$UserId";//order.userid=product.userid
             c["Remark"] = "2222";//order.remark=2222
             Code.OrderManage.Instance.Update(query, c);
+            
+            #endregion
+
+            #region 删除
             //关联删除
             var query2 = Code.ProductDataManage.Instance.GetLambdaQuery();
             query2.Where(b => b.Id == 10);
@@ -171,6 +175,7 @@ namespace WebTest.Code
             #region 缓存更新
             //按编号为1的数据
             var item = Code.ProductDataManage.Instance.QueryItemFromCache(1);
+            item.CheckNull("item");
             var guid = Guid.NewGuid().ToString().Substring(0,8);
             item.Change(b => b.SupplierName, guid);
             Code.ProductDataManage.Instance.Update(item);

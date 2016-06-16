@@ -1513,6 +1513,15 @@
             <param name="expression"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.DBExtend.Delete``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}})">
+            <summary>
+            关联删除
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TJoin"></typeparam>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.DBExtend.Delete``1(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
             按完整查询条件进行删除
@@ -2279,7 +2288,7 @@
         </member>
         <member name="M:CRL.ExtensionMethod.CheckNull(System.Object,System.Object)">
             <summary>
-            判断参数为空
+            判断值为空
             </summary>
             <param name="obj"></param>
             <param name="name"></param>

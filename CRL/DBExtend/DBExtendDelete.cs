@@ -86,6 +86,10 @@ namespace CRL
             {
                 throw new Exception("delete不支持group查询");
             }
+            if (query.__Relations.Count > 1)
+            {
+                throw new Exception("delete关联不支持多次");
+            }
             query._IsRelationUpdate = true;
             var conditions = query.GetQueryConditions(false).Trim();
             conditions = conditions.Substring(5);

@@ -238,6 +238,10 @@ namespace CRL
             {
                 throw new Exception("update不支持group查询");
             }
+            if (query.__Relations.Count > 1)
+            {
+                throw new Exception("update关联不支持多次");
+            }
             query._IsRelationUpdate = true;
             var conditions = query.GetQueryConditions(false).Trim();
             conditions = conditions.Substring(5);
