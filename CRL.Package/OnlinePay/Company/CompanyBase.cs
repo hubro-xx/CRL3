@@ -51,6 +51,26 @@ namespace CRL.Package.OnlinePay.Company
             }
         }
         /// <summary>
+        /// 证书路径
+        /// </summary>
+        public string CertFile
+        {
+            get
+            {
+                return ChargeConfig.GetConfigKey(ThisCompanyType, ChargeConfig.DataType.CertFile);
+            }
+        }
+        /// <summary>
+        /// 证书密码
+        /// </summary>
+        public string CertFilePass
+        {
+            get
+            {
+                return ChargeConfig.GetConfigKey(ThisCompanyType, ChargeConfig.DataType.CertFilePass);
+            }
+        }
+        /// <summary>
         /// 通知URL
         /// </summary>
         public string NotifyUrl

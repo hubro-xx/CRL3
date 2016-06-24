@@ -21,7 +21,9 @@ namespace WebTest
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            var order = new Code.Order();
+            order.Cumulation(b=>b.Status,10);
+            int a = order.Status;
             //Code.OrderManage.Instance.TestRelationUpdate();
             //TestGuid();
             //TestAllQuery();

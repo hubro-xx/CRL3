@@ -63,7 +63,7 @@ namespace CRL
         {
             var c = new ParameCollection();
             var fields = TypeCache.GetProperties(typeof(TModel), true);
-            if (obj.Changes.Count > 0)
+            if (obj.Changes.Count > 0)//按手动指定更改
             {
                 foreach (var item in obj.Changes)
                 {
@@ -91,6 +91,7 @@ namespace CRL
                 }
                 return c;
             }
+            //按对象对比
             var origin = obj.OriginClone;
             if (origin == null)
             {
@@ -161,6 +162,7 @@ namespace CRL
             {
                 throw new Exception("更新失败,找不到主键为 " + keyValue + " 的记录");
             }
+            obj.Changes.Clear();
             return n;
         }
         /// <summary>
@@ -178,7 +180,9 @@ namespace CRL
                 return 0;
                 //throw new Exception("更新集合为空");
             }
-            return Update(expression, c);
+            var n = Update(expression, c);
+            model.Changes.Clear();
+            return n;
         }
         /// <summary>
         /// 指定条件和参数进行更新

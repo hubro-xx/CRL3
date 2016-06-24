@@ -386,6 +386,9 @@ namespace CRL
         [NonSerialized]
         ParameCollection changes = new ParameCollection();
 
+        /// <summary>
+        /// 存储被更改的属性
+        /// </summary>
         [Attribute.Field(MapingField = false)]
         [System.Xml.Serialization.XmlIgnore]
         internal ParameCollection Changes
@@ -401,6 +404,7 @@ namespace CRL
         }
         /// <summary>
         /// 表示值被更改了
+        /// 当更新后,将被清空
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>

@@ -39,15 +39,18 @@ namespace CRL
         {
             if (backgroundDBExtend == null)
             {
-                var helper = SettingConfig.GetDbAccess(dbContext.DBLocation);
-                var dbContext2 = new DbContext(helper, dbContext.DBLocation);
-                dbContext2.ShardingMainDataIndex = dbContext.ShardingMainDataIndex;
-                dbContext2.UseSharding = dbContext.UseSharding;
-                backgroundDBExtend = new DBExtend(dbContext2);
+                backgroundDBExtend = copyDBExtend();
             }
             return backgroundDBExtend;
         }
-       
+        DBExtend copyDBExtend()
+        {
+            var helper = SettingConfig.GetDbAccess(dbContext.DBLocation);
+            var dbContext2 = new DbContext(helper, dbContext.DBLocation);
+            dbContext2.ShardingMainDataIndex = dbContext.ShardingMainDataIndex;
+            dbContext2.UseSharding = dbContext.UseSharding;
+            return new DBExtend(dbContext2);
+        }
 
         internal CoreHelper.DBHelper dbHelper;
         internal string DatabaseName
@@ -610,8 +613,8 @@ namespace CRL
            //二次检查,对照表结构
             if (!tb.ColumnChecked2)
             {
-                db = GetBackgroundDBExtend();
-                ExistsTableCache.ColumnBackgroundCheck.Add(db, type);
+                var db2 = copyDBExtend();
+                ExistsTableCache.ColumnBackgroundCheck.Add(db2, type);
                 tb.ColumnChecked2 = true;
             }
         }

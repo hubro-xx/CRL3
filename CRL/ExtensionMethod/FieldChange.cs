@@ -44,6 +44,10 @@ namespace CRL
                     value = LambdaCompileCache.GetParameExpressionValue(right);
                     //value = Expression.Lambda(right).Compile().DynamicInvoke();
                 }
+                //更改对象值
+                var pro = TypeCache.GetProperties(typeof(T), false);
+                var field = pro[name];
+                field.SetValue(obj, value);
                 obj.SetChanges(name, value);
             }
             else
@@ -79,6 +83,10 @@ namespace CRL
             obj.CheckNull(typeof(T));
             MemberExpression mExp = (MemberExpression)expression.Body;
             string name = mExp.Member.Name;
+            //更改对象值
+            var pro = TypeCache.GetProperties(typeof(T), false);
+            var field = pro[name];
+            field.SetValue(obj, value);
             obj.SetChanges(name, value);
         }
         #region 表示按值累加
@@ -146,6 +154,12 @@ namespace CRL
         {
             MemberExpression mExp = (MemberExpression)expression.Body;
             string name = mExp.Member.Name;
+            //更改对象值
+            var pro = TypeCache.GetProperties(typeof(T), false);
+            var field = pro[name];
+            dynamic origin = field.GetValue(obj);
+            origin += value;
+            field.SetValue(obj, origin);
             obj.SetChanges("$" + name, value);
         }
         #endregion
