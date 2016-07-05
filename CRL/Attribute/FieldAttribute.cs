@@ -164,7 +164,7 @@ namespace CRL.Attribute
             }
             if (string.IsNullOrEmpty(fieldName))
             {
-                fieldName = _DBAdapter.KeyWordFormat(Name);
+                fieldName = withTablePrefix ? Name : _DBAdapter.KeyWordFormat(Name);
             }
             //判断虚拟字段
             if (FieldType == Attribute.FieldType.虚拟字段)
