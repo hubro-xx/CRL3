@@ -162,7 +162,6 @@ namespace CRL
             {
                 throw new Exception("更新失败,找不到主键为 " + keyValue + " 的记录");
             }
-            obj.Changes.Clear();
             return n;
         }
         /// <summary>
@@ -181,7 +180,6 @@ namespace CRL
                 //throw new Exception("更新集合为空");
             }
             var n = Update(expression, c);
-            model.Changes.Clear();
             return n;
         }
         /// <summary>
