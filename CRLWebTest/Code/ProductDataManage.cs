@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -50,11 +50,7 @@ namespace WebTest.Code
 
         public List<ProductData> QueryDayProduct(DateTime date)
         {
-            var helper = DBExtend;
-            string sql = "select * from ProductData where datediff(d,addtime,@date)=0";
-            helper.AddParam("date", date);
-            return helper.AutoSpQuery<ProductData>(sql);
-            //其它数据结果参见Auto开头的其它方法
+            return new List<ProductData>();
         }
         
         public void DynamicQueryTest()

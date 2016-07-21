@@ -353,6 +353,21 @@
             存储过程模版
             </summary>
         </member>
+        <member name="T:CRL.DataBaseArchitecture">
+            <summary>
+            数据库架构
+            </summary>
+        </member>
+        <member name="F:CRL.DataBaseArchitecture.Relation">
+            <summary>
+            关系型
+            </summary>
+        </member>
+        <member name="F:CRL.DataBaseArchitecture.NotRelation">
+            <summary>
+            非关系型
+            </summary>
+        </member>
         <member name="M:CRL.DBAdapter.MSSQLDBAdapter.GetCreateSpScript(System.String,System.String)">
             <summary>
             创建存储过程脚本
@@ -627,7 +642,7 @@
         </member>
         <member name="P:CRL.IProvider.ModelType">
             <summary>
-            关联对象类型
+            绑定对象类型
             </summary>
         </member>
         <member name="M:CRL.ProviderOrigin`1.#ctor">
@@ -687,6 +702,13 @@
             添加一条记录[基本方法]
             </summary>
             <param name="p"></param>
+        </member>
+        <member name="M:CRL.ProviderOrigin`1.Add(System.Collections.Generic.List{`0},System.Boolean)">
+            <summary>
+            批量插入[基本方法]
+            </summary>
+            <param name="list"></param>
+            <param name="keepIdentity"></param>
         </member>
         <member name="M:CRL.ProviderOrigin`1.BatchInsert(System.Collections.Generic.List{`0},System.Boolean)">
             <summary>
@@ -895,7 +917,7 @@
             <param name="compileSp"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.ProviderOrigin`1.PackageTrans2(CRL.DBExtend,CRL.TransMethod,System.String@)">
+        <member name="M:CRL.ProviderOrigin`1.PackageTrans2(CRL.AbsDBExtend,CRL.TransMethod,System.String@)">
             <summary>
             使用DbTransaction封装事务(不推荐)
             </summary>
@@ -1197,6 +1219,21 @@
             只是字段时使用
             </summary>
         </member>
+        <member name="F:CRL.Attribute.FieldQuery.FieldName">
+            <summary>
+            字段名
+            </summary>
+        </member>
+        <member name="F:CRL.Attribute.FieldQuery.MemberName">
+            <summary>
+            成员名,别名
+            </summary>
+        </member>
+        <member name="F:CRL.Attribute.FieldQuery.MethodName">
+            <summary>
+            方法名
+            </summary>
+        </member>
         <member name="T:CRL.DbContext">
             <summary>
             数据访问上下文
@@ -1208,6 +1245,11 @@
             </summary>
             <param name="dbHelper"></param>
             <param name="dbLocation"></param>
+        </member>
+        <member name="F:CRL.DbContext.DataBaseArchitecture">
+            <summary>
+            数据库架构类型
+            </summary>
         </member>
         <member name="F:CRL.DbContext.DBLocation">
             <summary>
@@ -1252,268 +1294,170 @@
             分库指定的数据库
             </summary>
         </member>
-        <member name="T:CRL.DBExtend">
+        <member name="T:CRL.DBExtend.MongoDB.MongoDB">
             <summary>
-            对象数据访问
+            MongoDB不支持关联和直接语句查询
+            部份扩展方法支持
             </summary>
         </member>
-        <member name="F:CRL.DBExtend.OnUpdateNotifyCacheServer">
+        <member name="M:CRL.AbsDBExtend.CreateLambdaQuery``1">
             <summary>
-            对象被更新时,是否通知缓存服务器
+            创建当前数据库类型查询
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="F:CRL.AbsDBExtend.currentTransStatus">
+            <summary>
+            事务状态
             </summary>
         </member>
-        <member name="M:CRL.DBExtend.GetBackgroundDBExtend">
+        <member name="M:CRL.AbsDBExtend.GetBackgroundDBExtend">
             <summary>
             仅用来检查表结构
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.#ctor(CRL.DbContext)">
+        <member name="F:CRL.AbsDBExtend.lockObj">
+            <summary>
+            lockObj
+            </summary>
+        </member>
+        <member name="M:CRL.AbsDBExtend.CheckData(CRL.IModel)">
+             <summary>
+            检测数据
+             </summary>
+             <param name="obj"></param>
+        </member>
+        <member name="M:CRL.AbsDBExtend.UpdateCacheItem``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},CRL.ParameCollection)">
+            <summary>
+            按表达式更新缓存中项
+            当前类型有缓存时才会进行查询
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="expression"></param>
+            <param name="c"></param>
+        </member>
+        <member name="M:CRL.AbsDBExtend.UpdateCacheItem``1(``0,CRL.ParameCollection,System.Boolean)">
+            <summary>
+            更新缓存中的一项
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="newObj"></param>
+            <param name="c"></param>
+            <param name="checkInsert"></param>
+        </member>
+        <member name="M:CRL.AbsDBExtend.NotifyCacheServer``1(``0)">
+            <summary>
+            通知缓存服务器
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="newObj"></param>
+        </member>
+        <member name="M:CRL.AbsDBExtend.ToString">
+            <summary>
+            ToString
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.#ctor(CRL.DbContext)">
             <summary>
             构造DBExtend
             </summary>
             <param name="_dbContext"></param>
         </member>
-        <member name="M:CRL.DBExtend.ClearParams">
-            <summary>
-            清除参数
-            </summary>
-        </member>
-        <member name="M:CRL.DBExtend.AddParam(System.String,System.Object)">
-            <summary>
-            增加参数
-            </summary>
-            <param name="name"></param>
-            <param name="value"></param>
-        </member>
-        <member name="M:CRL.DBExtend.SetParam(System.String,System.Object)">
+        <member name="M:CRL.AbsDBExtend.SetParam(System.String,System.Object)">
             <summary>
             设置参数
             </summary>
             <param name="name"></param>
             <param name="value"></param>
         </member>
-        <member name="M:CRL.DBExtend.AddOutParam(System.String,System.Object)">
+        <member name="M:CRL.AbsDBExtend.AddOutParam(System.String,System.Object)">
             <summary>
-            增加输出参数
+            增加存储过程out参数
             </summary>
             <param name="name"></param>
-            <param name="value">对应类型任意值</param>
+            <param name="value"></param>
         </member>
-        <member name="M:CRL.DBExtend.GetReturnValue">
+        <member name="M:CRL.AbsDBExtend.AddParam(System.String,System.Object)">
             <summary>
-            获取存储过程return的值
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.GetOutParam(System.String)">
-            <summary>
-            获取OUTPUT的值
+            增加参数
             </summary>
             <param name="name"></param>
-            <returns></returns>
+            <param name="value"></param>
         </member>
-        <member name="M:CRL.DBExtend.GetOutParam``1(System.String)">
+        <member name="M:CRL.AbsDBExtend.ClearParame">
             <summary>
-            获取OUT值
+            清除参数
             </summary>
-            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:CRL.AbsDBExtend.GetOutParam(System.String)">
+            <summary>
+            获取out参数
+            </summary>
             <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.UpdateCacheItem``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},CRL.ParameCollection)">
+        <member name="M:CRL.AbsDBExtend.GetOutParam``1(System.String)">
             <summary>
-            按表达式更新缓存中项
-            当前类型有缓存时才会进行查询
-            </summary>
-            <typeparam name="TItem"></typeparam>
-            <param name="expression"></param>
-        </member>
-        <member name="M:CRL.DBExtend.UpdateCacheItem``1(``0,CRL.ParameCollection,System.Boolean)">
-            <summary>
-            更新缓存中的一项
-            </summary>
-            <typeparam name="TItem"></typeparam>
-            <param name="newObj"></param>
-            <param name="c"></param>
-        </member>
-        <member name="M:CRL.DBExtend.NotifyCacheServer``1(``0)">
-            <summary>
-            通知缓存服务器
-            </summary>
-            <typeparam name="TItem"></typeparam>
-            <param name="newObj"></param>
-        </member>
-        <member name="M:CRL.DBExtend.AutoFormat(System.String,System.Type[])">
-            <summary>
-            通过关键类型,格式化SQL语句
-            </summary>
-            <param name="sql"></param>
-            <param name="args">格式化SQL语句的关键类型</param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.ExecList``1(System.String,System.Type[])">
-            <summary>
-            指定替换对象查询,并返回对象列表
+            获存储过程取out参数
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="types"></param>
+            <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Execute(System.String,System.Type[])">
+        <member name="M:CRL.AbsDBExtend.GetReturnValue">
             <summary>
-            指定替换对象更新
+            获取存储过程返回值
             </summary>
-            <param name="sql"></param>
-            <param name="types"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.ExecScalar(System.String,System.Type[])">
+        <member name="M:CRL.AbsDBExtend.BeginTran">
             <summary>
-            指定替换对象返回单个结果
-            </summary>
-            <param name="sql"></param>
-            <param name="types">格式化SQL语句的关键类型</param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.ExecScalar``1(System.String,System.Type[])">
-            <summary>
-            指定替换对象返回单个结果
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="types"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.ExecObject``1(System.String,System.Type[])">
-            <summary>
-            返回首个对象
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="types"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.RunList``1(System.String)">
-            <summary>
-            执行存储过程返回结果集
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sp"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Run(System.String)">
-            <summary>
-            执行一个存储过程
-            </summary>
-            <param name="sp"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.RunObject``1(System.String)">
-            <summary>
-            返回首个对象
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sp"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.RunScalar(System.String)">
-            <summary>
-            执行存储过程并返回结果
-            </summary>
-            <param name="sp"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.BeginTran">
-            <summary>
-            开始物务
+            开始事务
             </summary>
         </member>
-        <member name="M:CRL.DBExtend.RollbackTran">
+        <member name="M:CRL.AbsDBExtend.RollbackTran">
             <summary>
             回滚事务
             </summary>
         </member>
-        <member name="M:CRL.DBExtend.CommitTran">
+        <member name="M:CRL.AbsDBExtend.CommitTran">
             <summary>
             提交事务
             </summary>
         </member>
-        <member name="M:CRL.DBExtend.CheckTableCreated(System.Type)">
+        <member name="M:CRL.AbsDBExtend.CheckTableCreated(System.Type)">
             <summary>
-            检查表是否被创建
+            检查表是否创建了
             </summary>
+            <param name="type"></param>
         </member>
-        <member name="M:CRL.DBExtend.CompileSqlToSp(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:CRL.AbsDBExtend.InsertFromObj``1(``0)">
             <summary>
-            将SQL语句编译成储存过程
+            插入
             </summary>
-            <param name="template">模版</param>
-            <param name="sql">SQL语句</param>
-            <param name="parames">模版替换参数</param>
-            <returns></returns>
+            <typeparam name="TModel"></typeparam>
+            <param name="obj"></param>
         </member>
-        <member name="M:CRL.DBExtend.AutoSpQuery``1(System.String,System.Type[])">
+        <member name="M:CRL.AbsDBExtend.BatchInsert``1(System.Collections.Generic.List{``0},System.Boolean)">
             <summary>
-            将查询自动转化为存储过程执行
+            批量插入
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="details"></param>
+            <param name="keepIdentity"></param>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Delete``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            按完整查询删除
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="types"></param>
+            <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.AutoSpQuery``2(System.String,System.Type[])">
-            <summary>
-            将查询自动转化为存储过程执行
-            </summary>
-            <typeparam name="TKey"></typeparam>
-            <typeparam name="TValue"></typeparam>
-            <param name="sql"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.AutoSpUpdate(System.String,System.Type[])">
-            <summary>
-            将更新自动转化为存储过程执行
-            </summary>
-            <param name="sql"></param>
-            <param name="types"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.AutoExecuteScalar``1(System.String,System.Type[])">
-            <summary>
-            返回首行首列
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="types"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Delete``1(System.String)">
-            <summary>
-            按条件删除
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="where"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Delete``1(System.Object)">
-            <summary>
-            按主键删除
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Delete``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}})">
-            <summary>
-            指定条件删除
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="expression"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Delete``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}})">
+        <member name="M:CRL.AbsDBExtend.Delete``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}})">
             <summary>
             关联删除
             </summary>
@@ -1522,124 +1466,102 @@
             <param name="expression"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Delete``1(CRL.LambdaQuery.LambdaQuery{``0})">
+        <member name="M:CRL.AbsDBExtend.Delete``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}})">
             <summary>
-            按完整查询条件进行删除
-            goup语法不支持,其它支持
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="query"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.BatchInsert``1(System.Collections.Generic.List{``0},System.Boolean)">
-            <summary>
-            批量插入,并指定是否保持自增主键
-            </summary>
-            <typeparam name="TItem"></typeparam>
-            <param name="details"></param>
-            <param name="keepIdentity"></param>
-        </member>
-        <member name="M:CRL.DBExtend.InsertFromObj``1(``0)">
-            <summary>
-            单个插入
-            </summary>
-            <param name="obj"></param>
-        </member>
-        <member name="M:CRL.DBExtend.Page``1(CRL.LambdaQuery.LambdaQuery{``0})">
-            <summary>
-            动态对象分页
+            按条件删除
             </summary>
             <typeparam name="TModel"></typeparam>
-            <param name="query"></param>
+            <param name="expression"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Page``2(CRL.LambdaQuery.LambdaQuery{``0})">
+        <member name="M:CRL.AbsDBExtend.Delete``1(System.Object)">
             <summary>
-            指定对象分页
+            按主键删除
             </summary>
             <typeparam name="TModel"></typeparam>
-            <typeparam name="TResult"></typeparam>
-            <param name="query"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.GetSpPageReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
-            <summary>
-            按编译
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="query"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.GetPageReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
-            <summary>
-            GROUP和是否编译判断
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="query"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.GetSpGroupPageReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
-            <summary>
-            按编译
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="query"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.GetGroupPageReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
-            <summary>
-            按是否能编译
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="query"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.QueryItem``1(System.Object)">
-            <summary>
-            按ID查询
-            </summary>
-            <typeparam name="TItem"></typeparam>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.QueryItem``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Boolean,System.Boolean)">
+        <member name="M:CRL.AbsDBExtend.ExecDictionary``2(System.String,System.Type[])">
             <summary>
-            查询返回单个结果
-            如果只查询ID,调用QueryItem(id)
+            返回字典
             </summary>
-            <typeparam name="TItem"></typeparam>
-            <param name="expression"></param>
-            <param name="idDest">是否按主键倒序</param>
-            <param name="compileSp">是否编译成存储过程</param>
+            <typeparam name="TKey"></typeparam>
+            <typeparam name="TValue"></typeparam>
+            <param name="sql"></param>
+            <param name="types"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.QueryList``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Boolean)">
+        <member name="M:CRL.AbsDBExtend.ToDictionary``3(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
-            使用lamada设置条件查询
+            返回字典
             </summary>
-            <typeparam name="TItem"></typeparam>
-            <param name="expression"></param>
-            <param name="compileSp">是否编译成储过程</param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.QueryList``1(CRL.LambdaQuery.LambdaQuery{``0})">
-            <summary>
-            使用完整的LamadaQuery查询
-            </summary>
-            <typeparam name="TItem"></typeparam>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TKey"></typeparam>
+            <typeparam name="TValue"></typeparam>
             <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.QueryList``1(CRL.LambdaQuery.LambdaQuery{``0},System.String@)">
+        <member name="M:CRL.AbsDBExtend.QueryScalar``1(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
-            使用完整的LamadaQuery查询
+            返回首行首列
             </summary>
-            <typeparam name="TItem"></typeparam>
+            <typeparam name="TModel"></typeparam>
             <param name="query"></param>
-            <param name="cacheKey">cacheKey</param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Count``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Boolean)">
+        <member name="M:CRL.AbsDBExtend.ExecDynamicList(System.String,System.Type[])">
+            <summary>
+            返回动态类型
+            </summary>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.ExecList``1(System.String,System.Type[])">
+            <summary>
+            返回自定义类型
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.ExecObject``1(System.String,System.Type[])">
+            <summary>
+            返回自定义类型
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.ExecScalar(System.String,System.Type[])">
+            <summary>
+            返回首行首个结果
+            </summary>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.ExecScalar``1(System.String,System.Type[])">
+            <summary>
+            返回首行首个结果
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Execute(System.String,System.Type[])">
+            <summary>
+            执行一条语句
+            </summary>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Count``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Boolean)">
             <summary>
             count
             </summary>
@@ -1648,7 +1570,7 @@
             <param name="compileSp"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Min``2(System.Linq.Expressions.Expression{System.Func{``1,System.Boolean}},System.Linq.Expressions.Expression{System.Func{``1,``0}},System.Boolean)">
+        <member name="M:CRL.AbsDBExtend.Min``2(System.Linq.Expressions.Expression{System.Func{``1,System.Boolean}},System.Linq.Expressions.Expression{System.Func{``1,``0}},System.Boolean)">
             <summary>
             最小值
             </summary>
@@ -1659,7 +1581,7 @@
             <param name="compileSp"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Max``2(System.Linq.Expressions.Expression{System.Func{``1,System.Boolean}},System.Linq.Expressions.Expression{System.Func{``1,``0}},System.Boolean)">
+        <member name="M:CRL.AbsDBExtend.Max``2(System.Linq.Expressions.Expression{System.Func{``1,System.Boolean}},System.Linq.Expressions.Expression{System.Func{``1,``0}},System.Boolean)">
             <summary>
             最大值
             </summary>
@@ -1670,9 +1592,9 @@
             <param name="compileSp"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Sum``2(System.Linq.Expressions.Expression{System.Func{``1,System.Boolean}},System.Linq.Expressions.Expression{System.Func{``1,``0}},System.Boolean)">
+        <member name="M:CRL.AbsDBExtend.Sum``2(System.Linq.Expressions.Expression{System.Func{``1,System.Boolean}},System.Linq.Expressions.Expression{System.Func{``1,``0}},System.Boolean)">
             <summary>
-            sum
+            合计
             </summary>
             <typeparam name="TType"></typeparam>
             <typeparam name="TModel"></typeparam>
@@ -1681,75 +1603,133 @@
             <param name="compileSp"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.SetOriginClone``1(System.Collections.Generic.List{``0})">
+        <member name="M:CRL.AbsDBExtend.Page``2(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
-            创建副本
-            </summary>
-            <typeparam name="TItem"></typeparam>
-            <param name="list"></param>
-        </member>
-        <member name="M:CRL.DBExtend.ForamtSetValue``1(CRL.ParameCollection)">
-            <summary>
-            格式化为更新值查询
-            </summary>
-            <param name="setValue"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Update``1(CRL.ParameCollection,System.String)">
-            <summary>
-            指定拼接条件更新
+            获取分页
             </summary>
             <typeparam name="TModel"></typeparam>
-            <param name="setValue"></param>
-            <param name="where"></param>
+            <typeparam name="TResult"></typeparam>
+            <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Update``1(``0)">
+        <member name="M:CRL.AbsDBExtend.Page``1(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
-            按对象差异更新,由主键确定记录
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="obj"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Update``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},``0)">
-            <summary>
-            指定条件并按对象差异更新
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="expression"></param>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Update``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},CRL.ParameCollection)">
-            <summary>
-            指定条件和参数进行更新
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="expression">条件</param>
-            <param name="setValue">值</param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Update``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Object)">
-            <summary>
-            按匿名对象更新
-            </summary>
-            <typeparam name="TModel"></typeparam>
-            <param name="expression"></param>
-            <param name="updateValue"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.DBExtend.Update``1(CRL.LambdaQuery.LambdaQuery{``0},CRL.ParameCollection)">
-            <summary>
-            按完整查询条件进行更新
-            goup语法不支持,其它支持
+            返回动态对象分页
             </summary>
             <typeparam name="TModel"></typeparam>
             <param name="query"></param>
-            <param name="updateValue"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.Update``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}},CRL.ParameCollection)">
+        <member name="M:CRL.AbsDBExtend.QueryDynamic``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            返回动态对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.QueryDynamic``2(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            返回自定义对象
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TResult"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.QueryDynamic``2(CRL.LambdaQuery.LambdaQuery{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+            按筛选返回动态对象
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TResult"></typeparam>
+            <param name="query"></param>
+            <param name="resultSelector"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.QueryItem``1(System.Object)">
+            <summary>
+            按ID查询
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.QueryItem``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Boolean,System.Boolean)">
+            <summary>
+            查询返回单个结果
+            如果只查询ID,调用QueryItem(id)
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="expression"></param>
+            <param name="idDest">是否按主键倒序</param>
+            <param name="compileSp">是否编译成存储过程</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.QueryList``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Boolean)">
+            <summary>
+            使用lamada设置条件查询
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="expression"></param>
+            <param name="compileSp">是否编译成储过程</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.QueryList``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            使用完整的LamadaQuery查询
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.QueryList``1(CRL.LambdaQuery.LambdaQuery{``0},System.String@)">
+            <summary>
+            返回多项结果
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <param name="cacheKey"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Run(System.String)">
+            <summary>
+            执行存储过程
+            </summary>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.RunDynamicList(System.String)">
+            <summary>
+            执行存储过程并返回动态对象
+            </summary>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.RunList``1(System.String)">
+            <summary>
+            执行存储过程反回自定义对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.RunObject``1(System.String)">
+            <summary>
+            执行存储过程并返回首个对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.RunScalar(System.String)">
+            <summary>
+            执行存储过程返回首行首列
+            </summary>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Update``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}},CRL.ParameCollection)">
             <summary>
             关联更新
             </summary>
@@ -1759,7 +1739,398 @@
             <param name="updateValue"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.ExecDynamicList(System.String,System.Type[])">
+        <member name="M:CRL.AbsDBExtend.Update``1(CRL.LambdaQuery.LambdaQuery{``0},CRL.ParameCollection)">
+            <summary>
+            使用完整查询更新
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <param name="updateValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Update``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},CRL.ParameCollection)">
+            <summary>
+            指定条件和参数进行更新
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="expression"></param>
+            <param name="setValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Update``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},``0)">
+            <summary>
+            指定条件并按对象差异更新
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="expression"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Update``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Object)">
+            <summary>
+            按匿名对象更新
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="expression"></param>
+            <param name="updateValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.Update``1(``0)">
+            <summary>
+            按对象差异更新
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.AbsDBExtend.SetOriginClone``1(System.Collections.Generic.List{``0})">
+            <summary>
+            创建副本
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="list"></param>
+        </member>
+        <member name="P:CRL.AbsDBExtend.DataBaseArchitecture">
+            <summary>
+            数据库架构类型
+            </summary>
+        </member>
+        <member name="P:CRL.AbsDBExtend.OnUpdateNotifyCacheServer">
+            <summary>
+            对象被更新时,是否通知缓存服务器
+            </summary>
+        </member>
+        <member name="P:CRL.AbsDBExtend.DatabaseName">
+            <summary>
+            库名
+            </summary>
+        </member>
+        <member name="P:CRL.AbsDBExtend._DBAdapter">
+            <summary>
+            当前数据库适配器
+            </summary>
+        </member>
+        <member name="T:CRL.DBExtend.RelationDB.DBExtend">
+            <summary>
+            对象数据访问
+            </summary>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.ClearParame">
+            <summary>
+            清除参数
+            </summary>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.AddParam(System.String,System.Object)">
+            <summary>
+            增加参数
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.SetParam(System.String,System.Object)">
+            <summary>
+            设置参数
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.AddOutParam(System.String,System.Object)">
+            <summary>
+            增加输出参数
+            </summary>
+            <param name="name"></param>
+            <param name="value">对应类型任意值</param>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.GetReturnValue">
+            <summary>
+            获取存储过程return的值
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.GetOutParam(System.String)">
+            <summary>
+            获取OUTPUT的值
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.GetOutParam``1(System.String)">
+            <summary>
+            获取OUT值
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.AutoFormat(System.String,System.Type[])">
+            <summary>
+            通过关键类型,格式化SQL语句
+            </summary>
+            <param name="sql"></param>
+            <param name="args">格式化SQL语句的关键类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.ExecList``1(System.String,System.Type[])">
+            <summary>
+            指定替换对象查询,并返回对象列表
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Execute(System.String,System.Type[])">
+            <summary>
+            指定替换对象更新
+            </summary>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.ExecScalar(System.String,System.Type[])">
+            <summary>
+            指定替换对象返回单个结果
+            </summary>
+            <param name="sql"></param>
+            <param name="types">格式化SQL语句的关键类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.ExecScalar``1(System.String,System.Type[])">
+            <summary>
+            指定替换对象返回单个结果
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.ExecObject``1(System.String,System.Type[])">
+            <summary>
+            返回首个对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sql"></param>
+            <param name="types"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.RunList``1(System.String)">
+            <summary>
+            执行存储过程返回结果集
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Run(System.String)">
+            <summary>
+            执行一个存储过程
+            </summary>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.RunObject``1(System.String)">
+            <summary>
+            返回首个对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.RunScalar(System.String)">
+            <summary>
+            执行存储过程并返回结果
+            </summary>
+            <param name="sp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.BeginTran">
+            <summary>
+            开始物务
+            </summary>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.RollbackTran">
+            <summary>
+            回滚事务
+            </summary>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.CommitTran">
+            <summary>
+            提交事务
+            </summary>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.CheckTableCreated(System.Type)">
+            <summary>
+            检查表是否被创建
+            </summary>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.CompileSqlToSp(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            将SQL语句编译成储存过程
+            </summary>
+            <param name="template">模版</param>
+            <param name="sql">SQL语句</param>
+            <param name="parames">模版替换参数</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Delete``1(System.String)">
+            <summary>
+            按条件删除
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="where"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Delete``1(System.Object)">
+            <summary>
+            按主键删除
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Delete``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}})">
+            <summary>
+            指定条件删除
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Delete``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}})">
+            <summary>
+            关联删除
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TJoin"></typeparam>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Delete``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            按完整查询条件进行删除
+            goup语法不支持,其它支持
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.BatchInsert``1(System.Collections.Generic.List{``0},System.Boolean)">
+            <summary>
+            批量插入,并指定是否保持自增主键
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="details"></param>
+            <param name="keepIdentity"></param>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.InsertFromObj``1(``0)">
+            <summary>
+            单个插入
+            </summary>
+            <param name="obj"></param>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Page``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            动态对象分页
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Page``2(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            指定对象分页
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TResult"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.GetSpPageReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            按编译
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.GetPageReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            GROUP和是否编译判断
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.GetSpGroupPageReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            按编译
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.GetGroupPageReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
+            <summary>
+            按是否能编译
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.QueryList``1(CRL.LambdaQuery.LambdaQuery{``0},System.String@)">
+            <summary>
+            使用完整的LamadaQuery查询
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <param name="cacheKey">cacheKey</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.ForamtSetValue``1(CRL.ParameCollection)">
+            <summary>
+            格式化为更新值查询
+            </summary>
+            <param name="setValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Update``1(CRL.ParameCollection,System.String)">
+            <summary>
+            指定拼接条件更新
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="setValue"></param>
+            <param name="where"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Update``1(``0)">
+            <summary>
+            按对象差异更新,由主键确定记录
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Update``1(CRL.LambdaQuery.LambdaQuery{``0},CRL.ParameCollection)">
+            <summary>
+            按完整查询条件进行更新
+            goup语法不支持,其它支持
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <param name="query"></param>
+            <param name="updateValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.Update``2(System.Linq.Expressions.Expression{System.Func{``0,``1,System.Boolean}},CRL.ParameCollection)">
+            <summary>
+            关联更新
+            </summary>
+            <typeparam name="TModel"></typeparam>
+            <typeparam name="TJoin"></typeparam>
+            <param name="expression"></param>
+            <param name="updateValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.ExecDynamicList(System.String,System.Type[])">
             <summary>
             返回dynamic集合
             </summary>
@@ -1767,14 +2138,14 @@
             <param name="types"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.RunDynamicList(System.String)">
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.RunDynamicList(System.String)">
             <summary>
             返回dynamic集合
             </summary>
             <param name="sp"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.QueryDynamic``1(CRL.LambdaQuery.LambdaQuery{``0})">
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.QueryDynamic``1(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
             返回动态对象
             </summary>
@@ -1782,16 +2153,16 @@
             <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.QueryDynamic``2(CRL.LambdaQuery.LambdaQuery{``0})">
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.QueryDynamic``2(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
-            返回指定类型
+            按select返回指定类型
             </summary>
             <typeparam name="TModel"></typeparam>
             <typeparam name="TResult"></typeparam>
             <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.QueryScalar``1(CRL.LambdaQuery.LambdaQuery{``0})">
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.QueryScalar``1(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
             返回首列结果
             </summary>
@@ -1799,15 +2170,15 @@
             <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.GetQueryDynamicReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.GetQueryDynamicReader``1(CRL.LambdaQuery.LambdaQuery{``0})">
             <summary>
             返回动态对象的查询
             </summary>
-            <typeparam name="TItem"></typeparam>
+            <typeparam name="TModel"></typeparam>
             <param name="query"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.DBExtend.QueryDynamic``2(CRL.LambdaQuery.LambdaQuery{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+        <member name="M:CRL.DBExtend.RelationDB.DBExtend.QueryDynamic``2(CRL.LambdaQuery.LambdaQuery{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})">
             <summary>
             按筛选返回匿名类型
             </summary>
@@ -1816,11 +2187,6 @@
             <param name="query"></param>
             <param name="resultSelector"></param>
             <returns></returns>
-        </member>
-        <member name="P:CRL.DBExtend._DBAdapter">
-            <summary>
-            当前数据库适配器
-            </summary>
         </member>
         <member name="T:CRL.FunctionType">
             <summary>
@@ -2279,6 +2645,15 @@
             <param name="e"></param>
             <returns></returns>
         </member>
+        <member name="M:CRL.ExtensionMethod.Substring(System.String,System.Int32,System.Int32)">
+            <summary>
+            按索引和长度检索字符串
+            </summary>
+            <param name="s"></param>
+            <param name="index"></param>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.ExtensionMethod.IsEnumerable(System.Type)">
             <summary>
             判断类型是否为集合类型
@@ -2389,6 +2764,11 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
+        <member name="F:CRL.LambdaQuery.LambdaQueryBase.__MainType">
+            <summary>
+            当前类型
+            </summary>
+        </member>
         <member name="F:CRL.LambdaQuery.LambdaQueryBase.__UseTableAliasesName">
             <summary>
             查询字段是否需要加上前辍,如t1.Id
@@ -2418,7 +2798,7 @@
             <param name="types"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.LambdaQuery.LambdaQueryBase.getSelectMethodCall(System.Linq.Expressions.Expression)">
+        <member name="M:CRL.LambdaQuery.LambdaQueryBase.getSelectMethodCall(System.Linq.Expressions.Expression,System.String@)">
             <summary>
             返回方法调用拼接
             </summary>
@@ -2625,7 +3005,7 @@
             对象转换时间
             </summary>
         </member>
-        <member name="M:CRL.LambdaQuery.LambdaQuery`1.FillParames(CRL.DBExtend)">
+        <member name="M:CRL.LambdaQuery.LambdaQuery`1.FillParames(CRL.AbsDBExtend)">
             <summary>
             填充参数
             </summary>
@@ -2733,13 +3113,6 @@
             设置条件 可累加，按and
             </summary>
             <param name="expression">最好用变量代替属性或方法</param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.LambdaQuery.LambdaQuery`1.Where(System.String)">
-            <summary>
-            直接字符串查询
-            </summary>
-            <param name="condition"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.LambdaQuery.LambdaQuery`1.OrderBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
@@ -2869,6 +3242,12 @@
             <summary>
             处理后的查询参数
             </summary>
+        </member>
+        <member name="M:CRL.LambdaQuery.MongoDBLambdaQuery`1.#ctor(CRL.DbContext)">
+            <summary>
+            lambda查询
+            </summary>
+            <param name="_dbContext"></param>
         </member>
         <member name="F:CRL.LambdaQuery.ExpressionVisitor.QueryParames">
             <summary>
@@ -3325,14 +3704,14 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CRL.IModel.CheckIndexExists(CRL.DBExtend)">
+        <member name="M:CRL.IModel.CheckIndexExists(CRL.AbsDBExtend)">
             <summary>
             检查索引
             </summary>
             <param name="db"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.IModel.CreateColumn(CRL.DBExtend,CRL.Attribute.FieldAttribute)">
+        <member name="M:CRL.IModel.CreateColumn(CRL.AbsDBExtend,CRL.Attribute.FieldAttribute)">
             <summary>
             创建列
             </summary>
@@ -3340,7 +3719,7 @@
             <param name="item"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.IModel.CheckColumnExists(CRL.DBExtend)">
+        <member name="M:CRL.IModel.CheckColumnExists(CRL.AbsDBExtend)">
             <summary>
             检查对应的字段是否存在,不存在则创建
             </summary>
@@ -3352,14 +3731,14 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CRL.IModel.CreateTable(CRL.DBExtend)">
+        <member name="M:CRL.IModel.CreateTable(CRL.AbsDBExtend)">
             <summary>
             创建表
             </summary>
             <param name="db"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.IModel.CreateTable(CRL.DBExtend,System.String@)">
+        <member name="M:CRL.IModel.CreateTable(CRL.AbsDBExtend,System.String@)">
             <summary>
             创建表
             会检查表是否存在,如果存在则检查字段
@@ -3369,17 +3748,28 @@
             <param name="message"></param>
             <returns></returns>
         </member>
-        <member name="F:CRL.IModel._originClone">
+        <member name="F:CRL.IModel.OriginClone">
             <summary>
             存放原始克隆
+            </summary>
+        </member>
+        <member name="F:CRL.IModel.Changes">
+            <summary>
+            存储被更改的属性
             </summary>
         </member>
         <member name="M:CRL.IModel.SetChanges(System.String,System.Object)">
             <summary>
             表示值被更改了
+            当更新后,将被清空
             </summary>
             <param name="name"></param>
             <param name="value"></param>
+        </member>
+        <member name="M:CRL.IModel.CleanChanges">
+            <summary>
+            清空Changes并重新Clone源对象
+            </summary>
         </member>
         <member name="M:CRL.IModel.Clone">
             <summary>
@@ -3544,6 +3934,67 @@
             访问参数
             </summary>
             <param name="parameterExpression">参数</param>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.#ctor(CRL.DbContext,System.Boolean)">
+            <summary>
+            lambda查询
+            </summary>
+            <param name="_dbContext"></param>
+            <param name="_useTableAliasesName">查询是否生成表别名,在更新和删除时用</param>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.Where(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            设置条件 可累加，按and
+            </summary>
+            <param name="expression">最好用变量代替属性或方法</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.OrderBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            设置排序 可累加
+            </summary>
+            <param name="expression"></param>
+            <param name="desc">是否倒序</param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.OrderByPrimaryKey(System.Boolean)">
+            <summary>
+            按主键排序
+            </summary>
+            <param name="desc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.Or(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            按当前条件累加OR条件
+            </summary>
+            <param name="expression"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.GetQueryFieldString(System.Predicate{CRL.Attribute.FieldAttribute})">
+            <summary>
+            获取查询字段字符串,按条件排除
+            </summary>
+            <param name="removes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.GetQueryConditions(System.Boolean)">
+            <summary>
+            获取查询条件串,带表名
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.GetOrderBy">
+            <summary>
+            获取排序 带 order by
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.LambdaQuery.RelationLambdaQuery`1.GetQuery">
+            <summary>
+            获取完整查询
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:CRL.MemoryDataCache.CacheService">
             <summary>

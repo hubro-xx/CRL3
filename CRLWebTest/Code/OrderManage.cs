@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -12,6 +12,36 @@ using System.Web;
 
 namespace WebTest.Code
 {
+    public class MongoDBModel:CRL.IModel
+    {
+        public MongoDBModel()
+        {
+            //保持唯一
+            Id = new Guid();
+        }
+        public Guid Id
+        {
+            get;
+            set;
+        }
+        public string OrderId
+        {
+            get;
+            set;
+        }
+        public int Status
+        {
+            get;
+            set;
+        }
+    }
+    public class MongoDBTestManage : CRL.BaseProvider<MongoDBModel>
+    {
+        public static MongoDBTestManage Instance
+        {
+            get { return new MongoDBTestManage(); }
+        }
+    }
     /// <summary>
     /// OrderManage
     /// </summary>

@@ -31,6 +31,10 @@ position:fixed ;
 top:20px; 
 left:500px; 
 } 
+        .notSupported
+        {
+            color:red;
+        }
     </style>
     <script>
         $(function () {
@@ -68,6 +72,7 @@ left:500px;
                             menus.Add("数据表创建缓存依赖", "/page/TableExistsCache.aspx");
                             menus.Add("导出/导入数据", "/page/ExportAndImport.aspx");
                             menus.Add("大数据分库分表", "/page/Sharding.aspx");
+                            menus.Add("MongoDB测试", "/page/MongoDB.aspx");
                             menus.Add("导出对象文档", "/page/ExportModelInfo.aspx");
                             menus.Add("版本/讨论", "/page/About.aspx");
                         %>

@@ -53,6 +53,15 @@
       <HintPath>..\packages\CoreHelper.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\packages\MongoDB.Bson.2.2.4\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\packages\MongoDB.Driver.2.2.4\lib\net45\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core">
+      <HintPath>..\packages\MongoDB.Driver.Core.2.2.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -90,6 +99,7 @@
     <Content Include="Page\ExtensionMethod.aspx" />
     <Content Include="Page\Insert.aspx" />
     <Content Include="Page\Model.aspx" />
+    <Content Include="Page\MongoDB.aspx" />
     <Content Include="Page\OrderTest.aspx" />
     <Content Include="Page\Pager.aspx" />
     <Content Include="Page\Query1.aspx" />
@@ -129,6 +139,7 @@
     <Compile Include="CRLExpressionTest.aspx.designer.cs">
       <DependentUpon>CRLExpressionTest.aspx</DependentUpon>
     </Compile>
+    <Compile Include="MongoDBTest.cs" />
     <Compile Include="Page\About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -232,6 +243,13 @@
     </Compile>
     <Compile Include="Page\Model.aspx.designer.cs">
       <DependentUpon>Model.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\MongoDB.aspx.cs">
+      <DependentUpon>MongoDB.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\MongoDB.aspx.designer.cs">
+      <DependentUpon>MongoDB.aspx</DependentUpon>
     </Compile>
     <Compile Include="Page\OrderTest.aspx.cs">
       <DependentUpon>OrderTest.aspx</DependentUpon>
@@ -380,6 +398,11 @@
       <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
       <Name>CRL</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DBConnection\mongodb.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

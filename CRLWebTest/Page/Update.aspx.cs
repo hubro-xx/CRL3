@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -39,7 +39,7 @@ namespace WebTest
             p.Change(b => b.BarCode);//表示值被更改了
             p.Change(b => b.BarCode, "123");//通过参数赋值
             p.Change(b => b.BarCode == "123");//通过表达式赋值
-            p.Cumulation(b => b.ProductName, "1");
+            p.Cumulation(b => b.ProductName, "1");//表示按字段累加
             Code.ProductDataManage.Instance.Update(b => b.Id == 4, p);//指定查询更新
 
             //当对象是查询创建则能自动识别

@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -44,6 +44,10 @@ namespace WebTest
                 {
                     //可按type区分数据库
                     var type2 = dbLocation.ManageType;
+                    if (type2 == typeof(Code.MongoDBTestManage))
+                    {
+                        return Code.LocalSqlHelper.MongoDB;
+                    }
                     return WebTest.Code.LocalSqlHelper.TestConnection;
                 }
             };

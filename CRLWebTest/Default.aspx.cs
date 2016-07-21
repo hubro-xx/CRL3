@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -21,13 +21,21 @@ namespace WebTest
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            var order = new Code.Order();
-            order.Cumulation(b=>b.Status,10);
-            int a = order.Status;
-            //Code.OrderManage.Instance.TestRelationUpdate();
-            //TestGuid();
+            var c = new CRL.ParameCollection();
+            c["A"] = 1;
+            var b = c["a"];
+            //MongoDBTest.Test();
             //TestAllQuery();
+            
+
+            //var p = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0);
+            //p.UserId += 1;//只会更新UserId
+            //Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
+
+            //var p2 = Code.ProductDataManage.Instance.QueryItem(b=>b.Id==p.Id);
+            //Response.Write(p2.ToJson());
         }
+       
         void TestJoin()
         {
             int id = 10;
@@ -67,13 +75,15 @@ namespace WebTest
             string bc = "sdfsdf";
             filed1 = DateTime.Now.ToString();
             var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query.Select(b => new {aa=b.BarCode, b.CategoryName,cc=b.Id.SUM() });
             int c = 10;
+            query.Where(b => !b.BarCode.Contains("123"));
+            query.Where(b => !b.IsTop);
             //query.Select(b => new { num = b.Number, aa = b.Id * b.Number, bb = 10, b.BarCode });//支持字段间二元运算
             //query.Select(b => b.Number.SUM());
             //query.Where(b => b.BarCode == aa());
-            query.Where(b => b.BarCode.Contains("abc"));
-            query.Join<Code.Member>((a, b) => a.UserId == b.Id)
-                .SelectAppendValue(b => b.Mobile);
+            //query.Where(b => b.BarCode.Contains("abc"));
+            //query.Join<Code.Member>((a, b) => a.UserId == b.Id).SelectAppendValue(b => b.Mobile);
             //query.Join<Code.Member>((a, b) => a.UserId == b.Id);
             //query.Select<Code.Member>((a, b) => new { a.UserId, b.Mobile });
             //query.GroupBy<Code.Member>((a, b) => new { a.BarCode, b.Name });
@@ -84,7 +94,7 @@ namespace WebTest
             //query.AppendJoinValue<Code.Member>((a, b) => a.UserId == b.Id && a.Id == c, b => new { Year2 = b.Year * b.Id });
             //query.OrderBy<Code.Member>(b => b.Name, true);//支持关联对象字段排序了
             //query.OrderBy(b => b.Id, true);
-            //var result = query.ToDynamic();
+            var result = query.ToDynamic();
             var sql = query.PrintQuery();
 
         }
