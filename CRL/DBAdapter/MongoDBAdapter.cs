@@ -142,5 +142,9 @@ namespace CRL.DBAdapter
         {
             throw new NotImplementedException();
         }
+        public override string CastToString(string field)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

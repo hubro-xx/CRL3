@@ -455,5 +455,9 @@ end
                   , KeyWordFormat(t2), setValue, condition);
             return sql;
         }
+        public override string CastToString(string field)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -508,6 +508,10 @@ set  nocount  on
             return string.Format("{0} NOT IN ({1})", field, parName);
         }
         #endregion
+        public override string CastToString(string field)
+        {
+            return string.Format("CAST({0} as nvarchar)", field);
+        }
     }
 
     internal class MSSQL2000DBAdapter : MSSQLDBAdapter
@@ -560,6 +564,10 @@ set  nocount  on
                     helper.Execute(s);
                 }
             }
+        }
+        public override string CastToString(string field)
+        {
+            return string.Format("CAST({0} as nvarchar)", field);
         }
     }
 }

@@ -47,6 +47,20 @@ namespace CRL.LambdaQuery
             {
                 return par1;
             }
+            if (par1.Data is CRLExpression.MethodCallObj)
+            {
+                var method = par1.Data as CRLExpression.MethodCallObj;
+                var _DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(dbContext);
+                var dic = MethodAnalyze.GetMethos(_DBAdapter);
+                if (!dic.ContainsKey(method.MethodName))
+                {
+                    throw new Exception("LambdaQuery不支持方法" + method.MethodName);
+                }
+                int newParIndex = parIndex;
+                par = dic[method.MethodName](method.MemberQueryName, method.ExpressionType, ref newParIndex, AddParame, method.Args.ToArray());
+                parIndex = newParIndex;
+            }
+
             //字段会返回替换符
             bool needPar = par.IndexOf("{") <= -1;//是否需要参数化处理
             if (!needPar)
@@ -181,18 +195,19 @@ namespace CRL.LambdaQuery
                     //return obj + "";
                     return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
                 }
-                var _DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(dbContext);
+                //var _DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(dbContext);
                 //var methodAnalyze = new CRL.LambdaQuery.MethodAnalyze(_DBAdapter);
-                var dic = MethodAnalyze.GetMethos(_DBAdapter);
+
                 #region 方法
                 //请扩展ExtensionMethod的方法
                 string methodName = mcExp.Method.Name;
                 parIndex += 1;
-                if (!dic.ContainsKey(methodName))
-                {
-                    //return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
-                    throw new Exception("LambdaQuery不支持方法" + mcExp.Method.Name);
-                }
+                //var dic = MethodAnalyze.GetMethos(_DBAdapter);
+                //if (!dic.ContainsKey(methodName))
+                //{
+                //    //return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
+                //    throw new Exception("LambdaQuery不支持方法" + mcExp.Method.Name);
+                //}
                 string field = "";
                 #region par
                 List<object> args = new List<object>();
@@ -206,8 +221,11 @@ namespace CRL.LambdaQuery
                     var mExpression = mcExp.Object as MemberExpression;
                     var type = mExpression.Expression.Type;
                     field = Base.FormatFieldPrefix(__DBAdapter,type, field);
-                    var obj = GetParameExpressionValue(mcExp.Arguments[0]);
-                    args.Add(obj);
+                    if (mcExp.Arguments.Count > 0)
+                    {
+                        var obj = GetParameExpressionValue(mcExp.Arguments[0]);
+                        args.Add(obj);
+                    }
                 }
                 
                 if (mcExp.Arguments.Count > 1)
@@ -226,15 +244,15 @@ namespace CRL.LambdaQuery
                     args.Add(obj);
                 }
                 #endregion
-                int newParIndex = parIndex;
+                //int newParIndex = parIndex;
                 if (nodeType == null)
                 {
                     nodeType = ExpressionType.Equal;
                 }
-                var result = dic[methodName](field, nodeType.Value, ref newParIndex, AddParame, args.ToArray());
-                parIndex = newParIndex;
+                //var result = dic[methodName](field, nodeType.Value, ref newParIndex, AddParame, args.ToArray());
+                //parIndex = newParIndex;
                 //return result;
-                var methodInfo = new CRLExpression.MethodCallObj() { Args = args, ExpressionType = nodeType.Value, MemberName = field.Substring(field.LastIndexOf("}") + 1), MethodName = methodName };
+                var methodInfo = new CRLExpression.MethodCallObj() { Args = args, ExpressionType = nodeType.Value, MemberName = field.Substring(field.LastIndexOf("}") + 1), MethodName = methodName, MemberQueryName = field };
                 return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.MethodCall, Data = methodInfo };
                 #endregion
             }

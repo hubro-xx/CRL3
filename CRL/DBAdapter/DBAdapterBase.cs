@@ -314,6 +314,7 @@ namespace CRL.DBAdapter
         {
             return string.Format("{0} NOT IN ({1})", field, parName);
         }
+        public abstract string CastToString(string field);
         #endregion
 
         /// <summary>

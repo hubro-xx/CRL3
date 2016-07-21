@@ -17,6 +17,10 @@ namespace CRL.LambdaQuery.CRLExpression
     internal class MethodCallObj
     {
         public string MemberName;
+        /// <summary>
+        /// SQL查询名
+        /// </summary>
+        public string MemberQueryName;
         public string MethodName;
         public ExpressionType ExpressionType;
         public List<object> Args;

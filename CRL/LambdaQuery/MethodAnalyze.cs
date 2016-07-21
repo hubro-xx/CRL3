@@ -59,10 +59,14 @@ namespace CRL.LambdaQuery
                 methodDic.Add("AVG", AVG);
                 methodDic.Add("Equals", Equals);
                 methodDic.Add("StartsWith", StartsWith);
+                methodDic.Add("ToString", ToString);
             }
             return methodDic;
         }
-
+        public string ToString(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        {
+            return dBAdapter.CastToString(field);
+        }
 
         public string Substring(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
         {
