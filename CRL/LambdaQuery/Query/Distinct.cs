@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -17,9 +17,9 @@ using System.Text.RegularExpressions;
 
 namespace CRL.LambdaQuery
 {
-    public sealed partial class LambdaQuery<T> : LambdaQueryBase where T : IModel, new()
+    public abstract partial class LambdaQuery<T> : LambdaQueryBase where T : IModel, new()
     {
-        //internal bool DistinctFields = false;
+        internal bool __DistinctFields = false;
         /// <summary>
         /// 表示 Distinct字段
         /// </summary>
@@ -30,7 +30,7 @@ namespace CRL.LambdaQuery
         {
             Top(0);
             var fields = GetSelectField(resultSelector.Body, false, typeof(T));
-            //DistinctFields = true;
+            __DistinctFields = true;
             __FieldFunctionFormat = " DISTINCT {0}";
             __QueryFields = fields;
             return this;

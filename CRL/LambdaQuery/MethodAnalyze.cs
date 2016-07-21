@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -66,6 +66,10 @@ namespace CRL.LambdaQuery
 
         public string Substring(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
         {
+            if (args.Length > 2)
+            {
+                throw new Exception("Substring扩展方法需要两个参数,index,length");
+            }
             return dBAdapter.SubstringFormat(field, (int)args[0], (int)args[1]);
             //return string.Format(" SUBSTRING({0},{1},{2})", field, args[0], args[1]);
         }

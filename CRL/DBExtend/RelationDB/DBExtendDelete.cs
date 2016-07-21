@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using CRL.LambdaQuery;
-namespace CRL
+namespace CRL.DBExtend.RelationDB
 {
     public sealed partial class DBExtend
     {
@@ -22,7 +22,7 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <param name="where"></param>
         /// <returns></returns>
-        public int Delete<TModel>(string where) where TModel : IModel,new()
+        internal int Delete<TModel>(string where)where TModel:IModel,new()
         {
             CheckTableCreated<TModel>();
             string table = TypeCache.GetTableName(typeof(TModel),dbContext);
@@ -38,7 +38,7 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public int Delete<TModel>(object id) where TModel : IModel, new()
+        public override int Delete<TModel>(object id)
         {
             var expression = Base.GetQueryIdExpression<TModel>(id);
             return Delete<TModel>(expression);
@@ -49,10 +49,10 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public int Delete<TModel>(Expression<Func<TModel, bool>> expression) where TModel : IModel, new()
+        public override int Delete<TModel>(Expression<Func<TModel, bool>> expression)
         {
-            LambdaQuery<TModel> query = new LambdaQuery<TModel>(dbContext, false);
-            string condition = query.FormatExpression(expression.Body);
+            LambdaQuery<TModel> query = new RelationLambdaQuery<TModel>(dbContext, false);
+            string condition = query.FormatExpression(expression.Body).SqlOut;
             query.FillParames(this);
             return Delete<TModel>(condition);
         }
@@ -64,11 +64,9 @@ namespace CRL
         /// <typeparam name="TJoin"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public int Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
-            where TModel : IModel, new()
-            where TJoin : IModel, new()
+        public override int Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
         {
-            var query = new LambdaQuery<TModel>(dbContext);
+            var query = new RelationLambdaQuery<TModel>(dbContext);
             query.Join<TJoin>(expression);
             return Delete(query);
         }
@@ -80,30 +78,31 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public int Delete<T>(LambdaQuery<T> query) where T : IModel, new()
+        public override int Delete<T>(LambdaQuery<T> query)
         {
-            if (query.__GroupFields.Count > 0)
+            var query1 = query as RelationLambdaQuery<T>;
+            if (query1.__GroupFields.Count > 0)
             {
                 throw new Exception("delete不支持group查询");
             }
-            if (query.__Relations.Count > 1)
+            if (query1.__Relations.Count > 1)
             {
                 throw new Exception("delete关联不支持多次");
             }
-            query._IsRelationUpdate = true;
-            var conditions = query.GetQueryConditions(false).Trim();
+            query1._IsRelationUpdate = true;
+            var conditions = query1.GetQueryConditions(false).Trim();
             conditions = conditions.Substring(5);
-            string table = query.QueryTableName;
-            table = query.__DBAdapter.KeyWordFormat(table);
-            query.FillParames(this);
-            if (query.__Relations.Count > 0)
+            string table = query1.QueryTableName;
+            table = query1.__DBAdapter.KeyWordFormat(table);
+            query1.FillParames(this);
+            if (query1.__Relations.Count > 0)
             {
-                var kv = query.__Relations.First();
-                var t1 = query.QueryTableName;
-                var t2 = TypeCache.GetTableName(kv.Key, query.__DbContext);
+                var kv = query1.__Relations.First();
+                var t1 = query1.QueryTableName;
+                var t2 = TypeCache.GetTableName(kv.Key, query1.__DbContext);
                 var join = kv.Value;
                 join = join.Substring(join.IndexOf(" on ") + 3);
-                string sql = query.__DBAdapter.GetRelationDeleteSql(t1, t2, join + " and " + conditions);
+                string sql = query1.__DBAdapter.GetRelationDeleteSql(t1, t2, join + " and " + conditions);
                 return Execute(sql);
             }
             return Delete<T>(conditions);

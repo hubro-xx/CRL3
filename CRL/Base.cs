@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -62,13 +62,13 @@ namespace CRL
         /// </summary>
         /// <param name="baseType"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute.TableAttribute,DBExtend> GetAllModel(Type baseType)
+        public static Dictionary<Attribute.TableAttribute,AbsDBExtend> GetAllModel(Type baseType)
         {
             //var assemblies = System.Web.Compilation.BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
             //var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             var assembyle = System.Reflection.Assembly.GetAssembly(baseType);
             Type[] types = assembyle.GetTypes();
-            var findTypes = new Dictionary<Attribute.TableAttribute,DBExtend>();
+            var findTypes = new Dictionary<Attribute.TableAttribute,AbsDBExtend>();
             var typeCRL = typeof(CRL.IProvider);
             foreach (var type in types)
             {
@@ -77,7 +77,7 @@ namespace CRL
                     var obj = System.Activator.CreateInstance(type) as IProvider;
                     var table = TypeCache.GetTable(obj.ModelType);
                     var pro = type.GetProperty("DBExtend", BindingFlags.Instance | BindingFlags.NonPublic);
-                    var db = pro.GetValue(obj) as DBExtend;
+                    var db = pro.GetValue(obj) as AbsDBExtend;
                     findTypes.Add(table, db);
                 }
             }

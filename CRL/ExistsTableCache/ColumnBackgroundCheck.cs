@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -16,13 +16,13 @@ namespace CRL.ExistsTableCache
 {
     internal class ColumnBackgroundCheck
     {
-        static ConcurrentDictionary<string, DBExtend> dBExtends = new ConcurrentDictionary<string, DBExtend>();
+        static ConcurrentDictionary<string, AbsDBExtend> dBExtends = new ConcurrentDictionary<string, AbsDBExtend>();
         //static object lockObj = new object();
         static ConcurrentDictionary<Type, string> needCheks = new ConcurrentDictionary<Type, string>();
         static Thread thread;
-        public static void Add(DBExtend dBExtend, Type type)
+        public static void Add(AbsDBExtend dBExtend, Type type)
         {
-            var dbName = dBExtend.dbHelper.DatabaseName;
+            var dbName = dBExtend.DatabaseName;
             //lock (lockObj)
             //{
                 if (!dBExtends.ContainsKey(dbName))

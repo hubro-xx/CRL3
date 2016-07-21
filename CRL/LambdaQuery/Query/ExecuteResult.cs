@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CRL.LambdaQuery
 {
-    public sealed partial class LambdaQuery<T> where T : IModel, new()
+    public abstract partial class LambdaQuery<T> where T : IModel, new()
     {
         #region 获取一条记录
 
@@ -52,7 +52,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public List<dynamic> ToDynamic()
         {
-            var db = new DBExtend(__DbContext);
+            var db = DBExtendFactory.CreateDBExtend(__DbContext);
             if (PageSize > 0)
             {
                 return db.Page(this);
@@ -68,7 +68,7 @@ namespace CRL.LambdaQuery
         public List<TResult> ToDynamic<TResult>(Expression<Func<T, TResult>> resultSelector)
         {
             //只能做到当前对象筛选
-            var db = new DBExtend(__DbContext);
+            var db = DBExtendFactory.CreateDBExtend(__DbContext);
             return db.QueryDynamic(this, resultSelector);
         }
         /// <summary>
@@ -80,7 +80,7 @@ namespace CRL.LambdaQuery
         public List<TResult> ToList<TResult>()
             where TResult : class,new()
         {
-            var db = new DBExtend(__DbContext);
+            var db = DBExtendFactory.CreateDBExtend(__DbContext);
             if (PageSize > 0)
             {
                 return db.Page<T, TResult>(this);
@@ -94,7 +94,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public List<T> ToList()
         {
-            var db = new DBExtend(__DbContext);
+            var db = DBExtendFactory.CreateDBExtend(__DbContext);
             //如果是筛选后的结果,属性可能匹配不上
             if (PageSize > 0)
             {
@@ -110,10 +110,10 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public Dictionary<TKey, TValue> ToDictionary<TKey, TValue>()
         {
-            var db = new DBExtend(__DbContext);
-            var reader = db.GetQueryDynamicReader(this);
-            return ObjectConvert.DataReadToDictionary<TKey, TValue>(reader);
+            var db = DBExtendFactory.CreateDBExtend(__DbContext);
+            return db.ToDictionary<T, TKey, TValue>(this);
         }
+
         #region 返回首列结果
         /// <summary>
         /// 返回首列结果
@@ -122,7 +122,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public TResult ToScalar<TResult>()
         {
-            var db = new DBExtend(__DbContext);
+            var db = DBExtendFactory.CreateDBExtend(__DbContext);
             var result = db.QueryScalar(this);
             if (result == null)
             {
@@ -136,7 +136,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public dynamic ToScalar()
         {
-            var db = new DBExtend(__DbContext);
+            var db = DBExtendFactory.CreateDBExtend(__DbContext);
             return db.QueryScalar(this);
         }
         #endregion

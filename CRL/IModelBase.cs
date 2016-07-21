@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -146,7 +146,7 @@ namespace CRL
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>
-        internal void CheckIndexExists(DBExtend db)
+        internal void CheckIndexExists(AbsDBExtend db)
         {
             var list = GetIndexScript(db);
             foreach (var item in list)
@@ -167,7 +167,7 @@ namespace CRL
         /// <param name="db"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        internal static string CreateColumn(DBExtend db, Attribute.FieldAttribute item)
+        internal static string CreateColumn(AbsDBExtend db, Attribute.FieldAttribute item)
         {
             var dbAdapter = db._DBAdapter;
             string result = "";
@@ -211,7 +211,7 @@ namespace CRL
         /// 检查对应的字段是否存在,不存在则创建
         /// </summary>
         /// <param name="db"></param>
-        internal string CheckColumnExists(DBExtend db)
+        internal string CheckColumnExists(AbsDBExtend db)
         {
             string result = "";
             var dbAdapter = db._DBAdapter;
@@ -268,7 +268,7 @@ namespace CRL
             }
             return columns;
         }
-        internal List<string> GetIndexScript(DBExtend db)
+        internal List<string> GetIndexScript(AbsDBExtend db)
         {
             var dbAdapter = db._DBAdapter;
             List<string> list2 = new List<string>();
@@ -290,7 +290,7 @@ namespace CRL
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>
-        public string CreateTable(DBExtend db)
+        public string CreateTable(AbsDBExtend db)
         {
             string msg;
             CreateTable(db, out msg);
@@ -304,7 +304,7 @@ namespace CRL
         /// <param name="db"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal void CreateTable(DBExtend db, out string message)
+        internal void CreateTable(AbsDBExtend db, out string message)
         {
             var dbAdapter = db._DBAdapter;
             message = "";
@@ -356,52 +356,17 @@ namespace CRL
         /// </summary>
         [System.Xml.Serialization.XmlIgnore]
         [NonSerialized]
-        private object _originClone = null;
-
-        [System.Xml.Serialization.XmlIgnore]
-        [Attribute.Field(MapingField = false)]
-        internal object OriginClone
-        {
-            get { return _originClone; }
-            set { _originClone = value; }
-        }
+        internal object OriginClone = null;
 
         [System.Xml.Serialization.XmlIgnore]
         [NonSerialized]
-        bool boundChange = true;
-
-        [System.Xml.Serialization.XmlIgnore]
-        internal bool BoundChange
-        {
-            get
-            {
-                return boundChange;
-            }
-            set
-            {
-                boundChange = value;
-            }
-        }
-        [System.Xml.Serialization.XmlIgnore]
-        [NonSerialized]
-        ParameCollection changes = new ParameCollection();
+        internal bool BoundChange = true;
 
         /// <summary>
         /// 存储被更改的属性
         /// </summary>
-        [Attribute.Field(MapingField = false)]
         [System.Xml.Serialization.XmlIgnore]
-        internal ParameCollection Changes
-        {
-            get
-            {
-                return changes;
-            }
-            set
-            {
-                changes = value;
-            }
-        }
+        internal ParameCollection Changes = new ParameCollection();
         /// <summary>
         /// 表示值被更改了
         /// 当更新后,将被清空
@@ -415,6 +380,18 @@ namespace CRL
             if (name.ToLower() == "boundchange")
                 return;
             Changes[name] = value;
+        }
+        /// <summary>
+        /// 清空Changes并重新Clone源对象
+        /// </summary>
+        internal void CleanChanges()
+        {
+            Changes.Clear();
+            if (SettingConfig.UsePropertyChange)
+            {
+                return;
+            }
+            OriginClone = Clone();
         }
         #endregion
 
@@ -441,11 +418,11 @@ namespace CRL
             }
             return modelKey;
         }
-        internal string GetpPrimaryKeyValue()
+        internal object GetpPrimaryKeyValue()
         {
             var primaryKey = TypeCache.GetTable(GetType()).PrimaryKey;
             var keyValue = primaryKey.GetValue(this);
-            return keyValue.ToString();
+            return keyValue;
         }
 
         #region 动态字典,效果同索引

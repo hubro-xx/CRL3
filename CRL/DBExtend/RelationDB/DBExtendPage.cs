@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-namespace CRL
+namespace CRL.DBExtend.RelationDB
 {
     public sealed partial class DBExtend
     {
@@ -21,7 +21,7 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public List<dynamic> Page<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
+        public override List<dynamic> Page<TModel>(LambdaQuery<TModel> query)
         {
             int count;
             var reader = GetPageReader(query);
@@ -37,9 +37,7 @@ namespace CRL
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public List<TResult> Page<TModel, TResult>(LambdaQuery<TModel> query)
-            where TModel : IModel, new()
-            where TResult : class,new()
+        public override List<TResult> Page<TModel, TResult>(LambdaQuery<TModel> query)
         {
             int count;
             var reader = GetPageReader(query);
@@ -56,21 +54,22 @@ namespace CRL
         /// <returns></returns>
         CallBackDataReader GetSpPageReader<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
         {
+            var query1 = query as RelationLambdaQuery<TModel>;
             CheckTableCreated<TModel>();
             //var fields = query.GetQueryFieldString(b => b.Length > 500 || b.PropertyType == typeof(byte[]));
-            var fields = query.GetQueryFieldString();
-            var rowOver = query.__QueryOrderBy;
+            var fields = query1.GetQueryFieldString();
+            var rowOver = query1.__QueryOrderBy;
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(typeof(TModel));
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.Name);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
-            var condition = query.GetQueryConditions();
+            var condition = query1.GetQueryConditions();
             condition = _DBAdapter.SqlFormat(condition);
-            query.FillParames(this);
-            var pageIndex = query.PageIndex;
-            var pageSize = query.PageSize;
+            query1.FillParames(this);
+            var pageIndex = query1.PageIndex;
+            var pageSize = query1.PageSize;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             AddParam("pageIndex", pageIndex);
@@ -88,7 +87,7 @@ namespace CRL
                 return GetOutParam<int>("count");
             });
             ClearParame();
-            query.ExecuteTime += dbHelper.ExecuteTime;
+            query1.ExecuteTime += dbHelper.ExecuteTime;
             return reader;
         }
         /// <summary>
@@ -99,38 +98,39 @@ namespace CRL
         /// <returns></returns>
         internal CallBackDataReader GetPageReader<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
         {
-            if (query.__GroupFields.Count > 0)
+            var query1 = query as RelationLambdaQuery<TModel>;
+            if (query1.__GroupFields.Count > 0)
             {
-                return GetGroupPageReader(query);
+                return GetGroupPageReader(query1);
             }
-            if (_DBAdapter.CanCompileSP && query.__CompileSp)
+            if (_DBAdapter.CanCompileSP && query1.__CompileSp)
             {
-                return GetSpPageReader(query);
+                return GetSpPageReader(query1);
             }
 
             CheckTableCreated<TModel>();
             //var fields = query.GetQueryFieldString(b => b.Length > 500 || b.PropertyType == typeof(byte[]));
-            var fields = query.GetQueryFieldString();
-            var rowOver = query.__QueryOrderBy;
+            var fields = query1.GetQueryFieldString();
+            var rowOver = query1.__QueryOrderBy;
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(typeof(TModel));
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.Name);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
-            var condition = query.GetQueryConditions();
+            var condition = query1.GetQueryConditions();
 
             condition = _DBAdapter.SqlFormat(condition);
-            query.FillParames(this);
+            query1.FillParames(this);
 
-            var pageIndex = query.PageIndex;
-            var pageSize = query.PageSize;
+            var pageIndex = query1.PageIndex;
+            var pageSize = query1.PageSize;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             string countSql = string.Format("select count(*) from {0}", condition);
             int count = Convert.ToInt32(dbHelper.ExecScalar(countSql));
-            query.ExecuteTime += dbHelper.ExecuteTime;
-            query.RowCount = count;
+            query1.ExecuteTime += dbHelper.ExecuteTime;
+            query1.RowCount = count;
             if (count == 0)
             {
                 return null;
@@ -146,7 +146,7 @@ namespace CRL
             {
                 return count;
             });
-            query.ExecuteTime += dbHelper.ExecuteTime;
+            query1.ExecuteTime += dbHelper.ExecuteTime;
             ClearParame();
             return reader;
         }
@@ -161,14 +161,15 @@ namespace CRL
         /// <returns></returns>
         CallBackDataReader GetSpGroupPageReader<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
         {
+            var query1 = query as RelationLambdaQuery<TModel>;
             CheckTableCreated<TModel>();
-            var conditions = query.GetQueryConditions();
-            var fields = query.GetQueryFieldString();
+            var conditions = query1.GetQueryConditions();
+            var fields = query1.GetQueryFieldString();
             if (!conditions.Contains("group"))
             {
                 throw new Exception("缺少group语法");
             }
-            var rowOver = query.__QueryOrderBy;
+            var rowOver = query1.__QueryOrderBy;
             if (string.IsNullOrEmpty(rowOver))
             {
                 throw new Exception("Group分页需指定Group排序字段");
@@ -178,9 +179,9 @@ namespace CRL
             var sort1 = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "");
             conditions = _DBAdapter.SqlFormat(conditions);
 
-            query.FillParames(this);
-            var pageIndex = query.PageIndex;
-            var pageSize = query.PageSize;
+            query1.FillParames(this);
+            var pageIndex = query1.PageIndex;
+            var pageSize = query1.PageSize;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             AddParam("pageIndex", pageIndex);
@@ -196,7 +197,7 @@ namespace CRL
             {
                 return GetOutParam<int>("count");
             });
-            query.ExecuteTime += dbHelper.ExecuteTime;
+            query1.ExecuteTime += dbHelper.ExecuteTime;
             ClearParame();
             return reader;
         }
@@ -209,18 +210,19 @@ namespace CRL
         /// <returns></returns>
         CallBackDataReader GetGroupPageReader<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
         {
-            if (_DBAdapter.CanCompileSP && query.__CompileSp)
+            var query1 = query as RelationLambdaQuery<TModel>;
+            if (_DBAdapter.CanCompileSP && query1.__CompileSp)
             {
-                return GetSpGroupPageReader(query);
+                return GetSpGroupPageReader(query1);
             }
             CheckTableCreated<TModel>();
-            var condition = query.GetQueryConditions();
-            var fields = query.GetQueryFieldString();
+            var condition = query1.GetQueryConditions();
+            var fields = query1.GetQueryFieldString();
             if (!condition.Contains("group"))
             {
                 throw new Exception("缺少group语法");
             }
-            var rowOver = query.__QueryOrderBy;
+            var rowOver = query1.__QueryOrderBy;
             if (string.IsNullOrEmpty(rowOver))
             {
                 throw new Exception("Group分页需指定Group排序字段");
@@ -230,16 +232,16 @@ namespace CRL
             var sort1 = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "");
             condition = _DBAdapter.SqlFormat(condition);
 
-            query.FillParames(this);
-            var pageIndex = query.PageIndex;
-            var pageSize = query.PageSize;
+            query1.FillParames(this);
+            var pageIndex = query1.PageIndex;
+            var pageSize = query1.PageSize;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
 
             string countSql = string.Format("select count(*)  from (select count(*) as a from {0}) t", condition);
             int count = Convert.ToInt32(dbHelper.ExecScalar(countSql));
-            query.ExecuteTime += dbHelper.ExecuteTime;
-            query.RowCount = count;
+            query1.ExecuteTime += dbHelper.ExecuteTime;
+            query1.RowCount = count;
             if (count == 0)
             {
                 return null;
@@ -257,7 +259,7 @@ namespace CRL
             {
                 return count;
             });
-            query.ExecuteTime += dbHelper.ExecuteTime;
+            query1.ExecuteTime += dbHelper.ExecuteTime;
             ClearParame();
             return reader;
         }

@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -13,7 +13,7 @@ using System.Data;
 
 namespace CRL.DBAdapter
 {
-    internal abstract class DBAdapterBase
+    public abstract class DBAdapterBase
     {
         internal DbContext dbContext;
         protected CoreHelper.DBHelper helper;
@@ -55,6 +55,9 @@ namespace CRL.DBAdapter
                     break;
                 case CoreHelper.DBType.ORACLE:
                     db = new ORACLEDBAdapter(dbContext);
+                    break;
+                case CoreHelper.DBType.MongoDB:
+                    db = new MongoDBAdapter(dbContext);
                     break;
             }
             if (db == null)

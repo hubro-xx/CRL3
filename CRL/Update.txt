@@ -244,3 +244,6 @@
 	帐户模块帐号改为int AccountDetail.Account
 2016-06-24
 	优化了值修改通知Change方法,对象值也会被同步了
+2016-07-18
+	升级到版本4.0,非关系型数据库MongoDB能被支持了
+	优化IgnoreCaseDictionary,Key保持原始值

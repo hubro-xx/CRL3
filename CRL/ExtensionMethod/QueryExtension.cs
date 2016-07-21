@@ -1,4 +1,11 @@
-﻿using System;
+/**
+* CRL 快速开发框架 V4.0
+* Copyright (c) 2016 Hubro All rights reserved.
+* GitHub https://github.com/hubro-xx/CRL3
+* 主页 http://www.cnblogs.com/hubro
+* 在线文档 http://crl.changqidongli.com/
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +25,7 @@ namespace CRL
         /// <returns></returns>
         public static int Delete<T>(this LambdaQuery<T> query) where T : IModel, new()
         {
-            var db = new DBExtend(query.__DbContext);
+            var db = DBExtendFactory.CreateDBExtend(query.__DbContext);
             return db.Delete(query);
         }
         /// <summary>
@@ -31,7 +38,7 @@ namespace CRL
         /// <returns></returns>
         public static int Update<T>(this LambdaQuery<T> query, ParameCollection updateValue) where T : IModel, new()
         {
-            var db = new DBExtend(query.__DbContext);
+            var db = DBExtendFactory.CreateDBExtend(query.__DbContext);
             return db.Update(query, updateValue);
         }
     }

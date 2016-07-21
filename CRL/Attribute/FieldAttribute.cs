@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -337,6 +337,23 @@ namespace CRL.Attribute
             }
             propertyInfo.SetValue(obj, value, null);
         }
+        internal FieldQuery FieldQuery;
+    }
+
+    internal class FieldQuery
+    {
+        /// <summary>
+        /// 字段名
+        /// </summary>
+        public string FieldName;
+        /// <summary>
+        /// 成员名,别名
+        /// </summary>
+        public string MemberName;
+        /// <summary>
+        /// 方法名
+        /// </summary>
+        public string MethodName;
     }
 
 }

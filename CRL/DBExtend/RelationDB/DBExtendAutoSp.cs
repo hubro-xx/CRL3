@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -11,7 +11,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using CRL.LambdaQuery;
-namespace CRL
+namespace CRL.DBExtend.RelationDB
 {
     public sealed partial class DBExtend
     { 
@@ -89,80 +89,80 @@ namespace CRL
             return sp;
         }
 
-        /// <summary>
-        /// 将查询自动转化为存储过程执行
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="types"></param>
-        /// <returns></returns>
-        public List<T> AutoSpQuery<T>(string sql, params Type[] types) where T : class, new()
-        {
-            var reader = AutoSpQuery(sql, types);
-            double runTime;
-            return ObjectConvert.DataReaderToList<T>(reader,out runTime);
-        }
-        System.Data.Common.DbDataReader AutoSpQuery(string sql, params Type[] types) 
-        {
-            sql = AutoFormat(sql, types);
-            sql = _DBAdapter.SqlFormat(sql);
-            string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-            System.Data.Common.DbDataReader reader;
-            reader = dbHelper.RunDataReader(sp);
-            ClearParame();
-            return reader;
-        }
-        /// <summary>
-        /// 将查询自动转化为存储过程执行
-        /// </summary>
-        /// <typeparam name="TKey"></typeparam>
-        /// <typeparam name="TValue"></typeparam>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        public Dictionary<TKey, TValue> AutoSpQuery<TKey, TValue>(string sql, params Type[] types)
-        {
-            sql = AutoFormat(sql, types);
-            sql = _DBAdapter.SqlFormat(sql);
-            string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-            System.Data.Common.DbDataReader reader = null;
-            reader = dbHelper.RunDataReader(sp);
-            ClearParame();
-            return ObjectConvert.DataReadToDictionary<TKey, TValue>(reader);
-        }
-        /// <summary>
-        /// 将更新自动转化为存储过程执行
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="types"></param>
-        /// <returns></returns>
-        public int AutoSpUpdate(string sql, params Type[] types)
-        {
-            int n;
-            sql = AutoFormat(sql, types);
-            sql = _DBAdapter.SqlFormat(sql);
-            string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-            n = dbHelper.Run(sp);
-            ClearParame();
-            return n;
-        }
-        /// <summary>
-        /// 返回首行首列
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="types"></param>
-        /// <returns></returns>
-        public T AutoExecuteScalar<T>(string sql,params Type[] types)
-        {
-            object obj;
-            sql = _DBAdapter.SqlFormat(sql);
-            sql = AutoFormat(sql, types);
-            sql = _DBAdapter.SqlFormat(sql);
-            string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-            obj = RunScalar(sp);
-            ClearParame();
-            return ObjectConvert.ConvertObject<T>(obj);
-        }
+        ///// <summary>
+        ///// 将查询自动转化为存储过程执行
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="sql"></param>
+        ///// <param name="types"></param>
+        ///// <returns></returns>
+        //public override List<T> AutoSpQuery<T>(string sql, params Type[] types) 
+        //{
+        //    var reader = AutoSpQuery(sql, types);
+        //    double runTime;
+        //    return ObjectConvert.DataReaderToList<T>(reader,out runTime);
+        //}
+        //System.Data.Common.DbDataReader AutoSpQuery(string sql, params Type[] types) 
+        //{
+        //    sql = AutoFormat(sql, types);
+        //    sql = _DBAdapter.SqlFormat(sql);
+        //    string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
+        //    System.Data.Common.DbDataReader reader;
+        //    reader = dbHelper.RunDataReader(sp);
+        //    ClearParame();
+        //    return reader;
+        //}
+        ///// <summary>
+        ///// 将查询自动转化为存储过程执行
+        ///// </summary>
+        ///// <typeparam name="TKey"></typeparam>
+        ///// <typeparam name="TValue"></typeparam>
+        ///// <param name="sql"></param>
+        ///// <returns></returns>
+        //public override Dictionary<TKey, TValue> AutoSpQuery<TKey, TValue>(string sql, params Type[] types)
+        //{
+        //    sql = AutoFormat(sql, types);
+        //    sql = _DBAdapter.SqlFormat(sql);
+        //    string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
+        //    System.Data.Common.DbDataReader reader = null;
+        //    reader = dbHelper.RunDataReader(sp);
+        //    ClearParame();
+        //    return ObjectConvert.DataReadToDictionary<TKey, TValue>(reader);
+        //}
+        ///// <summary>
+        ///// 将更新自动转化为存储过程执行
+        ///// </summary>
+        ///// <param name="sql"></param>
+        ///// <param name="types"></param>
+        ///// <returns></returns>
+        //public override int AutoSpUpdate(string sql, params Type[] types)
+        //{
+        //    int n;
+        //    sql = AutoFormat(sql, types);
+        //    sql = _DBAdapter.SqlFormat(sql);
+        //    string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
+        //    n = dbHelper.Run(sp);
+        //    ClearParame();
+        //    return n;
+        //}
+        ///// <summary>
+        ///// 返回首行首列
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="sql"></param>
+        ///// <param name="types"></param>
+        ///// <returns></returns>
+        //public override T AutoExecuteScalar<T>(string sql,params Type[] types)
+        //{
+        //    object obj;
+        //    sql = _DBAdapter.SqlFormat(sql);
+        //    sql = AutoFormat(sql, types);
+        //    sql = _DBAdapter.SqlFormat(sql);
+        //    string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
+        //    obj = RunScalar(sp);
+        //    ClearParame();
+        //    return ObjectConvert.ConvertObject<T>(obj);
+        //}
         #endregion
     }
 }

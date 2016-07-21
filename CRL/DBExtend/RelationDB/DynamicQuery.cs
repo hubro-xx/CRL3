@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using CRL.LambdaQuery;
-namespace CRL
+namespace CRL.DBExtend.RelationDB
 {
     //返回动态类型
     public sealed partial class DBExtend
@@ -24,7 +24,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public List<dynamic> ExecDynamicList(string sql, params Type[] types)
+        public override List<dynamic> ExecDynamicList(string sql, params Type[] types)
         {
             var reader = GetDataReader(sql, types);
             double runTime;
@@ -35,7 +35,7 @@ namespace CRL
         /// </summary>
         /// <param name="sp"></param>
         /// <returns></returns>
-        public List<dynamic> RunDynamicList(string sp)
+        public override List<dynamic> RunDynamicList(string sp)
         {
             double runTime;
             var reader = dbHelper.RunDataReader(sp);
@@ -49,8 +49,7 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public List<dynamic> QueryDynamic<T>(LambdaQuery<T> query)
-            where T : IModel, new()
+        public override List<dynamic> QueryDynamic<T>(LambdaQuery<T> query)
         {
             var reader = GetQueryDynamicReader(query);
             double runTime;
@@ -60,15 +59,13 @@ namespace CRL
             return list;
         }
         /// <summary>
-        /// 返回指定类型
+        /// 按select返回指定类型
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery<TModel> query)
-            where TModel : IModel, new()
-            where TResult : class,new()
+        public override List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery<TModel> query)
         {
             var reader = GetQueryDynamicReader(query);
             double runTime;
@@ -83,7 +80,7 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public dynamic QueryScalar<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
+        public override dynamic QueryScalar<TModel>(LambdaQuery<TModel> query)
         {
             query.Top(1);
             var reader = GetQueryDynamicReader(query);
@@ -99,13 +96,12 @@ namespace CRL
         /// <summary>
         /// 返回动态对象的查询
         /// </summary>
-        /// <typeparam name="TItem"></typeparam>
+        /// <typeparam name="TModel"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        internal System.Data.Common.DbDataReader GetQueryDynamicReader<TItem>(LambdaQuery<TItem> query)
-            where TItem : IModel, new()
+        internal System.Data.Common.DbDataReader GetQueryDynamicReader<TModel>(LambdaQuery<TModel> query) where TModel : CRL.IModel, new()
         {
-            CheckTableCreated<TItem>();
+            CheckTableCreated<TModel>();
             string sql = "";
             query.FillParames(this);
             sql = query.GetQuery();
@@ -139,7 +135,7 @@ namespace CRL
         /// <param name="query"></param>
         /// <param name="resultSelector"></param>
         /// <returns></returns>
-        public List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery<TModel> query, Expression<Func<TModel, TResult>> resultSelector) where TModel : IModel, new()
+        public override List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery<TModel> query, Expression<Func<TModel, TResult>> resultSelector)
         {
             //todo 由于不能自动识别TResult,只能按当前类型筛选
             CheckTableCreated<TModel>();

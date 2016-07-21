@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -16,96 +16,26 @@ using System.Linq.Expressions;
 using System.Diagnostics;
 using System.Data.Common;
 using CRL.LambdaQuery;
-namespace CRL
+namespace CRL.DBExtend.RelationDB
 {
     /// <summary>
     /// 对象数据访问
     /// </summary>
-    public sealed partial class DBExtend
+    public sealed partial class DBExtend : AbsDBExtend
     {
-        #region 属性
-        /// <summary>
-        /// 对象被更新时,是否通知缓存服务器
-        /// </summary>
-        internal bool OnUpdateNotifyCacheServer = false;
-        internal Guid GUID;
-
-        DBExtend backgroundDBExtend;
-        /// <summary>
-        /// 仅用来检查表结构
-        /// </summary>
-        /// <returns></returns>
-        DBExtend GetBackgroundDBExtend()
-        {
-            if (backgroundDBExtend == null)
-            {
-                backgroundDBExtend = copyDBExtend();
-            }
-            return backgroundDBExtend;
-        }
-        DBExtend copyDBExtend()
-        {
-            var helper = SettingConfig.GetDbAccess(dbContext.DBLocation);
-            var dbContext2 = new DbContext(helper, dbContext.DBLocation);
-            dbContext2.ShardingMainDataIndex = dbContext.ShardingMainDataIndex;
-            dbContext2.UseSharding = dbContext.UseSharding;
-            return new DBExtend(dbContext2);
-        }
-
-        internal CoreHelper.DBHelper dbHelper;
-        internal string DatabaseName
-        {
-            get
-            {
-                return dbHelper.DatabaseName;
-            }
-        }
-        DBAdapter.DBAdapterBase __DBAdapter;
-        /// <summary>
-        /// 当前数据库适配器
-        /// </summary>
-        internal DBAdapter.DBAdapterBase _DBAdapter
-        {
-            get
-            {
-                //return Base.CurrentDBAdapter;
-                if (__DBAdapter == null)
-                {
-                    __DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(dbContext);
-                }
-                return __DBAdapter;
-            }
-        }
-
-        static object lockObj = new object();
-        
-        #endregion
-
-        internal DbContext dbContext;
-        public override string ToString()
-        {
-            return string.Format("{0} {1}", GUID, currentTransStatus);
-        }
-        /// <summary>
-        /// 构造DBExtend
-        /// </summary>
-        /// <param name="_dbContext"></param>
         public DBExtend(DbContext _dbContext)
+            : base(_dbContext)
         {
-            dbContext = _dbContext;
-            var _helper = _dbContext.DBHelper;
-            if (_helper == null)
-            {
-                throw new Exception("数据访问对象未实例化,请实现CRL.SettingConfig.GetDbAccess");
-            }
-            GUID = Guid.NewGuid();
-            dbHelper = _helper;
+        }
+        protected override LambdaQuery<TModel> CreateLambdaQuery<TModel>()
+        {
+            return new RelationLambdaQuery<TModel>(dbContext); 
         }
         #region 参数处理
         /// <summary>
         /// 清除参数
         /// </summary>
-        public void ClearParams()
+        public override void ClearParame()
         {
             dbHelper.ClearParams();
         }
@@ -114,7 +44,7 @@ namespace CRL
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public void AddParam(string name,object value)
+        public override void AddParam(string name, object value)
         {
             value = ObjectConvert.CheckNullValue(value);
             dbHelper.AddParam(name,value);
@@ -124,7 +54,7 @@ namespace CRL
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public void SetParam(string name, object value)
+        public override void SetParam(string name, object value)
         {
             value = ObjectConvert.CheckNullValue(value);
             dbHelper.SetParam(name, value);
@@ -134,7 +64,7 @@ namespace CRL
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value">对应类型任意值</param>
-        public void AddOutParam(string name, object value = null)
+        public override void AddOutParam(string name, object value = null)
         {
             dbHelper.AddOutParam(name, value);
         }
@@ -142,7 +72,7 @@ namespace CRL
         /// 获取存储过程return的值
         /// </summary>
         /// <returns></returns>
-        public int GetReturnValue()
+        public override int GetReturnValue()
         {
             return dbHelper.GetReturnValue();
         }
@@ -151,7 +81,7 @@ namespace CRL
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public object GetOutParam(string name)
+        public override object GetOutParam(string name)
         {
             return dbHelper.GetOutParam(name);
         }
@@ -161,125 +91,10 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
         /// <returns></returns>
-        public T GetOutParam<T>(string name)
+        public override T GetOutParam<T>(string name)
         {
             var obj = dbHelper.GetOutParam(name);
             return ObjectConvert.ConvertObject<T>(obj);
-        }
-        void ClearParame()
-        {
-            dbHelper.ClearParams();
-        }
-        #endregion
-        void CheckData(IModel obj)
-        {
-            var types = CRL.TypeCache.GetProperties(obj.GetType(), true).Values;
-            string msg;
-            var sb = new StringBuilder();
-            //检测数据约束
-            foreach (Attribute.FieldAttribute p in types)
-            {
-                string value = p.GetValue(obj) + "";
-                if (!string.IsNullOrEmpty(value) && p.Name != "AddTime" && obj.CheckRepeatedInsert)
-                {
-                    sb.Append(value.GetHashCode().ToString());
-                }
-                if (p.PropertyType == typeof(System.String))
-                {
-                    if (p.NotNull && string.IsNullOrEmpty(value))
-                    {
-                        msg = string.Format("对象{0}属性{1}值不能为空", obj.GetType(), p.Name);
-                        throw new Exception(msg);
-                    }
-                    if (value.Length > p.Length && p.Length < 3000)
-                    {
-                        msg = string.Format("对象{0}属性{1}长度超过了设定值{2}", obj.GetType(), p.Name, p.Length);
-                        throw new Exception(msg);
-                    }
-                }
-            }
-            if (obj.CheckRepeatedInsert)
-            {
-                string concurrentKey = "insertRepeatedCheck_" + CoreHelper.StringHelper.EncryptMD5(sb.ToString());
-                if (!CoreHelper.ConcurrentControl.Check(concurrentKey, 3))
-                {
-                    throw new Exception("检测到有重复提交的数据");
-                }
-            }
-            //校验数据
-            msg = obj.CheckData();
-            if (!string.IsNullOrEmpty(msg))
-            {
-                msg = string.Format("数据校验证失败,在类型{0} {1} 请核对校验规则", obj.GetType(), msg);
-                throw new Exception(msg);
-            }
-        }
-
-        #region 更新缓存中的一项
-
-        /// <summary>
-        /// 按表达式更新缓存中项
-        /// 当前类型有缓存时才会进行查询
-        /// </summary>
-        /// <typeparam name="TItem"></typeparam>
-        /// <param name="expression"></param>
-        void UpdateCacheItem<TItem>(Expression<Func<TItem, bool>> expression, ParameCollection c) where TItem : IModel, new()
-        {
-            //事务开启不执行查询
-            if (currentTransStatus == TranStatus.已开始)
-            {
-                return;
-            }
-            Type type = typeof(TItem);
-            var updateModel = MemoryDataCache.CacheService.GetCacheTypeKey(typeof(TItem));
-            foreach (var key in updateModel)
-            {
-                var list = QueryList<TItem>(expression);
-                foreach (var item in list)
-                {
-                    MemoryDataCache.CacheService.UpdateCacheItem(key, item, c);
-                    //NotifyCacheServer(item);//远端缓存暂无法更新
-                }
-            }
-        }
-        /// <summary>
-        /// 更新缓存中的一项
-        /// </summary>
-        /// <typeparam name="TItem"></typeparam>
-        /// <param name="newObj"></param>
-        /// <param name="c"></param>
-        internal void UpdateCacheItem<TItem>(TItem newObj, ParameCollection c, bool checkInsert = false) where TItem : IModel
-        {
-            var updateModel = MemoryDataCache.CacheService.GetCacheTypeKey(typeof(TItem));
-            foreach (var key in updateModel)
-            {
-                MemoryDataCache.CacheService.UpdateCacheItem(key, newObj, c, checkInsert);
-            }
-            NotifyCacheServer(newObj);
-            //Type type = typeof(TItem);
-            //if (TypeCache.ModelKeyCache.ContainsKey(type))
-            //{
-            //    string key = TypeCache.ModelKeyCache[type];
-            //    MemoryDataCache.UpdateCacheItem(key,newObj);
-            //}
-        }
-        /// <summary>
-        /// 通知缓存服务器
-        /// </summary>
-        /// <typeparam name="TItem"></typeparam>
-        /// <param name="newObj"></param>
-        void NotifyCacheServer<TItem>(TItem newObj) where TItem : IModel
-        {
-            if (!OnUpdateNotifyCacheServer)
-                return;
-            System.Threading.Tasks.Task.Run(() =>
-            {
-                var client = CacheServerSetting.GetCurrentClient(typeof(TItem));
-                if (client != null)
-                {
-                    client.Update(newObj);
-                }
-            });
         }
         #endregion
 
@@ -349,7 +164,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public List<T> ExecList<T>(string sql, params Type[] types) where T : class, new()
+        public override List<T> ExecList<T>(string sql, params Type[] types)
         {
             sql = _DBAdapter.SqlFormat(sql);
             var reader = GetDataReader(sql, types);
@@ -365,7 +180,7 @@ namespace CRL
             ClearParame();
             return reader;
         }
-        public Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql, params Type[] types)
+        public override Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql, params Type[] types)
         {
             var reader = GetDataReader(sql, types);
             return ObjectConvert.DataReadToDictionary<TKey, TValue>(reader);
@@ -377,7 +192,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public int Execute(string sql, params Type[] types)
+        public override int Execute(string sql, params Type[] types)
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
@@ -391,7 +206,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types">格式化SQL语句的关键类型</param>
         /// <returns></returns>
-        public object ExecScalar(string sql, params Type[] types)
+        public override object ExecScalar(string sql, params Type[] types)
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
@@ -406,7 +221,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public T ExecScalar<T>(string sql, params Type[] types)
+        public override T ExecScalar<T>(string sql, params Type[] types)
         {
             sql = _DBAdapter.SqlFormat(sql);
             var obj = ExecScalar(sql, types);
@@ -419,7 +234,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public T ExecObject<T>(string sql, params Type[] types) where T : class, new()
+        public override T ExecObject<T>(string sql, params Type[] types)
         {
             var list = ExecList<T>(sql, types);
             if (list.Count == 0)
@@ -435,7 +250,7 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="sp"></param>
         /// <returns></returns>
-        public List<T> RunList<T>(string sp) where T : class, new()
+        public override List<T> RunList<T>(string sp)
         {
             var reader = dbHelper.RunDataReader(sp);
             ClearParame();
@@ -447,7 +262,7 @@ namespace CRL
         /// </summary>
         /// <param name="sp"></param>
         /// <returns></returns>
-        public int Run(string sp)
+        public override int Run(string sp)
         {
             int count = dbHelper.Run(sp);
             ClearParame();
@@ -459,7 +274,7 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="sp"></param>
         /// <returns></returns>
-        public T RunObject<T>(string sp) where T : class, new()
+        public override T RunObject<T>(string sp)
         {
             var list = RunList<T>(sp);
             if (list.Count == 0)
@@ -471,7 +286,7 @@ namespace CRL
         /// </summary>
         /// <param name="sp"></param>
         /// <returns></returns>
-        public object RunScalar(string sp)
+        public override object RunScalar(string sp)
         {
             object obj = dbHelper.RunScalar(sp);
             ClearParame();
@@ -481,16 +296,11 @@ namespace CRL
         #endregion
 
         #region 事务控制
-        enum TranStatus
-        {
-            未开始,
-            已开始
-        }
-        TranStatus currentTransStatus = TranStatus.未开始;
+
         /// <summary>
         /// 开始物务
         /// </summary>
-        internal void BeginTran()
+        public override void BeginTran()
         {
             if (currentTransStatus != TranStatus.未开始)
             {
@@ -502,7 +312,7 @@ namespace CRL
         /// <summary>
         /// 回滚事务
         /// </summary>
-        internal void RollbackTran()
+        public override void RollbackTran()
         {
             if (currentTransStatus != TranStatus.已开始)
             {
@@ -514,7 +324,7 @@ namespace CRL
         /// <summary>
         /// 提交事务
         /// </summary>
-        internal void CommitTran()
+        public override void CommitTran()
         {
             if (currentTransStatus != TranStatus.已开始)
             {
@@ -534,17 +344,17 @@ namespace CRL
         /// <summary>
         /// 检查表是否被创建
         /// </summary>
-       internal void CheckTableCreated(Type type)
+        internal override void CheckTableCreated(Type type)
         {
             if (!SettingConfig.CheckModelTableMaping)
             {
                 return;
             }
             //TypeCache.SetDBAdapterCache(type, _DBAdapter);
-            var dbName = dbHelper.DatabaseName;
+            var dbName = DatabaseName;
             var cacheInstance =CRL.ExistsTableCache.ExistsTableCache.Instance;
             var table = TypeCache.GetTable(type);
-            DBExtend db;
+            AbsDBExtend db;
             if (!cacheInstance.DataBase.ContainsKey(dbName))
             {
                 db = GetBackgroundDBExtend();

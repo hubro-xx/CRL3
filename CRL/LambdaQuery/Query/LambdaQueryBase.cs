@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -12,10 +12,15 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using CoreHelper;
+using MongoDB.Driver;
+using MongoDB.Bson;
 namespace CRL.LambdaQuery
 {
     public abstract class LambdaQueryBase
     {
+        /// <summary>
+        /// 当前类型
+        /// </summary>
         protected Type __MainType;
         internal ExpressionVisitor __Visitor;
         /// <summary>
@@ -71,10 +76,13 @@ namespace CRL.LambdaQuery
                     var memberName = newExpression.Members[i].Name;
                     if (item is MethodCallExpression)//group用
                     {
-                        var methodQuery = getSelectMethodCall(item);
+                        var methodCallExpression = item as MethodCallExpression;
+                        string methodMember;
+                        var methodQuery = getSelectMethodCall(methodCallExpression, out methodMember);
                         var f = allFilds[__MainType].First().Value.Clone();
                         //f.QueryFullName = methodQuery + " as " + memberName;
                         f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, memberName, methodQuery);
+                        f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = methodMember, MethodName = methodCallExpression.Method.Name };
                         resultFields.Add(f);
                     }
                     else if (item is BinaryExpression)
@@ -83,6 +91,7 @@ namespace CRL.LambdaQuery
                         var f = allFilds[__MainType].First().Value.Clone();
                         //f.QueryFullName = string.Format("{0} as {1}", field, memberName);
                         f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, memberName, field);
+                        f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = field, MethodName = "" };
                         resultFields.Add(f);
                     }
                     else if (item is ConstantExpression)//常量
@@ -96,6 +105,7 @@ namespace CRL.LambdaQuery
                         }
                         //f.QueryFullName = string.Format("{0} as {1}", value, memberName);
                         f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, memberName, value);
+                        f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = value, MethodName = "" };
                         resultFields.Add(f);
                     }
                     else if (item is MemberExpression)
@@ -113,6 +123,7 @@ namespace CRL.LambdaQuery
                             //f.SetFieldQueryScript(aliasName, true, false);
                             f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix, "");
                         }
+                        f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = f.Name, MethodName = "" };
                         resultFields.Add(f);
                     }
                     else
@@ -126,10 +137,13 @@ namespace CRL.LambdaQuery
             else if (expressionBody is MethodCallExpression)
             {
                 #region 方法
+                var method = expressionBody as MethodCallExpression;
                 var f = allFilds[__MainType].First().Value.Clone();
-                var methodQuery = getSelectMethodCall(expressionBody);
+                string methodMember;
+                var methodQuery = getSelectMethodCall(expressionBody, out methodMember);
                 //f.QueryFullName = methodQuery;
                 f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, "", methodQuery);
+                f.FieldQuery = new Attribute.FieldQuery() { MemberName = methodMember, FieldName = methodMember, MethodName = method.Method.Name };
                 resultFields.Add(f);
                 #endregion
             }
@@ -139,6 +153,7 @@ namespace CRL.LambdaQuery
                 var f = allFilds[__MainType].First().Value.Clone();
                 //f.QueryFullName = string.Format("{0}", field);
                 f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, "", field);
+                f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.Name, FieldName = field, MethodName = "" };
                 resultFields.Add(f);
             }
             else if (expressionBody is ConstantExpression)
@@ -147,6 +162,7 @@ namespace CRL.LambdaQuery
                 var f = allFilds[__MainType].First().Value.Clone();
                 //f.QueryFullName = string.Format("{0}", constant.Value);
                 f.SetFieldQueryScript2(__DBAdapter, false, withTablePrefix, "", constant.Value + "");
+                f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.Name, FieldName = constant.Value + "", MethodName = "" };
                 resultFields.Add(f);
             }
             else if (expressionBody is UnaryExpression)
@@ -171,6 +187,7 @@ namespace CRL.LambdaQuery
                 var f = allFilds[mExp.Expression.Type][mExp.Member.Name].Clone();
                 //f.SetFieldQueryScript(aliasName, true, false);
                 f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix, "");
+                f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.Name, FieldName = f.Name, MethodName = "" };
                 resultFields.Add(f);
             }
             else
@@ -184,11 +201,12 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        string getSelectMethodCall(Expression expression)
+        string getSelectMethodCall(Expression expression,out string memberName)
         {
             var method = expression as MethodCallExpression;
             MemberExpression memberExpression;
             var args = method.Arguments[0];
+            memberName = "";
             string methodArgs = "";
             if (args is ParameterExpression)
             {
@@ -197,16 +215,19 @@ namespace CRL.LambdaQuery
                 var p = type.GetProperty("Body");
                 var exp3 = p.GetValue(exp2.Operand, null) as Expression;
                 methodArgs = getSeletctBinary(exp3);
+                memberName = "";
             }
             else if (args is UnaryExpression)//like a.Code.Count()
             {
                 memberExpression = (args as UnaryExpression).Operand as MemberExpression;
+                memberName = memberExpression.Member.Name;
                 methodArgs = GetPrefix(memberExpression.Expression.Type) + memberExpression.Member.Name;
             }
             else if (args is MemberExpression)
             {
                 //like a.Code
                 memberExpression = args as MemberExpression;
+                memberName = memberExpression.Member.Name;
                 methodArgs = GetPrefix(memberExpression.Expression.Type) + memberExpression.Member.Name;
             }
             else
@@ -224,7 +245,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         string getSeletctBinary(Expression expression)
         {
-            var str = __Visitor.RouteExpressionHandler(expression);
+            var str = __Visitor.RouteExpressionHandler(expression).SqlOut;
             return str;
         }
         #endregion
@@ -297,22 +318,30 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="expressionBody"></param>
         /// <returns></returns>
-        internal string FormatExpression(Expression expressionBody)
+        internal CRLExpression.CRLExpression FormatExpression(Expression expressionBody)
         {
-            string condition;
+            //string condition;
             if (expressionBody == null)
-                return "";
-            condition = __Visitor.RouteExpressionHandler(expressionBody);
-            condition = ReplacePrefix(condition);
-            return condition;
+                return null;
+            var result = __Visitor.RouteExpressionHandler(expressionBody);
+            if (string.IsNullOrEmpty(result.SqlOut))
+            {
+                result.SqlOut = result.Data + "";
+            }
+            result.SqlOut = ReplacePrefix(result.SqlOut);
+            //RouteCRLExpression(result);
+            return result;
+            //condition = __Visitor.RouteExpressionHandler(expressionBody).FullOut;
+            //condition = ReplacePrefix(condition);
+            //return condition;
         }
-
+        
         internal string FormatJoinExpression(Expression expressionBody)
         {
             string condition;
             if (expressionBody == null)
                 return "";
-            condition = __Visitor.RouteExpressionHandler(expressionBody);
+            condition = __Visitor.RouteExpressionHandler(expressionBody).SqlOut;
             //GetPrefix(typeof(TInner));
             condition = ReplacePrefix(condition);
             return condition;
@@ -333,7 +362,7 @@ namespace CRL.LambdaQuery
                 throw new Exception(string.Format("关联查询不能指定自已 {0} {1}" , inner,condition));
                 return;
             }
-            new DBExtend(__DbContext).CheckTableCreated(inner);
+            DBExtendFactory.CreateDBExtend(__DbContext).CheckTableCreated(inner);
             var tableName = TypeCache.GetTableName(inner, __DbContext);
 
             string aliasName = GetPrefix(inner);

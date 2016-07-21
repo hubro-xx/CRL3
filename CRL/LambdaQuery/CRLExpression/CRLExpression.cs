@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -58,5 +58,13 @@ namespace CRL.LambdaQuery.CRLExpression
         /// 左右操作类型
         /// </summary>
         public string ExpressionType;
+
+
+        [System.Xml.Serialization.XmlIgnore]
+        public string SqlOut
+        {
+            get;
+            set;
+        }
     }
 }

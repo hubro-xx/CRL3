@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 
 namespace CRL.LambdaQuery
 {
-    public sealed partial class LambdaQuery<T> : LambdaQueryBase where T : IModel, new()
+    public abstract partial class LambdaQuery<T> : LambdaQueryBase where T : IModel, new()
     {
         #region group
         /// <summary>
@@ -43,7 +43,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQuery<T> GroupHaving(Expression<Func<T, bool>> expression)
         {
-            string condition = FormatExpression(expression.Body);
+            string condition = FormatExpression(expression.Body).SqlOut;
             Having += string.IsNullOrEmpty(Having) ? condition : " and " + condition;
             return this;
         }

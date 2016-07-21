@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -26,7 +26,13 @@ namespace CRL
         {
             DBHelper = dbHelper;
             DBLocation = dbLocation;
+            //todo 按数据库类型类型判断
+            DataBaseArchitecture = dbHelper.CurrentDBType == CoreHelper.DBType.MongoDB ? DataBaseArchitecture.NotRelation : CRL.DataBaseArchitecture.Relation;
         }
+        /// <summary>
+        /// 数据库架构类型
+        /// </summary>
+        internal DataBaseArchitecture DataBaseArchitecture;
         /// <summary>
         /// 数据库连接定位
         /// </summary>

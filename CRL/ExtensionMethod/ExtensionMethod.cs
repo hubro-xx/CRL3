@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -253,6 +253,17 @@ namespace CRL
         public static int ToInt(this Enum e)
         {
             return Convert.ToInt32(e);
+        }
+        /// <summary>
+        /// 按索引和长度检索字符串
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="index"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static string Substring(this String s, int index, int length)
+        {
+            return "";
         }
         public static int ToInt(this String s)
         {

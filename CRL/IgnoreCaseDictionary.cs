@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -17,6 +17,16 @@ namespace CRL
     /// </summary>
     public class IgnoreCaseDictionary<T> : Dictionary<string, T> where T : class
     {
+        Dictionary<string, string> keyMaping = new Dictionary<string, string>();
+        string getKey(string key)
+        {
+            var key2 = key.ToUpper();
+            if (!keyMaping.ContainsKey(key2))
+            {
+                keyMaping[key2] = key;
+            }
+            return keyMaping[key2];
+        }
         /// <summary>
         /// 获取键值,按小写
         /// </summary>
@@ -27,30 +37,30 @@ namespace CRL
             get
             {
                 T obj = null;
-                TryGetValue(key.ToLower(), out obj);
+                TryGetValue(getKey(key), out obj);
                 return obj as T;
             }
             set
             {
-                base[key.ToLower()] = value;
+                base[getKey(key)] = value;
             }
         }
         /// <summary>
-        /// 按小写名添加到字典
+        /// 添加到字典
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         public new void Add(string key, T value)
         {
-            base.Add(key.ToLower(), value);
+            base.Add(getKey(key), value);
         }
         public new bool ContainsKey(string key)
         {
-            return base.ContainsKey(key.ToLower());
+            return base.ContainsKey(getKey(key));
         }
         public new bool Remove(string key)
         {
-            return base.Remove(key.ToLower());
+            return base.Remove(getKey(key));
         }
     }
 }
