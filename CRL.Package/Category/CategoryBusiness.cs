@@ -30,7 +30,7 @@ namespace CRL.Package.Category
         }
         public string MakeNewCode(string parentSequenceCode, TModel category)
         {
-            DBExtend helper = DBExtend;
+            var helper = DBExtend;
             string newCode = parentSequenceCode + "";
             #region 生成新编码
 
@@ -63,7 +63,7 @@ namespace CRL.Package.Category
         /// <returns></returns>
         public TModel Add(string parentSequenceCode, TModel category)
         {
-            DBExtend helper = DBExtend;
+            var helper = DBExtend;
             string newCode = MakeNewCode(parentSequenceCode, category);
             //helper.Clear();
             category.SequenceCode = newCode;

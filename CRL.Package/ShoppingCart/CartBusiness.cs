@@ -42,7 +42,7 @@ namespace CRL.Package.ShoppingCart
         /// <returns></returns>
         public decimal GetTotalAmount(int userId, int cartType=0)
         {
-            DBExtend helper = DBExtend;
+            var helper = DBExtend;
 
             var a = Sum<decimal>(b => b.UserId == userId && b.CartType == cartType && b.Selected == true, b => b.Num * b.Price);
             return a;
@@ -56,7 +56,7 @@ namespace CRL.Package.ShoppingCart
         /// <returns></returns>
         public int Add(TModel item,bool groupByPrice=false)
         {
-            DBExtend helper = DBExtend;
+            var helper = DBExtend;
             TModel item2;
             if (groupByPrice)//按价格分组
             {

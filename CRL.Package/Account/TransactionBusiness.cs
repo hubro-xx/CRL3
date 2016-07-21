@@ -26,7 +26,7 @@ namespace CRL.Package.Account
 
         public override string CreateTable()
         {
-            DBExtend helper = DBExtend;
+            var helper = DBExtend;
             Transaction obj1 = new Transaction();
             //IAccountRecord obj2 = new IAccountRecord();
             string msg = obj1.CreateTable(helper);

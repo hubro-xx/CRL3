@@ -21,7 +21,7 @@ namespace CRL.Package.RoleAuthorize
 
         public new string CreateTable()
         {
-            DBExtend helper = DBExtend;
+            var helper = DBExtend;
             AccessControl obj1 = new AccessControl();
             string msg = obj1.CreateTable(helper);
             Employee obj2 = new Employee();

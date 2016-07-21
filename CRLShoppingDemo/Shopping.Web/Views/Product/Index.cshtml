@@ -28,7 +28,7 @@
         </tr>
     }
 </table>
-@Core.Mvc.HtmlHelper.CreatePageNavigation(Model)
+@Core.Mvc.ControllHelper.CreatePageNavigation(Model)
 <script>
     function addToCart( productId,   num) {
         $.post("/cart/AddToCart", { productId: productId, num: num }, function (result) {
