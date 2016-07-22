@@ -504,7 +504,7 @@ end
         {
             throw new NotImplementedException();
         }
-        public override string CastToString(string field)
+        public override string CastField(string field, Type fieldType)
         {
             throw new NotImplementedException();
         }

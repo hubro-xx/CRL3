@@ -37,7 +37,7 @@ namespace CRL.LambdaQuery
                 dbContext.parIndex = value;
             }
         }
-        CRLExpression.CRLExpression DealParame(CRLExpression.CRLExpression par1, string typeStr, out string typeStr2)
+        public CRLExpression.CRLExpression DealParame(CRLExpression.CRLExpression par1, string typeStr, out string typeStr2)
         {
 
             var par = par1.Data + "";
@@ -57,7 +57,7 @@ namespace CRL.LambdaQuery
                     throw new Exception("LambdaQuery不支持方法" + method.MethodName);
                 }
                 int newParIndex = parIndex;
-                par = dic[method.MethodName](method.MemberQueryName, method.ExpressionType, ref newParIndex, AddParame, method.Args.ToArray());
+                par = dic[method.MethodName](method, ref newParIndex, AddParame);
                 parIndex = newParIndex;
             }
 
@@ -253,6 +253,7 @@ namespace CRL.LambdaQuery
                 //parIndex = newParIndex;
                 //return result;
                 var methodInfo = new CRLExpression.MethodCallObj() { Args = args, ExpressionType = nodeType.Value, MemberName = field.Substring(field.LastIndexOf("}") + 1), MethodName = methodName, MemberQueryName = field };
+                methodInfo.ReturnType = mcExp.Type;
                 return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.MethodCall, Data = methodInfo };
                 #endregion
             }

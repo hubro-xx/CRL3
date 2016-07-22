@@ -247,3 +247,5 @@
 2016-07-18
 	升级到版本4.0,非关系型数据库MongoDB能被支持了
 	优化IgnoreCaseDictionary,Key保持原始值
+2016-07-21
+	增加字段转换计算 => b.Id.ToString() == "123" 能转换成cast语法了

@@ -22,6 +22,7 @@ namespace CRL.LambdaQuery.CRLExpression
         /// </summary>
         public string MemberQueryName;
         public string MethodName;
+        public Type ReturnType;
         public ExpressionType ExpressionType;
         public List<object> Args;
     }

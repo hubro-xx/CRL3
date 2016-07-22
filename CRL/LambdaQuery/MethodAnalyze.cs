@@ -14,7 +14,7 @@ using System.Text;
 
 namespace CRL.LambdaQuery
 {
-    internal delegate string MethodHandler(string field, ExpressionType nodeType,ref int parIndex, AddParameHandler addParame, params object[] args);
+    internal delegate string MethodHandler(CRLExpression.MethodCallObj methodInfo,ref int parIndex, AddParameHandler addParame);
     internal delegate void AddParameHandler(string name, object value);
     internal class MethodAnalyze
     {
@@ -59,45 +59,59 @@ namespace CRL.LambdaQuery
                 methodDic.Add("AVG", AVG);
                 methodDic.Add("Equals", Equals);
                 methodDic.Add("StartsWith", StartsWith);
-                methodDic.Add("ToString", ToString);
+                methodDic.Add("ToString", CaseToType);
+                methodDic.Add("ToInt32", CaseToType);
+                methodDic.Add("ToDecimal", CaseToType);
+                methodDic.Add("ToDouble", CaseToType);
+                methodDic.Add("ToBoolean", CaseToType);
+                methodDic.Add("ToDateTime", CaseToType);
+                methodDic.Add("ToInt16", CaseToType);
+                methodDic.Add("ToSingle", CaseToType);
             }
             return methodDic;
         }
-        public string ToString(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string CaseToType(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
-            return dBAdapter.CastToString(field);
+            var field = methodInfo.MemberQueryName;
+            return dBAdapter.CastField(field, methodInfo.ReturnType);
         }
 
-        public string Substring(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string Substring(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
-            if (args.Length > 2)
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args;
+            if (args.Count > 2)
             {
                 throw new Exception("Substring扩展方法需要两个参数,index,length");
             }
             return dBAdapter.SubstringFormat(field, (int)args[0], (int)args[1]);
             //return string.Format(" SUBSTRING({0},{1},{2})", field, args[0], args[1]);
         }
-        public string StringLike(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string StringLike(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
-            var args1 = args[0];
-            return StringLikeFull(field, nodeType, ref parIndex, addParame, "%{0}%", args1);
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args;
+            return StringLikeFull(methodInfo,ref parIndex, addParame, "%{0}%");
         }
-        public string StringLikeLeft(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string StringLikeLeft(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
             //string str = args[0].ToString();
             //str = str.Replace("%", "");
-            var args1 = args[0];
-            return StringLikeFull(field, nodeType, ref parIndex, addParame, "%{0}", args1);
+            return StringLikeFull(methodInfo,ref parIndex, addParame, "%{0}");
         }
-        public string StringLikeRight(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string StringLikeRight(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
             //string str = args[0].ToString();
             //str = str.Replace("%","");
-            var args1 = args[0];
-            return StringLikeFull(field, nodeType, ref parIndex, addParame, "{0}%", args1);
+            return StringLikeFull(methodInfo, ref parIndex, addParame, "{0}%");
         }
-        string StringLikeFull(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, string likeFormat,object args)
+        string StringLikeFull(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame,string likeFormat)
         {
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args[0];
             string parName = string.Format("@like{0}" , parIndex);
             parIndex += 1;
 
@@ -127,8 +141,11 @@ namespace CRL.LambdaQuery
             }
             //return string.Format("{0} LIKE {1}", field, parName);
         }
-        public string StringContains(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string StringContains(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args;
             string parName = string.Format("@contrains{0}", parIndex);
             var args1 = args[0];
             if (args1 is ExpressionValueObj)
@@ -150,8 +167,11 @@ namespace CRL.LambdaQuery
             }
             //return string.Format("CHARINDEX({1},{0})>0", field, parName);
         }
-        public string Between(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string Between(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args;
             string parName = string.Format("@between{0}", parIndex);
             var args1 = args[0];
             var args2 = args[1];
@@ -184,8 +204,11 @@ namespace CRL.LambdaQuery
             }
             //return string.Format("{0} between {1} and {2}", field, parName, parName2);
         }
-        public string DateTimeDateDiff(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string DateTimeDateDiff(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args;
             string parName = string.Format("@DateDiff{0}", parIndex);
             var args1 = args[0];
             if (args1 is ExpressionValueObj)
@@ -202,40 +225,30 @@ namespace CRL.LambdaQuery
             //return string.Format("DateDiff({0},{1},{2}){3}", args[0], field, parName, args[2]);
         }
         #region 函数
-        /// <summary>
-        /// 表示COUNT此字段
-        /// </summary>
-        /// <param name="field"></param>
-        /// <param name="parIndex"></param>
-        /// <param name="addParame"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public string Count(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string Count(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
             return string.Format("count({0})", field);
         }
-        /// <summary>
-        /// 表示SUM此字段
-        /// </summary>
-        /// <param name="field"></param>
-        /// <param name="parIndex"></param>
-        /// <param name="addParame"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public string Sum(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+
+        public string Sum(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
             return string.Format("sum({0})", field);
         }
-        public string Max(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string Max(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
             return string.Format("max({0})", field);
         }
-        public string Min(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string Min(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
             return string.Format("min({0})", field);
         }
-        public string AVG(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string AVG(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
             return string.Format("avg({0})", field);
         }
         #endregion
@@ -281,8 +294,11 @@ namespace CRL.LambdaQuery
             }
             return str;
         }
-        public string In(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string In(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args;
             string str = InFormat(args[0], ref parIndex, addParame);
             if (nodeType == ExpressionType.Equal)
             {
@@ -294,8 +310,11 @@ namespace CRL.LambdaQuery
             }
             //return string.Format("{0} IN ({1})", field, str);
         }
-        public string Equals(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string Equals(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args;
             string parName = string.Format("@equalEnum{0}", parIndex);
             parIndex += 1;
             var args1 = args[0];
@@ -317,8 +336,11 @@ namespace CRL.LambdaQuery
                 return string.Format("{0}!={1}", field, parName);
             }
         }
-        public string StartsWith(string field, ExpressionType nodeType, ref int parIndex, AddParameHandler addParame, object[] args)
+        public string StartsWith(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
+            var field = methodInfo.MemberQueryName;
+            var nodeType = methodInfo.ExpressionType;
+            var args = methodInfo.Args;
             var par = args[0].ToString();
             string parName = string.Format("@StartsWith{0}", parIndex);
             parIndex += 1;

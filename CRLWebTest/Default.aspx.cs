@@ -21,14 +21,17 @@ namespace WebTest
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            var c = new CRL.ParameCollection();
-            c["A"] = 1;
-            var b = c["a"];
+
             //MongoDBTest.Test();
             //TestAllQuery();
-            
 
-            //var p = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0);
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query.Where(b => !b.BarCode.StartsWith("123"));
+            //query.Where(b => b.Id.ToString() != "123");
+            //query.Where(b => Convert.ToSingle(b.SoldPrice) == 100);
+            var result = query.PrintQuery();
+            var list = query.ToList();
+            Response.Write(result);
             //p.UserId += 1;//只会更新UserId
             //Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
 

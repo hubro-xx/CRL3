@@ -324,9 +324,10 @@ namespace CRL.LambdaQuery
             if (expressionBody == null)
                 return null;
             var result = __Visitor.RouteExpressionHandler(expressionBody);
-            if (string.IsNullOrEmpty(result.SqlOut))
+            if (string.IsNullOrEmpty(result.SqlOut))//没有构成树
             {
-                result.SqlOut = result.Data + "";
+                string typeStr2 = "";
+                result.SqlOut = __Visitor.DealParame(result, "", out typeStr2).Data + "";
             }
             result.SqlOut = ReplacePrefix(result.SqlOut);
             //RouteCRLExpression(result);

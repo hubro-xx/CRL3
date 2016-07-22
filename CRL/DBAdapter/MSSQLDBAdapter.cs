@@ -508,9 +508,16 @@ set  nocount  on
             return string.Format("{0} NOT IN ({1})", field, parName);
         }
         #endregion
-        public override string CastToString(string field)
+        public override string CastField(string field, Type fieldType)
         {
-            return string.Format("CAST({0} as nvarchar)", field);
+            var dic = FieldMaping();
+            if (!dic.ContainsKey(fieldType))
+            {
+                throw new Exception(string.Format("没找到对应类型的转换{0} 在字段{1}", fieldType, field));
+            }
+            var type = dic[fieldType];
+            type = string.Format(type, 100);
+            return string.Format("CAST({0} as {1})", field, type);
         }
     }
 
@@ -564,10 +571,6 @@ set  nocount  on
                     helper.Execute(s);
                 }
             }
-        }
-        public override string CastToString(string field)
-        {
-            return string.Format("CAST({0} as nvarchar)", field);
         }
     }
 }

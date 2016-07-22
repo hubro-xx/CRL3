@@ -40,6 +40,7 @@ namespace WebTest.Code
             query.Where(b => b.ProductName.Like("123"));// %like%
             query.Where(b => b.ProductName.LikeLeft("123"));// %like
             query.Where(b => b.ProductName.LikeRight("123"));// like%
+            query.Where(b => b.Id.ToString() == "123");//支持Cast转换
             query.Page(2, 1);
             var sql1 = query.PrintQuery();
             var list = query.ToDynamic();

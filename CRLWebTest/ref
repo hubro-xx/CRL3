@@ -2675,7 +2675,7 @@
         </member>
         <member name="M:CRL.IgnoreCaseDictionary`1.Add(System.String,`0)">
             <summary>
-            按小写名添加到字典
+            添加到字典
             </summary>
             <param name="key"></param>
             <param name="value"></param>
@@ -2756,6 +2756,11 @@
         <member name="P:CRL.LambdaQuery.CRLExpression.CRLQueryExpression.PageIndex">
             <summary>
             分页用,页索引
+            </summary>
+        </member>
+        <member name="F:CRL.LambdaQuery.CRLExpression.MethodCallObj.MemberQueryName">
+            <summary>
+            SQL查询名
             </summary>
         </member>
         <member name="T:CRL.LambdaQuery.LambdaQuery`1">
@@ -3884,26 +3889,6 @@
             </summary>
             <typeparam name="TJoin2"></typeparam>
             <param name="expression"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.LambdaQuery.MethodAnalyze.Count(System.String,System.Linq.Expressions.ExpressionType,System.Int32@,CRL.LambdaQuery.AddParameHandler,System.Object[])">
-            <summary>
-            表示COUNT此字段
-            </summary>
-            <param name="field"></param>
-            <param name="parIndex"></param>
-            <param name="addParame"></param>
-            <param name="args"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.LambdaQuery.MethodAnalyze.Sum(System.String,System.Linq.Expressions.ExpressionType,System.Int32@,CRL.LambdaQuery.AddParameHandler,System.Object[])">
-            <summary>
-            表示SUM此字段
-            </summary>
-            <param name="field"></param>
-            <param name="parIndex"></param>
-            <param name="addParame"></param>
-            <param name="args"></param>
             <returns></returns>
         </member>
         <member name="T:CRL.LambdaQuery.ParameterRebinder">

@@ -455,7 +455,7 @@ end
                   , KeyWordFormat(t2), setValue, condition);
             return sql;
         }
-        public override string CastToString(string field)
+        public override string CastField(string field, Type fieldType)
         {
             throw new NotImplementedException();
         }
