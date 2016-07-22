@@ -53,7 +53,7 @@ namespace CRL.LambdaQuery
         public List<dynamic> ToDynamic()
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            if (PageSize > 0)
+            if (SkipPage > 0)
             {
                 return db.Page(this);
             }
@@ -81,7 +81,7 @@ namespace CRL.LambdaQuery
             where TResult : class,new()
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            if (PageSize > 0)
+            if (SkipPage > 0)
             {
                 return db.Page<T, TResult>(this);
             }
@@ -96,7 +96,7 @@ namespace CRL.LambdaQuery
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
             //如果是筛选后的结果,属性可能匹配不上
-            if (PageSize > 0)
+            if (SkipPage > 0)
             {
                 return db.Page<T, T>(this);
             }

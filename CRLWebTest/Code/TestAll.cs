@@ -175,13 +175,13 @@ namespace WebTest.Code
 
             #region 缓存更新
             //按编号为1的数据
-            var item = Code.ProductDataManage.Instance.QueryItemFromCache(1);
+            var item = Code.ProductDataManage.Instance.QueryFromCache(b => b.Id > 0).FirstOrDefault();
             item.CheckNull("item");
             var guid = Guid.NewGuid().ToString().Substring(0,8);
             item.Change(b => b.SupplierName, guid);
             Code.ProductDataManage.Instance.Update(item);
-            item = Code.ProductDataManage.Instance.QueryItemFromCache(1);
-            var item2 = Code.ProductDataManage.Instance.QueryItem(1);
+            item = Code.ProductDataManage.Instance.QueryItemFromCache(item.Id);
+            var item2 = Code.ProductDataManage.Instance.QueryItem(item.Id);
             var a2 = item.SupplierName == item2.SupplierName && item.SupplierName == guid;
             if (!a2)
             {

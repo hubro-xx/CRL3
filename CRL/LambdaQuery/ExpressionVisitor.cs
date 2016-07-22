@@ -317,7 +317,7 @@ namespace CRL.LambdaQuery
             QueryParames.Add(name, value);
             //parIndex += 1;
         }
-        public string ExpressionTypeCast(ExpressionType expType)
+        public static string ExpressionTypeCast(ExpressionType expType)
         {
             switch (expType)
             {

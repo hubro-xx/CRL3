@@ -72,7 +72,7 @@ namespace Core.Mvc
         public static PageObj<T> ToPageObj<T>(this CRL.LambdaQuery.LambdaQuery<T> query) where T : CRL.IModel, new()
         {
             var result = query.ToList();
-            var pageObj = new PageObj<T>(result, query.PageIndex, query.RowCount, query.PageSize);
+            var pageObj = new PageObj<T>(result, query.SkipPage, query.RowCount, query.TakeNum);
             return pageObj;
         }
 

@@ -66,7 +66,7 @@ namespace Shopping.Web.Controllers
         {
             var query = ProductManage.Instance.GetLambdaQuery();
             query.Where(b => b.SupplierId == CurrentUser.Id);
-
+            query.Page(pageSize, page);
             var result = query.ToList();
             int count = query.RowCount;
             var pageObj = new PageObj<Product>(result, page, count, pageSize);

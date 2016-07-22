@@ -11,7 +11,7 @@ namespace WebTest.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            TestMongoDB();
+           
         }
         void TestMongoDB()
         {
@@ -47,6 +47,11 @@ namespace WebTest.Page
             var item2 = instance.QueryItem(b => b.Status > 0);
             item2.Status = 123;
             instance.Update(item2);
+        }
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            TestMongoDB();
         }
     }
 }

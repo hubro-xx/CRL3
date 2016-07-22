@@ -29,9 +29,7 @@ namespace CRL.DBExtend.MongoDB
 
         public override List<dynamic> Page<TModel>(LambdaQuery.LambdaQuery<TModel> query1)
         {
-            //todo
-            throw new NotSupportedException();
-           
+            return GetDynamicResult(query1);
         }
 
         

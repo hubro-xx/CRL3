@@ -25,13 +25,6 @@ namespace WebTest
             //MongoDBTest.Test();
             //TestAllQuery();
 
-            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
-            query.Where(b => !b.BarCode.StartsWith("123"));
-            //query.Where(b => b.Id.ToString() != "123");
-            //query.Where(b => Convert.ToSingle(b.SoldPrice) == 100);
-            var result = query.PrintQuery();
-            var list = query.ToList();
-            Response.Write(result);
             //p.UserId += 1;//只会更新UserId
             //Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
 
@@ -96,7 +89,7 @@ namespace WebTest
             //query.Join<Code.Member>((a, b) => a.UserId == b.Id && a.Id == c, (a, b) => new { a.BarCode, Year2 = b.Year * b.Id });
             //query.AppendJoinValue<Code.Member>((a, b) => a.UserId == b.Id && a.Id == c, b => new { Year2 = b.Year * b.Id });
             //query.OrderBy<Code.Member>(b => b.Name, true);//支持关联对象字段排序了
-            //query.OrderBy(b => b.Id, true);
+            query.OrderBy(b => b.Id);
             var result = query.ToDynamic();
             var sql = query.PrintQuery();
 

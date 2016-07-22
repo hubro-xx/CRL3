@@ -292,7 +292,7 @@ namespace CRL.LambdaQuery
                 {
                     var table = tables[i];
                     var part1 = part.Replace("from " + __DBAdapter.KeyWordFormat(tableName), "from " + __DBAdapter.KeyWordFormat(table.PartName));
-                    sql += __DBAdapter.GetSelectTop(fields, part1, "", __QueryTop);
+                    sql += __DBAdapter.GetSelectTop(fields, part1, "", TakeNum);
                     if (i < tables.Count - 1)
                     {
                         sql += "\r\n" + union + "\r\n";
@@ -302,7 +302,7 @@ namespace CRL.LambdaQuery
             }
             else
             {
-                sql = __DBAdapter.GetSelectTop(fields, part, orderBy, __QueryTop);
+                sql = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
             }
             var ts = DateTime.Now - startTime;
             AnalyticalTime = ts.TotalMilliseconds;

@@ -31,7 +31,7 @@ namespace CRL.DBExtend.RelationDB
         public override List<TModel> QueryList<TModel>(LambdaQuery<TModel> query, out string cacheKey)
         {
             CheckTableCreated<TModel>();
-            if (query.PageSize > 0)//按分页
+            if (query.SkipPage > 0)//按分页
             {
                 cacheKey = "";
                 return Page<TModel, TModel>(query);
@@ -50,7 +50,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 if (!compileSp)
                 {
-                    if (query.__QueryTop > 0)
+                    if (query.TakeNum > 0)
                     {
                         dbHelper.AutoFormatWithNolock = false;
                     }

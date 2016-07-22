@@ -119,23 +119,23 @@ namespace CRL.LambdaQuery
         /// 条件
         /// </summary>
         protected string Condition = "";
-        /// <summary>
-        /// 前几条
-        /// </summary>
-        internal int __QueryTop = 0;
+        ///// <summary>
+        ///// 前几条
+        ///// </summary>
+        //internal int __QueryTop = 0;
         /// <summary>
         /// 使用函数格式化字段
         /// </summary>
         internal string __FieldFunctionFormat = "";
 
         /// <summary>
-        /// 分页每页大小
+        /// 获取记录条数
         /// </summary>
-        public int PageSize = 0;
+        public int TakeNum = 0;
         /// <summary>
-        /// 分页索引
+        /// 分页索引,要分页,设为大于1
         /// </summary>
-        public int PageIndex = 0;
+        public int SkipPage = 0;
 
         /// <summary>
         /// group having
@@ -159,7 +159,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQuery<T> Top(int top)
         {
-            __QueryTop = top;
+            TakeNum = top;
             //return Select(top, null);
             return this;
         }
@@ -181,8 +181,8 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQuery<T> Page(int pageSize = 15, int pageIndex = 1)
         {
-            PageSize = pageSize;
-            PageIndex = pageIndex;
+            TakeNum = pageSize;
+            SkipPage = pageIndex;
             __CompileSp = pageSize > 0;
             return this;
         }

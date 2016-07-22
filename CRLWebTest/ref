@@ -2758,9 +2758,29 @@
             分页用,页索引
             </summary>
         </member>
+        <member name="T:CRL.LambdaQuery.CRLExpression.MethodCallObj">
+            <summary>
+            表示一个方法调用
+            </summary>
+        </member>
+        <member name="F:CRL.LambdaQuery.CRLExpression.MethodCallObj.MemberName">
+            <summary>
+            属性名称
+            </summary>
+        </member>
         <member name="F:CRL.LambdaQuery.CRLExpression.MethodCallObj.MemberQueryName">
             <summary>
             SQL查询名
+            </summary>
+        </member>
+        <member name="F:CRL.LambdaQuery.CRLExpression.MethodCallObj.ReturnType">
+            <summary>
+            返回类型
+            </summary>
+        </member>
+        <member name="F:CRL.LambdaQuery.CRLExpression.MethodCallObj.ExpressionType">
+            <summary>
+            二元运算类型
             </summary>
         </member>
         <member name="T:CRL.LambdaQuery.LambdaQuery`1">
@@ -3026,24 +3046,19 @@
             条件
             </summary>
         </member>
-        <member name="F:CRL.LambdaQuery.LambdaQuery`1.__QueryTop">
-            <summary>
-            前几条
-            </summary>
-        </member>
         <member name="F:CRL.LambdaQuery.LambdaQuery`1.__FieldFunctionFormat">
             <summary>
             使用函数格式化字段
             </summary>
         </member>
-        <member name="F:CRL.LambdaQuery.LambdaQuery`1.PageSize">
+        <member name="F:CRL.LambdaQuery.LambdaQuery`1.TakeNum">
             <summary>
-            分页每页大小
+            获取记录条数
             </summary>
         </member>
-        <member name="F:CRL.LambdaQuery.LambdaQuery`1.PageIndex">
+        <member name="F:CRL.LambdaQuery.LambdaQuery`1.SkipPage">
             <summary>
-            分页索引
+            分页索引,要分页,设为大于1
             </summary>
         </member>
         <member name="F:CRL.LambdaQuery.LambdaQuery`1.Having">

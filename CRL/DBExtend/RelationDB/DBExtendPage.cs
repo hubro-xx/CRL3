@@ -68,8 +68,8 @@ namespace CRL.DBExtend.RelationDB
             var condition = query1.GetQueryConditions();
             condition = _DBAdapter.SqlFormat(condition);
             query1.FillParames(this);
-            var pageIndex = query1.PageIndex;
-            var pageSize = query1.PageSize;
+            var pageIndex = query1.SkipPage;
+            var pageSize = query1.TakeNum;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             AddParam("pageIndex", pageIndex);
@@ -123,18 +123,18 @@ namespace CRL.DBExtend.RelationDB
             condition = _DBAdapter.SqlFormat(condition);
             query1.FillParames(this);
 
-            var pageIndex = query1.PageIndex;
-            var pageSize = query1.PageSize;
+            var pageIndex = query1.SkipPage;
+            var pageSize = query1.TakeNum;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             string countSql = string.Format("select count(*) from {0}", condition);
             int count = Convert.ToInt32(dbHelper.ExecScalar(countSql));
             query1.ExecuteTime += dbHelper.ExecuteTime;
             query1.RowCount = count;
-            if (count == 0)
-            {
-                return null;
-            }
+            //if (count == 0)
+            //{
+            //    return null;
+            //}
             int pageCount = (count + pageSize - 1) / pageSize;
             if (pageIndex > pageCount)
                 pageIndex = pageCount;
@@ -180,8 +180,8 @@ namespace CRL.DBExtend.RelationDB
             conditions = _DBAdapter.SqlFormat(conditions);
 
             query1.FillParames(this);
-            var pageIndex = query1.PageIndex;
-            var pageSize = query1.PageSize;
+            var pageIndex = query1.SkipPage;
+            var pageSize = query1.TakeNum;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             AddParam("pageIndex", pageIndex);
@@ -233,8 +233,8 @@ namespace CRL.DBExtend.RelationDB
             condition = _DBAdapter.SqlFormat(condition);
 
             query1.FillParames(this);
-            var pageIndex = query1.PageIndex;
-            var pageSize = query1.PageSize;
+            var pageIndex = query1.SkipPage;
+            var pageSize = query1.TakeNum;
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
 

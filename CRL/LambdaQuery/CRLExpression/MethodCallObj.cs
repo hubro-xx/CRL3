@@ -14,15 +14,27 @@ using System.Threading.Tasks;
 
 namespace CRL.LambdaQuery.CRLExpression
 {
+    /// <summary>
+    /// 表示一个方法调用
+    /// </summary>
     internal class MethodCallObj
     {
+        /// <summary>
+        /// 属性名称
+        /// </summary>
         public string MemberName;
         /// <summary>
         /// SQL查询名
         /// </summary>
         public string MemberQueryName;
         public string MethodName;
+        /// <summary>
+        /// 返回类型
+        /// </summary>
         public Type ReturnType;
+        /// <summary>
+        /// 二元运算类型
+        /// </summary>
         public ExpressionType ExpressionType;
         public List<object> Args;
     }

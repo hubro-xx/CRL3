@@ -110,7 +110,7 @@ namespace CRL.DBExtend.RelationDB
             var compileSp = query.__CompileSp;
             if (!compileSp)
             {
-                if (query.__QueryTop > 0)
+                if (query.TakeNum > 0)
                 {
                     dbHelper.AutoFormatWithNolock = false;
                 }

@@ -81,7 +81,7 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
-            if (args.Count > 2)
+            if (args.Count < 2)
             {
                 throw new Exception("Substring扩展方法需要两个参数,index,length");
             }
@@ -327,14 +327,16 @@ namespace CRL.LambdaQuery
                 args1 = ObjectConvert.ConvertObject(args1.GetType(), args1);
                 addParame(parName, args1);
             }
-            if (nodeType == ExpressionType.Equal)
-            {
-                return string.Format("{0}={1}", field, parName);
-            }
-            else
-            {
-                return string.Format("{0}!={1}", field, parName);
-            }
+            var operate = ExpressionVisitor.ExpressionTypeCast(nodeType);
+            return string.Format("{0}{2}{1}", field, parName, operate);
+            //if (nodeType == ExpressionType.Equal)
+            //{
+            //    return string.Format("{0}={1}", field, parName);
+            //}
+            //else
+            //{
+            //    return string.Format("{0}!={1}", field, parName);
+            //}
         }
         public string StartsWith(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
@@ -354,15 +356,17 @@ namespace CRL.LambdaQuery
                 addParame(parName, par);
             }
             var str = dBAdapter.SubstringFormat(field, 0, par.Length);
-            if (nodeType == ExpressionType.Equal)
-            {
-                return string.Format("{0}={1}", str, parName);
-            }
-            else
-            {
-                return string.Format("{0}!={1}", str, parName);
-            }
-        }
 
+            var operate = ExpressionVisitor.ExpressionTypeCast(nodeType);
+            return string.Format("{0}{2}{1}", str, parName, operate);
+            //if (nodeType == ExpressionType.Equal)
+            //{
+            //    return string.Format("{0}={1}", str, parName);
+            //}
+            //else
+            //{
+            //    return string.Format("{0}!={1}", str, parName);
+            //}
+        }
     }
 }

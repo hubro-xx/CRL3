@@ -27,15 +27,12 @@ namespace CRL.DBExtend.MongoDB
             var query = query1 as MongoDBLambdaQuery<TModel>;
             var selectField = query.__QueryFields;
             var collection = _MongoDB.GetCollection<TModel>(query.QueryTableName);
-            var pageIndex = query1.PageIndex;
-            var pageSize = query1.PageSize;
-            var skin = 0;
-            if (query.PageSize > 0)
+            var pageIndex = query1.SkipPage;
+            var pageSize = query1.TakeNum;
+            var skip = 0;
+            if (query.TakeNum > 0)
             {
-
-                pageIndex = pageIndex == 0 ? 1 : pageIndex;
-                pageSize = pageSize == 0 ? 15 : pageSize;
-                skin = pageSize * pageIndex;
+                skip = pageSize * pageIndex;
             }
             if (query.__GroupFields.Count > 0)
             {
@@ -63,9 +60,13 @@ namespace CRL.DBExtend.MongoDB
                     }
                 }
                 var aggregate = collection.Aggregate().Match(query.__MongoDBFilter).Group(groupInfo);
-                if (query.PageSize > 0)
+                if (query.TakeNum > 0)
                 {
-                    aggregate.Limit(pageSize).Skip(skin);
+                    aggregate.Limit(pageSize);
+                    if (skip > 0)
+                    {
+                        aggregate.Skip(skip);
+                    }
                 }
 
                 var result = aggregate.ToList();
@@ -99,9 +100,13 @@ namespace CRL.DBExtend.MongoDB
             {
                 #region 动态类型
                 var query2 = collection.Find(query.__MongoDBFilter);
-                if (query.PageSize > 0)
+                if (query.TakeNum > 0)
                 {
-                    query2.Limit(pageSize).Skip(skin);
+                    query2.Limit(pageSize);
+                    if (skip > 0)
+                    {
+                        query2.Skip(skip);
+                    }
                 }
                 var result = query2.ToList();
                 var list = new List<dynamic>();
@@ -172,18 +177,16 @@ namespace CRL.DBExtend.MongoDB
             var collection = _MongoDB.GetCollection<TModel>(query.QueryTableName);
 
             var query2 = collection.Find(query.__MongoDBFilter).Sort(query._MongoDBSort);
-            if (query.__QueryTop > 0)
+            if (query.TakeNum > 0)
             {
-                query2.Limit(query.__QueryTop);
-            }
-            if (query.PageSize > 0)
-            {
-                var pageIndex = query1.PageIndex;
-                var pageSize = query1.PageSize;
-                pageIndex = pageIndex == 0 ? 1 : pageIndex;
-                pageSize = pageSize == 0 ? 15 : pageSize;
-                var n = pageSize * pageIndex;
-                query2.Limit(pageSize).Skip(n);
+                var pageIndex = query1.SkipPage;
+                var pageSize = query1.TakeNum;
+                var skip = pageSize * pageIndex;
+                query2.Limit(pageSize);
+                if (skip > 0)
+                {
+                    query2.Skip(skip);
+                }
             }
             var result = query2.ToList();
             SetOriginClone(result);
