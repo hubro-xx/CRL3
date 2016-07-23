@@ -47,7 +47,7 @@ namespace CRL
                 //更改对象值
                 var pro = TypeCache.GetProperties(typeof(T), false);
                 var field = pro[name];
-                field.SetValue(obj, value);
+                field.TupleSetValue<T>(obj, value);
                 obj.SetChanges(name, value);
             }
             else
@@ -86,7 +86,7 @@ namespace CRL
             //更改对象值
             var pro = TypeCache.GetProperties(typeof(T), false);
             var field = pro[name];
-            field.SetValue(obj, value);
+            field.TupleSetValue<T>(obj, value);
             obj.SetChanges(name, value);
         }
         #region 表示按值累加
@@ -159,7 +159,7 @@ namespace CRL
             var field = pro[name];
             dynamic origin = field.GetValue(obj);
             origin += value;
-            field.SetValue(obj, origin);
+            field.TupleSetValue<T>(obj, origin);
             obj.SetChanges("$" + name, value);
         }
         #endregion

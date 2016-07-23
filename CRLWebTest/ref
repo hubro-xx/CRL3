@@ -1122,8 +1122,16 @@
         </member>
         <member name="M:CRL.Attribute.FieldAttribute.SetValue(System.Object,System.Object)">
             <summary>
-            设置对象属性值
+            用反射设置对象属性值
             </summary>
+            <param name="obj"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:CRL.Attribute.FieldAttribute.TupleSetValue``1(System.Object,System.Object)">
+            <summary>
+            用Tuple委托设置对象属性值
+            </summary>
+            <typeparam name="T"></typeparam>
             <param name="obj"></param>
             <param name="value"></param>
         </member>
@@ -4147,7 +4155,7 @@
             <param name="obj"></param>
             <returns></returns>
         </member>
-        <member name="M:CRL.ObjectConvert.DataReaderToObj(System.Data.Common.DbDataReader,System.Type,System.Collections.Generic.IEnumerable{CRL.Attribute.FieldAttribute})">
+        <member name="M:CRL.ObjectConvert.DataReaderToObj``1(System.Data.Common.DbDataReader,System.Type,System.Collections.Generic.IEnumerable{CRL.Attribute.FieldAttribute})">
             <summary>
             
             </summary>

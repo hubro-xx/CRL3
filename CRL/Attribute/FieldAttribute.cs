@@ -298,6 +298,10 @@ namespace CRL.Attribute
         {
             propertyInfo = _propertyInfo;
         }
+        internal PropertyInfo GetPropertyInfo()
+        {
+            return propertyInfo;
+        }
         /// <summary>
         /// 获取对象属性值
         /// </summary>
@@ -308,7 +312,7 @@ namespace CRL.Attribute
             return propertyInfo.GetValue(obj, null);
         }
         /// <summary>
-        /// 设置对象属性值
+        /// 用反射设置对象属性值
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="value"></param>
@@ -336,6 +340,38 @@ namespace CRL.Attribute
                 throw new Exception(ero.Message + " 在属性" + propertyInfo.Name + " " + propertyInfo.PropertyType);
             }
             propertyInfo.SetValue(obj, value, null);
+        }
+        /// <summary>
+        /// 用Tuple委托设置对象属性值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <param name="value"></param>
+        internal void TupleSetValue<T>(object obj, object value)
+        {
+            if (value == null)
+                return;
+            if (value is DBNull)
+                return;
+            Type type = value.GetType();
+            if (propertyInfo.PropertyType != type)
+            {
+                if (value is Int32 && propertyInfo.PropertyType == typeof(string))
+                {
+                    value = value.ToString();
+                }
+            }
+            try
+            {
+                //oracle会出现类型转换问题
+                value = ObjectConvert.ConvertObject(propertyInfo.PropertyType, value);
+            }
+            catch (Exception ero)
+            {
+                throw new Exception(ero.Message + " 在属性" + propertyInfo.Name + " " + propertyInfo.PropertyType);
+            }
+            var tuple = Tuple.GetCachedPP<T>(ModelType, Name);
+            Tuple.SetPropertyValue(tuple, type, (T)obj, Name, value);
         }
         internal FieldQuery FieldQuery;
     }

@@ -97,7 +97,7 @@ namespace CRL.MemoryDataCache
                     var field = fields[f.Key];
                     if (field == null)//名称带$时不更新
                         continue;
-                    field.SetValue(originObj, f.Value);
+                    field.TupleSetValue<TItem>(originObj, f.Value);
                 }
             }
             else//整体更新

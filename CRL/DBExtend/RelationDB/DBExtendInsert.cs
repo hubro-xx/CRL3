@@ -64,7 +64,7 @@ namespace CRL.DBExtend.RelationDB
             var index = _DBAdapter.InsertObject(obj);
             if (!primaryKey.KeepIdentity)
             {
-                primaryKey.SetValue(obj, index);
+                primaryKey.TupleSetValue<TModel>(obj, index);
             }
             ClearParame();
             var clone = obj.Clone();

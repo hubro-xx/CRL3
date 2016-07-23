@@ -75,7 +75,7 @@ namespace CRL.Dynamic
             var typeArry = TypeCache.GetProperties(typeof(T), true).Values;
             while (reader.Read())
             {
-                var detailItem = ObjectConvert.DataReaderToObj(reader, typeof(T), typeArry) as T;
+                var detailItem = ObjectConvert.DataReaderToObj<T>(reader, typeof(T), typeArry) as T;
                 var result = resultSelector.Compile()(detailItem);
                 list.Add(result);
             }

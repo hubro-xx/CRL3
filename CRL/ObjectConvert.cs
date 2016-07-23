@@ -210,14 +210,15 @@ namespace CRL
             var mainType = typeof(TItem);
             return DataReaderToList<TItem>(reader, mainType, out runTime, setConstraintObj);
         }
-        internal static List<TItem> DataReaderToList<TItem>(DbDataReader reader, Type mainType,out double runTime, bool setConstraintObj = false) where TItem : class, new()
+        internal static List<TItem> DataReaderToList<TItem>(DbDataReader reader, Type mainType, out double runTime, bool setConstraintObj = false) where TItem : class, new()
         {
+            //rem mainType 不一定为TItem
             var time = DateTime.Now;
             var list = new List<TItem>();
             var typeArry = TypeCache.GetProperties(mainType, !setConstraintObj).Values;
             while (reader.Read())
             {
-                var detailItem = DataReaderToObj(reader, mainType, typeArry) as TItem;
+                var detailItem = DataReaderToObj<TItem>(reader, mainType, typeArry) as TItem;
                 list.Add(detailItem);
             }
             reader.Close();
@@ -232,9 +233,10 @@ namespace CRL
         /// <param name="mainType"></param>
         /// <param name="typeArry"></param>
         /// <returns></returns>
-        internal static object DataReaderToObj(DbDataReader reader, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry)
+        internal static object DataReaderToObj<T>(DbDataReader reader, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry)
         {
             object detailItem = System.Activator.CreateInstance(mainType);
+            var canTuple = mainType == typeof(T);
             var columns = new List<string>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
@@ -254,7 +256,14 @@ namespace CRL
                     string tab = TypeCache.GetTableName(info.ConstraintType,null);
                     string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField);
                     var value = reader[fieldName];
-                    info.SetValue(detailItem, value);
+                    if (canTuple)
+                    {
+                        info.TupleSetValue<T>(detailItem, value);
+                    }
+                    else
+                    {
+                        info.SetValue(detailItem, value);
+                    }
                     if (obj2 != null)
                     {
                         obj2[info.Name] = value;
@@ -292,7 +301,14 @@ namespace CRL
                     }
                     object value = reader[info.Name];
                     columns.Remove(info.Name.ToLower());
-                    info.SetValue(detailItem, value);
+                    if (canTuple)
+                    {
+                        info.TupleSetValue<T>(detailItem, value);
+                    }
+                    else
+                    {
+                        info.SetValue(detailItem, value);
+                    }
                     #endregion
                 }
             }
