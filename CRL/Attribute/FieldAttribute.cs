@@ -370,8 +370,9 @@ namespace CRL.Attribute
             {
                 throw new Exception(ero.Message + " 在属性" + propertyInfo.Name + " " + propertyInfo.PropertyType);
             }
-            var tuple = Tuple.GetCacheTupleDelegate<T>(ModelType, Name);
-            Tuple.SetPropertyValue(tuple, (T)obj, Name, value);
+            var tuple = Tuple.GetCacheDelegate<T>(ModelType, Name);
+            tuple.SetValue(obj, value);
+            //Tuple.SetPropertyValue2(tuple, (T)obj, value);
         }
         internal FieldQuery FieldQuery;
     }
