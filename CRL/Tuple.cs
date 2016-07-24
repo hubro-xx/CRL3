@@ -24,8 +24,14 @@ namespace CRL
             }
             //public Tuple<PropertyInfo, Delegate> TupleDelegate;
             public Action<object, object> SetValue;
+            //public Func<object, object> GetValue; 
         }
         internal static DelegateCacheItem GetCacheDelegate<T>(Type type, string propertyName)
+        {
+            var properties = TypeCache.GetProperties(type, false).Values.Select(b => b.GetPropertyInfo());
+            return GetCacheDelegate<T>(type, properties, propertyName);
+        }
+        internal static DelegateCacheItem GetCacheDelegate<T>(Type type, IEnumerable<PropertyInfo> properties, string propertyName)
         {
             var key = (type.FullName + "." + propertyName).ToUpper();
             DelegateCacheItem deletageItem = null;
@@ -33,10 +39,9 @@ namespace CRL
             {
                 return deletageItem;
             }
-            var properties = TypeCache.GetProperties(type, false);
-            foreach (var item in properties)
+            foreach (var prop in properties)
             {
-                var prop = item.Value.GetPropertyInfo();
+                //var prop = item.Value.GetPropertyInfo();
                 var cacheItem = new DelegateCacheItem();
                 #region 判断
                 if (typeof(int) == prop.PropertyType)
