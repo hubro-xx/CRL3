@@ -41,6 +41,7 @@ namespace WebTest.Page
             query.Where(b => b.ProductName.Like("123"));// %like%
             query.Where(b => b.ProductName.LikeLeft("123"));// %like
             query.Where(b => b.ProductName.LikeRight("123"));// like%
+            query.Where(b => !string.IsNullOrEmpty(b.BarCode));
             int LastDays = 30;
             query.Where(b => b.AddTime.DateDiff(CRL.DatePart.dd, DateTime.Now) < LastDays);
             query.PrintQuery();

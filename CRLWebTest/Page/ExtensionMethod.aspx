@@ -28,6 +28,7 @@
         query.Where(b => b.ProductName.Like("123"));// %like%
         query.Where(b => b.ProductName.LikeLeft("123"));// %like
         query.Where(b => b.ProductName.LikeRight("123"));// like%
+        query.Where(b => !string.IsNullOrEmpty(b.BarCode));
         query.PrintQuery();
     </pre>
 </asp:Content>

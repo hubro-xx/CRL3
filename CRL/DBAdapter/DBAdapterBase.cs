@@ -315,6 +315,10 @@ namespace CRL.DBAdapter
             return string.Format("{0} NOT IN ({1})", field, parName);
         }
         public abstract string CastField(string field,Type fieldType);
+        public virtual string IsNotFormat(bool isNot)
+        {
+            return isNot ? "is not" : "is";
+        }
         #endregion
 
         /// <summary>

@@ -75,6 +75,7 @@ namespace WebTest
             int c = 10;
             query.Where(b => !b.BarCode.Contains("123"));
             query.Where(b => !b.IsTop);
+            query.Where(b => string.IsNullOrEmpty(b.BarCode));
             //query.Select(b => new { num = b.Number, aa = b.Id * b.Number, bb = 10, b.BarCode });//支持字段间二元运算
             //query.Select(b => b.Number.SUM());
             //query.Where(b => b.BarCode == aa());

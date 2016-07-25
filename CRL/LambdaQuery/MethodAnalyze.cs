@@ -59,6 +59,7 @@ namespace CRL.LambdaQuery
                 methodDic.Add("AVG", AVG);
                 methodDic.Add("Equals", Equals);
                 methodDic.Add("StartsWith", StartsWith);
+                methodDic.Add("IsNullOrEmpty", IsNullOrEmpty);
                 methodDic.Add("ToString", CaseToType);
                 methodDic.Add("ToInt32", CaseToType);
                 methodDic.Add("ToDecimal", CaseToType);
@@ -67,8 +68,17 @@ namespace CRL.LambdaQuery
                 methodDic.Add("ToDateTime", CaseToType);
                 methodDic.Add("ToInt16", CaseToType);
                 methodDic.Add("ToSingle", CaseToType);
+                
             }
             return methodDic;
+        }
+        public string IsNullOrEmpty(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            var isNot = methodInfo.ExpressionType == ExpressionType.Not;
+            var notStr = dBAdapter.IsNotFormat(isNot);
+            var result = string.Format("({0} {1} null {3} {0}{2}'')", field, notStr, isNot ? "!=" : "=", isNot ? "and" : "or");
+            return result;
         }
         public string CaseToType(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
