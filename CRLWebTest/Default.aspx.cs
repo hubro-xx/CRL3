@@ -23,7 +23,7 @@ namespace WebTest
         {
 
             //MongoDBTest.Test();
-            //TestAllQuery();
+            TestAllQuery();
 
             //p.UserId += 1;//只会更新UserId
             //Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
@@ -71,7 +71,7 @@ namespace WebTest
             string bc = "sdfsdf";
             filed1 = DateTime.Now.ToString();
             var query = Code.ProductDataManage.Instance.GetLambdaQuery();
-            query.Select(b => new {aa=b.BarCode, b.CategoryName,cc=b.Id.SUM() });
+            //query.Select(b => new {aa=b.BarCode, b.CategoryName,cc=b.Id.SUM() });
             int c = 10;
             query.Where(b => !b.BarCode.Contains("123"));
             query.Where(b => !b.IsTop);
@@ -89,7 +89,7 @@ namespace WebTest
             //query.Join<Code.Member>((a, b) => a.UserId == b.Id && a.Id == c, (a, b) => new { a.BarCode, Year2 = b.Year * b.Id });
             //query.AppendJoinValue<Code.Member>((a, b) => a.UserId == b.Id && a.Id == c, b => new { Year2 = b.Year * b.Id });
             //query.OrderBy<Code.Member>(b => b.Name, true);//支持关联对象字段排序了
-            query.OrderBy(b => b.Id);
+            query.OrderBy(b => b.Id*1);
             var result = query.ToDynamic();
             var sql = query.PrintQuery();
 

@@ -242,10 +242,10 @@ namespace CRL.DBExtend.RelationDB
             int count = Convert.ToInt32(dbHelper.ExecScalar(countSql));
             query1.ExecuteTime += dbHelper.ExecuteTime;
             query1.RowCount = count;
-            if (count == 0)
-            {
-                return null;
-            }
+            //if (count == 0)
+            //{
+            //    return null;
+            //}
             int pageCount = (count + pageSize - 1) / pageSize;
             if (pageIndex > pageCount)
                 pageIndex = pageCount;

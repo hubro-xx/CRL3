@@ -28,16 +28,25 @@ namespace CRL
         }
         internal static DelegateCacheItem GetCacheDelegate<T>(Type type, string propertyName)
         {
-            var properties = TypeCache.GetProperties(type, false).Values.Select(b => b.GetPropertyInfo());
-            return GetCacheDelegate<T>(type, properties, propertyName);
-        }
-        internal static DelegateCacheItem GetCacheDelegate<T>(Type type, IEnumerable<PropertyInfo> properties, string propertyName)
-        {
             var key = (type.FullName + "." + propertyName).ToUpper();
             DelegateCacheItem deletageItem = null;
             if (DelegateCache.TryGetValue(key, out deletageItem))
             {
                 return deletageItem;
+            }
+            var properties = TypeCache.GetProperties(type, false).Values.Select(b => b.GetPropertyInfo());
+            return GetCacheDelegate<T>(type, properties, propertyName, false);
+        }
+        internal static DelegateCacheItem GetCacheDelegate<T>(Type type, IEnumerable<PropertyInfo> properties, string propertyName, bool fromCache = true)
+        {
+            var key = (type.FullName + "." + propertyName).ToUpper();
+            if (fromCache)
+            {
+                DelegateCacheItem deletageItem = null;
+                if (DelegateCache.TryGetValue(key, out deletageItem))
+                {
+                    return deletageItem;
+                }
             }
             foreach (var prop in properties)
             {

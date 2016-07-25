@@ -42,6 +42,7 @@ namespace WebTest.Code
             query.Where(b => b.ProductName.LikeRight("123"));// like%
             query.Where(b => b.Id.ToString() == "123");//支持Cast转换
             query.Page(2, 1);
+            query.OrderBy(b => b.Id * 1);
             var sql1 = query.PrintQuery();
             var list = query.ToDynamic();
             #endregion
@@ -56,6 +57,7 @@ namespace WebTest.Code
             foreach (var item in list2)
             {
                 var mobile = item["Mobile"];
+                var mobile2 = item.Bag.Mobile;
             }
             //按筛选值
             query = ProductDataManage.Instance.GetLambdaQuery();

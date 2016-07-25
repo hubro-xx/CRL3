@@ -148,7 +148,9 @@ namespace CRL.DBExtend.MongoDB
                     if (dict.ContainsKey(columnName))
                     {
                         object value = dict[columnName];
-                        f.SetValue(obj, value);
+                        //f.SetValue(obj, value);
+                        var tuple = Tuple.GetCacheDelegate<TResult>(type, pro, columnName);
+                        tuple.SetValue(obj, value);
                     }
                 }
                 list.Add(obj);
