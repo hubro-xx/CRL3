@@ -68,9 +68,20 @@ namespace CRL.LambdaQuery
                 methodDic.Add("ToDateTime", CaseToType);
                 methodDic.Add("ToInt16", CaseToType);
                 methodDic.Add("ToSingle", CaseToType);
-                
+                methodDic.Add("ToUpper", ToUpper);
+                methodDic.Add("ToLower", ToLower);
             }
             return methodDic;
+        }
+        public string ToUpper(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            return dBAdapter.ToUpperFormat(field);
+        }
+        public string ToLower(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            return dBAdapter.ToLowerFormat(field);
         }
         public string IsNullOrEmpty(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
@@ -103,7 +114,7 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
-            return StringLikeFull(methodInfo,ref parIndex, addParame, "%{0}%");
+            return StringLikeFull(methodInfo, ref parIndex, addParame, "%{0}%");
         }
         public string StringLikeLeft(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {

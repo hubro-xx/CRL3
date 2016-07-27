@@ -319,6 +319,14 @@ namespace CRL.DBAdapter
         {
             return isNot ? "is not" : "is";
         }
+        public virtual string ToUpperFormat(string field)
+        {
+            return string.Format("upper({0})",field);
+        }
+        public virtual string ToLowerFormat(string field)
+        {
+            return string.Format("lower({0})", field);
+        }
         #endregion
 
         /// <summary>
