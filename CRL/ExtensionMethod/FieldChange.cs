@@ -28,7 +28,7 @@ namespace CRL
         {
             if (expression.Body is BinaryExpression)
             {
-
+                var Reflection = ReflectionHelper.GetInfo<T>();
                 BinaryExpression be = ((BinaryExpression)expression.Body);
                 MemberExpression mExp = (MemberExpression)be.Left;
                 string name = mExp.Member.Name;
@@ -47,7 +47,8 @@ namespace CRL
                 //更改对象值
                 var pro = TypeCache.GetProperties(typeof(T), false);
                 var field = pro[name];
-                field.TupleSetValue<T>(obj, value);
+                //field.TupleSetValue<T>(obj, value);
+                Reflection.GetAccessor(field.Name).Set((T)obj, value);
                 obj.SetChanges(name, value);
             }
             else
@@ -86,7 +87,9 @@ namespace CRL
             //更改对象值
             var pro = TypeCache.GetProperties(typeof(T), false);
             var field = pro[name];
-            field.TupleSetValue<T>(obj, value);
+            var Reflection = ReflectionHelper.GetInfo<T>();
+            //field.TupleSetValue<T>(obj, value);
+            Reflection.GetAccessor(field.Name).Set((T)obj, value);
             obj.SetChanges(name, value);
         }
         #region 表示按值累加
@@ -159,7 +162,9 @@ namespace CRL
             var field = pro[name];
             dynamic origin = field.GetValue(obj);
             origin += value;
-            field.TupleSetValue<T>(obj, origin);
+            var Reflection = ReflectionHelper.GetInfo<T>();
+            //field.TupleSetValue<T>(obj, origin);
+            Reflection.GetAccessor(field.Name).Set((T)obj, origin);
             obj.SetChanges("$" + name, value);
         }
         #endregion

@@ -206,6 +206,8 @@ namespace CRL
                     f.FieldIndexType = Attribute.FieldIndexType.非聚集唯一;
                     n += 1;
                 }
+
+
                 list.Add(f);
             }
             if (n == 0)

@@ -91,13 +91,15 @@ namespace CRL.MemoryDataCache
             if (c != null)//按更改的值
             {
                 var fields = TypeCache.GetProperties(obj.GetType(), false);
+                var Reflection = ReflectionHelper.GetInfo<TItem>();
                 foreach (var f in c)
                 {
                     //var field = fields.Find(b => b.Name.ToUpper() == f.Key.ToUpper());
                     var field = fields[f.Key];
                     if (field == null)//名称带$时不更新
                         continue;
-                    field.TupleSetValue<TItem>(originObj, f.Value);
+                    //field.TupleSetValue<TItem>(originObj, f.Value);
+                    Reflection.GetAccessor(field.Name).Set((TItem)originObj, f.Value);
                 }
             }
             else//整体更新

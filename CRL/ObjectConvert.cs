@@ -108,6 +108,7 @@ namespace CRL
             #endregion
         }
         static Dictionary<Type, Func<object, object>> convertMethod = new Dictionary<Type, Func<object, object>>();
+        static Dictionary<Type, Func<DbDataReader, int, object>> convertDataReaderMethod = new Dictionary<Type, Func<DbDataReader, int, object>>();
         /// <summary>
         /// 转换为为强类型
         /// </summary>
@@ -126,19 +127,23 @@ namespace CRL
                 {
                     return new Guid(a.ToString());
                 });
-                convertMethod.Add(typeof(Enum), (a) =>
-                {
-                    return Convert.ToInt32(a);
-                });
+                //convertMethod.Add(typeof(Enum), (a) =>
+                //{
+                //    return Convert.ToInt32(a);
+                //});
+            }
+            if (type.IsEnum)
+            {
+                type = type.GetEnumUnderlyingType();
             }
             if (convertMethod.ContainsKey(type))
             {
                 return convertMethod[type](value);
             }
-            if (type.BaseType == typeof(Enum))
-            {
-                return convertMethod[type.BaseType](value);
-            }
+            //if (type.BaseType == typeof(Enum))
+            //{
+            //    return convertMethod[type.BaseType](value);
+            //}
             if (type.FullName.StartsWith("System.Nullable"))
             {
                 //Nullable<T> 可空属性
@@ -189,6 +194,80 @@ namespace CRL
             #endregion
             return value;
         }
+        internal static object GetDataReaderValue(DbDataReader _reader, Type propType, int _index)
+        {
+            if (propType.IsEnum)
+            {
+                propType = propType.GetEnumUnderlyingType();
+            }
+            if (propType.FullName.StartsWith("System.Nullable"))
+            {
+                //Nullable<T> 可空属性
+                propType = propType.GenericTypeArguments[0];
+            }
+            if (convertDataReaderMethod.Count == 0)
+            {
+                convertDataReaderMethod.Add(typeof(string), (reader, index) =>
+                {
+                    return reader.GetString(index);
+                });
+                convertDataReaderMethod.Add(typeof(int), (reader, index) =>
+                {
+                    return reader.GetInt32(index);
+                });
+                convertDataReaderMethod.Add(typeof(DateTime), (reader, index) =>
+                {
+                    return reader.GetDateTime(index);
+                });
+                convertDataReaderMethod.Add(typeof(long), (reader, index) =>
+                {
+                    return reader.GetInt64(index);
+                });
+                convertDataReaderMethod.Add(typeof(float), (reader, index) =>
+                {
+                    return reader.GetFloat(index);
+                });
+                convertDataReaderMethod.Add(typeof(double), (reader, index) =>
+                {
+                    return reader.GetDouble(index);
+                });
+                convertDataReaderMethod.Add(typeof(Guid), (reader, index) =>
+                {
+                    return reader.GetGuid(index);
+                });
+                convertDataReaderMethod.Add(typeof(short), (reader, index) =>
+                {
+                    return reader.GetInt16(index);
+                });
+                convertDataReaderMethod.Add(typeof(byte), (reader, index) =>
+                {
+                    return reader.GetByte(index);
+                });
+                convertDataReaderMethod.Add(typeof(char), (reader, index) =>
+                {
+                    return reader.GetChar(index);
+                });
+                convertDataReaderMethod.Add(typeof(decimal), (reader, index) =>
+                {
+                    return reader.GetDecimal(index);
+                });
+                convertDataReaderMethod.Add(typeof(byte[]), (reader, index) =>
+                {
+                    return reader.GetValue(index);
+                });
+                convertDataReaderMethod.Add(typeof(bool), (reader, index) =>
+                {
+                    return reader.GetBoolean(index);
+                });
+            }
+            Func<DbDataReader, int, object> method;
+            var a = convertDataReaderMethod.TryGetValue(propType, out method);
+            if (a)
+            {
+                return method(_reader, _index);
+            }
+            return _reader.GetValue(_index);
+        }
         /// <summary>
         /// 转换为为强类型
         /// </summary>
@@ -216,9 +295,23 @@ namespace CRL
             var time = DateTime.Now;
             var list = new List<TItem>();
             var typeArry = TypeCache.GetProperties(mainType, !setConstraintObj).Values;
+            var columns = new Dictionary<int,string>();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columns.Add(i, reader.GetName(i).ToLower());
+            }
+
             while (reader.Read())
             {
-                var detailItem = DataReaderToObj<TItem>(reader, mainType, typeArry) as TItem;
+                object[] values = new object[columns.Count];
+                reader.GetValues(values);
+                var dic = new Dictionary<string, object>();
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    var name = columns[i];
+                    dic.Add(name.ToLower(), values[i]);
+                }
+                var detailItem = DataReaderToObj<TItem>(dic, mainType, typeArry) as TItem;
                 list.Add(detailItem);
             }
             reader.Close();
@@ -226,28 +319,19 @@ namespace CRL
             runTime = ts.TotalMilliseconds;
             return list;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="mainType"></param>
-        /// <param name="typeArry"></param>
-        /// <returns></returns>
-        internal static object DataReaderToObj<T>(DbDataReader reader, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry)
+        internal static object DataReaderToObj<T>(Dictionary<string, object> values, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry) where T : class,new()
         {
-            object detailItem = System.Activator.CreateInstance(mainType);
+            //rem mainType 不一定为T
+            object detailItem ;
             var canTuple = mainType == typeof(T);
-            var columns = new List<string>();
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                columns.Add(reader.GetName(i).ToLower());
-            }
+            detailItem = System.Activator.CreateInstance(mainType);
             IModel obj2 = null;
             if (detailItem is IModel)
             {
                 obj2 = detailItem as IModel;
                 obj2.BoundChange = false;
             }
+            var reflection = ReflectionHelper.GetInfo<T>();
             foreach (Attribute.FieldAttribute info in typeArry)
             {
                 if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
@@ -255,10 +339,11 @@ namespace CRL
                     #region 按外部字段
                     string tab = TypeCache.GetTableName(info.ConstraintType,null);
                     string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField);
-                    var value = reader[fieldName];
+                    var value = values[fieldName.ToLower()];
                     if (canTuple)
                     {
-                        info.TupleSetValue<T>(detailItem, value);
+                        //info.TupleSetValue<T>(detailItem, value);
+                        reflection.GetAccessor(info.Name).Set((T)detailItem, value);
                     }
                     else
                     {
@@ -267,7 +352,7 @@ namespace CRL
                     if (obj2 != null)
                     {
                         obj2[info.Name] = value;
-                        columns.Remove(info.Name.ToLower());
+                        values.Remove(info.Name.ToLower());
                     }
                     #endregion
                 }
@@ -281,12 +366,12 @@ namespace CRL
                     foreach (Attribute.FieldAttribute info2 in typeArry2)
                     {
                         string fieldName = info2.MapingName;
-                        object value = reader[fieldName];
+                        object value = values[fieldName.ToLower()];
                         info2.SetValue(oleObject, value);
                         if (obj2 != null)
                         {
                             obj2[info2.Name] = value;
-                            columns.Remove(info2.Name.ToLower());
+                            values.Remove(info2.Name.ToLower());
                         }
                     }
                     info.SetValue(detailItem, oleObject);
@@ -295,15 +380,17 @@ namespace CRL
                 else
                 {
                     #region 按属性
-                    if (!columns.Contains(info.Name.ToLower()))
+                    object value;
+                    var b = values.TryGetValue(info.Name.ToLower(), out value);
+                    if (!b)
                     {
                         continue;
                     }
-                    object value = reader[info.Name];
-                    columns.Remove(info.Name.ToLower());
+                    values.Remove(info.Name.ToLower());
                     if (canTuple)
                     {
-                        info.TupleSetValue<T>(detailItem, value);
+                        reflection.GetAccessor(info.Name).Set((T)detailItem, value);
+                        //info.TupleSetValue<T>(detailItem, value);
                     }
                     else
                     {
@@ -312,27 +399,21 @@ namespace CRL
                     #endregion
                 }
             }
-            if (obj2 != null)
+            if (obj2 != null && values.Count > 0)
             {
                 var b = obj2.BoundChange;
                 //没有找到属性的列放入索引,按别名
-                foreach (var col in columns)
+                foreach (var kv in values)
                 {
+                    var col = kv.Key;
                     var n = col.LastIndexOf("__");
                     if (n == -1)
                     {
                         continue;
                     }
-                    var mapingName = col.Substring(n+2);
-                    obj2[mapingName] = reader[col];
+                    var mapingName = col.Substring(n + 2);
+                    obj2[mapingName] = kv.Value;
                 }
-                //if (fieldMapping != null)//由lambdaQuery创建
-                //{
-                //    foreach (var name in fieldMapping.Keys)
-                //    {
-                //        obj2[name] = reader[fieldMapping[name].ToString()];
-                //    }
-                //}
                 obj2.BoundChange = true;
             }
             return detailItem;

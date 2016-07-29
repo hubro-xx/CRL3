@@ -58,13 +58,15 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="obj"></param>
         public override void InsertFromObj<TModel>(TModel obj)
         {
+            var Reflection = ReflectionHelper.GetInfo<TModel>();
             CheckTableCreated<TModel>();
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
             CheckData(obj);
             var index = _DBAdapter.InsertObject(obj);
             if (!primaryKey.KeepIdentity)
             {
-                primaryKey.TupleSetValue<TModel>(obj, index);
+                Reflection.GetAccessor(primaryKey.Name).Set((TModel)obj, index);
+                //primaryKey.TupleSetValue<TModel>(obj, index);
             }
             ClearParame();
             var clone = obj.Clone();

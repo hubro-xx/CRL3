@@ -209,7 +209,7 @@ namespace CRL.LambdaQuery
         internal override string GetQueryConditions(bool withTableName = true)
         {
             string where = Condition;
-            where = string.IsNullOrEmpty(where) ? " 1=1 " : where;
+            //where = string.IsNullOrEmpty(where) ? " 1=1 " : where;
             #region group判断
             if (__GroupFields.Count > 0)
             {
@@ -232,12 +232,15 @@ namespace CRL.LambdaQuery
             }
             if (_IsRelationUpdate)
             {
-                part += string.Format(" where {0}", where);
+                if (!string.IsNullOrEmpty(where))
+                {
+                    part += string.Format(" where {0}", where);
+                }
             }
             else
             {
                 string join = string.Join(" ", __Relations.Values);
-                part += string.Format(" {0}  where {1}", join, where);
+                part += string.Format(" {0}{1}", join, string.IsNullOrEmpty(where) ? " " : " where " + where);
             }
             part = ReplacePrefix(part);
             return part;

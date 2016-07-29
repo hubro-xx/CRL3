@@ -73,9 +73,22 @@ namespace CRL.Dynamic
             var time = DateTime.Now;
             List<TResult> list = new List<TResult>();
             var typeArry = TypeCache.GetProperties(typeof(T), true).Values;
+            var columns = new Dictionary<int, string>();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columns.Add(i, reader.GetName(i).ToLower());
+            }
             while (reader.Read())
             {
-                var detailItem = ObjectConvert.DataReaderToObj<T>(reader, typeof(T), typeArry) as T;
+                object[] values = new object[columns.Count];
+                reader.GetValues(values);
+                var dic = new Dictionary<string, object>();
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    var name = columns[i];
+                    dic.Add(name.ToLower(), values[i]);
+                }
+                var detailItem = ObjectConvert.DataReaderToObj<T>(dic, typeof(T), typeArry) as T;
                 var result = resultSelector.Compile()(detailItem);
                 list.Add(result);
             }

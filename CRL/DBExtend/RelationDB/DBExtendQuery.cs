@@ -44,8 +44,8 @@ namespace CRL.DBExtend.RelationDB
             System.Data.Common.DbDataReader reader;
             var cacheTime = query.__ExpireMinute;
             var compileSp = query.__CompileSp;
-            List<TModel> list;
-            double runTime;
+            List<TModel> list = new List<TModel>();
+            double runTime=0;
             if (cacheTime <= 0)
             {
                 if (!compileSp)
