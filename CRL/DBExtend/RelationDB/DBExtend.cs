@@ -386,7 +386,7 @@ namespace CRL.DBExtend.RelationDB
                     }
                 }
                 string msg;
-                obj.CreateTable(db, out msg);
+                ModelCheck.CreateTable(type, db, out msg);
                 //RecoveryParams();
                 //if (!a)
                 //{
@@ -414,8 +414,8 @@ namespace CRL.DBExtend.RelationDB
                 //BackupParams();
                 foreach (var item in needCreates)
                 {
-                    IModel.SetColumnDbType(_DBAdapter, item);
-                    string str = IModel.CreateColumn(db, item);
+                    ModelCheck.SetColumnDbType(_DBAdapter, item);
+                    string str = ModelCheck.CreateColumn(db, item);
                 }
                 //RecoveryParams();
                 #endregion

@@ -138,6 +138,7 @@ namespace CRL.DBExtend.MongoDB
             var type = typeof(TResult);
             var pro = type.GetProperties();
             var list = new List<TResult>();
+            var reflection = ReflectionHelper.GetInfo<TResult>();
             foreach (var item in result)
             {
                 var dict = item as IDictionary<string, object>;
@@ -149,8 +150,10 @@ namespace CRL.DBExtend.MongoDB
                     {
                         object value = dict[columnName];
                         //f.SetValue(obj, value);
-                        var tuple = Tuple.GetCacheDelegate<TResult>(type, pro, columnName);
-                        tuple.SetValue(obj, value);
+                        //var tuple = Tuple.GetCacheDelegate<TResult>(type, pro, columnName);
+                        //tuple.SetValue(obj, value);
+                        var access = reflection.GetAccessor(columnName);
+                        access.Set((TResult)obj, value);
                     }
                 }
                 list.Add(obj);

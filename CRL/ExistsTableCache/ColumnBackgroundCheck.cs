@@ -88,8 +88,8 @@ namespace CRL.ExistsTableCache
                 //var model = System.Activator.CreateInstance(item.Key) as IModel;
                 foreach (var field in needCreates)
                 {
-                    IModel.SetColumnDbType(_DBAdapter, field);
-                    string str = IModel.CreateColumn(db, field);
+                    ModelCheck.SetColumnDbType(_DBAdapter, field);
+                    string str = ModelCheck.CreateColumn(db, field);
                 }
                 string val;
                 needCheks.TryRemove(item.Key, out val);

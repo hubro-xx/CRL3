@@ -175,6 +175,7 @@ namespace CRL
         public Accessor GetAccessor(string fieldName)
         {
             Accessor accessor;
+            return accessorDict[fieldName.ToUpper()];
             if (accessorDict.TryGetValue(fieldName.ToUpper(), out accessor))
             {
                 return accessor;

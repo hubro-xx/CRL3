@@ -255,7 +255,7 @@ namespace CRL.Attribute
         /// <summary>
         /// 属性类型
         /// </summary>
-        internal Type PropertyType;
+        public Type PropertyType;
         #region 约束 自动关查询时用
         /// <summary>
         /// 自动转换虚拟字段
@@ -336,47 +336,6 @@ namespace CRL.Attribute
             //    throw new Exception(ero.Message + " 在属性" + propertyInfo.Name + " " + propertyInfo.PropertyType);
             //}
             propertyInfo.SetValue(obj, value, null);
-        }
-        /// <summary>
-        /// 用Tuple委托设置对象属性值
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
-        /// <param name="value"></param>
-        internal void TupleSetValue2<T>(object obj, object value)
-        {
-            if (value == null)
-                return;
-            if (value is DBNull)
-                return;
-            //SetValue(obj,value);
-            //return;
-            //todo
-            //Type type = value.GetType();
-            //if (propertyInfo.PropertyType != type)
-            //{
-            //    if (value is Int32 && propertyInfo.PropertyType == typeof(string))
-            //    {
-            //        value = value.ToString();
-            //    }
-            //}
-            //try
-            //{
-            //    //oracle会出现类型转换问题
-            //    value = ObjectConvert.ConvertObject(propertyInfo.PropertyType, value);
-            //}
-            //catch (Exception ero)
-            //{
-            //    throw new Exception(ero.Message + " 在属性" + propertyInfo.Name + " " + propertyInfo.PropertyType);
-            //}
-            //SetValue(obj,value);
-            //return;
-
-            var tuple = Tuple.GetCacheDelegate<T>(ModelType, Name);
-            tuple.SetValue(obj, value);
-
-            //var tuple2 = Tuple.GetCacheTupleDelegate1<T>(ModelType, Name);
-            //Tuple.SetPropertyValue1(tuple2, (T)obj, value);
         }
         internal FieldQuery FieldQuery;
     }

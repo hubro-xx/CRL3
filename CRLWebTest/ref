@@ -149,6 +149,50 @@
             可回调取出out参数的DataReader
             </summary>
         </member>
+        <member name="M:CRL.ModelCheck.CheckIndexExists(System.Type,CRL.AbsDBExtend)">
+            <summary>
+            检查索引
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ModelCheck.CreateColumn(CRL.AbsDBExtend,CRL.Attribute.FieldAttribute)">
+            <summary>
+            创建列
+            </summary>
+            <param name="db"></param>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ModelCheck.CheckColumnExists(System.Type,CRL.AbsDBExtend)">
+            <summary>
+            检查对应的字段是否存在,不存在则创建
+            </summary>
+            <param name="db"></param>
+        </member>
+        <member name="M:CRL.ModelCheck.GetColumns(System.Type,CRL.DBAdapter.DBAdapterBase)">
+            <summary>
+            获取列
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ModelCheck.CreateTable(System.Type,CRL.AbsDBExtend)">
+            <summary>
+            创建表
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CRL.ModelCheck.CreateTable(System.Type,CRL.AbsDBExtend,System.String@)">
+            <summary>
+            创建表
+            会检查表是否存在,如果存在则检查字段
+            创建失败则抛出异常
+            </summary>
+            <param name="db"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
         <member name="M:CRL.DBAdapter.DBAdapterBase.GetDBAdapterBase(CRL.DbContext)">
             <summary>
             根据数据库类型获取适配器
@@ -1124,14 +1168,6 @@
             <summary>
             用反射设置对象属性值
             </summary>
-            <param name="obj"></param>
-            <param name="value"></param>
-        </member>
-        <member name="M:CRL.Attribute.FieldAttribute.TupleSetValue``1(System.Object,System.Object)">
-            <summary>
-            用Tuple委托设置对象属性值
-            </summary>
-            <typeparam name="T"></typeparam>
             <param name="obj"></param>
             <param name="value"></param>
         </member>
@@ -3732,50 +3768,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CRL.IModel.CheckIndexExists(CRL.AbsDBExtend)">
-            <summary>
-            检查索引
-            </summary>
-            <param name="db"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.IModel.CreateColumn(CRL.AbsDBExtend,CRL.Attribute.FieldAttribute)">
-            <summary>
-            创建列
-            </summary>
-            <param name="db"></param>
-            <param name="item"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.IModel.CheckColumnExists(CRL.AbsDBExtend)">
-            <summary>
-            检查对应的字段是否存在,不存在则创建
-            </summary>
-            <param name="db"></param>
-        </member>
-        <member name="M:CRL.IModel.GetColumns(CRL.DBAdapter.DBAdapterBase)">
-            <summary>
-            获取列
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.IModel.CreateTable(CRL.AbsDBExtend)">
-            <summary>
-            创建表
-            </summary>
-            <param name="db"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.IModel.CreateTable(CRL.AbsDBExtend,System.String@)">
-            <summary>
-            创建表
-            会检查表是否存在,如果存在则检查字段
-            创建失败则抛出异常
-            </summary>
-            <param name="db"></param>
-            <param name="message"></param>
-            <returns></returns>
-        </member>
         <member name="F:CRL.IModel.OriginClone">
             <summary>
             存放原始克隆
@@ -4153,15 +4145,6 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="obj"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CRL.ObjectConvert.DataReaderToObj``1(System.Data.Common.DbDataReader,System.Type,System.Collections.Generic.IEnumerable{CRL.Attribute.FieldAttribute})">
-            <summary>
-            
-            </summary>
-            <param name="reader"></param>
-            <param name="mainType"></param>
-            <param name="typeArry"></param>
             <returns></returns>
         </member>
         <member name="M:CRL.ObjectConvert.DataReadToDictionary``2(System.Data.Common.DbDataReader)">

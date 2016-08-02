@@ -108,7 +108,7 @@ namespace CRL
             #endregion
         }
         static Dictionary<Type, Func<object, object>> convertMethod = new Dictionary<Type, Func<object, object>>();
-        static Dictionary<Type, Func<DbDataReader, int, object>> convertDataReaderMethod = new Dictionary<Type, Func<DbDataReader, int, object>>();
+
         /// <summary>
         /// 转换为为强类型
         /// </summary>
@@ -194,6 +194,8 @@ namespace CRL
             #endregion
             return value;
         }
+        #region GetDataReaderValue
+        static Dictionary<Type, Func<DbDataReader, int, object>> convertDataReaderMethod = new Dictionary<Type, Func<DbDataReader, int, object>>();
         internal static object GetDataReaderValue(DbDataReader _reader, Type propType, int _index)
         {
             if (propType.IsEnum)
@@ -268,6 +270,7 @@ namespace CRL
             }
             return _reader.GetValue(_index);
         }
+        #endregion
         /// <summary>
         /// 转换为为强类型
         /// </summary>
@@ -300,7 +303,7 @@ namespace CRL
             {
                 columns.Add(i, reader.GetName(i).ToLower());
             }
-
+            var reflection = ReflectionHelper.GetInfo<TItem>();
             while (reader.Read())
             {
                 object[] values = new object[columns.Count];
@@ -311,7 +314,7 @@ namespace CRL
                     var name = columns[i];
                     dic.Add(name.ToLower(), values[i]);
                 }
-                var detailItem = DataReaderToObj<TItem>(dic, mainType, typeArry) as TItem;
+                var detailItem = DataReaderToObj<TItem>(dic, reflection, mainType, typeArry) as TItem;
                 list.Add(detailItem);
             }
             reader.Close();
@@ -319,7 +322,7 @@ namespace CRL
             runTime = ts.TotalMilliseconds;
             return list;
         }
-        internal static object DataReaderToObj<T>(Dictionary<string, object> values, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry) where T : class,new()
+        internal static object DataReaderToObj<T>(Dictionary<string, object> values, ReflectionInfo<T> reflection, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry) where T : class,new()
         {
             //rem mainType 不一定为T
             object detailItem ;
@@ -331,15 +334,16 @@ namespace CRL
                 obj2 = detailItem as IModel;
                 obj2.BoundChange = false;
             }
-            var reflection = ReflectionHelper.GetInfo<T>();
+            
             foreach (Attribute.FieldAttribute info in typeArry)
             {
+                string nameLower = info.Name.ToLower();
                 if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
                 {
                     #region 按外部字段
                     string tab = TypeCache.GetTableName(info.ConstraintType,null);
                     string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField);
-                    var value = values[fieldName.ToLower()];
+                    var value = values[nameLower];
                     if (canTuple)
                     {
                         //info.TupleSetValue<T>(detailItem, value);
@@ -352,7 +356,7 @@ namespace CRL
                     if (obj2 != null)
                     {
                         obj2[info.Name] = value;
-                        values.Remove(info.Name.ToLower());
+                        values.Remove(nameLower);
                     }
                     #endregion
                 }
@@ -361,7 +365,7 @@ namespace CRL
                     #region 按动态实例
                     Type type = info.PropertyType;
                     object oleObject = System.Activator.CreateInstance(type);
-                    string tableName = TypeCache.GetTableName(type,null);
+                    string tableName = TypeCache.GetTableName(type, null);
                     var typeArry2 = TypeCache.GetProperties(type, true).Values;
                     foreach (Attribute.FieldAttribute info2 in typeArry2)
                     {
@@ -380,22 +384,17 @@ namespace CRL
                 else
                 {
                     #region 按属性
-                    object value;
-                    var b = values.TryGetValue(info.Name.ToLower(), out value);
-                    if (!b)
-                    {
-                        continue;
-                    }
-                    values.Remove(info.Name.ToLower());
+                    object value = values[nameLower];
                     if (canTuple)
                     {
-                        reflection.GetAccessor(info.Name).Set((T)detailItem, value);
-                        //info.TupleSetValue<T>(detailItem, value);
+                        var access = reflection.GetAccessor(info.Name);
+                        access.Set((T)detailItem, value);
                     }
                     else
                     {
                         info.SetValue(detailItem, value);
                     }
+                    values.Remove(nameLower);
                     #endregion
                 }
             }

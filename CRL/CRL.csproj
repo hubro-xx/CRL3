@@ -103,6 +103,7 @@
     <Compile Include="CacheServer\TcpServer.cs" />
     <Compile Include="CacheServer\ResultData.cs" />
     <Compile Include="CallBackDataReader.cs" />
+    <Compile Include="ModelCheck.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="DBAdapter\MongoDBAdapter.cs" />
     <Compile Include="DBExtend\DataBaseArchitecture.cs" />
@@ -204,7 +205,6 @@
     <Compile Include="Sharding\UnionType.cs" />
     <Compile Include="SummaryAnalysis.cs" />
     <Compile Include="ExistsTableCache\ExistsTableCache.cs" />
-    <Compile Include="Tuple.cs" />
     <Compile Include="TypeCache.cs" />
   </ItemGroup>
   <ItemGroup>

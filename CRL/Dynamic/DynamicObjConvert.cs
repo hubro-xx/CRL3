@@ -78,6 +78,7 @@ namespace CRL.Dynamic
             {
                 columns.Add(i, reader.GetName(i).ToLower());
             }
+            var reflection = ReflectionHelper.GetInfo<T>();
             while (reader.Read())
             {
                 object[] values = new object[columns.Count];
@@ -88,7 +89,7 @@ namespace CRL.Dynamic
                     var name = columns[i];
                     dic.Add(name.ToLower(), values[i]);
                 }
-                var detailItem = ObjectConvert.DataReaderToObj<T>(dic, typeof(T), typeArry) as T;
+                var detailItem = ObjectConvert.DataReaderToObj<T>(dic,reflection, typeof(T), typeArry) as T;
                 var result = resultSelector.Compile()(detailItem);
                 list.Add(result);
             }

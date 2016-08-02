@@ -24,17 +24,6 @@ namespace CRL.Package.Account
             get { return new TransactionBusiness<TType>(); }
         }
 
-        public override string CreateTable()
-        {
-            var helper = DBExtend;
-            Transaction obj1 = new Transaction();
-            //IAccountRecord obj2 = new IAccountRecord();
-            string msg = obj1.CreateTable(helper);
-            //msg += obj2.CreateTable(helper);
-            LockRecord rec = new LockRecord();
-            msg += rec.CreateTable(helper);
-            return msg;
-        }
         #region 内部属性
         long serialNumber = 0;
         #endregion

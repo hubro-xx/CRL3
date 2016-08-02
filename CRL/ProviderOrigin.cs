@@ -123,7 +123,7 @@ namespace CRL
         {
             AbsDBExtend db = DBExtend;
             TModel obj1 = new TModel();
-            var str = obj1.CreateTable(db);
+            var str = ModelCheck.CreateTable(typeof(TModel),db);
             return str;
         }
         /// <summary>
@@ -133,7 +133,7 @@ namespace CRL
         {
             AbsDBExtend db = DBExtend;
             TModel obj1 = new TModel();
-            obj1.CheckIndexExists(db);
+            ModelCheck.CheckIndexExists(typeof(TModel),db);
         }
         #endregion
 

@@ -18,25 +18,6 @@ namespace CRL.Package.RoleAuthorize
         {
             get { return new AccessControlBusiness(); }
         }
-
-        public new string CreateTable()
-        {
-            var helper = DBExtend;
-            AccessControl obj1 = new AccessControl();
-            string msg = obj1.CreateTable(helper);
-            Employee obj2 = new Employee();
-            msg += obj2.CreateTable(helper);
-            var obj3 = new Menu();
-            msg += obj3.CreateTable(helper);
-            var obj4 = new Role();
-            msg += obj4.CreateTable(helper);
-            var obj5 = new SystemType();
-            msg += obj5.CreateTable(helper);
-            var obj6 = new Person.LoginLog();
-            msg += obj6.CreateTable(helper);
-            SystemTypeBusiness.Instance.Add(new SystemType() { Name = "默认项目" });
-            return msg;
-        }
         //static List<AccessControl> accessControls;
         //public static List<AccessControl> AccessControls
         //{

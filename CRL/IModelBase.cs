@@ -55,7 +55,7 @@ namespace CRL
     /// </summary>
     [Serializable]
     //[Attribute.ModelProxy]
-    public abstract class IModel : ICloneable
+    public abstract class IModel 
     {
         /// <summary>
         /// 序列化为JSON
@@ -140,215 +140,6 @@ namespace CRL
         }
         #endregion
 
-        #region 检查表
-        /// <summary>
-        /// 检查索引
-        /// </summary>
-        /// <param name="db"></param>
-        /// <returns></returns>
-        internal void CheckIndexExists(AbsDBExtend db)
-        {
-            var list = GetIndexScript(db);
-            foreach (var item in list)
-            {
-                try
-                {
-                    db.Execute(item);
-                }
-                catch (Exception ero)//出错,
-                {
-                    CoreHelper.EventLog.Log(string.Format("创建索引失败:{0}\r\n{1}", ero.Message, item));
-                }
-            }
-        }
-        /// <summary>
-        /// 创建列
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        internal static string CreateColumn(AbsDBExtend db, Attribute.FieldAttribute item)
-        {
-            var dbAdapter = db._DBAdapter;
-            string result = "";
-            if (string.IsNullOrEmpty(item.ColumnType))
-            {
-                throw new Exception("ColumnType is null");
-            }
-            string str = dbAdapter.GetCreateColumnScript(item);
-            string indexScript = "";
-            if (item.FieldIndexType != Attribute.FieldIndexType.无)
-            {
-                indexScript = dbAdapter.GetColumnIndexScript(item);
-            }
-            try
-            {
-                db.Execute(str);
-                if (!string.IsNullOrEmpty(indexScript))
-                {
-                    db.Execute(indexScript);
-                }
-                result = string.Format("创建字段:{0} {1} {2}\r\n", item.TableName, item.Name,item.PropertyType);
-                var model = System.Activator.CreateInstance(item.ModelType) as IModel;
-                try
-                {
-                    model.OnColumnCreated(item.Name);
-                }
-                catch(Exception ero)
-                {
-                    result = string.Format("添加字段:{0} {1},升级数据时发生错误:{2}\r\n", item.TableName, item.Name, ero.Message);
-                }
-                CoreHelper.EventLog.Log(result, "", false);
-            }
-            catch (Exception ero)
-            {
-                //CoreHelper.EventLog.Log("创建字段时发生错误:" + ero.Message);
-                result = string.Format("创建字段:{0} {1}发生错误:{2}\r\n", item.TableName, item.Name, ero.Message);
-            }
-            return result;
-        }
-        /// <summary>
-        /// 检查对应的字段是否存在,不存在则创建
-        /// </summary>
-        /// <param name="db"></param>
-        internal string CheckColumnExists(AbsDBExtend db)
-        {
-            string result = "";
-            var dbAdapter = db._DBAdapter;
-            List<Attribute.FieldAttribute> columns = GetColumns(dbAdapter);
-            string tableName = TypeCache.GetTableName(this.GetType(),db.dbContext);
-            foreach (Attribute.FieldAttribute item in columns)
-            {
-                string sql = dbAdapter.GetSelectTop(item.KeyWordName, "from " + tableName, "", 1);
-                try
-                {
-                    db.Execute(sql);
-                }
-                catch//出错,按没有字段算
-                {
-                    result += CreateColumn(db, item);
-                    
-                }
-            }
-            return result;
-        }
-        internal static void SetColumnDbType(DBAdapter.DBAdapterBase dbAdapter, Attribute.FieldAttribute info)
-        {
-            if (info.FieldType != Attribute.FieldType.数据库字段)
-            {
-                return ;
-            }
-            string defaultValue;
-            Type propertyType = info.PropertyType;
-            var columnType = dbAdapter.GetColumnType(info, out defaultValue);
-            info.ColumnType = columnType;
-            info.DefaultValue = defaultValue;
-            if (info.ColumnType.Contains("{0}"))
-            {
-                throw new Exception(string.Format("属性:{0} 需要指定长度 ColumnType:{1}", info.Name, info.ColumnType));
-            }
-        }
-        /// <summary>
-        /// 获取列
-        /// </summary>
-        /// <returns></returns>
-        List<Attribute.FieldAttribute> GetColumns(DBAdapter.DBAdapterBase dbAdapter)
-        {
-            //var dbAdapter = Base.CurrentDBAdapter;
-            Type type = this.GetType();
-            string tableName = TypeCache.GetTableName(type,dbAdapter.dbContext);
-            var typeArry = TypeCache.GetProperties(type, true).Values;
-            var columns = new List<CRL.Attribute.FieldAttribute>();
-            foreach (var info in typeArry)
-            {
-                if (info.FieldType != Attribute.FieldType.数据库字段)
-                    continue;
-                SetColumnDbType(dbAdapter, info);
-                columns.Add(info);
-            }
-            return columns;
-        }
-        internal List<string> GetIndexScript(AbsDBExtend db)
-        {
-            var dbAdapter = db._DBAdapter;
-            List<string> list2 = new List<string>();
-            List<Attribute.FieldAttribute> columns = GetColumns(dbAdapter);
-            foreach (Attribute.FieldAttribute item in columns)
-            {
-                if (item.FieldIndexType != Attribute.FieldIndexType.无)
-                {
-                    //string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]({1})", tableName, item.Name, item.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
-                    string indexScript = dbAdapter.GetColumnIndexScript(item);
-                    list2.Add(indexScript);
-                }
-            }
-            return list2;
-        }
-
-        /// <summary>
-        /// 创建表
-        /// </summary>
-        /// <param name="db"></param>
-        /// <returns></returns>
-        public string CreateTable(AbsDBExtend db)
-        {
-            string msg;
-            CreateTable(db, out msg);
-            return msg;
-        }
-        /// <summary>
-        /// 创建表
-        /// 会检查表是否存在,如果存在则检查字段
-        /// 创建失败则抛出异常
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        internal void CreateTable(AbsDBExtend db, out string message)
-        {
-            var dbAdapter = db._DBAdapter;
-            message = "";
-            //TypeCache.SetDBAdapterCache(GetType(),dbAdapter);
-            string tableName = TypeCache.GetTableName(GetType(),db.dbContext);
-            string sql = dbAdapter.GetSelectTop("0", "from " + tableName, "", 1);
-            bool needCreate = false;
-            try
-            {
-                //检查表是否存在
-                db.Execute(sql);
-            }
-            catch
-            {
-                needCreate = true;
-            }
-            if (needCreate)
-            {
-                List<string> list = new List<string>();
-                try
-                {
-                    List<Attribute.FieldAttribute> columns = GetColumns(dbAdapter);
-                    dbAdapter.CreateTable(columns, tableName);
-                    message = string.Format("创建表:{0}\r\n", tableName);
-                    CheckIndexExists(db);
-                    //return true;
-                }
-                catch (Exception ero)
-                {
-                    message = "创建表时发生错误 类型{0} {1}\r\n";
-                    message = string.Format(message, GetType(), ero.Message);
-                    throw new Exception(message);
-                    //return false;
-                }
-                //CoreHelper.EventLog.Log(message, "", false);
-            }
-            else
-            {
-                message = CheckColumnExists(db);
-            }
-            //return false;
-        }
-
-        #endregion
 
         #region 更新值判断
         /// <summary>
@@ -404,18 +195,11 @@ namespace CRL
             return MemberwiseClone();
         }
 
-        [System.Xml.Serialization.XmlIgnore]
-        [NonSerialized]
-        string modelKey = null;
-
         internal string GetModelKey()
         {
-            if (modelKey == null)
-            {
-                var type = GetType();
-                var tab = TypeCache.GetTable(type);
-                modelKey = string.Format("{0}_{1}", type, tab.PrimaryKey.GetValue(this));
-            }
+            var type = GetType();
+            var tab = TypeCache.GetTable(type);
+            var modelKey = string.Format("{0}_{1}", type, tab.PrimaryKey.GetValue(this));
             return modelKey;
         }
         internal object GetpPrimaryKeyValue()
@@ -424,7 +208,10 @@ namespace CRL
             var keyValue = primaryKey.GetValue(this);
             return keyValue;
         }
-
+        public string CreateTable(AbsDBExtend db)
+        {
+            return ModelCheck.CreateTable(GetType(), db);
+        }
         #region 动态字典,效果同索引
         private Dynamic.DynamicViewDataDictionary _dynamicViewDataDictionary;
 
