@@ -62,7 +62,8 @@ namespace CRL.Attribute
                     }
                     else if (!string.IsNullOrEmpty(ConstraintField))
                     {
-                        fieldType = isSystemType ? FieldType.关联字段 : Attribute.FieldType.关联对象;
+                        //fieldType = isSystemType ? FieldType.关联字段 : Attribute.FieldType.关联对象;
+                        fieldType = Attribute.FieldType.关联字段;
                     }
                     else
                     {

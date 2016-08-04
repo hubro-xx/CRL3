@@ -304,6 +304,9 @@ namespace CRL
                 columns.Add(i, reader.GetName(i).ToLower());
             }
             var reflection = ReflectionHelper.GetInfo<TItem>();
+            var actions = new List<Action<TItem,object >>();
+            var first = true;
+            var objOrigin = System.Activator.CreateInstance(mainType);
             while (reader.Read())
             {
                 object[] values = new object[columns.Count];
@@ -314,40 +317,56 @@ namespace CRL
                     var name = columns[i];
                     dic.Add(name.ToLower(), values[i]);
                 }
-                var detailItem = DataReaderToObj<TItem>(dic, reflection, mainType, typeArry) as TItem;
+                var detailItem = DataReaderToObj<TItem>(dic, reflection, mainType, typeArry, actions, first) as TItem;
                 list.Add(detailItem);
+                first = false;
             }
             reader.Close();
             var ts = DateTime.Now - time;
             runTime = ts.TotalMilliseconds;
             return list;
         }
-        internal static object DataReaderToObj<T>(Dictionary<string, object> values, ReflectionInfo<T> reflection, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry) where T : class,new()
+        internal static object DataReaderToObj<T>(Dictionary<string, object> values, ReflectionInfo<T> reflection, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry, List<Action<T, object>> actions ,bool first) where T : class,new()
         {
             //rem mainType 不一定为T
             object detailItem ;
             var canTuple = mainType == typeof(T);
-            detailItem = System.Activator.CreateInstance(mainType);
+            if (canTuple)
+            {
+                detailItem = new T();
+            }
+            else
+            {
+                detailItem = System.Activator.CreateInstance(mainType);
+            }
             IModel obj2 = null;
             if (detailItem is IModel)
             {
                 obj2 = detailItem as IModel;
                 obj2.BoundChange = false;
             }
-            
+            var _values = new List<object>();
             foreach (Attribute.FieldAttribute info in typeArry)
             {
                 string nameLower = info.Name.ToLower();
                 if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
                 {
                     #region 按外部字段
-                    string tab = TypeCache.GetTableName(info.ConstraintType,null);
-                    string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField);
-                    var value = values[nameLower];
+                    string tab = TypeCache.GetTableName(info.ConstraintType, null);
+                    string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
+                    var value = values[fieldName];
                     if (canTuple)
                     {
-                        //info.TupleSetValue<T>(detailItem, value);
-                        reflection.GetAccessor(info.Name).Set((T)detailItem, value);
+                        if (first)
+                        {
+                            var accessor = reflection.GetAccessor(info.Name);
+                            accessor.Set((T)detailItem, value);
+                            actions.Add(accessor.Set);
+                        }
+                        else
+                        {
+                            _values.Add(value);
+                        }
                     }
                     else
                     {
@@ -356,29 +375,8 @@ namespace CRL
                     if (obj2 != null)
                     {
                         obj2[info.Name] = value;
-                        values.Remove(nameLower);
                     }
-                    #endregion
-                }
-                else if (info.FieldType == Attribute.FieldType.关联对象)//按动态实例
-                {
-                    #region 按动态实例
-                    Type type = info.PropertyType;
-                    object oleObject = System.Activator.CreateInstance(type);
-                    string tableName = TypeCache.GetTableName(type, null);
-                    var typeArry2 = TypeCache.GetProperties(type, true).Values;
-                    foreach (Attribute.FieldAttribute info2 in typeArry2)
-                    {
-                        string fieldName = info2.MapingName;
-                        object value = values[fieldName.ToLower()];
-                        info2.SetValue(oleObject, value);
-                        if (obj2 != null)
-                        {
-                            obj2[info2.Name] = value;
-                            values.Remove(info2.Name.ToLower());
-                        }
-                    }
-                    info.SetValue(detailItem, oleObject);
+                    values.Remove(fieldName);
                     #endregion
                 }
                 else
@@ -387,8 +385,16 @@ namespace CRL
                     object value = values[nameLower];
                     if (canTuple)
                     {
-                        var access = reflection.GetAccessor(info.Name);
-                        access.Set((T)detailItem, value);
+                        if (first)
+                        {
+                            var accessor = reflection.GetAccessor(info.Name);
+                            accessor.Set((T)detailItem, value);
+                            actions.Add(accessor.Set);
+                        }
+                        else
+                        {
+                            _values.Add(value);
+                        }
                     }
                     else
                     {
@@ -396,6 +402,13 @@ namespace CRL
                     }
                     values.Remove(nameLower);
                     #endregion
+                }
+            }
+            if (_values.Count > 0)
+            {
+                for (int i = 0; i < actions.Count; i++)
+                {
+                    actions[i]((T)detailItem, _values[i]);
                 }
             }
             if (obj2 != null && values.Count > 0)

@@ -20,7 +20,6 @@ namespace CRL.Attribute
         NONE,
         数据库字段,
         虚拟字段,
-        关联字段,
-        关联对象
+        关联字段
     }
 }

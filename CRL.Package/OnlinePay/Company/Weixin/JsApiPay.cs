@@ -158,7 +158,7 @@ namespace CRL.Package.OnlinePay.Company.Weixin
          * @return 统一下单结果
          * @失败时抛异常WxPayException
          */
-        public WxPayData GetUnifiedOrderResult(PayHistory order)
+        public WxPayData GetUnifiedOrderResult(PayHistory order, string trade_type = "JSAPI")
         {
             //统一下单
             WxPayData data = new WxPayData();
@@ -169,14 +169,17 @@ namespace CRL.Package.OnlinePay.Company.Weixin
             data.SetValue("time_start", DateTime.Now.ToString("yyyyMMddHHmmss"));
             data.SetValue("time_expire", DateTime.Now.AddMinutes(10).ToString("yyyyMMddHHmmss"));
             data.SetValue("goods_tag", order.TagData);
-            data.SetValue("trade_type", "JSAPI");
-            data.SetValue("openid", openid);
-
+            data.SetValue("trade_type", trade_type);
+            data.SetValue("notify_url", WxPayConfig.NOTIFY_URL);//异步通知url
+            if (trade_type == "JSAPI")
+            {
+                data.SetValue("openid", openid);
+            }
             WxPayData result = WxPayApi.UnifiedOrder(data);
             if (!result.IsSet("appid") || !result.IsSet("prepay_id") || result.GetValue("prepay_id").ToString() == "")
             {
                 Log.Error(this.GetType().ToString(), "UnifiedOrder response error!");
-                throw new WxPayException("UnifiedOrder response error!");
+                throw new WxPayException("UnifiedOrder response error!" + result.GetValue("return_msg"));
             }
 
             unifiedOrderResult = result;

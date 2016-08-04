@@ -150,7 +150,7 @@ namespace CRL.LambdaQuery
                 queryFields.RemoveAll(removes);
             }
             //找出需要关联的字段
-            List<Attribute.FieldAttribute> constraint = queryFields.FindAll(b => b.FieldType == Attribute.FieldType.关联字段 || b.FieldType == Attribute.FieldType.关联对象);
+            List<Attribute.FieldAttribute> constraint = queryFields.FindAll(b => b.FieldType == Attribute.FieldType.关联字段);
             //找出关联和对应的字段
             int tabIndex = 2;
             foreach (Attribute.FieldAttribute a in constraint)

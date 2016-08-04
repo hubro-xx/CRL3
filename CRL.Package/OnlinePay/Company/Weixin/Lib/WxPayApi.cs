@@ -345,7 +345,20 @@ namespace CRL.Package.OnlinePay.Company.Weixin
 		    return result;
 	    }
 
+        public static WxPayData GetAPPPayData(string prepayid)
+        {
+            var inputObj = new WxPayData();
 
+            inputObj.SetValue("appid", WxPayConfig.APPID);//公众账号ID
+            inputObj.SetValue("partnerid", WxPayConfig.MCHID);//商户号  	    
+            inputObj.SetValue("nonce_str", GenerateNonceStr());//随机字符串
+            inputObj.SetValue("prepayid", prepayid);
+            inputObj.SetValue("package", "Sign=WXPay");
+            inputObj.SetValue("timeStamp", GenerateTimeStamp());
+            //签名
+            inputObj.SetValue("sign", inputObj.MakeSign());
+            return inputObj;
+        }
         /**
         * 
         * 统一下单
