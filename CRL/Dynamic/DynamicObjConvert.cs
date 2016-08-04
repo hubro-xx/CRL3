@@ -79,7 +79,7 @@ namespace CRL.Dynamic
                 columns.Add(i, reader.GetName(i).ToLower());
             }
             var reflection = ReflectionHelper.GetInfo<T>();
-            var actions = new List<Action<T, object>>();
+            var actions = new List<CRL.ObjectConvert.ActionItem<T>>();
             var first = true;
             while (reader.Read())
             {

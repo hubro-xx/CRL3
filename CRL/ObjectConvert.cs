@@ -304,7 +304,7 @@ namespace CRL
                 columns.Add(i, reader.GetName(i).ToLower());
             }
             var reflection = ReflectionHelper.GetInfo<TItem>();
-            var actions = new List<Action<TItem,object >>();
+            var actions = new List<ActionItem<TItem>>();
             var first = true;
             var objOrigin = System.Activator.CreateInstance(mainType);
             while (reader.Read())
@@ -326,10 +326,15 @@ namespace CRL
             runTime = ts.TotalMilliseconds;
             return list;
         }
-        internal static object DataReaderToObj<T>(Dictionary<string, object> values, ReflectionInfo<T> reflection, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry, List<Action<T, object>> actions ,bool first) where T : class,new()
+        internal struct ActionItem<T>
+        {
+            public Action<T, object> Action;
+            public string Name;
+        }
+        internal static object DataReaderToObj<T>(Dictionary<string, object> values, ReflectionInfo<T> reflection, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first) where T : class,new()
         {
             //rem mainType 不一定为T
-            object detailItem ;
+            object detailItem;
             var canTuple = mainType == typeof(T);
             if (canTuple)
             {
@@ -345,71 +350,50 @@ namespace CRL
                 obj2 = detailItem as IModel;
                 obj2.BoundChange = false;
             }
-            var _values = new List<object>();
-            foreach (Attribute.FieldAttribute info in typeArry)
+            if (first)
             {
-                string nameLower = info.Name.ToLower();
-                if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
+                #region foreach field
+                foreach (Attribute.FieldAttribute info in typeArry)
                 {
-                    #region 按外部字段
-                    string tab = TypeCache.GetTableName(info.ConstraintType, null);
-                    string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
-                    var value = values[fieldName];
-                    if (canTuple)
+                    string nameLower = info.Name.ToLower();
+                    if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
                     {
-                        if (first)
+                        #region 按外部字段
+                        string tab = TypeCache.GetTableName(info.ConstraintType, null);
+                        string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
+                        if (canTuple)
                         {
                             var accessor = reflection.GetAccessor(info.Name);
-                            accessor.Set((T)detailItem, value);
-                            actions.Add(accessor.Set);
+                            actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = fieldName });
                         }
                         else
                         {
-                            _values.Add(value);
+                            actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = fieldName });
                         }
+                        #endregion
                     }
                     else
                     {
-                        info.SetValue(detailItem, value);
-                    }
-                    if (obj2 != null)
-                    {
-                        obj2[info.Name] = value;
-                    }
-                    values.Remove(fieldName);
-                    #endregion
-                }
-                else
-                {
-                    #region 按属性
-                    object value = values[nameLower];
-                    if (canTuple)
-                    {
-                        if (first)
+                        #region 按属性
+                        if (canTuple)
                         {
                             var accessor = reflection.GetAccessor(info.Name);
-                            accessor.Set((T)detailItem, value);
-                            actions.Add(accessor.Set);
+                            actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = nameLower });
                         }
                         else
                         {
-                            _values.Add(value);
+                            actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = nameLower });
                         }
+                        #endregion
                     }
-                    else
-                    {
-                        info.SetValue(detailItem, value);
-                    }
-                    values.Remove(nameLower);
-                    #endregion
                 }
+                #endregion
             }
-            if (_values.Count > 0)
+            foreach (var item in actions)
             {
-                for (int i = 0; i < actions.Count; i++)
-                {
-                    actions[i]((T)detailItem, _values[i]);
-                }
+                //var item = actions[i];
+                item.Action((T)detailItem, values[item.Name]);
+                values.Remove(item.Name);
             }
             if (obj2 != null && values.Count > 0)
             {
@@ -430,8 +414,6 @@ namespace CRL
             }
             return detailItem;
         }
-
-        
 
         /// <summary>
         /// DataRead转为字典
