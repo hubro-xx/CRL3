@@ -744,6 +744,7 @@ namespace CRL
         public int Update<TModel>(System.Linq.Expressions.Expression<Func<TModel, bool>> expression, CRL.ParameCollection setValue) where TModel : CRL.IModel, new()
         {
             var query = CreateLambdaQuery<TModel>();
+            query.Where(expression);
             var n= Update(query, setValue);
             System.Threading.Tasks.Task.Run(() =>
             {

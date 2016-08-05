@@ -52,6 +52,7 @@ namespace CRL.DBExtend.RelationDB
         public override int Delete<TModel>(Expression<Func<TModel, bool>> expression)
         {
             LambdaQuery<TModel> query = new RelationLambdaQuery<TModel>(dbContext, false);
+            query.Where(expression);
             string condition = query.FormatExpression(expression.Body).SqlOut;
             query.FillParames(this);
             return Delete<TModel>(condition);
@@ -102,7 +103,11 @@ namespace CRL.DBExtend.RelationDB
                 var t2 = TypeCache.GetTableName(kv.Key, query1.__DbContext);
                 var join = kv.Value;
                 join = join.Substring(join.IndexOf(" on ") + 3);
-                string sql = query1.__DBAdapter.GetRelationDeleteSql(t1, t2, join + " and " + conditions);
+                if (!string.IsNullOrEmpty(conditions))
+                {
+                    join += " and ";
+                }
+                string sql = query1.__DBAdapter.GetRelationDeleteSql(t1, t2, join + conditions);
                 return Execute(sql);
             }
             return Delete<T>(conditions);

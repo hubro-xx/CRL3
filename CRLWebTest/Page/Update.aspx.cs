@@ -29,7 +29,6 @@ namespace WebTest
             CRL.ParameCollection c = new CRL.ParameCollection();
             c["ProductName"] = "product1";
             Code.ProductDataManage.Instance.Update(b => b.Id == 4, c);
-
             //按匿名对象
             Code.ProductDataManage.Instance.Update(b => b.Id == 4, new { ProductName = "product1" });
 

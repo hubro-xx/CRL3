@@ -134,7 +134,11 @@ namespace CRL.DBExtend.RelationDB
             }
             query1._IsRelationUpdate = true;
             var conditions = query1.GetQueryConditions(false).Trim();
-            conditions = conditions.Substring(5);
+            if (conditions.Length > 5)
+            {
+                conditions = conditions.Substring(5);
+            }
+
             string table = query1.QueryTableName;
             table = query1.__DBAdapter.KeyWordFormat(table);
             query1.FillParames(this);
@@ -148,7 +152,11 @@ namespace CRL.DBExtend.RelationDB
                 var t2 = TypeCache.GetTableName(kv.Key, query1.__DbContext);
                 var join = query1.__Relations[kv.Key];
                 join = join.Substring(join.IndexOf(" on ") + 3);
-                string sql = query1.__DBAdapter.GetRelationUpdateSql(t1, t2, join + " and " + conditions, setString);
+                if (!string.IsNullOrEmpty(conditions))
+                {
+                    join += " and ";
+                }
+                string sql = query1.__DBAdapter.GetRelationUpdateSql(t1, t2, join + conditions, setString);
                 return Execute(sql);
             }
             else
