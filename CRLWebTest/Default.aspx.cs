@@ -23,8 +23,8 @@ namespace WebTest
         {
 
             //MongoDBTest.Test();
-            TestAllQuery();
-
+            //TestAllQuery();
+            //TestGuid();
             //p.UserId += 1;//只会更新UserId
             //Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
 

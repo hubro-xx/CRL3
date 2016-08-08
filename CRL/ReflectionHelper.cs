@@ -188,13 +188,25 @@ namespace CRL
 
         public abstract class Accessor
         {
+            PropertyInfo _prop;
+            public Accessor(PropertyInfo prop)
+            {
+                _prop = prop;
+            }
             public void Set(TObject obj, object value)
             {
                 if (value == null || value is DBNull)
                 {
                     return;
                 }
-                DoSet(obj, value);
+                try
+                {
+                    DoSet(obj, value);
+                }
+                catch
+                {
+                    throw new Exception(string.Format("无法将值{2}转换为{1},在{0}", obj.GetType(), _prop, value + " " + value.GetType()));
+                }
             }
 
             public object Get(TObject obj)
@@ -213,6 +225,7 @@ namespace CRL
             Func<TObject, string> getter;
 
             public StringAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, string>)Delegate.CreateDelegate(typeof(Action<TObject, string>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, string>)Delegate.CreateDelegate(typeof(Func<TObject, string>), null, prop.GetGetMethod(true));
@@ -232,6 +245,7 @@ namespace CRL
             Action<TObject, int> setter;
             Func<TObject, int> getter;
             public IntAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, int>)Delegate.CreateDelegate(typeof(Action<TObject, int>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, int>)Delegate.CreateDelegate(typeof(Func<TObject, int>), null, prop.GetGetMethod(true));
@@ -251,6 +265,7 @@ namespace CRL
             Action<TObject, int?> setter;
             Func<TObject, int?> getter;
             public IntNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, int?>)Delegate.CreateDelegate(typeof(Action<TObject, int?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, int?>)Delegate.CreateDelegate(typeof(Func<TObject, int?>), null, prop.GetGetMethod(true));
@@ -270,6 +285,7 @@ namespace CRL
             Action<TObject, DateTime> setter;
             Func<TObject, DateTime> getter;
             public DateTimeAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, DateTime>)Delegate.CreateDelegate(typeof(Action<TObject, DateTime>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, DateTime>)Delegate.CreateDelegate(typeof(Func<TObject, DateTime>), null, prop.GetGetMethod(true));
@@ -289,6 +305,7 @@ namespace CRL
             Action<TObject, DateTime?> setter;
             Func<TObject, DateTime?> getter;
             public DateTimeNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, DateTime?>)Delegate.CreateDelegate(typeof(Action<TObject, DateTime?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, DateTime?>)Delegate.CreateDelegate(typeof(Func<TObject, DateTime?>), null, prop.GetGetMethod(true));
@@ -309,6 +326,7 @@ namespace CRL
             Action<TObject, long> setter;
             Func<TObject, long> getter;
             public LongAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, long>)Delegate.CreateDelegate(typeof(Action<TObject, long>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, long>)Delegate.CreateDelegate(typeof(Func<TObject, long>), null, prop.GetGetMethod(true));
@@ -329,6 +347,7 @@ namespace CRL
             Action<TObject, long?> setter;
             Func<TObject, long?> getter;
             public LongNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, long?>)Delegate.CreateDelegate(typeof(Action<TObject, long?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, long?>)Delegate.CreateDelegate(typeof(Func<TObject, long?>), null, prop.GetGetMethod(true));
@@ -348,6 +367,7 @@ namespace CRL
             Action<TObject, double> setter;
             Func<TObject, double> getter;
             public DoubleAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, double>)Delegate.CreateDelegate(typeof(Action<TObject, double>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, double>)Delegate.CreateDelegate(typeof(Func<TObject, double>), null, prop.GetGetMethod(true));
@@ -367,6 +387,7 @@ namespace CRL
             Action<TObject, double?> setter;
             Func<TObject, double?> getter;
             public DoubleNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, double?>)Delegate.CreateDelegate(typeof(Action<TObject, double?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, double?>)Delegate.CreateDelegate(typeof(Func<TObject, double?>), null, prop.GetGetMethod(true));
@@ -386,6 +407,7 @@ namespace CRL
             Action<TObject, float> setter;
             Func<TObject, float> getter;
             public FloatAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, float>)Delegate.CreateDelegate(typeof(Action<TObject, float>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, float>)Delegate.CreateDelegate(typeof(Func<TObject, float>), null, prop.GetGetMethod(true));
@@ -405,6 +427,7 @@ namespace CRL
             Action<TObject, float?> setter;
             Func<TObject, float?> getter;
             public FloatNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, float?>)Delegate.CreateDelegate(typeof(Action<TObject, float?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, float?>)Delegate.CreateDelegate(typeof(Func<TObject, float?>), null, prop.GetGetMethod(true));
@@ -424,13 +447,14 @@ namespace CRL
             Action<TObject, Guid> setter;
             Func<TObject, Guid> getter;
             public GuidAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, Guid>)Delegate.CreateDelegate(typeof(Action<TObject, Guid>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, Guid>)Delegate.CreateDelegate(typeof(Func<TObject, Guid>), null, prop.GetGetMethod(true));
             }
             protected override void DoSet(TObject obj, object value)
             {
-                setter(obj, (Guid)value);
+                setter(obj, Guid.Parse(value.ToString()));
             }
             protected override object DoGet(TObject obj)
             {
@@ -443,13 +467,14 @@ namespace CRL
             Action<TObject, Guid?> setter;
             Func<TObject, Guid?> getter;
             public GuidNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, Guid?>)Delegate.CreateDelegate(typeof(Action<TObject, Guid?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, Guid?>)Delegate.CreateDelegate(typeof(Func<TObject, Guid?>), null, prop.GetGetMethod(true));
             }
             protected override void DoSet(TObject obj, object value)
             {
-                setter(obj, (Guid)value);
+                setter(obj, Guid.Parse(value.ToString()));
             }
             protected override object DoGet(TObject obj)
             {
@@ -462,6 +487,7 @@ namespace CRL
             Action<TObject, byte> setter;
             Func<TObject, byte> getter;
             public ByteAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, byte>)Delegate.CreateDelegate(typeof(Action<TObject, byte>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, byte>)Delegate.CreateDelegate(typeof(Func<TObject, byte>), null, prop.GetGetMethod(true));
@@ -481,6 +507,7 @@ namespace CRL
             Func<TObject, byte?> getter;
 
             public ByteNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, byte?>)Delegate.CreateDelegate(typeof(Action<TObject, byte?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, byte?>)Delegate.CreateDelegate(typeof(Func<TObject, byte?>), null, prop.GetGetMethod(true));
@@ -500,6 +527,7 @@ namespace CRL
             Action<TObject, short> setter;
             Func<TObject, short> getter;
             public ShortAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, short>)Delegate.CreateDelegate(typeof(Action<TObject, short>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, short>)Delegate.CreateDelegate(typeof(Func<TObject, short>), null, prop.GetGetMethod(true));
@@ -518,6 +546,7 @@ namespace CRL
             Action<TObject, short?> setter;
             Func<TObject, short?> getter;
             public ShortNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, short?>)Delegate.CreateDelegate(typeof(Action<TObject, short?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, short?>)Delegate.CreateDelegate(typeof(Func<TObject, short?>), null, prop.GetGetMethod(true));
@@ -537,6 +566,7 @@ namespace CRL
             Action<TObject, char> setter;
             Func<TObject, char> getter;
             public CharAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, char>)Delegate.CreateDelegate(typeof(Action<TObject, char>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, char>)Delegate.CreateDelegate(typeof(Func<TObject, char>), null, prop.GetGetMethod(true));
@@ -556,6 +586,7 @@ namespace CRL
             Action<TObject, char?> setter;
             Func<TObject, char?> getter;
             public CharNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, char?>)Delegate.CreateDelegate(typeof(Action<TObject, char?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, char?>)Delegate.CreateDelegate(typeof(Func<TObject, char?>), null, prop.GetGetMethod(true));
@@ -575,6 +606,7 @@ namespace CRL
             Action<TObject, bool> setter;
             Func<TObject, bool> getter;
             public BoolAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, bool>)Delegate.CreateDelegate(typeof(Action<TObject, bool>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, bool>)Delegate.CreateDelegate(typeof(Func<TObject, bool>), null, prop.GetGetMethod(true));
@@ -604,6 +636,7 @@ namespace CRL
             Action<TObject, bool?> setter;
             Func<TObject, bool?> getter;
             public BoolNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, bool?>)Delegate.CreateDelegate(typeof(Action<TObject, bool?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, bool?>)Delegate.CreateDelegate(typeof(Func<TObject, bool?>), null, prop.GetGetMethod(true));
@@ -633,6 +666,7 @@ namespace CRL
             Action<TObject, TimeSpan> setter;
             Func<TObject, TimeSpan> getter;
             public TimeSpanAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, TimeSpan>)Delegate.CreateDelegate(typeof(Action<TObject, TimeSpan>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, TimeSpan>)Delegate.CreateDelegate(typeof(Func<TObject, TimeSpan>), null, prop.GetGetMethod(true));
@@ -652,6 +686,7 @@ namespace CRL
             Action<TObject, TimeSpan?> setter;
             Func<TObject, TimeSpan?> getter;
             public TimeSpanNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, TimeSpan?>)Delegate.CreateDelegate(typeof(Action<TObject, TimeSpan?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, TimeSpan?>)Delegate.CreateDelegate(typeof(Func<TObject, TimeSpan?>), null, prop.GetGetMethod(true));
@@ -671,6 +706,7 @@ namespace CRL
             Action<TObject, decimal> setter;
             Func<TObject, decimal> getter;
             public DecimalAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, decimal>)Delegate.CreateDelegate(typeof(Action<TObject, decimal>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, decimal>)Delegate.CreateDelegate(typeof(Func<TObject, decimal>), null, prop.GetGetMethod(true));
@@ -690,6 +726,7 @@ namespace CRL
             Action<TObject, decimal?> setter;
             Func<TObject, decimal?> getter;
             public DecimalNullableAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, decimal?>)Delegate.CreateDelegate(typeof(Action<TObject, decimal?>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, decimal?>)Delegate.CreateDelegate(typeof(Func<TObject, decimal?>), null, prop.GetGetMethod(true));
@@ -709,6 +746,7 @@ namespace CRL
             Action<TObject, byte[]> setter;
             Func<TObject, byte[]> getter;
             public ByteArrayAccessor(PropertyInfo prop)
+                : base(prop)
             {
                 setter = (Action<TObject, byte[]>)Delegate.CreateDelegate(typeof(Action<TObject, byte[]>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, byte[]>)Delegate.CreateDelegate(typeof(Func<TObject, byte[]>), null, prop.GetGetMethod(true));
