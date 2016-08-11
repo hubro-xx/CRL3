@@ -145,7 +145,7 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
-            string indexName = string.Format("pk_{0}_{1}", filed.TableName, filed.Name);
+            string indexName = string.Format("pk_{0}_{1}", filed.TableName, filed.MapingName);
             string indexScript = string.Format("create {3} index {0} on {1}({2}); ", indexName, filed.TableName, filed.KeyWordName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
             return indexScript;
         }
@@ -166,7 +166,7 @@ namespace CRL.DBAdapter
             {
                 if (item.IsPrimaryKey)
                 {
-                    primaryKey = item.Name;
+                    primaryKey = item.MapingName;
                 }
                 var columnType = GetDBColumnType(item.PropertyType);
                 string nullStr = item.NotNull ? "NOT NULL" : "";
@@ -254,7 +254,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             int id = Convert.ToInt32(helper.ExecScalar(sqlGetIndex));
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                string name = info.Name;
+                string name = info.MapingName;
                 if (info.IsPrimaryKey && !info.KeepIdentity)
                 {
                     //continue;//手动插入ID
@@ -281,7 +281,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             sql += sql1 + ") values( " + sql2 + ")";
             sql = SqlFormat(sql);
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
-            helper.SetParam(primaryKey.Name, id);
+            helper.SetParam(primaryKey.MapingName, id);
             helper.Execute(sql);
             //var helper2 = helper as CoreHelper.OracleHelper;
             //int id = helper2.Insert(sql,sequenceName);

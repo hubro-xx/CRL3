@@ -89,5 +89,10 @@ namespace Shopping.Web.Controllers
             ProductManage.Instance.Update(product);
             return RedirectToAction("Product");
         }
+        public ActionResult ProductDelete(int id)
+        {
+            ProductManage.Instance.Delete(id);
+            return RedirectToAction("Product");
+        }
     }
 }

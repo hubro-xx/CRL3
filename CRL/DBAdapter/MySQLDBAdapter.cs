@@ -218,7 +218,7 @@ EXECUTE  ' {1} ';
             string sql2 = "";
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                string name = info.Name;
+                string name = info.MapingName;
                 if (info.IsPrimaryKey)
                 {
                     primaryKey = info;

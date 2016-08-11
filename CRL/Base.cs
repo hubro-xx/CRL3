@@ -51,7 +51,7 @@ namespace CRL
             var parameter = Expression.Parameter(typeof(TModel), "b");
             //创建常数 
             var constant = Expression.Constant(id);
-            MemberExpression member = Expression.PropertyOrField(parameter, table.PrimaryKey.Name);
+            MemberExpression member = Expression.PropertyOrField(parameter, table.PrimaryKey.MemberName);
             var body = Expression.Equal(member, constant);
             //获取Lambda表达式
             var lambda = Expression.Lambda<Func<TModel, Boolean>>(body, parameter);

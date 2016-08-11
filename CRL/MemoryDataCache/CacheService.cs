@@ -99,7 +99,7 @@ namespace CRL.MemoryDataCache
                     if (field == null)//名称带$时不更新
                         continue;
                     //field.TupleSetValue<TItem>(originObj, f.Value);
-                    Reflection.GetAccessor(field.Name).Set((TItem)originObj, f.Value);
+                    Reflection.GetAccessor(field.MemberName).Set((TItem)originObj, f.Value);
                 }
             }
             else//整体更新

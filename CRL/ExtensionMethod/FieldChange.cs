@@ -48,7 +48,7 @@ namespace CRL
                 var pro = TypeCache.GetProperties(typeof(T), false);
                 var field = pro[name];
                 //field.TupleSetValue<T>(obj, value);
-                Reflection.GetAccessor(field.Name).Set((T)obj, value);
+                Reflection.GetAccessor(field.MemberName).Set((T)obj, value);
                 obj.SetChanges(name, value);
             }
             else
@@ -89,7 +89,7 @@ namespace CRL
             var field = pro[name];
             var Reflection = ReflectionHelper.GetInfo<T>();
             //field.TupleSetValue<T>(obj, value);
-            Reflection.GetAccessor(field.Name).Set((T)obj, value);
+            Reflection.GetAccessor(field.MemberName).Set((T)obj, value);
             obj.SetChanges(name, value);
         }
         #region 表示按值累加
@@ -164,8 +164,8 @@ namespace CRL
             origin += value;
             var Reflection = ReflectionHelper.GetInfo<T>();
             //field.TupleSetValue<T>(obj, origin);
-            Reflection.GetAccessor(field.Name).Set((T)obj, origin);
-            obj.SetChanges("$" + name, value);
+            Reflection.GetAccessor(field.MemberName).Set((T)obj, origin);
+            obj.SetChanges("$" + field.MapingName, value);
         }
         #endregion
         #endregion

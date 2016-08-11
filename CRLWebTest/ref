@@ -1098,7 +1098,7 @@
             字段属性设置
             </summary>
         </member>
-        <member name="F:CRL.Attribute.FieldAttribute.Name">
+        <member name="F:CRL.Attribute.FieldAttribute.MemberName">
             <summary>
             属性名称
             </summary>
@@ -1206,7 +1206,8 @@
         </member>
         <member name="P:CRL.Attribute.FieldAttribute.MapingName">
             <summary>
-            映射名称,在查询时用 如 new{Name1=b.Name}
+            映射字段名
+            MongoDB不支持表和字段别名
             </summary>
         </member>
         <member name="P:CRL.Attribute.FieldAttribute.DefaultValue">
@@ -4224,6 +4225,7 @@
         <member name="P:CRL.Attribute.TableAttribute.TableName">
             <summary>
             表名
+            MongoDB不支持表和字段别名
             </summary>
         </member>
         <member name="P:CRL.Attribute.TableAttribute.DefaultSort">

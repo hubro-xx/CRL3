@@ -129,7 +129,7 @@ namespace CRL
                         continue;
                     }
                 }
-                list.Add(item.Name, item.Clone());
+                list.Add(item.MemberName, item.Clone());
             }
             return list;
         }
@@ -180,7 +180,7 @@ namespace CRL
                 }
                 f.SetPropertyInfo(info);
                 f.PropertyType = propertyType;
-                f.Name = info.Name;
+                f.MemberName = info.Name;
                 f.TableName = table.TableName;
                 f.ModelType = table.Type;
                 if (!string.IsNullOrEmpty(f.VirtualField))

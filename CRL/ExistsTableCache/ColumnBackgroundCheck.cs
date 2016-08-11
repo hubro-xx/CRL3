@@ -80,7 +80,7 @@ namespace CRL.ExistsTableCache
                     {
                         continue;
                     }
-                    if (!allFileds2.ContainsKey(field.Name.ToLower()))
+                    if (!allFileds2.ContainsKey(field.MemberName.ToLower()))
                     {
                         needCreates.Add(field);
                     }

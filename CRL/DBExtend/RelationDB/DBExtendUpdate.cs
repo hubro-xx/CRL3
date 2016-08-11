@@ -97,8 +97,8 @@ namespace CRL.DBExtend.RelationDB
             }
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
             var keyValue = primaryKey.GetValue(obj);
-            string where = string.Format("{0}=@{0}", primaryKey.Name);
-            AddParam(primaryKey.Name, keyValue);
+            string where = string.Format("{0}=@{0}", primaryKey.MapingName);
+            AddParam(primaryKey.MapingName, keyValue);
             int n = Update<TModel>(c, where);
             UpdateCacheItem(obj, c);
             if (n == 0)

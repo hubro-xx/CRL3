@@ -44,6 +44,7 @@ namespace WebTest
             //当对象是查询创建则能自动识别
             p = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0);
             p.UserId += 1;//只会更新UserId
+            p.ProductName = "2342342";
             Code.ProductDataManage.Instance.Update(p);//按主键更新,主键值是必须的
 
             //使用完整查询关联更新

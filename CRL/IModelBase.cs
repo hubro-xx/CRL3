@@ -111,7 +111,7 @@ namespace CRL
 
         [System.Xml.Serialization.XmlIgnore]
         [NonSerialized]
-        Dictionary<string, dynamic> Datas = new Dictionary<string, dynamic>();
+        Dictionary<string, object> Datas = null;
 
 
         /// <summary>
@@ -126,6 +126,7 @@ namespace CRL
             get
             {
                 dynamic obj = null;
+                Datas = Datas ?? new Dictionary<string, object>();
                 var a = Datas.TryGetValue(key.ToLower(), out obj);
                 if (!a)
                 {
@@ -135,6 +136,7 @@ namespace CRL
             }
             set
             {
+                Datas = Datas ?? new Dictionary<string, object>();
                 Datas[key.ToLower()] = value;
             }
         }
@@ -157,7 +159,7 @@ namespace CRL
         /// 存储被更改的属性
         /// </summary>
         [System.Xml.Serialization.XmlIgnore]
-        internal ParameCollection Changes = new ParameCollection();
+        ParameCollection Changes = null;
         /// <summary>
         /// 表示值被更改了
         /// 当更新后,将被清空
@@ -170,7 +172,13 @@ namespace CRL
                 return;
             if (name.ToLower() == "boundchange")
                 return;
+            Changes = Changes ?? new ParameCollection();
             Changes[name] = value;
+        }
+        internal ParameCollection GetChanges()
+        {
+            Changes = Changes ?? new ParameCollection();
+            return Changes;
         }
         /// <summary>
         /// 清空Changes并重新Clone源对象

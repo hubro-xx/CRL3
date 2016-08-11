@@ -21,6 +21,8 @@ namespace CRL.Dynamic
         // Methods
         public DynamicViewDataDictionary(Dictionary<string, object> viewDataThunk)
         {
+            viewDataThunk = viewDataThunk ?? new Dictionary<string, object>();
+
             this._viewDataThunk = viewDataThunk;
         }
 

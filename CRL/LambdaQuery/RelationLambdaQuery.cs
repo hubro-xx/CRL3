@@ -75,7 +75,7 @@ namespace CRL.LambdaQuery
                 __QueryOrderBy += ",";
             }
             var key = TypeCache.GetTable(typeof(T)).PrimaryKey;
-            __QueryOrderBy += string.Format(" {2}{0} {1}", key.Name, desc ? "desc" : "asc", GetPrefix());
+            __QueryOrderBy += string.Format(" {2}{0} {1}", key.MapingName, desc ? "desc" : "asc", GetPrefix());
             //QueryOrderBy = ReplacePrefix(QueryOrderBy);
             return this;
         }
@@ -159,7 +159,7 @@ namespace CRL.LambdaQuery
                 tabIndex += 1;
                 if (a.FieldType == Attribute.FieldType.关联字段 && a.ConstraintType == null)//虚拟字段,没有设置关联类型
                 {
-                    throw new Exception(string.Format("需指定关联类型:{0}.{1}.Attribute.Field.ConstraintType", typeof(T), a.Name));
+                    throw new Exception(string.Format("需指定关联类型:{0}.{1}.Attribute.Field.ConstraintType", typeof(T), a.MemberName));
                 }
                 if (string.IsNullOrEmpty(a.ConstraintField))//约束为空
                 {

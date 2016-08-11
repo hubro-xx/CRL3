@@ -79,7 +79,7 @@ namespace CRL.ExistsTableCache
                 var fields2 = new List<string>();
                 fields.ForEach(b =>
                 {
-                    fields2.Add(b.Name.ToLower());
+                    fields2.Add(b.MemberName.ToLower());
                 });
                 var tb = new Table() { Name = tableName, Fields = fields2 };
                 var db = DataBase[dbName];
@@ -117,7 +117,7 @@ namespace CRL.ExistsTableCache
             {
                 if (item.FieldType != Attribute.FieldType.数据库字段)
                     continue;
-                if (!tb.Fields.Contains(item.Name.ToLower()))
+                if (!tb.Fields.Contains(item.MemberName.ToLower()))
                 {
                     returns.Add(item);
                 }
@@ -128,7 +128,7 @@ namespace CRL.ExistsTableCache
                 var fields2 = new List<string>();
                 fields.ForEach(b =>
                 {
-                    fields2.Add(b.Name.ToLower());
+                    fields2.Add(b.MemberName.ToLower());
                 });
                 tb.Fields = fields2;
                 Save();

@@ -15,12 +15,13 @@
     @foreach (var item in Model)
     {
         <tr>
-            <td>@item.ProductName</td>
+            <td>@item.Id @item.ProductName</td>
             <td>@item.SettlementPrice</td>
             <td>@item.SoldPrice</td>
             <td>@item.ProductStatus</td>
             <td>
                 <a href="/supplier/ProductUpdate/@item.Id">修改</a>
+                <a href="/supplier/ProductDelete/@item.Id">删除</a>
             </td>
         </tr>
     }

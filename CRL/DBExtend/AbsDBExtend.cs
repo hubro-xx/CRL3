@@ -120,7 +120,7 @@ namespace CRL
             foreach (Attribute.FieldAttribute p in types)
             {
                 string value = p.GetValue(obj) + "";
-                if (!string.IsNullOrEmpty(value) && p.Name != "AddTime" && obj.CheckRepeatedInsert)
+                if (!string.IsNullOrEmpty(value) && p.MemberName != "AddTime" && obj.CheckRepeatedInsert)
                 {
                     sb.Append(value.GetHashCode().ToString());
                 }
@@ -128,12 +128,12 @@ namespace CRL
                 {
                     if (p.NotNull && string.IsNullOrEmpty(value))
                     {
-                        msg = string.Format("对象{0}属性{1}值不能为空", obj.GetType(), p.Name);
+                        msg = string.Format("对象{0}属性{1}值不能为空", obj.GetType(), p.MemberName);
                         throw new Exception(msg);
                     }
                     if (value.Length > p.Length && p.Length < 3000)
                     {
-                        msg = string.Format("对象{0}属性{1}长度超过了设定值{2}", obj.GetType(), p.Name, p.Length);
+                        msg = string.Format("对象{0}属性{1}长度超过了设定值{2}", obj.GetType(), p.MemberName, p.Length);
                         throw new Exception(msg);
                     }
                 }
@@ -822,9 +822,9 @@ namespace CRL
         {
             var c = new ParameCollection();
             var fields = TypeCache.GetProperties(typeof(TModel), true);
-            if (obj.Changes.Count > 0)//按手动指定更改
+            if (obj.GetChanges().Count > 0)//按手动指定更改
             {
-                foreach (var item in obj.Changes)
+                foreach (var item in obj.GetChanges())
                 {
                     var key = item.Key.Replace("$", "");
                     var f = fields[key];
@@ -837,13 +837,13 @@ namespace CRL
                     //使用Cumulation扩展方法后按此处理
                     if (key != item.Key)//按$name=name+'123123'
                     {
-                        if (value.ToString().IsNumber())
+                        if (f.PropertyType == typeof(string))
                         {
-                            value = string.Format("{0}+{1}", key, value);
+                            value = string.Format("{0}+'{1}'", key, value);
                         }
                         else
                         {
-                            value = string.Format("{0}+'{1}'", key, value);
+                            value = string.Format("{0}+{1}", key, value);
                         }
                     }
                     c[item.Key] = value;
@@ -868,7 +868,7 @@ namespace CRL
                 var currentValue = f.GetValue(obj);
                 if (!Object.Equals(originValue, currentValue))
                 {
-                    c.Add(f.Name, currentValue);
+                    c.Add(f.MapingName, currentValue);
                 }
             }
             if (c.Count() > 0)

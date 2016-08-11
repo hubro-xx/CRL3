@@ -252,3 +252,10 @@
 	调整分页参数判断
 2016-07-23
 	优化了对象映射赋值，使用Tuple委托
+2016-08-08
+	修改关联删除和更新时,条件没有传入
+	修改委托赋值时类型转换错误
+2016-08-11
+	属性可以自定义对字段名了
+	[CRL.Attribute.Field(MapingName = "ProductName1")]
+	public string ProductName

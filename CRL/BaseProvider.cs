@@ -246,7 +246,7 @@ namespace CRL
                     if (binary.Left is MemberExpression)
                     {
                         var member = binary.Left as MemberExpression;
-                        var primaryKey = TypeCache.GetTable(typeof(TModel)).PrimaryKey.Name;
+                        var primaryKey = TypeCache.GetTable(typeof(TModel)).PrimaryKey.MemberName;
                         if (member.Member.Name.ToUpper() == primaryKey.ToUpper())
                         {
                             var value = LambdaCompileCache.GetParameExpressionValue(binary.Right).ToString();

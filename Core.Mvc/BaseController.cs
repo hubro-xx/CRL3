@@ -404,7 +404,7 @@ setTimeout('goUrl()', 3300)</script>";
     </tr>";
                 var primaryKey = item.GetPrimaryKey();
 
-                part = string.Format(part, item.Type.FullName, item.TableName, primaryKey.GetName() + "(" + primaryKey.PropertyType + ")");
+                part = string.Format(part, item.Type.FullName, item.TableName, primaryKey.GetMemberName() + "(" + primaryKey.PropertyType + ")");
                 html += part;
             }
             return Content(html);

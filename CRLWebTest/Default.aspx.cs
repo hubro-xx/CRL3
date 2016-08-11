@@ -21,7 +21,9 @@ namespace WebTest
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            var time = DateTime.Now;
+            var ts = DateTime.Now - time;
+            Response.Write(ts.TotalMilliseconds);
             //MongoDBTest.Test();
             //TestAllQuery();
             //TestGuid();

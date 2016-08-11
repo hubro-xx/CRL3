@@ -38,13 +38,13 @@ namespace WebTest.Page
             member.Id = 11;
             query.Join<Code.Member>((a, b) => a.UserId == member.Id && b.Id > 0,
                  CRL.LambdaQuery.JoinType.Left
-                ).Select((a, b) => new { BarCode1 = a.BarCode, Name1 = b.Name });
+                ).Select((a, b) => new { BarCode1 = a.BarCode, Name1 = b.Name,a.ProductName });
             var list = query.ToDynamic();
             txtOutput.Visible = true;
             txtOutput.Text = query.PrintQuery();
             foreach (dynamic item in list)
             {
-                var str = string.Format("{0}______{1}<br>", item.BarCode1, item.Name1);//动态对象
+                var str = string.Format("{0}______{1}<br>", item.BarCode1, item.Name1, item.ProductName);//动态对象
                 Response.Write(str);
             }
         }

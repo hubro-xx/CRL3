@@ -56,22 +56,22 @@ namespace CRL
                 {
                     db.Execute(indexScript);
                 }
-                result = string.Format("创建字段:{0} {1} {2}\r\n", item.TableName, item.Name, item.PropertyType);
+                result = string.Format("创建字段:{0} {1} {2}\r\n", item.TableName, item.MemberName, item.PropertyType);
                 var model = System.Activator.CreateInstance(item.ModelType) as IModel;
                 try
                 {
-                    model.OnColumnCreated(item.Name);
+                    model.OnColumnCreated(item.MemberName);
                 }
                 catch (Exception ero)
                 {
-                    result = string.Format("添加字段:{0} {1},升级数据时发生错误:{2}\r\n", item.TableName, item.Name, ero.Message);
+                    result = string.Format("添加字段:{0} {1},升级数据时发生错误:{2}\r\n", item.TableName, item.MemberName, ero.Message);
                 }
                 CoreHelper.EventLog.Log(result, "", false);
             }
             catch (Exception ero)
             {
                 //CoreHelper.EventLog.Log("创建字段时发生错误:" + ero.Message);
-                result = string.Format("创建字段:{0} {1}发生错误:{2}\r\n", item.TableName, item.Name, ero.Message);
+                result = string.Format("创建字段:{0} {1}发生错误:{2}\r\n", item.TableName, item.MemberName, ero.Message);
             }
             return result;
         }
@@ -113,7 +113,7 @@ namespace CRL
             info.DefaultValue = defaultValue;
             if (info.ColumnType.Contains("{0}"))
             {
-                throw new Exception(string.Format("属性:{0} 需要指定长度 ColumnType:{1}", info.Name, info.ColumnType));
+                throw new Exception(string.Format("属性:{0} 需要指定长度 ColumnType:{1}", info.MemberName, info.ColumnType));
             }
         }
         /// <summary>

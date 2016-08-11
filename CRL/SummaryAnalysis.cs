@@ -159,7 +159,7 @@ namespace CRL
                     //}
                     foreach (var item in list2.Values)
                     {
-                        var item2 = list.Find(b => b.Name == item.Name);
+                        var item2 = list.Find(b => b.Name == item.MemberName);
                         if (item2 != null)
                         {
                             item.Remark = item2.Remark;
@@ -209,13 +209,13 @@ namespace CRL
                         {
                             enumStr = enumStr.Substring(0, enumStr.Length-1);
                         }
-                        remark += p.Name + "[" + enumStr + "]";
+                        remark += p.MemberName + "[" + enumStr + "]";
                     }
                     if (p.FieldType == Attribute.FieldType.虚拟字段)
                     {
                         remark += string.Format("[as {0}]", System.Text.RegularExpressions.Regex.Replace(p.VirtualField, @"\{.+?\}", ""));
                     }
-                    sb.Append(@"<tr><td width='150'>" + p.Name + "</td><td  width='220'>" + p.PropertyType + "</td><td  width='40'>" + lengthStr + "</td><td  width='40'>" + p.FieldIndexType + "</td><td>" + remark + "</td></tr>");
+                    sb.Append(@"<tr><td width='150'>" + p.MemberName + "</td><td  width='220'>" + p.PropertyType + "</td><td  width='40'>" + lengthStr + "</td><td  width='40'>" + p.FieldIndexType + "</td><td>" + remark + "</td></tr>");
                 }
                 sb.Append("</table>");
             }

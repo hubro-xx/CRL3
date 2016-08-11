@@ -191,11 +191,11 @@ namespace CRL.LambdaQuery
             var field = GetSelectField(expression.Body, false, typeof(T)).First();
             if (desc)
             {
-                _MongoDBSort = _MongoDBSort.Descending(field.Name);
+                _MongoDBSort = _MongoDBSort.Descending(field.MemberName);
             }
             else
             {
-                _MongoDBSort = _MongoDBSort.Ascending(field.Name);
+                _MongoDBSort = _MongoDBSort.Ascending(field.MemberName);
             }
             return this;
         }
@@ -206,11 +206,11 @@ namespace CRL.LambdaQuery
             var field = TypeCache.GetTable(typeof(T)).PrimaryKey;
             if (desc)
             {
-                _MongoDBSort = _MongoDBSort.Descending(field.Name);
+                _MongoDBSort = _MongoDBSort.Descending(field.MemberName);
             }
             else
             {
-                _MongoDBSort = _MongoDBSort.Ascending(field.Name);
+                _MongoDBSort = _MongoDBSort.Ascending(field.MemberName);
             }
             return this;
         }

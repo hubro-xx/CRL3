@@ -41,7 +41,7 @@ namespace CRL.DBExtend.MongoDB
                 groupField.CheckNull("groupField");
 
                 var groupInfo = new BsonDocument();
-                groupInfo.Add("_id", "$" + groupField.Name);
+                groupInfo.Add("_id", "$" + groupField.MemberName);
                 foreach (var f in selectField)
                 {
                     var method = f.FieldQuery.MethodName.ToLower();
@@ -90,7 +90,7 @@ namespace CRL.DBExtend.MongoDB
             else if (query.__DistinctFields)
             {
                 #region distinct
-                string fieldName = selectField.FirstOrDefault().Name;
+                string fieldName = selectField.FirstOrDefault().MemberName;
                 FieldDefinition<TModel, dynamic> distinctField = fieldName;
                 var query2 = collection.Distinct(distinctField, query.__MongoDBFilter);
                 return query2.ToList();

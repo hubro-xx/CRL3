@@ -150,7 +150,7 @@ end", spName, script);
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
-            string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]([{1}])", filed.TableName, filed.Name, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
+            string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]([{1}])", filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
             return indexScript;
         }
 
@@ -170,15 +170,15 @@ end", spName, script);
             {
                 if (item.IsPrimaryKey)
                 {
-                    primaryKey = item.Name;
+                    primaryKey = item.MapingName;
                 }
                 string nullStr = item.NotNull ? "NOT NULL" : "";
-                string str = string.Format("[{0}] {1} {2} ", item.Name, item.ColumnType, nullStr);
+                string str = string.Format("[{0}] {1} {2} ", item.MapingName, item.ColumnType, nullStr);
                 list2.Add(str);
                 //生成默认值语句
                 if (!string.IsNullOrEmpty(item.DefaultValue))
                 {
-                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.Name, item.DefaultValue);
+                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MapingName, item.DefaultValue);
                     defaultValues.Add(v);
                 }
             }
@@ -231,7 +231,7 @@ end", spName, script);
                 DataRow dr = tempTable.NewRow();
                 foreach (Attribute.FieldAttribute info in typeArry)
                 {
-                    string name = info.Name;
+                    string name = info.MapingName;
                     object value = info.GetValue(item);
                     if (!keepIdentity)
                     {
@@ -273,7 +273,7 @@ end", spName, script);
             string sql2 = "";
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                string name = info.Name;
+                string name = info.MapingName;
                 if (info.IsPrimaryKey)
                 {
                     primaryKey = info;
@@ -392,8 +392,8 @@ begin
     set @pageCount=(@count+@pageSize-1)/@pageSize
 
     /**当前页大于总页数 取最后一页**/
-    if @pageIndex>@pageCount
-        set @pageIndex=@pageCount
+    --if @pageIndex>@pageCount
+        --set @pageIndex=@pageCount
 
 	--计算开始结束的行号
 	set @start = @pageSize*(@pageIndex-1)+1
@@ -431,8 +431,8 @@ begin
     set @pageCount=(@count+@pageSize-1)/@pageSize
 
     /**当前页大于总页数 取最后一页**/
-    if @pageIndex>@pageCount
-        set @pageIndex=@pageCount
+    --if @pageIndex>@pageCount
+        --set @pageIndex=@pageCount
 
 	--计算开始结束的行号
 	set @start = @pageSize*(@pageIndex-1)+1
@@ -545,12 +545,12 @@ set  nocount  on
             foreach (Attribute.FieldAttribute item in fields)
             {
                 string nullStr = item.NotNull ? "NOT NULL" : "";
-                string str = string.Format("[{0}] {1} {2} ", item.Name, item.ColumnType, nullStr);
+                string str = string.Format("[{0}] {1} {2} ", item.MapingName, item.ColumnType, nullStr);
                 list2.Add(str);
                 //生成默认值语句
                 if (!string.IsNullOrEmpty(item.DefaultValue))
                 {
-                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.Name, item.DefaultValue);
+                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MapingName, item.DefaultValue);
                     defaultValues.Add(v);
                 }
             }

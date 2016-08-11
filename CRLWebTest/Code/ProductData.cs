@@ -105,6 +105,7 @@ namespace WebTest.Code
             get;
             set;
         }
+        [CRL.Attribute.Field(MapingName = "ProductName1")]
         public string ProductName
         {
             get;

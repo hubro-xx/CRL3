@@ -37,7 +37,7 @@ namespace CRL.Attribute
         {
             get
             {
-                if (Name.ToLower() == "id")
+                if (MapingName.ToLower() == "id")
                 {
                     return true;
                 }
@@ -96,15 +96,15 @@ namespace CRL.Attribute
         }
         public override string ToString()
         {
-            return string.Format("{0}.{1} |{2}", TableName, Name, QueryFullScript);
+            return string.Format("{0}.{1} |{2}", TableName, MemberName, QueryFullScript);
         }
         /// <summary>
         /// 属性名称
         /// </summary>
-        internal string Name;
-        public string GetName()
+        internal string MemberName;
+        public string GetMemberName()
         {
-            return Name;
+            return MemberName;
         }
 
         /// <summary>
@@ -119,21 +119,22 @@ namespace CRL.Attribute
         {
             get
             {
-                return Name;
+                return MapingName;
             }
         }
-       
+
 
         string mapingName;
         /// <summary>
-        /// 映射名称,在查询时用 如 new{Name1=b.Name}
+        /// 映射字段名
+        /// MongoDB不支持表和字段别名
         /// </summary>
-        internal string MapingName
+        public string MapingName
         {
             get
             {
                 if (string.IsNullOrEmpty(mapingName))
-                    mapingName = Name;
+                    mapingName = MemberName;
                 return mapingName;
             }
             set { mapingName = value; }
@@ -165,13 +166,13 @@ namespace CRL.Attribute
             }
             if (string.IsNullOrEmpty(fieldName))
             {
-                fieldName = withTablePrefix ? Name : _DBAdapter.KeyWordFormat(Name);
+                fieldName = withTablePrefix ? MapingName : _DBAdapter.KeyWordFormat(MapingName);
             }
             //判断虚拟字段
             if (FieldType == Attribute.FieldType.虚拟字段)
             {
                 query = VirtualField;
-                mapingName = Name;
+                mapingName = MemberName;
             }
             else
             {
@@ -181,14 +182,14 @@ namespace CRL.Attribute
             var mappNameFull = fieldName;
             if (!string.IsNullOrEmpty(mapingName))
             {
-                MapingName = mapingName;
+                //MapingName = mapingName;
                 mappNameFull = mapingName;
             }
             if (withTablePrefix)
             {
                 mappNameFull = GetTableFieldFormat(TableName, mappNameFull);
             }
-            MapingName = mappNameFull;
+            //MapingName = mappNameFull;
             //别名不为空或有表前辍
             if (!string.IsNullOrEmpty(mapingName) || withTablePrefix)
             {
