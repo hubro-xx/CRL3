@@ -25,27 +25,45 @@ namespace CRL.DBExtend.RelationDB
         {
             string tableName = TypeCache.GetTableName(typeof(T), dbContext);
             string setString = "";
+            var fields = TypeCache.GetProperties(typeof(T), true);
             foreach (var pair in setValue)
             {
                 string name = pair.Key;
                 object value = pair.Value;
+
                 value = ObjectConvert.CheckNullValue(value);
 
                 if (name.StartsWith("$"))//直接按值拼接 c2["$SoldCount"] = "SoldCount+" + num;
                 {
                     name = name.Substring(1, name.Length - 1);
+                    if (!fields.ContainsKey(name))
+                    {
+                        throw new Exception("找不到对应的字段,在" + typeof(T) + ",名称" + name);
+                    }
+                    var field = fields[name];
+                    string value1 = value.ToString();
+                    value1 = System.Text.RegularExpressions.Regex.Replace(value1, name + @"([\+\-])", field.MapingName + "$1");
+                    name = field.MapingName;
+                    value = value1;
                     setString += string.Format(" {0}={1},", _DBAdapter.KeyWordFormat(name), value);
                 }
                 else
                 {
                     if (value.ToString().Contains("$"))//当是关联更新
                     {
+                        //todo 名称按属性名,需要转换成字段名
                         //右边字段需加前辍
                         value = value.ToString().Replace("$", "t2.");
                         name = string.Format("t1.{0}", name);
                     }
                     else
                     {
+                        if (!fields.ContainsKey(name))
+                        {
+                            throw new Exception("找不到对应的字段,在" + typeof(T) + ",名称" + name);
+                        }
+                        var field = fields[name];
+                        name = field.MapingName;//转换映射名
                         string parame = string.Format("@{0}", name, dbContext.parIndex);
                         AddParam(name, value);
                         dbContext.parIndex += 1;

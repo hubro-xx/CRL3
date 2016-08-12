@@ -143,8 +143,9 @@ namespace CRL
             List<Attribute.FieldAttribute> list = new List<CRL.Attribute.FieldAttribute>();
             //string fieldPat = @"^([A-Z][a-z|\d]+)+$";
             int n = 0;
+            Attribute.FieldAttribute keyField = null;
             #region 读取
-            List<PropertyInfo> typeArry = table.Type.GetProperties().ToList();
+            var typeArry = table.Type.GetProperties().ToList();
             //移除重复的
             var dic = new Dictionary<string, PropertyInfo>();
             foreach (PropertyInfo info in typeArry)
@@ -205,6 +206,7 @@ namespace CRL
                 {
                     table.PrimaryKey = f;
                     f.FieldIndexType = Attribute.FieldIndexType.非聚集唯一;
+                    keyField = f;
                     n += 1;
                 }
 
@@ -220,6 +222,12 @@ namespace CRL
                 throw new Exception(string.Format("对象{0}设置的主键字段太多 {1}", type.Name, n));
             }
             #endregion
+            //主键排前面
+            if (keyField != null)
+            {
+                list.Remove(keyField);
+                list.Insert(0, keyField);
+            }
             table.Fields = list;
         }
     }

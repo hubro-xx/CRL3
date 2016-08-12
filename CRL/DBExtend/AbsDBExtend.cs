@@ -868,7 +868,7 @@ namespace CRL
                 var currentValue = f.GetValue(obj);
                 if (!Object.Equals(originValue, currentValue))
                 {
-                    c.Add(f.MapingName, currentValue);
+                    c.Add(f.MemberName, currentValue);
                 }
             }
             if (c.Count() > 0)

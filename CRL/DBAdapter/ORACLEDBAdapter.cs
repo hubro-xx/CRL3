@@ -126,7 +126,7 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public override string GetCreateColumnScript(Attribute.FieldAttribute field)
         {
-            string str = string.Format("alter table {0} add {1} {2};", field.TableName, field.KeyWordName, field.ColumnType);
+            string str = string.Format("alter table {0} add {1} {2};", field.TableName, field.MapingName, field.ColumnType);
             if (!string.IsNullOrEmpty(field.DefaultValue))
             {
                 str += string.Format(" default '{0}' ", field.DefaultValue);
@@ -146,7 +146,7 @@ namespace CRL.DBAdapter
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
             string indexName = string.Format("pk_{0}_{1}", filed.TableName, filed.MapingName);
-            string indexScript = string.Format("create {3} index {0} on {1}({2}); ", indexName, filed.TableName, filed.KeyWordName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
+            string indexScript = string.Format("create {3} index {0} on {1}({2}); ", indexName, filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
             return indexScript;
         }
 
@@ -170,7 +170,7 @@ namespace CRL.DBAdapter
                 }
                 var columnType = GetDBColumnType(item.PropertyType);
                 string nullStr = item.NotNull ? "NOT NULL" : "";
-                string str = string.Format("{0} {1} {2} ", item.KeyWordName, item.ColumnType, nullStr);
+                string str = string.Format("{0} {1} {2} ", item.MapingName, item.ColumnType, nullStr);
 
                 list2.Add(str);
 
@@ -272,9 +272,9 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
                     }
                 }
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", info.KeyWordName);
-                sql2 += string.Format("@{0},", info.KeyWordName);
-                helper.AddParam(info.KeyWordName, value);
+                sql1 += string.Format("{0},", info.MapingName);
+                sql2 += string.Format("@{0},", info.MapingName);
+                helper.AddParam(info.MapingName, value);
             }
             sql1 = sql1.Substring(0, sql1.Length - 1);
             sql2 = sql2.Substring(0, sql2.Length - 1);

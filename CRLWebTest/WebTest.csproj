@@ -437,7 +437,7 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetDir)\CRL.DLL $(ProjectDir)\ref
-copy $(TargetDir)\CRL.XML $(ProjectDir)\ref</PostBuildEvent>
+    <PostBuildEvent>copy $(SolutionDir)\CRL\update.txt $(ProjectDir)\update.txt
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

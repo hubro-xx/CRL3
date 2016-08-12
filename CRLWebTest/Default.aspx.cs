@@ -21,9 +21,12 @@ namespace WebTest
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            var time = DateTime.Now;
-            var ts = DateTime.Now - time;
-            Response.Write(ts.TotalMilliseconds);
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query.Where(b => b.ProductName.StartsWith("123"));
+            query.OrderBy(b => b.ProductName);
+            var str = query.PrintQuery();
+            Response.Write(str);
+            //Response.End();
             //MongoDBTest.Test();
             //TestAllQuery();
             //TestGuid();

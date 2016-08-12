@@ -165,7 +165,7 @@ namespace CRL
             var Reflection = ReflectionHelper.GetInfo<T>();
             //field.TupleSetValue<T>(obj, origin);
             Reflection.GetAccessor(field.MemberName).Set((T)obj, origin);
-            obj.SetChanges("$" + field.MapingName, value);
+            obj.SetChanges("$" + field.MemberName, value);
         }
         #endregion
         #endregion

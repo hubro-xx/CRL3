@@ -131,7 +131,7 @@ end", spName, script);
         /// <returns></returns>
         public override string GetCreateColumnScript(Attribute.FieldAttribute field)
         {
-            string str = string.Format("alter table [{0}] add {1} {2}", field.TableName, field.KeyWordName, field.ColumnType);
+            string str = string.Format("alter table [{0}] add {1} {2}", field.TableName, field.MapingName, field.ColumnType);
             if (!string.IsNullOrEmpty(field.DefaultValue))
             {
                 str += string.Format(" default({0})", field.DefaultValue);
@@ -295,7 +295,7 @@ end", spName, script);
                     }
                 }
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", info.KeyWordName);
+                sql1 += string.Format("{0},", info.MapingName);
                 sql2 += string.Format("@{0},", name);
                 helper.AddParam(name, value);
             }

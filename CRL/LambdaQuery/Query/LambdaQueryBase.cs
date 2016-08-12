@@ -122,7 +122,12 @@ namespace CRL.LambdaQuery
                             //var aliasName = GetPrefix(memberExpression.Expression.Type);
                             //f.SetFieldQueryScript(aliasName, true, false);
                             //字段名和属性名不一样时才生成别名
-                            f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix, f.MapingName != f.MemberName ? f.MemberName : "");
+                            string fieldName = "";
+                            if (withTablePrefix)
+                            {
+                                fieldName = f.MapingName != f.MemberName ? f.MemberName : "";
+                            }
+                            f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix,fieldName);
                         }
                         f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = f.MapingName, MethodName = "" };
                         resultFields.Add(f);

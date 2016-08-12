@@ -145,7 +145,7 @@ namespace CRL.LambdaQuery
                         //return filed.VirtualField;
                         return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = filed.VirtualField };
                     }
-                    var field = Base.FormatFieldPrefix(__DBAdapter,type, fieldName);//格式化为别名
+                    var field = Base.FormatFieldPrefix(__DBAdapter, type, filed.MapingName);//格式化为别名
                     //return field;
                     return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = field };
                 }
@@ -218,9 +218,11 @@ namespace CRL.LambdaQuery
                 else
                 {
                     field = mcExp.Object.ToString().Split('.')[1];
+
                     var mExpression = mcExp.Object as MemberExpression;
                     var type = mExpression.Expression.Type;
-                    field = Base.FormatFieldPrefix(__DBAdapter,type, field);
+                    var filed2 = TypeCache.GetProperties(type, true)[field];
+                    field = Base.FormatFieldPrefix(__DBAdapter, type, filed2.MapingName);
                     if (mcExp.Arguments.Count > 0)
                     {
                         var obj = GetParameExpressionValue(mcExp.Arguments[0]);
@@ -373,7 +375,9 @@ namespace CRL.LambdaQuery
                 {
                     if (m.Expression.NodeType == ExpressionType.Parameter)
                     {
-                        return new ExpressionValueObj { Value = Base.FormatFieldPrefix(__DBAdapter, m.Expression.Type, m.Member.Name), IsMember = true };
+                        string name = m.Member.Name;
+                        var filed2 = TypeCache.GetProperties(m.Expression.Type, true)[name];
+                        return new ExpressionValueObj { Value = Base.FormatFieldPrefix(__DBAdapter, m.Expression.Type, filed2.MapingName), IsMember = true };
                     }
                 }
             }

@@ -112,18 +112,6 @@ namespace CRL.Attribute
         /// </summary>
         internal Type ModelType;
 
-        /// <summary>
-        /// 关键字处理后的名称(字段名) 
-        /// </summary>
-        internal string KeyWordName
-        {
-            get
-            {
-                return MapingName;
-            }
-        }
-
-
         string mapingName;
         /// <summary>
         /// 映射字段名

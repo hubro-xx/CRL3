@@ -8,7 +8,7 @@
         <h2>CRL <%=WebTest.Code.Setting.GetVersion() %></h2>
         <blockquote>
             <ul class="unstyled" style="font-size: 15px; line-height: 25px;">
-                <li>CRL是一个面向对象的轻便型ORM开发框架
+                <li>CRL是一个面向对象的轻便型开发框架
             <ul>
                 <li>通过抽象数据库架构和数据库实现,支持关系和非关系类型数据库</li>
                 <li>数据处理使用了对象/数据映射,采用Lambda表达式来表示条件查询,增加了可编程性和可靠性,出错机率低,同时也能用原生的SQL实现查询或操作</li>
