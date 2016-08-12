@@ -21,7 +21,7 @@ namespace CRL.DBExtend.RelationDB
         /// </summary>
         /// <param name="setValue"></param>
         /// <returns></returns>
-        string ForamtSetValue<T>(ParameCollection setValue) where T : IModel
+        string ForamtSetValue<T>(ParameCollection setValue, Type joinType = null) where T : IModel
         {
             string tableName = TypeCache.GetTableName(typeof(T), dbContext);
             string setString = "";
@@ -42,7 +42,8 @@ namespace CRL.DBExtend.RelationDB
                     }
                     var field = fields[name];
                     string value1 = value.ToString();
-                    value1 = System.Text.RegularExpressions.Regex.Replace(value1, name + @"([\+\-])", field.MapingName + "$1");
+                    //未处理空格
+                    value1 = System.Text.RegularExpressions.Regex.Replace(value1, name + @"([\+\-])", field.MapingName + "$1", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                     name = field.MapingName;
                     value = value1;
                     setString += string.Format(" {0}={1},", _DBAdapter.KeyWordFormat(name), value);
@@ -51,9 +52,22 @@ namespace CRL.DBExtend.RelationDB
                 {
                     if (value.ToString().Contains("$"))//当是关联更新
                     {
-                        //todo 名称按属性名,需要转换成字段名
-                        //右边字段需加前辍
-                        value = value.ToString().Replace("$", "t2.");
+
+                        if (!fields.ContainsKey(name))
+                        {
+                            throw new Exception("找不到对应的字段,在" + typeof(T) + ",名称" + name);
+                        }
+                        var field = fields[name];
+                        name = field.MapingName;//转换映射名
+
+                        var fields2 = TypeCache.GetProperties(joinType, true);
+                        var value1 = System.Text.RegularExpressions.Regex.Match(value.ToString(), @"\$(\w+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Groups[1].Value;
+                        if (!fields2.ContainsKey(value1))
+                        {
+                            throw new Exception("找不到对应的字段,在" + joinType + ",名称" + value1);
+                        }
+                        var field2 = fields2[value1];
+                        value = value.ToString().Replace("$" + value1, "t2." + field2.MapingName);//右边字段需加前辍
                         name = string.Format("t1.{0}", name);
                     }
                     else
@@ -160,11 +174,11 @@ namespace CRL.DBExtend.RelationDB
             string table = query1.QueryTableName;
             table = query1.__DBAdapter.KeyWordFormat(table);
             query1.FillParames(this);
-            var properties = updateValue.GetType().GetProperties();
+            //var properties = updateValue.GetType().GetProperties();
 
             if (query1.__Relations.Count > 0)
             {
-                string setString = ForamtSetValue<TModel>(updateValue);
+                string setString = ForamtSetValue<TModel>(updateValue,query.__JoinTypes.Keys.First());
                 var kv = query1.__Relations.First();
                 var t1 = query1.QueryTableName;
                 var t2 = TypeCache.GetTableName(kv.Key, query1.__DbContext);
