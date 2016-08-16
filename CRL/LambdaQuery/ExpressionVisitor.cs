@@ -155,6 +155,10 @@ namespace CRL.LambdaQuery
                 {
                     obj = (int)obj;
                 }
+                else if (obj is Boolean)//sql2000
+                {
+                    obj = Convert.ToInt32(obj);
+                }
                 //return obj + "";
                 return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
             }
