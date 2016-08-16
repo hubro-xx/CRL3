@@ -23,6 +23,8 @@ namespace WebTest
         {
             var query = Code.ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.ProductName.StartsWith("123"));
+            Code.TransType type = Code.TransType.In;
+            query.Where(b => b.TransType == Code.TransType.In);
             query.OrderBy(b => b.ProductName);
             var str = query.PrintQuery();
             Response.Write(str);

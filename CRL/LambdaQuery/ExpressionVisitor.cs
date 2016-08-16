@@ -294,6 +294,10 @@ namespace CRL.LambdaQuery
                 else if (ue.Operand is MemberExpression)
                 {
                     MemberExpression mExp = (MemberExpression)ue.Operand;
+                    if (mExp.Expression.NodeType != ExpressionType.Parameter)
+                    {
+                        return RouteExpressionHandler(ue.Operand); 
+                    }
                     var parameter = Expression.Parameter(mExp.Expression.Type, "b");
                     if (ue.NodeType == ExpressionType.Not)
                     {
@@ -305,6 +309,7 @@ namespace CRL.LambdaQuery
                         //like Convert(b.Id);
                         var ex2 = parameter.Property(mExp.Member.Name);
                         return RouteExpressionHandler(ex2);
+  
                     }
                 }
                 throw new Exception("未处理的一元运算" + ue.NodeType);

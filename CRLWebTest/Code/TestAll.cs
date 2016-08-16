@@ -18,6 +18,7 @@ namespace WebTest.Code
         {
             var instance = Code.ProductDataManage.Instance;
             var query = ProductDataManage.Instance.GetLambdaQuery();
+            query.Where(b => b.TransType == TransType.In);
             query.Select(b => new { b.InterFaceUser, bb = b.Id * b.Number
                 });
             var year = DateTime.Now.Year;
