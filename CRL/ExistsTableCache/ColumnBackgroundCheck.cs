@@ -95,5 +95,13 @@ namespace CRL.ExistsTableCache
                 needCheks.TryRemove(item.Key, out val);
             }
         }
+        public static void Stop()
+        {
+            if (thread != null)
+            {
+                thread.Abort();
+            }
+            thread = null;
+        }
     }
 }

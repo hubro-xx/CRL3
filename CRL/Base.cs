@@ -167,5 +167,10 @@ namespace CRL
         {
             return "{" + type.FullName + "}" + dBAdapter.KeyWordFormat(fieldName);
         }
+        public static void Dispose()
+        {
+            MemoryDataCache.CacheService.StopWatch();
+            ExistsTableCache.ColumnBackgroundCheck.Stop();
+        }
     }
 }
