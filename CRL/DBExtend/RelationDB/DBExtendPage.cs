@@ -62,7 +62,7 @@ namespace CRL.DBExtend.RelationDB
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(typeof(TModel));
-                rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
+                rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MappingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
             var condition = query1.GetQueryConditions();
@@ -115,7 +115,7 @@ namespace CRL.DBExtend.RelationDB
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(typeof(TModel));
-                rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
+                rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MappingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
             var condition = query1.GetQueryConditions();

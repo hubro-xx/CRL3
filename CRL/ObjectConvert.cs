@@ -356,7 +356,7 @@ namespace CRL
                 #region foreach field
                 foreach (Attribute.FieldAttribute info in typeArry)
                 {
-                    string nameLower = info.MapingName.ToLower();
+                    string nameLower = info.MappingName.ToLower();
                     if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
                     {
                         #region 按外部字段

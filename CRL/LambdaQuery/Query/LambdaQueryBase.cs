@@ -125,11 +125,11 @@ namespace CRL.LambdaQuery
                             string fieldName = "";
                             if (withTablePrefix)
                             {
-                                fieldName = f.MapingName != f.MemberName ? f.MemberName : "";
+                                fieldName = f.MappingName != f.MemberName ? f.MemberName : "";
                             }
                             f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix,fieldName);
                         }
-                        f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = f.MapingName, MethodName = "" };
+                        f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = f.MappingName, MethodName = "" };
                         resultFields.Add(f);
                     }
                     else
@@ -193,7 +193,7 @@ namespace CRL.LambdaQuery
                 var f = allFilds[mExp.Expression.Type][mExp.Member.Name].Clone();
                 //f.SetFieldQueryScript(aliasName, true, false);
                 f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix, "");
-                f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.MemberName, FieldName = f.MapingName, MethodName = "" };
+                f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.MemberName, FieldName = f.MappingName, MethodName = "" };
                 resultFields.Add(f);
             }
             else

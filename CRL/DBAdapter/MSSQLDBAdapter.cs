@@ -131,7 +131,7 @@ end", spName, script);
         /// <returns></returns>
         public override string GetCreateColumnScript(Attribute.FieldAttribute field)
         {
-            string str = string.Format("alter table [{0}] add {1} {2}", field.TableName, field.MapingName, field.ColumnType);
+            string str = string.Format("alter table [{0}] add {1} {2}", field.TableName, field.MappingName, field.ColumnType);
             if (!string.IsNullOrEmpty(field.DefaultValue))
             {
                 str += string.Format(" default({0})", field.DefaultValue);
@@ -150,7 +150,7 @@ end", spName, script);
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
-            string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]([{1}])", filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
+            string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]([{1}])", filed.TableName, filed.MappingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
             return indexScript;
         }
 
@@ -170,15 +170,15 @@ end", spName, script);
             {
                 if (item.IsPrimaryKey)
                 {
-                    primaryKey = item.MapingName;
+                    primaryKey = item.MappingName;
                 }
                 string nullStr = item.NotNull ? "NOT NULL" : "";
-                string str = string.Format("[{0}] {1} {2} ", item.MapingName, item.ColumnType, nullStr);
+                string str = string.Format("[{0}] {1} {2} ", item.MappingName, item.ColumnType, nullStr);
                 list2.Add(str);
                 //生成默认值语句
                 if (!string.IsNullOrEmpty(item.DefaultValue))
                 {
-                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MapingName, item.DefaultValue);
+                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MappingName, item.DefaultValue);
                     defaultValues.Add(v);
                 }
             }
@@ -231,7 +231,7 @@ end", spName, script);
                 DataRow dr = tempTable.NewRow();
                 foreach (Attribute.FieldAttribute info in typeArry)
                 {
-                    string name = info.MapingName;
+                    string name = info.MappingName;
                     object value = info.GetValue(item);
                     if (!keepIdentity)
                     {
@@ -273,7 +273,7 @@ end", spName, script);
             string sql2 = "";
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                string name = info.MapingName;
+                string name = info.MappingName;
                 if (info.IsPrimaryKey)
                 {
                     primaryKey = info;
@@ -295,7 +295,7 @@ end", spName, script);
                     }
                 }
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", info.MapingName);
+                sql1 += string.Format("{0},", info.MappingName);
                 sql2 += string.Format("@{0},", name);
                 helper.AddParam(name, value);
             }
@@ -545,12 +545,12 @@ set  nocount  on
             foreach (Attribute.FieldAttribute item in fields)
             {
                 string nullStr = item.NotNull ? "NOT NULL" : "";
-                string str = string.Format("[{0}] {1} {2} ", item.MapingName, item.ColumnType, nullStr);
+                string str = string.Format("[{0}] {1} {2} ", item.MappingName, item.ColumnType, nullStr);
                 list2.Add(str);
                 //生成默认值语句
                 if (!string.IsNullOrEmpty(item.DefaultValue))
                 {
-                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MapingName, item.DefaultValue);
+                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MappingName, item.DefaultValue);
                     defaultValues.Add(v);
                 }
             }

@@ -37,7 +37,7 @@ namespace CRL.Attribute
         {
             get
             {
-                if (MapingName.ToLower() == "id")
+                if (MappingName.ToLower() == "id")
                 {
                     return true;
                 }
@@ -117,7 +117,7 @@ namespace CRL.Attribute
         /// 映射字段名
         /// MongoDB不支持表和字段别名
         /// </summary>
-        public string MapingName
+        public string MappingName
         {
             get
             {
@@ -154,7 +154,7 @@ namespace CRL.Attribute
             }
             if (string.IsNullOrEmpty(fieldName))
             {
-                fieldName = withTablePrefix ? MapingName : _DBAdapter.KeyWordFormat(MapingName);
+                fieldName = withTablePrefix ? MappingName : _DBAdapter.KeyWordFormat(MappingName);
             }
             //判断虚拟字段
             if (FieldType == Attribute.FieldType.虚拟字段)

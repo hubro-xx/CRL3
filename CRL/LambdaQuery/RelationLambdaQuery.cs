@@ -75,7 +75,7 @@ namespace CRL.LambdaQuery
                 __QueryOrderBy += ",";
             }
             var key = TypeCache.GetTable(typeof(T)).PrimaryKey;
-            __QueryOrderBy += string.Format(" {2}{0} {1}", key.MapingName, desc ? "desc" : "asc", GetPrefix());
+            __QueryOrderBy += string.Format(" {2}{0} {1}", key.MappingName, desc ? "desc" : "asc", GetPrefix());
             //QueryOrderBy = ReplacePrefix(QueryOrderBy);
             return this;
         }
