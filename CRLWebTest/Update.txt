@@ -257,5 +257,5 @@
 	修改委托赋值时类型转换错误
 2016-08-11
 	属性可以自定义对字段名了
-	[CRL.Attribute.Field(MapingName = "ProductName1")]
+	[CRL.Attribute.Field(MappingName = "ProductName1")]
 	public string ProductName

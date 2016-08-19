@@ -81,8 +81,10 @@ namespace CRL.Dynamic
             var reflection = ReflectionHelper.GetInfo<T>();
             var actions = new List<CRL.ObjectConvert.ActionItem<T>>();
             var first = true;
+            var objOrigin = new T();
             while (reader.Read())
             {
+                object objInstance = objOrigin.Clone();
                 object[] values = new object[columns.Count];
                 reader.GetValues(values);
                 var dic = new Dictionary<string, object>();
@@ -91,7 +93,7 @@ namespace CRL.Dynamic
                     var name = columns[i];
                     dic.Add(name.ToLower(), values[i]);
                 }
-                var detailItem = ObjectConvert.DataReaderToObj<T>(dic, reflection, typeof(T), typeArry, actions, first) as T;
+                var detailItem = ObjectConvert.DataReaderToObj<T>(dic, reflection, true, objInstance, typeArry, actions, first) as T;
                 var result = resultSelector.Compile()(detailItem);
                 list.Add(result);
                 first = false;

@@ -351,10 +351,10 @@ namespace CRL.Package.OnlinePay.Company.Weixin
 
             inputObj.SetValue("appid", WxPayConfig.APPID);//公众账号ID
             inputObj.SetValue("partnerid", WxPayConfig.MCHID);//商户号  	    
-            inputObj.SetValue("nonce_str", GenerateNonceStr());//随机字符串
+            inputObj.SetValue("noncestr", GenerateNonceStr());//随机字符串
             inputObj.SetValue("prepayid", prepayid);
             inputObj.SetValue("package", "Sign=WXPay");
-            inputObj.SetValue("timeStamp", GenerateTimeStamp());
+            inputObj.SetValue("timestamp", GenerateTimeStamp());
             //签名
             inputObj.SetValue("sign", inputObj.MakeSign());
             return inputObj;

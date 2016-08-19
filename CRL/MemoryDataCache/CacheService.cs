@@ -30,7 +30,7 @@ namespace CRL.MemoryDataCache
     public class CacheService
     {
 
-        static Thread thread;
+        static System.Timers.Timer timer;
 
         static object lockObj = new object();
         static ConcurrentDictionary<string, MemoryDataCacheItem> cacheDatas = new ConcurrentDictionary<string, MemoryDataCacheItem>();
@@ -176,7 +176,7 @@ namespace CRL.MemoryDataCache
                 dataItem.QueryCount = 1;
             }
 
-            if (thread == null)
+            if (timer == null)
             {
                 StarWatch();
             }
@@ -343,10 +343,14 @@ namespace CRL.MemoryDataCache
         /// </summary>
         public static void StarWatch()
         {
-            if (thread == null)
+            if (timer == null)
             {
-                thread = new Thread(new ThreadStart(DoWatch));
-                thread.Start();
+                timer = new System.Timers.Timer(30000);
+                timer.Elapsed += (a, b) =>
+                {
+                    DoUpdate();
+                };
+                timer.Start();
             }
         }
         /// <summary>
@@ -354,24 +358,24 @@ namespace CRL.MemoryDataCache
         /// </summary>
         public static void StopWatch()
         {
-            if (thread != null)
+            if (timer != null)
             {
-                thread.Abort();
+                timer.Stop();
             }
-            thread = null;
+            timer = null;
             //WriteLog("监听已停止");
         }
         static bool working = false;
-        static void DoWatch()
-        {
-            #region watch
-            while (true)
-            {
-                DoUpdate();
-                Thread.Sleep(30000);
-            }
-            #endregion
-        }
+        //static void DoWatch()
+        //{
+        //    #region watch
+        //    while (true)
+        //    {
+        //        DoUpdate();
+        //        Thread.Sleep(30000);
+        //    }
+        //    #endregion
+        //}
         static void DoUpdate()
         {
             if (working)
@@ -419,42 +423,64 @@ namespace CRL.MemoryDataCache
                 return;
             }
             working = true;
-            int threadTask = needUpdates.Count / 10;//每个线程10个任务
-            if (threadTask > 5)
-                threadTask = 5;
-            //多线程处理
-            var threadSplit = new CoreHelper.ThreadSplit<UpdateItem>(needUpdates, threadTask);
-            threadSplit.UseLog = false;
-            //任务执行时
-            #region 多线程
-            threadSplit.OnWork = (sender) =>
+            foreach (var item in needUpdates)
             {
-                foreach (var item in sender)
+                try
                 {
-                    try
-                    {
-                        //EventLog.WriteLog("更新TABLE " + item.Value.TableName);
-                        //重新给参数赋值
-                        DBHelper helper = item.DBHelper;
-                        helper.Params = item.Params;
-                        //将新数据放放UpdateData中, 下次调用时填入Data
-                        var data = QueryData(item.Key, item.Type, item.TableName, helper);
-                        cacheDatas[item.Key].UpdateTime = DateTime.Now;
-                        cacheDatas[item.Key].UpdatedData = data;
-                        cacheDatas[item.Key].Data = null;
-                    }
-                    catch (Exception ero)
-                    {
-                        EventLog.Log("更新数据缓存查询时出现错误 " + item.TableName + "错误," + ero.Message, true);
-                    }
+                    //EventLog.WriteLog("更新TABLE " + item.Value.TableName);
+                    //重新给参数赋值
+                    DBHelper helper = item.DBHelper;
+                    helper.Params = item.Params;
+                    //将新数据放放UpdateData中, 下次调用时填入Data
+                    var data = QueryData(item.Key, item.Type, item.TableName, helper);
+                    cacheDatas[item.Key].UpdateTime = DateTime.Now;
+                    cacheDatas[item.Key].UpdatedData = data;
+                    cacheDatas[item.Key].Data = null;
                 }
-            };
-            //任务执行完成
-            threadSplit.OnFinish += (sender, e) =>
-            {
-                working = false;
-            };
-            threadSplit.Start();
+                catch (Exception ero)
+                {
+                    EventLog.Log("更新数据缓存查询时出现错误 " + item.TableName + "错误," + ero.Message, true);
+                }
+            }
+            working = false;
+
+            //int threadTask = needUpdates.Count / 10;//每个线程10个任务
+            //if (threadTask > 5)
+            //    threadTask = 5;
+            //多线程处理
+            //var threadSplit = new CoreHelper.ThreadSplit<UpdateItem>(needUpdates, threadTask);
+            //threadSplit.UseLog = false;
+            //任务执行时
+     
+            #region 多线程
+            //threadSplit.OnWork = (sender) =>
+            //{
+            //    foreach (var item in sender)
+            //    {
+            //        try
+            //        {
+            //            //EventLog.WriteLog("更新TABLE " + item.Value.TableName);
+            //            //重新给参数赋值
+            //            DBHelper helper = item.DBHelper;
+            //            helper.Params = item.Params;
+            //            //将新数据放放UpdateData中, 下次调用时填入Data
+            //            var data = QueryData(item.Key, item.Type, item.TableName, helper);
+            //            cacheDatas[item.Key].UpdateTime = DateTime.Now;
+            //            cacheDatas[item.Key].UpdatedData = data;
+            //            cacheDatas[item.Key].Data = null;
+            //        }
+            //        catch (Exception ero)
+            //        {
+            //            EventLog.Log("更新数据缓存查询时出现错误 " + item.TableName + "错误," + ero.Message, true);
+            //        }
+            //    }
+            //};
+            ////任务执行完成
+            //threadSplit.OnFinish += (sender, e) =>
+            //{
+            //    working = false;
+            //};
+            //threadSplit.Start();
             #endregion
             needUpdates.Clear();
             needUpdates = null;

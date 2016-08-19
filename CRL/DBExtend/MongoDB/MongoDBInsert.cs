@@ -17,6 +17,8 @@ namespace CRL.DBExtend.MongoDB
     {
         public override void BatchInsert<TModel>(List<TModel> details, bool keepIdentity = false)
         {
+            if (details.Count == 0)
+                return;
             string table = TypeCache.GetTableName(typeof(TModel), dbContext);
             var collection = _MongoDB.GetCollection<TModel>(table);
             collection.InsertMany(details);

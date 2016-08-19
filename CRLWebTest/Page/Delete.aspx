@@ -8,5 +8,12 @@
     Code.ProductDataManage.Instance.Delete(b => b.Id == 0);//按条件删除
     Code.ProductDataManage.Instance.Delete(1);//按主键删除
     Code.OrderManage.Instance.Delete&lt;Code.ProductData>((a, b) => a.UserId == b.Id);//关联ProductData删除
+    
+    //使用完整语法删除 goup语法不支持
+    var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+    query.Where(b => b.Id == 10);
+    query.Join&lt;Code.Member>((a, b) => a.SupplierId == "10" && b.Name == "123");
+    Code.ProductDataManage.Instance.Delete(query);
+
     </pre>
 </asp:Content>

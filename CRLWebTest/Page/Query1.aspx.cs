@@ -23,8 +23,9 @@ namespace WebTest
 
         protected void Button1_Click(object sender, EventArgs e)
         {
+            var a = true;
             //查询一项
-            var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0 && b.Number == 0&&b.ProductName=="111");
+            var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0 || b.IsTop == a);
             var list = new List<object>(); 
             
             if(item!=null)

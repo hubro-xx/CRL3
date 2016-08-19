@@ -155,7 +155,7 @@ namespace CRL.LambdaQuery
                 {
                     obj = (int)obj;
                 }
-                else if (obj is Boolean)//sql2000
+                else if (obj is Boolean)//sql2000需要转换
                 {
                     obj = Convert.ToInt32(obj);
                 }

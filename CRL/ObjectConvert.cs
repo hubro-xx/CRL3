@@ -292,23 +292,39 @@ namespace CRL
             var mainType = typeof(TItem);
             return DataReaderToList<TItem>(reader, mainType, out runTime, setConstraintObj);
         }
-        internal static List<TItem> DataReaderToList<TItem>(DbDataReader reader, Type mainType, out double runTime, bool setConstraintObj = false) where TItem : class, new()
+        internal static List<T> DataReaderToList<T>(DbDataReader reader, Type mainType, out double runTime, bool setConstraintObj = false) where T : class, new()
         {
-            //rem mainType 不一定为TItem
+            //rem mainType 不一定为T
             var time = DateTime.Now;
-            var list = new List<TItem>();
+            var list = new List<T>();
             var typeArry = TypeCache.GetProperties(mainType, !setConstraintObj).Values;
             var columns = new Dictionary<int,string>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 columns.Add(i, reader.GetName(i).ToLower());
             }
-            var reflection = ReflectionHelper.GetInfo<TItem>();
-            var actions = new List<ActionItem<TItem>>();
+            var reflection = ReflectionHelper.GetInfo<T>();
+            var actions = new List<ActionItem<T>>();
             var first = true;
             var objOrigin = System.Activator.CreateInstance(mainType);
+            var canTuple = mainType == typeof(T);
+            IModel obj2 = null;
+            if (objOrigin is IModel)
+            {
+                obj2 = objOrigin as IModel;
+            }
             while (reader.Read())
             {
+                object objInstance = null;
+                if (obj2 != null)
+                {
+                    objInstance = obj2.Clone();
+                    //objInstance = new T();
+                }
+                else
+                {
+                    objInstance = System.Activator.CreateInstance(mainType);
+                }
                 object[] values = new object[columns.Count];
                 reader.GetValues(values);
                 var dic = new Dictionary<string, object>();
@@ -317,7 +333,7 @@ namespace CRL
                     var name = columns[i];
                     dic.Add(name.ToLower(), values[i]);
                 }
-                var detailItem = DataReaderToObj<TItem>(dic, reflection, mainType, typeArry, actions, first) as TItem;
+                var detailItem = DataReaderToObj<T>(dic, reflection, canTuple, objInstance, typeArry, actions, first) as T;
                 list.Add(detailItem);
                 first = false;
             }
@@ -331,20 +347,8 @@ namespace CRL
             public Action<T, object> Action;
             public string Name;
         }
-        internal static object DataReaderToObj<T>(Dictionary<string, object> values, ReflectionInfo<T> reflection, Type mainType, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first) where T : class,new()
+        internal static object DataReaderToObj<T>(Dictionary<string, object> values, ReflectionInfo<T> reflection, bool canTuple, object detailItem, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first) where T : class,new()
         {
-            //rem mainType 不一定为T
-            object detailItem;
-            var canTuple = mainType == typeof(T);
-            if (canTuple)
-            {
-                detailItem = System.Activator.CreateInstance<T>();
-            }
-            else
-            {
-                detailItem = System.Activator.CreateInstance(mainType);
-            }
-            //return detailItem;
             IModel obj2 = null;
             if (detailItem is IModel)
             {

@@ -19,7 +19,7 @@ namespace CRL.ExistsTableCache
         static ConcurrentDictionary<string, AbsDBExtend> dBExtends = new ConcurrentDictionary<string, AbsDBExtend>();
         //static object lockObj = new object();
         static ConcurrentDictionary<Type, string> needCheks = new ConcurrentDictionary<Type, string>();
-        static Thread thread;
+        static System.Timers.Timer timer;
         public static void Add(AbsDBExtend dBExtend, Type type)
         {
             var dbName = dBExtend.DatabaseName;
@@ -34,23 +34,24 @@ namespace CRL.ExistsTableCache
                     needCheks.TryAdd(type, dbName);
                 }
             //}
-            if (thread == null)
+            if (timer == null)
             {
-                thread = new Thread(new ThreadStart(DoWatch));
-                thread.Start();
+                timer = new System.Timers.Timer(15000);
+                timer.Elapsed += (a, b) =>
+                {
+                    DoWatch();
+                };
+                timer.Start();
             }
         }
         static void DoWatch()
         {
             #region watch
-            while (true)
+            try
             {
-                try
-                {
-                    DoCheck();
-                }catch{}
-                Thread.Sleep(10000);
+                DoCheck();
             }
+            catch { }
             #endregion
         }
         static void DoCheck()
@@ -97,11 +98,11 @@ namespace CRL.ExistsTableCache
         }
         public static void Stop()
         {
-            if (thread != null)
+            if (timer != null)
             {
-                thread.Abort();
+                timer.Stop();
             }
-            thread = null;
+            timer = null;
         }
     }
 }
