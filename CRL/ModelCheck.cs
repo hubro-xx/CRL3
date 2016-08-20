@@ -178,7 +178,7 @@ namespace CRL
             message = "";
             //TypeCache.SetDBAdapterCache(GetType(),dbAdapter);
             string tableName = TypeCache.GetTableName(type, db.dbContext);
-            string sql = dbAdapter.GetSelectTop("0", "from " + tableName, "", 1);
+            string sql = dbAdapter.GetSelectTop("0", "from " + dbAdapter.KeyWordFormat(tableName), "", 1);
             bool needCreate = false;
             try
             {

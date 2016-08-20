@@ -223,7 +223,7 @@ end", spName, script);
                 return;
             var type = details[0].GetType();
             string table = TypeCache.GetTableName(type, dbContext);
-            string sql = GetSelectTop("*", " from " + table + " where 1=0","", 1);
+            string sql = GetSelectTop("*", " from " + KeyWordFormat(table) + " where 1=0","", 1);
             DataTable tempTable = helper.ExecDataTable(sql);
             var typeArry = TypeCache.GetProperties(type, true).Values;
             foreach (var item in details)
@@ -327,6 +327,7 @@ end", spName, script);
         /// </summary>
         /// <param name="fields">id,name</param>
         /// <param name="query">from table where 1=1</param>
+        /// <param name="sort"></param>
         /// <param name="top"></param>
         /// <returns></returns>
         public override string GetSelectTop(string fields, string query,string sort, int top)

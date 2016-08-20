@@ -397,7 +397,11 @@ namespace CRL
             foreach (var item in actions)
             {
                 //var item = actions[i];
-                item.Action((T)detailItem, values[item.Name]);
+                object value;
+                if (values.TryGetValue(item.Name, out value))
+                {
+                    item.Action((T)detailItem, value);
+                }
                 values.Remove(item.Name);
             }
             if (obj2 != null && values.Count > 0)
