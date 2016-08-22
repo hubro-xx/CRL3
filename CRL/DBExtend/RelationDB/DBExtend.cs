@@ -415,7 +415,11 @@ namespace CRL.DBExtend.RelationDB
                 foreach (var item in needCreates)
                 {
                     ModelCheck.SetColumnDbType(_DBAdapter, item);
-                    string str = ModelCheck.CreateColumn(db, item);
+                    try
+                    {
+                        string str = ModelCheck.CreateColumn(db, item);
+                    }
+                    catch { }
                 }
                 //RecoveryParams();
                 #endregion

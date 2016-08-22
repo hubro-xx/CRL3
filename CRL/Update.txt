@@ -261,3 +261,6 @@
 	public string ProductName
 2016-08-17
 	WinForm下,线程不能自动回收,改为Timer
+2016-08-20
+	优化了对象映射,名称不匹配时异常
+	修改了一些关键字错误
