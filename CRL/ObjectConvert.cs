@@ -298,7 +298,7 @@ namespace CRL
             var time = DateTime.Now;
             var list = new List<T>();
             var typeArry = TypeCache.GetProperties(mainType, !setConstraintObj).Values;
-            var columns = new Dictionary<int,string>();
+            var columns = new Dictionary<int, string>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 columns.Add(i, reader.GetName(i).ToLower());
@@ -306,20 +306,20 @@ namespace CRL
             var reflection = ReflectionHelper.GetInfo<T>();
             var actions = new List<ActionItem<T>>();
             var first = true;
-            var objOrigin = System.Activator.CreateInstance(mainType);
+            //var objOrigin = System.Activator.CreateInstance(mainType);
             var canTuple = mainType == typeof(T);
-            IModel obj2 = null;
-            if (objOrigin is IModel)
-            {
-                obj2 = objOrigin as IModel;
-            }
+            //IModel obj2 = null;
+            //if (objOrigin is IModel)
+            //{
+            //    obj2 = objOrigin as IModel;
+            //}
             while (reader.Read())
             {
                 object objInstance = null;
-                if (obj2 != null)
+                if (canTuple)
                 {
-                    objInstance = obj2.Clone();
-                    //objInstance = new T();
+                    //objInstance = obj2.Clone();
+                    objInstance = new T();
                 }
                 else
                 {
