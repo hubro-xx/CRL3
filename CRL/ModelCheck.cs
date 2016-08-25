@@ -87,7 +87,7 @@ namespace CRL
             string tableName = TypeCache.GetTableName(type, db.dbContext);
             foreach (Attribute.FieldAttribute item in columns)
             {
-                string sql = dbAdapter.GetSelectTop(item.MappingName, "from " + tableName, "", 1);
+                string sql = dbAdapter.GetSelectTop(item.MappingName, "from " + dbAdapter.KeyWordFormat(tableName), "", 1);
                 try
                 {
                     db.Execute(sql);

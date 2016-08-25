@@ -282,7 +282,10 @@ namespace CRL.LambdaQuery
                     {
                         returnValue = Convert.ToInt32(cExp.Value).ToString();
                     }
-                    returnValue = cExp.Value;
+                    else
+                    {
+                        returnValue = cExp.Value;
+                    }
                 }
                 return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = returnValue };
                 #endregion
