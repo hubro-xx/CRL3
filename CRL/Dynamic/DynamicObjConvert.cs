@@ -34,14 +34,14 @@ namespace CRL.Dynamic
                 yield return d;
             }
         }
-        static dynamic getDataRow(System.Data.Common.DbDataReader reader)
+        static dynamic getDataRow(List<string> columns,object[] values)
         {
             dynamic obj = new System.Dynamic.ExpandoObject();
             var dict = obj as IDictionary<string, object>;
-            for (int i = 0; i < reader.FieldCount; i++)
+            for (int i = 0; i < values.Count(); i++)
             {
-                string columnName = reader.GetName(i);
-                object value = reader[columnName];
+                string columnName = columns[i];
+                object value = values[i];
                 dict.Add(columnName, value);
             }
             return obj;
@@ -50,9 +50,17 @@ namespace CRL.Dynamic
         {
             var time = DateTime.Now;
             List<dynamic> list = new List<dynamic>();
+            var columns = new List<string>();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columns.Add(reader.GetName(i));
+            }
+
             while (reader.Read())
             {
-                var d = getDataRow(reader);
+                object[] values = new object[columns.Count];
+                reader.GetValues(values);
+                var d = getDataRow(columns, values);
                 list.Add(d);
             }
             reader.Close();

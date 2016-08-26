@@ -319,6 +319,10 @@ namespace CRL.LambdaQuery
   
                     }
                 }
+                else if (ue.Operand is ConstantExpression)
+                {
+                    return RouteExpressionHandler(ue.Operand);
+                }
                 throw new Exception("未处理的一元运算" + ue.NodeType);
             }
             else
