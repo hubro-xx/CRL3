@@ -223,7 +223,8 @@ end", spName, script);
                 return;
             var type = details[0].GetType();
             string table = TypeCache.GetTableName(type, dbContext);
-            string sql = GetSelectTop("*", " from " + KeyWordFormat(table) + " where 1=0","", 1);
+            table = KeyWordFormat(table);
+            string sql = GetSelectTop("*", " from " + table + " where 1=0","", 1);
             DataTable tempTable = helper.ExecDataTable(sql);
             var typeArry = TypeCache.GetProperties(type, true).Values;
             foreach (var item in details)

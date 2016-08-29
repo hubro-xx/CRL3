@@ -54,6 +54,10 @@ namespace CRL
         {
             base.Add(getKey(key), value);
         }
+        public new bool TryGetValue(string key, out T value)
+        {
+            return base.TryGetValue(getKey(key), out value);
+        }
         public new bool ContainsKey(string key)
         {
             return base.ContainsKey(getKey(key));

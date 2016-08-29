@@ -282,7 +282,10 @@ namespace CRL.LambdaQuery
                     {
                         returnValue = Convert.ToInt32(cExp.Value).ToString();
                     }
-                    returnValue = cExp.Value;
+                    else
+                    {
+                        returnValue = cExp.Value;
+                    }
                 }
                 return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = returnValue };
                 #endregion
@@ -315,6 +318,10 @@ namespace CRL.LambdaQuery
                         return RouteExpressionHandler(ex2);
   
                     }
+                }
+                else if (ue.Operand is ConstantExpression)
+                {
+                    return RouteExpressionHandler(ue.Operand);
                 }
                 throw new Exception("未处理的一元运算" + ue.NodeType);
             }
