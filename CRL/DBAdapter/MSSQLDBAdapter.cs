@@ -254,7 +254,7 @@ end", spName, script);
                 }
                 tempTable.Rows.Add(dr);
             }
-            helper.InsertFromDataTable(tempTable, table, keepIdentity);
+            helper.InsertFromDataTable(tempTable, KeyWordFormat(table), keepIdentity);
         }
 
         /// <summary>
