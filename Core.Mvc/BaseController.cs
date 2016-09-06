@@ -306,6 +306,7 @@ setTimeout('goUrl()', 3300)</script>";
         #endregion
 
         #region 控制台
+        #region 缓存管理
         /// <summary>
         /// 缓存管理
         /// </summary>
@@ -355,6 +356,9 @@ setTimeout('goUrl()', 3300)</script>";
 
             return Content(html);
         }
+        #endregion
+
+        #region 对象检查
         /// <summary>
         /// 重写以获取结构检查对象程序集
         /// </summary>
@@ -410,7 +414,8 @@ setTimeout('goUrl()', 3300)</script>";
             return Content(html);
         }
         #endregion
+        #endregion
 
-        
+
     }
 }

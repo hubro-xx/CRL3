@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -295,7 +296,8 @@ namespace CRL
         internal static List<T> DataReaderToList<T>(DbDataReader reader, Type mainType, out double runTime, bool setConstraintObj = false) where T : class, new()
         {
             //rem mainType 不一定为T
-            var time = DateTime.Now;
+            var sw = new Stopwatch();
+            sw.Start();
             var list = new List<T>();
             var typeArry = TypeCache.GetProperties(mainType, !setConstraintObj).Values;
             var columns = new Dictionary<int, string>();
@@ -306,20 +308,21 @@ namespace CRL
             var reflection = ReflectionHelper.GetInfo<T>();
             var actions = new List<ActionItem<T>>();
             var first = true;
-            //var objOrigin = System.Activator.CreateInstance(mainType);
+            var objOrigin = System.Activator.CreateInstance(mainType);
             var canTuple = mainType == typeof(T);
-            //IModel obj2 = null;
-            //if (objOrigin is IModel)
-            //{
-            //    obj2 = objOrigin as IModel;
-            //}
+            IModel obj2 = null;
+            if (objOrigin is IModel)
+            {
+                obj2 = objOrigin as IModel;
+            }
             while (reader.Read())
             {
                 object objInstance = null;
                 if (canTuple)
                 {
-                    //objInstance = obj2.Clone();
-                    objInstance = new T();
+                    objInstance = obj2.Clone();
+                    //objInstance = new T();
+                    //objInstance = obj2;
                 }
                 else
                 {
@@ -338,8 +341,9 @@ namespace CRL
                 first = false;
             }
             reader.Close();
-            var ts = DateTime.Now - time;
-            runTime = ts.TotalMilliseconds;
+            sw.Stop();
+            runTime = sw.ElapsedMilliseconds;
+            Console.WriteLine("CRL映射用时:"+runTime);
             return list;
         }
         internal struct ActionItem<T>

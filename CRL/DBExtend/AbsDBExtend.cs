@@ -814,7 +814,6 @@ namespace CRL
             foreach (var item in list)
             {
                 TModel clone = item.Clone() as TModel;
-                clone.OriginClone = null;
                 item.OriginClone = clone;
             }
         }

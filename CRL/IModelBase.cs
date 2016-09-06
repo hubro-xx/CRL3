@@ -93,7 +93,13 @@ namespace CRL
             return null;
         }
         #endregion
-
+        /// <summary>
+        /// 手动跟踪对象状态,使更新时能识别
+        /// </summary>
+        public void BeginTracking()
+        {
+            OriginClone = Clone();
+        }
 
         /// <summary>
         /// 是否检查重复插入,默认为true

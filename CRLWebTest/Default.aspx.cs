@@ -17,20 +17,40 @@ namespace WebTest
 {
     public partial class Default : System.Web.UI.Page
     {
-
-
+        public class classA
+        {
+            public string name1
+            {
+                get;
+                set;
+            }
+            public string name2
+            {
+                get;
+                set;
+            }
+        }
+        long Test<T>() where T : CRL.IModel, new()
+        {
+            var watch = new Stopwatch();
+            var model = new T();
+            var list = new List<T>();
+            watch.Start();
+            for (int i = 0; i < 500000; i++)
+            {
+                //var m = new T();
+                //var m = model.Clone() as T;
+                list.Add(model);
+                //var m = Activator.CreateInstance<T>();
+            }
+            watch.Stop();
+            return watch.ElapsedMilliseconds;
+        }
         protected void Page_Load(object sender, EventArgs e)
         {
 
-            var time = DateTime.Now;
-            var time1 = time.ToString();
-            var model = new Code.ProductData();
-            for (int i = 0; i < 50000;i++ )
-            {
-                var m = new Code.ProductData();
-            }
-            var ts = DateTime.Now - time;
-            Response.Write(ts.TotalMilliseconds);
+            var n = Test<Code.ProductData>();
+            Response.Write(n);
             //Response.End();
             //MongoDBTest.Test();
             //TestAllQuery();
