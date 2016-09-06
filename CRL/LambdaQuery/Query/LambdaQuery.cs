@@ -160,7 +160,16 @@ namespace CRL.LambdaQuery
         public LambdaQuery<T> Top(int top)
         {
             TakeNum = top;
-            //return Select(top, null);
+            return this;
+        }
+        /// <summary>
+        /// 设置查询TOP
+        /// </summary>
+        /// <param name="top"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> Take(int top)
+        {
+            TakeNum = top;
             return this;
         }
         /// <summary>

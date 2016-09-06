@@ -366,28 +366,34 @@ namespace CRL
                         #region 按外部字段
                         string tab = TypeCache.GetTableName(info.ConstraintType, null);
                         string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
-                        if (canTuple)
+                        if (values.ContainsKey(fieldName))
                         {
-                            var accessor = reflection.GetAccessor(info.MemberName);
-                            actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = fieldName });
-                        }
-                        else
-                        {
-                            actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = fieldName });
+                            if (canTuple)
+                            {
+                                var accessor = reflection.GetAccessor(info.MemberName);
+                                actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = fieldName });
+                            }
+                            else
+                            {
+                                actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = fieldName });
+                            }
                         }
                         #endregion
                     }
                     else
                     {
                         #region 按属性
-                        if (canTuple)
+                        if (values.ContainsKey(nameLower))
                         {
-                            var accessor = reflection.GetAccessor(info.MemberName);
-                            actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = nameLower });
-                        }
-                        else
-                        {
-                            actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = nameLower });
+                            if (canTuple)
+                            {
+                                var accessor = reflection.GetAccessor(info.MemberName);
+                                actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = nameLower });
+                            }
+                            else
+                            {
+                                actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = nameLower });
+                            }
                         }
                         #endregion
                     }
@@ -397,11 +403,8 @@ namespace CRL
             foreach (var item in actions)
             {
                 //var item = actions[i];
-                object value;
-                if (values.TryGetValue(item.Name, out value))
-                {
-                    item.Action((T)detailItem, value);
-                }
+                object value = values[item.Name];
+                item.Action((T)detailItem, value);
                 values.Remove(item.Name);
             }
             if (obj2 != null && values.Count > 0)
