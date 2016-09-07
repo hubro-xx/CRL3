@@ -35,12 +35,16 @@ namespace WebTest
             var watch = new Stopwatch();
             var model = new T();
             var list = new List<T>();
+            var type=typeof(T);
+            var info = type.GetConstructor(Type.EmptyTypes);
+            
             watch.Start();
-            for (int i = 0; i < 500000; i++)
+            for (int i = 0; i < 100; i++)
             {
+                //var obj = act(null);
                 //var m = new T();
                 //var m = model.Clone() as T;
-                list.Add(model);
+                //list.Add(model);
                 //var m = Activator.CreateInstance<T>();
             }
             watch.Stop();

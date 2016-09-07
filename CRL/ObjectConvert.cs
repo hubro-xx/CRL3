@@ -308,26 +308,27 @@ namespace CRL
             var reflection = ReflectionHelper.GetInfo<T>();
             var actions = new List<ActionItem<T>>();
             var first = true;
-            var objOrigin = System.Activator.CreateInstance(mainType);
+            //var objOrigin = reflection.ObjectCreateDelegate(null);
             var canTuple = mainType == typeof(T);
-            IModel obj2 = null;
-            if (objOrigin is IModel)
-            {
-                obj2 = objOrigin as IModel;
-            }
+            //IModel obj2 = null;
+            //if (objOrigin is IModel)
+            //{
+            //    obj2 = objOrigin as IModel;
+            //}
             while (reader.Read())
             {
-                object objInstance = null;
-                if (canTuple)
-                {
-                    objInstance = obj2.Clone();
-                    //objInstance = new T();
-                    //objInstance = obj2;
-                }
-                else
-                {
-                    objInstance = System.Activator.CreateInstance(mainType);
-                }
+                object objInstance = reflection.CreateObject();
+                //if (canTuple)
+                //{
+                //    objInstance = act(null);
+                //    //objInstance = obj2.Clone();
+                //    //objInstance = new T();
+                //    //objInstance = obj2;
+                //}
+                //else
+                //{
+                //    objInstance = System.Activator.CreateInstance(mainType);
+                //}
                 object[] values = new object[columns.Count];
                 reader.GetValues(values);
                 var dic = new Dictionary<string, object>();

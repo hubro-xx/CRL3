@@ -1,6 +1,7 @@
 ﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -33,12 +34,30 @@ namespace CRL
     {
         public string TableName { get; set; }
 
-
+        Func<object> ObjectCreateDelegate;
         private Dictionary<string, Accessor> accessorDict;
+
+        Func<object> CreateObjectGenerator(ConstructorInfo constructor)
+        {
+            Func<object> ret = null;
+            ParameterInfo[] parameters = constructor.GetParameters();
+            List<Expression> arguments = new List<Expression>(parameters.Length);
+            var body = Expression.New(constructor, arguments);
+            ret = Expression.Lambda<Func<object>>(body).Compile();
+            return ret;
+        }
+
         public ReflectionInfo(Type modelType)
         {
+            var info = modelType.GetConstructor(Type.EmptyTypes);
+            var act = CreateObjectGenerator(info);
+            ObjectCreateDelegate = act;
             InitInfo(modelType);
             // PrimaryKey = primaryKey;
+        }
+        public object CreateObject()
+        {
+            return ObjectCreateDelegate();
         }
 
         private void InitInfo(Type modelType)
