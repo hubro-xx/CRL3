@@ -81,27 +81,34 @@ namespace CRL.Dynamic
             var time = DateTime.Now;
             List<TResult> list = new List<TResult>();
             var typeArry = TypeCache.GetProperties(typeof(T), true).Values;
-            var columns = new Dictionary<int, string>();
+            //var columns = new Dictionary<int, string>();
+            //for (int i = 0; i < reader.FieldCount; i++)
+            //{
+            //    columns.Add(i, reader.GetName(i).ToLower());
+            //}
+            var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
-                columns.Add(i, reader.GetName(i).ToLower());
+                columns.Add(reader.GetName(i).ToLower(), i);
             }
+            var leftColumns = new Dictionary<string, int>(columns);
             var reflection = ReflectionHelper.GetInfo<T>();
             var actions = new List<CRL.ObjectConvert.ActionItem<T>>();
             var first = true;
-            var objOrigin = new T();
+            //var objOrigin = new T();
             while (reader.Read())
             {
-                object objInstance = objOrigin.Clone();
+                object objInstance = reflection.CreateObject();
+        
                 object[] values = new object[columns.Count];
                 reader.GetValues(values);
-                var dic = new Dictionary<string, object>();
-                for (int i = 0; i < columns.Count; i++)
-                {
-                    var name = columns[i];
-                    dic.Add(name.ToLower(), values[i]);
-                }
-                var detailItem = ObjectConvert.DataReaderToObj<T>(dic, reflection, true, objInstance, typeArry, actions, first) as T;
+                //var dic = new Dictionary<string, object>();
+                //for (int i = 0; i < columns.Count; i++)
+                //{
+                //    var name = columns[i];
+                //    dic.Add(name.ToLower(), values[i]);
+                //}
+                var detailItem = ObjectConvert.DataReaderToObj2<T>(columns, values, reflection, true, objInstance, typeArry, actions, first, leftColumns) as T;
                 var result = resultSelector.Compile()(detailItem);
                 list.Add(result);
                 first = false;
