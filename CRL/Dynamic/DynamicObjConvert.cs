@@ -108,7 +108,7 @@ namespace CRL.Dynamic
                 //    var name = columns[i];
                 //    dic.Add(name.ToLower(), values[i]);
                 //}
-                var detailItem = ObjectConvert.DataReaderToObj2<T>(columns, values, reflection, true, objInstance, typeArry, actions, first, leftColumns) as T;
+                var detailItem = ObjectConvert.DataReaderToObj<T>(columns, values, reflection, true, objInstance, typeArry, actions, first, leftColumns) as T;
                 var result = resultSelector.Compile()(detailItem);
                 list.Add(result);
                 first = false;

@@ -122,6 +122,7 @@ namespace CRL.LambdaQuery
                             //var aliasName = GetPrefix(memberExpression.Expression.Type);
                             //f.SetFieldQueryScript(aliasName, true, false);
                             //字段名和属性名不一样时才生成别名
+                            //todo 属性别名不一样时,查询应返回属性名
                             string fieldName = "";
                             if (withTablePrefix)
                             {
