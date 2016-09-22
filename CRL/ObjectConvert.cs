@@ -287,7 +287,13 @@ namespace CRL
             var type = typeof(T);
             return (T)ConvertObject(type, obj);
         }
-       
+        internal struct ActionItem<T>
+        {
+            public Action<T, object> Set;
+            public string Name;
+            public int ValueIndex;
+        }
+        #region 返回object
         internal static List<TItem> DataReaderToList<TItem>(DbDataReader reader, out double runTime, bool setConstraintObj = false) where TItem : class, new()
         {
             var mainType = typeof(TItem);
@@ -331,15 +337,10 @@ namespace CRL
             reader.Close();
             sw.Stop();
             runTime = sw.ElapsedMilliseconds;
-            Console.WriteLine("CRL映射用时:"+runTime);
+            Console.WriteLine("CRL映射用时:" + runTime);
             return list;
         }
-        internal struct ActionItem<T>
-        {
-            public Action<T, object> Action;
-            public string Name;
-            public int ValueIndex;
-        }
+
         internal static object DataReaderToObj<T>(Dictionary<string, int> columns, object[] values, ReflectionInfo<T> reflection, bool canTuple, object detailItem, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first, Dictionary<string, int> leftColumns) where T : class,new()
         {
             IModel obj2 = null;
@@ -366,18 +367,18 @@ namespace CRL
                             if (canTuple)
                             {
                                 var accessor = reflection.GetAccessor(info.MemberName);
-                                action = new ActionItem<T>() { Action = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
+                                action = new ActionItem<T>() { Set = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
                                 //actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] });
                             }
                             else
                             {
-                                action = new ActionItem<T>() { Action = info.SetValue, Name = fieldName, ValueIndex = columns[fieldName] };
+                                action = new ActionItem<T>() { Set = info.SetValue, Name = fieldName, ValueIndex = columns[fieldName] };
                                 //actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = fieldName, ValueIndex = columns[fieldName] });
                             }
                             leftColumns.Remove(fieldName);
                             actions.Add(action);
                             object value = values[action.ValueIndex];
-                            action.Action((T)detailItem, value);
+                            action.Set((T)detailItem, value);
                         }
                         #endregion
                     }
@@ -389,18 +390,18 @@ namespace CRL
                             if (canTuple)
                             {
                                 var accessor = reflection.GetAccessor(info.MemberName);
-                                action = new ActionItem<T>() { Action = accessor.Set, Name = nameLower, ValueIndex = columns[nameLower] };
+                                action = new ActionItem<T>() { Set = accessor.Set, Name = nameLower, ValueIndex = columns[nameLower] };
                                 //actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = nameLower, ValueIndex = columns[nameLower] });
                             }
                             else
                             {
-                                action = new ActionItem<T>() { Action = info.SetValue, Name = nameLower, ValueIndex = columns[nameLower] };
+                                action = new ActionItem<T>() { Set = info.SetValue, Name = nameLower, ValueIndex = columns[nameLower] };
                                 //actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = nameLower, ValueIndex = columns[nameLower] });
                             }
                             leftColumns.Remove(nameLower);
                             actions.Add(action);
                             object value = values[action.ValueIndex];
-                            action.Action((T)detailItem, value);
+                            action.Set((T)detailItem, value);
                         }
                         #endregion
                     }
@@ -414,7 +415,7 @@ namespace CRL
                 {
                     var item = actions[i];
                     object value = values[item.ValueIndex];
-                    item.Action((T)detailItem, value);
+                    item.Set((T)detailItem, value);
                 }
             }
 
@@ -436,6 +437,117 @@ namespace CRL
             }
             return detailItem;
         }
+
+        #endregion
+        #region 返回T 按IModel
+        internal static List<T> DataReaderToIModelList<T>(DbDataReader reader, out double runTime, bool setConstraintObj = false) where T : IModel, new()
+        {
+            var mainType=typeof(T);
+            var sw = new Stopwatch();
+            sw.Start();
+            var list = new List<T>();
+            var typeArry = TypeCache.GetProperties(mainType, !setConstraintObj).Values;
+            var columns = new Dictionary<string, int>();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columns.Add(reader.GetName(i).ToLower(), i);
+            }
+            var leftColumns = new Dictionary<string, int>(columns);
+            var reflection = ReflectionHelper.GetInfo<T>();
+            var actions = new List<ActionItem<T>>();
+            var first = true;
+            object[] values = new object[columns.Count];
+            while (reader.Read())
+            {
+                reader.GetValues(values);
+                var detailItem = DataReaderToIModel<T>(columns, values, reflection, typeArry, actions, first, leftColumns);
+                list.Add(detailItem);
+                first = false;
+            }
+            reader.Close();
+            sw.Stop();
+            runTime = sw.ElapsedMilliseconds;
+            Console.WriteLine("CRL映射用时:" + runTime);
+            return list;
+        }
+
+        internal static T DataReaderToIModel<T>(Dictionary<string, int> columns, object[] values, ReflectionInfo<T> reflection, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first, Dictionary<string, int> leftColumns) where T : IModel, new()
+        {
+            T detailItem = reflection.CreateObject();
+            detailItem.BoundChange = false;
+            //return detailItem;
+            if (first)
+            {
+                #region foreach field
+                foreach (Attribute.FieldAttribute info in typeArry)
+                {
+                    ActionItem<T> action;
+                    string nameLower = info.MappingName.ToLower();
+                    if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
+                    {
+                        #region 按外部字段
+                        string tab = TypeCache.GetTableName(info.ConstraintType, null);
+                        string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
+                        if (columns.ContainsKey(fieldName))
+                        {
+                            var accessor = reflection.GetAccessor(info.MemberName);
+                            action = new ActionItem<T>() { Set = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
+
+                            leftColumns.Remove(fieldName);
+                            actions.Add(action);
+                            object value = values[action.ValueIndex];
+                            action.Set((T)detailItem, value);
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        #region 按属性
+                        if (columns.ContainsKey(nameLower))
+                        {
+                            var accessor = reflection.GetAccessor(info.MemberName);
+                            action = new ActionItem<T>() { Set = accessor.Set, Name = nameLower, ValueIndex = columns[nameLower] };
+
+                            leftColumns.Remove(nameLower);
+                            actions.Add(action);
+                            object value = values[action.ValueIndex];
+                            action.Set(detailItem, value);
+                        }
+                        #endregion
+                    }
+
+                }
+                #endregion
+            }
+            else
+            {
+                for (int i = 1; i < actions.Count; i++)
+                {
+                    var item = actions[i];
+                    object value = values[item.ValueIndex];
+                    item.Set(detailItem, value);
+                }
+            }
+
+            if (leftColumns.Count > 0)
+            {
+                foreach (var item in leftColumns)
+                {
+                    var col = item.Key;
+                    var n = col.LastIndexOf("__");
+                    if (n == -1)
+                    {
+                        continue;
+                    }
+                    var mapingName = col.Substring(n + 2);
+                    detailItem[mapingName] = values[item.Value];
+
+                }
+                detailItem.BoundChange = true;
+            }
+            return detailItem;
+        }
+        #endregion
         /// <summary>
         /// DataRead转为字典
         /// </summary>

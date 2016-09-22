@@ -52,7 +52,7 @@ namespace CRL.LambdaQuery
         /// <param name="withTablePrefix">是否生按表生成前辍,关联时用 如Table__Name</param>
         /// <param name="types"></param>
         /// <returns></returns>
-        internal List<Attribute.FieldAttribute> GetSelectField(Expression expressionBody, bool withTablePrefix, params Type[] types)
+        internal List<Attribute.FieldAttribute> GetSelectField(bool isSelect,Expression expressionBody, bool withTablePrefix, params Type[] types)
         {
             var allFilds = new Dictionary<Type, IgnoreCaseDictionary<Attribute.FieldAttribute>>();
             //var mainType = typeof(T);
@@ -124,11 +124,25 @@ namespace CRL.LambdaQuery
                             //字段名和属性名不一样时才生成别名
                             //todo 属性别名不一样时,查询应返回属性名
                             string fieldName = "";
-                            if (withTablePrefix)
+                            if (isSelect)//查询字段时按属性名生成别名
                             {
-                                fieldName = f.MappingName != f.MemberName ? f.MemberName : "";
+                                if (!string.IsNullOrEmpty(f.MappingName))
+                                {
+                                    fieldName = f.MemberName;
+                                }
+                                //if (withTablePrefix)
+                                //{
+                                //    fieldName = f.MappingName != f.MemberName ? f.MemberName : "";
+                                //}
+                                //else
+                                //{
+                                //    if (!string.IsNullOrEmpty(f.MappingName))
+                                //    {
+                                //        fieldName = f.MemberName;
+                                //    }
+                                //}
                             }
-                            f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix,fieldName);
+                            f.SetFieldQueryScript2(__DBAdapter, true, withTablePrefix, fieldName);
                         }
                         f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = f.MappingName, MethodName = "" };
                         resultFields.Add(f);
@@ -175,7 +189,7 @@ namespace CRL.LambdaQuery
             else if (expressionBody is UnaryExpression)
             {
                 var unaryExpression = expressionBody as UnaryExpression;
-                return GetSelectField(unaryExpression.Operand, withTablePrefix, types);
+                return GetSelectField(false,unaryExpression.Operand, withTablePrefix, types);
             }
             else if (expressionBody is MemberExpression)//按成员
             {

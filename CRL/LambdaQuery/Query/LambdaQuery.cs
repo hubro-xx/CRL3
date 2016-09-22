@@ -264,7 +264,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         internal LambdaQuery<T> Select(Expression resultSelectorBody)
         {
-            var fields = GetSelectField(resultSelectorBody, false, typeof(T));
+            var fields = GetSelectField(true,resultSelectorBody, false, typeof(T));
             __QueryFields = fields;
             return this;
         }

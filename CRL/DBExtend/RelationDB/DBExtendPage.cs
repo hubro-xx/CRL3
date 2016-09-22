@@ -21,7 +21,7 @@ namespace CRL.DBExtend.RelationDB
         /// <typeparam name="TModel"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public override List<dynamic> Page<TModel>(LambdaQuery<TModel> query)
+        public override List<dynamic> PageDynamic<TModel>(LambdaQuery<TModel> query)
         {
             int count;
             var reader = GetPageReader(query);
@@ -29,7 +29,16 @@ namespace CRL.DBExtend.RelationDB
             query.MapingTime += reader.runTime;
             query.RowCount = count;
             return list;
-        }    
+        }
+        public override List<TModel> Page<TModel>(LambdaQuery<TModel> query)
+        {
+            int count;
+            var reader = GetPageReader(query);
+            var list = reader.GetDataIModel<TModel>(out count);
+            query.MapingTime += reader.runTime;
+            query.RowCount = count;
+            return list;
+        }
         /// <summary>
         /// 指定对象分页
         /// </summary>
@@ -41,7 +50,7 @@ namespace CRL.DBExtend.RelationDB
         {
             int count;
             var reader = GetPageReader(query);
-            var list = reader.GetData<TResult>(out count);
+            var list = reader.GetDataTResult<TResult>(out count);
             query.MapingTime += reader.runTime;
             query.RowCount = count;
             return list;

@@ -26,9 +26,16 @@ namespace CRL
             reader = _reader;
             handler = _handler;
         }
-        public List<T> GetData<T>(out int outParame) where T : class,new()
+        public List<T> GetDataTResult<T>(out int outParame) where T : class,new()
         {
-            var data = ObjectConvert.DataReaderToList<T>(reader,out runTime, false);
+            var data = ObjectConvert.DataReaderToList<T>(reader, out runTime, false);
+            reader.Close();
+            outParame = handler();
+            return data;
+        }
+        public List<T> GetDataIModel<T>(out int outParame) where T : IModel, new()
+        {
+            var data = ObjectConvert.DataReaderToIModelList<T>(reader, out runTime, false);
             reader.Close();
             outParame = handler();
             return data;

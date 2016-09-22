@@ -54,7 +54,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public override LambdaQuery<T> OrderBy<TResult>(Expression<Func<T, TResult>> expression, bool desc = true)
         {
-            var fields = GetSelectField(expression.Body, false, typeof(T));
+            var fields = GetSelectField(false, expression.Body, false, typeof(T));
             if (!string.IsNullOrEmpty(__QueryOrderBy))
             {
                 __QueryOrderBy += ",";
@@ -273,6 +273,7 @@ namespace CRL.LambdaQuery
             }
             if (distinctCount)
             {
+                fields = System.Text.RegularExpressions.Regex.Replace(fields,@" as \w+"," ");//替换别名
                 fields = string.Format(" count({0}) as Total", fields);
                 if (__QueryFields.Count > 1)
                 {

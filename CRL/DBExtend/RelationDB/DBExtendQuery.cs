@@ -62,7 +62,7 @@ namespace CRL.DBExtend.RelationDB
                     reader = dbHelper.RunDataReader(sp);
                 }
                 query.ExecuteTime += dbHelper.ExecuteTime;
-                list = ObjectConvert.DataReaderToList<TModel>(reader, out runTime, true);
+                list = ObjectConvert.DataReaderToIModelList<TModel>(reader, out runTime, true);
                 query.MapingTime += runTime;
             }
             else

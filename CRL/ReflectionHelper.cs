@@ -34,16 +34,16 @@ namespace CRL
     {
         public string TableName { get; set; }
 
-        Func<object> ObjectCreateDelegate;
+        Func<TObject> ObjectCreateDelegate;
         private Dictionary<string, Accessor> accessorDict;
 
-        Func<object> CreateObjectGenerator(ConstructorInfo constructor)
+        Func<TObject> CreateObjectGenerator(ConstructorInfo constructor)
         {
-            Func<object> ret = null;
+            Func<TObject> ret = null;
             ParameterInfo[] parameters = constructor.GetParameters();
             List<Expression> arguments = new List<Expression>(parameters.Length);
             var body = Expression.New(constructor, arguments);
-            ret = Expression.Lambda<Func<object>>(body).Compile();
+            ret = Expression.Lambda<Func<TObject>>(body).Compile();
             return ret;
         }
 
@@ -55,7 +55,7 @@ namespace CRL
             InitInfo(modelType);
             // PrimaryKey = primaryKey;
         }
-        public object CreateObject()
+        public TObject CreateObject()
         {
             return ObjectCreateDelegate();
         }
@@ -202,7 +202,7 @@ namespace CRL
             return null;
         }
 
-        
+
 
 
         public abstract class Accessor
@@ -235,9 +235,27 @@ namespace CRL
 
             protected abstract void DoSet(TObject obj, object value);
             protected abstract object DoGet(TObject obj);
+
         }
 
         #region Accessor
+        public class EmptyAccessor : Accessor
+        {
+            public EmptyAccessor(PropertyInfo prop)
+                : base(prop)
+            {
+            }
+            protected override object DoGet(TObject obj)
+            {
+                return null;
+            }
+
+            protected override void DoSet(TObject obj, object value)
+            {
+                return;
+            }
+        }
+
         public class StringAccessor : Accessor
         {
             Action<TObject, string> setter;
@@ -308,6 +326,7 @@ namespace CRL
             {
                 setter = (Action<TObject, DateTime>)Delegate.CreateDelegate(typeof(Action<TObject, DateTime>), null, prop.GetSetMethod(true));
                 getter = (Func<TObject, DateTime>)Delegate.CreateDelegate(typeof(Func<TObject, DateTime>), null, prop.GetGetMethod(true));
+
             }
             protected override void DoSet(TObject obj, object value)
             {
@@ -473,7 +492,7 @@ namespace CRL
             }
             protected override void DoSet(TObject obj, object value)
             {
-                setter(obj, Guid.Parse(value.ToString()));
+                setter(obj, (Guid)value);
             }
             protected override object DoGet(TObject obj)
             {
@@ -493,7 +512,7 @@ namespace CRL
             }
             protected override void DoSet(TObject obj, object value)
             {
-                setter(obj, Guid.Parse(value.ToString()));
+                setter(obj, (Guid)value);
             }
             protected override object DoGet(TObject obj)
             {
@@ -513,7 +532,14 @@ namespace CRL
             }
             protected override void DoSet(TObject obj, object value)
             {
-                setter(obj, Convert.ToByte(value));
+                if (value is byte)
+                {
+                    setter(obj, (byte)value);
+                }
+                else
+                {
+                    setter(obj, Convert.ToByte(value));
+                }
             }
             protected override object DoGet(TObject obj)
             {
@@ -533,7 +559,14 @@ namespace CRL
             }
             protected override void DoSet(TObject obj, object value)
             {
-                setter(obj, Convert.ToByte(value));
+                if (value is byte)
+                {
+                    setter(obj, (byte)value);
+                }
+                else
+                {
+                    setter(obj, Convert.ToByte(value));
+                }
             }
             protected override object DoGet(TObject obj)
             {
@@ -632,17 +665,14 @@ namespace CRL
             }
             protected override void DoSet(TObject obj, object value)
             {
-                bool theValue = false;
-                if (value.GetType() == typeof(bool))
+                if (value is bool)
                 {
-                    theValue = (bool)value;
+                    setter(obj, (bool)value);
                 }
                 else
                 {
-                    var intValue = Convert.ToInt32(value);
-                    theValue = intValue > 0;
+                    setter(obj, Convert.ToUInt16(value) > 0);
                 }
-                setter(obj, theValue);
             }
             protected override object DoGet(TObject obj)
             {
@@ -662,17 +692,14 @@ namespace CRL
             }
             protected override void DoSet(TObject obj, object value)
             {
-                bool theValue = false;
-                if (value.GetType() == typeof(bool))
+                if (value is bool)
                 {
-                    theValue = (bool)value;
+                    setter(obj, (bool)value);
                 }
                 else
                 {
-                    var intValue = Convert.ToInt32(value);
-                    theValue = intValue > 0;
+                    setter(obj, Convert.ToUInt16(value) > 0);
                 }
-                setter(obj, theValue);
             }
             protected override object DoGet(TObject obj)
             {

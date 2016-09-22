@@ -53,7 +53,7 @@ namespace CRL.LambdaQuery
         public LambdaQueryJoin<T, TJoin> Select(Expression<Func<T, TJoin, object>> resultSelector) 
         {
             //在关联两次以上,可调用以下方法指定关联对象获取对应的字段
-            var resultFields = BaseQuery.GetSelectField(resultSelector.Body, false, typeof(T), typeof(TJoin));
+            var resultFields = BaseQuery.GetSelectField(true,resultSelector.Body, false, typeof(T), typeof(TJoin));
             BaseQuery.__QueryFields.AddRange(resultFields);
             return this;
         }
@@ -70,7 +70,7 @@ namespace CRL.LambdaQuery
             {
                 BaseQuery.SelectAll();
             }
-            var resultFields = BaseQuery.GetSelectField(resultSelector.Body, true, typeof(T), typeof(TJoin));
+            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, true, typeof(T), typeof(TJoin));
             BaseQuery.__QueryFields.AddRange(resultFields);
             return this;
         }
@@ -84,7 +84,7 @@ namespace CRL.LambdaQuery
         {
             //在关联两次以上,可调用以下方法指定关联对象获取对应的字段
             //var innerType = typeof(TJoin);
-            var resultFields = BaseQuery.GetSelectField(resultSelector.Body, false, typeof(T), typeof(TJoin));
+            var resultFields = BaseQuery.GetSelectField(false, resultSelector.Body, false, typeof(T), typeof(TJoin));
             BaseQuery.__GroupFields.AddRange(resultFields);
             return this;
         }
@@ -97,7 +97,7 @@ namespace CRL.LambdaQuery
         public LambdaQueryJoin<T, TJoin> OrderBy<TResult>(Expression<Func<TJoin, TResult>> expression, bool desc = true) 
         {
             //var innerType = typeof(TJoin);
-            var fields = BaseQuery.GetSelectField(expression.Body, false, typeof(T), typeof(TJoin));
+            var fields = BaseQuery.GetSelectField(false, expression.Body, false, typeof(T), typeof(TJoin));
             if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
             {
                 BaseQuery.__QueryOrderBy += ",";

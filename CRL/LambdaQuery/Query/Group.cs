@@ -28,7 +28,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQuery<T> GroupBy(Expression<Func<T, object>> resultSelector)
         {
-            var fields = GetSelectField(resultSelector.Body, false, typeof(T));
+            var fields = GetSelectField(false, resultSelector.Body, false, typeof(T));
             __GroupFields = fields;
             //CompileSp = true;
             return this;

@@ -55,7 +55,7 @@ namespace CRL.LambdaQuery
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
             if (SkipPage > 0)
             {
-                return db.Page(this);
+                return db.PageDynamic(this);
             }
             return db.QueryDynamic(this);
         }
@@ -98,7 +98,7 @@ namespace CRL.LambdaQuery
             //如果是筛选后的结果,属性可能匹配不上
             if (SkipPage > 0)
             {
-                return db.Page<T, T>(this);
+                return db.Page<T>(this);
             }
             return db.QueryList(this);
         }

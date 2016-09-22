@@ -125,7 +125,9 @@ namespace CRL.Attribute
                     mapingName = MemberName;
                 return mapingName;
             }
-            set { mapingName = value; }
+            set { 
+                mapingName = value;
+            }
         }
 
       

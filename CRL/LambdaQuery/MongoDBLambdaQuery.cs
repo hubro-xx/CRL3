@@ -188,7 +188,7 @@ namespace CRL.LambdaQuery
         public override LambdaQuery<T> OrderBy<TResult>(System.Linq.Expressions.Expression<Func<T, TResult>> expression, bool desc = true)
         {
             //var sortBuild = Builders<T>.Sort;
-            var field = GetSelectField(expression.Body, false, typeof(T)).First();
+            var field = GetSelectField(false,expression.Body, false, typeof(T)).First();
             if (desc)
             {
                 _MongoDBSort = _MongoDBSort.Descending(field.MemberName);

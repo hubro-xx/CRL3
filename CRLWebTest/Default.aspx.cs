@@ -53,8 +53,7 @@ namespace WebTest
         protected void Page_Load(object sender, EventArgs e)
         {
 
-            var n = Test<Code.ProductData>();
-            Response.Write(n);
+            TestFileMapping();
             //Response.End();
             //MongoDBTest.Test();
             //TestAllQuery();
@@ -65,7 +64,36 @@ namespace WebTest
             //var p2 = Code.ProductDataManage.Instance.QueryItem(b=>b.Id==p.Id);
             //Response.Write(p2.ToJson());
         }
-       
+
+        void TestFileMapping()
+        {
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query.Where(b => b.Id > 0);
+            query.DistinctBy(b => new { b.ProductName });
+            query.DistinctCount();//表示count Distinct 结果名为Total
+            var list5 = query.ToDynamic();
+            foreach (var item in list5)
+            {
+                var total = item.Total;
+                //var name = item.ProductName;
+            }
+            var query2 = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query2.Select(b => new { b.ProductName, ss2 = b.PurchasePrice * b.Id });
+            query2.Where(b => b.Id > 0);
+            var result = query2.ToDynamic();
+            foreach (var d in result)
+            {
+                var a = d.ProductName;
+                var c = d.ss2;
+            }
+            var query3 = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query3.Join<Code.Member>((a, b) => a.UserId == b.Id).SelectAppendValue(b => b.Name);
+            var resutl3 = query3.ToList();
+            foreach (var d in resutl3)
+            {
+                var a = d.Bag.Name;
+            }
+        }
         void TestJoin()
         {
             int id = 10;

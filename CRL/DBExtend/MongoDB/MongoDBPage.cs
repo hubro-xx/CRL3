@@ -26,8 +26,12 @@ namespace CRL.DBExtend.MongoDB
             }
             return result.ToType<TResult>();
         }
-
-        public override List<dynamic> Page<TModel>(LambdaQuery.LambdaQuery<TModel> query1)
+        public override List<TModel> Page<TModel>(LambdaQuery<TModel> query)
+        {
+            var result = QueryList(query);
+            return result;
+        }
+        public override List<dynamic> PageDynamic<TModel>(LambdaQuery.LambdaQuery<TModel> query1)
         {
             return GetDynamicResult(query1);
         }

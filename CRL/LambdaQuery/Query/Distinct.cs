@@ -29,7 +29,7 @@ namespace CRL.LambdaQuery
         public LambdaQuery<T> DistinctBy<TResult>(Expression<Func<T, TResult>> resultSelector)
         {
             Top(0);
-            var fields = GetSelectField(resultSelector.Body, false, typeof(T));
+            var fields = GetSelectField(true, resultSelector.Body, false, typeof(T));
             __DistinctFields = true;
             __FieldFunctionFormat = " DISTINCT {0}";
             __QueryFields = fields;

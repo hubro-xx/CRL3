@@ -560,7 +560,7 @@ namespace CRL
 
         #region Page
         /// <summary>
-        /// 获取分页
+        /// 返回指定类型分页
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
         /// <typeparam name="TResult"></typeparam>
@@ -569,13 +569,23 @@ namespace CRL
         public abstract List<TResult> Page<TModel, TResult>(CRL.LambdaQuery.LambdaQuery<TModel> query)
             where TModel : CRL.IModel, new()
             where TResult : class, new();
+
+        /// <summary>
+        /// 返回当前类型分页
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public abstract List<TModel> Page<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query)
+            where TModel : CRL.IModel, new();
+
         /// <summary>
         /// 返回动态对象分页
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public abstract List<dynamic> Page<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query) where TModel : CRL.IModel, new();
+        public abstract List<dynamic> PageDynamic<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query) where TModel : CRL.IModel, new();
         #endregion
 
         #region QueryDynamic
