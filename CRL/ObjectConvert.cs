@@ -292,6 +292,10 @@ namespace CRL
             public Action<T, object> Set;
             public string Name;
             public int ValueIndex;
+            public void SetValue(T item, object[] values)
+            {
+                Set(item, values[ValueIndex]);
+            }
         }
         #region 返回object
         internal static List<TItem> DataReaderToList<TItem>(DbDataReader reader, out double runTime, bool setConstraintObj = false) where TItem : class, new()
@@ -323,11 +327,11 @@ namespace CRL
                 object objInstance;
                 if (canTuple)
                 {
-                    objInstance = reflection.CreateObject();
+                    objInstance = reflection.CreateObjectInstance();
                 }
                 else
                 {
-                    objInstance = System.Activator.CreateInstance(mainType);
+                    objInstance = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
                 }
                 reader.GetValues(values);
                 var detailItem = DataReaderToObj<T>(columns, values, reflection, canTuple, objInstance, typeArry, actions, first, leftColumns) as T;
@@ -337,7 +341,7 @@ namespace CRL
             reader.Close();
             sw.Stop();
             runTime = sw.ElapsedMilliseconds;
-            Console.WriteLine("CRL映射用时:" + runTime);
+            //Console.WriteLine("CRL映射用时:" + runTime);
             return list;
         }
 
@@ -356,56 +360,31 @@ namespace CRL
                 foreach (Attribute.FieldAttribute info in typeArry)
                 {
                     ActionItem<T> action;
-                    string nameLower = info.MappingName.ToLower();
+                    string fieldName;
                     if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
                     {
-                        #region 按外部字段
                         string tab = TypeCache.GetTableName(info.ConstraintType, null);
-                        string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
-                        if (columns.ContainsKey(fieldName))
-                        {
-                            if (canTuple)
-                            {
-                                var accessor = reflection.GetAccessor(info.MemberName);
-                                action = new ActionItem<T>() { Set = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
-                                //actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] });
-                            }
-                            else
-                            {
-                                action = new ActionItem<T>() { Set = info.SetValue, Name = fieldName, ValueIndex = columns[fieldName] };
-                                //actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = fieldName, ValueIndex = columns[fieldName] });
-                            }
-                            leftColumns.Remove(fieldName);
-                            actions.Add(action);
-                            object value = values[action.ValueIndex];
-                            action.Set((T)detailItem, value);
-                        }
-                        #endregion
+                        fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
                     }
                     else
                     {
-                        #region 按属性
-                        if (columns.ContainsKey(nameLower))
-                        {
-                            if (canTuple)
-                            {
-                                var accessor = reflection.GetAccessor(info.MemberName);
-                                action = new ActionItem<T>() { Set = accessor.Set, Name = nameLower, ValueIndex = columns[nameLower] };
-                                //actions.Add(new ActionItem<T>() { Action = accessor.Set, Name = nameLower, ValueIndex = columns[nameLower] });
-                            }
-                            else
-                            {
-                                action = new ActionItem<T>() { Set = info.SetValue, Name = nameLower, ValueIndex = columns[nameLower] };
-                                //actions.Add(new ActionItem<T>() { Action = info.SetValue, Name = nameLower, ValueIndex = columns[nameLower] });
-                            }
-                            leftColumns.Remove(nameLower);
-                            actions.Add(action);
-                            object value = values[action.ValueIndex];
-                            action.Set((T)detailItem, value);
-                        }
-                        #endregion
+                        fieldName = info.MappingName.ToLower();
                     }
-
+                    if (columns.ContainsKey(fieldName))
+                    {
+                        if (canTuple)
+                        {
+                            var accessor = reflection.GetAccessor(info.MemberName);
+                            action = new ActionItem<T>() { Set = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
+                        }
+                        else
+                        {
+                            action = new ActionItem<T>() { Set = info.SetValue, Name = fieldName, ValueIndex = columns[fieldName] };
+                        }
+                        leftColumns.Remove(fieldName);
+                        actions.Add(action);
+                        action.Set((T)detailItem, values[action.ValueIndex]);
+                    }
                 }
                 #endregion
             }
@@ -413,9 +392,8 @@ namespace CRL
             {
                 for (int i = 1; i < actions.Count; i++)
                 {
-                    var item = actions[i];
-                    object value = values[item.ValueIndex];
-                    item.Set((T)detailItem, value);
+                    ActionItem<T> item = actions[i];
+                    item.Set((T)detailItem, values[item.ValueIndex]);
                 }
             }
 
@@ -457,96 +435,77 @@ namespace CRL
             var actions = new List<ActionItem<T>>();
             var first = true;
             object[] values = new object[columns.Count];
+            int actionCount = 0;
+            int leftColumnsCount = 0;
             while (reader.Read())
             {
                 reader.GetValues(values);
-                var detailItem = DataReaderToIModel<T>(columns, values, reflection, typeArry, actions, first, leftColumns);
-                list.Add(detailItem);
-                first = false;
-            }
-            reader.Close();
-            sw.Stop();
-            runTime = sw.ElapsedMilliseconds;
-            Console.WriteLine("CRL映射用时:" + runTime);
-            return list;
-        }
-
-        internal static T DataReaderToIModel<T>(Dictionary<string, int> columns, object[] values, ReflectionInfo<T> reflection, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first, Dictionary<string, int> leftColumns) where T : IModel, new()
-        {
-            T detailItem = reflection.CreateObject();
-            detailItem.BoundChange = false;
-            //return detailItem;
-            if (first)
-            {
-                #region foreach field
-                foreach (Attribute.FieldAttribute info in typeArry)
+                T detailItem = reflection.CreateObjectInstance();
+                detailItem.BoundChange = false;
+                if (first)
                 {
-                    ActionItem<T> action;
-                    string nameLower = info.MappingName.ToLower();
-                    if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
+                    #region foreach field
+                    foreach (Attribute.FieldAttribute info in typeArry)
                     {
-                        #region 按外部字段
-                        string tab = TypeCache.GetTableName(info.ConstraintType, null);
-                        string fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
+                        ActionItem<T> action;
+                        string fieldName;
+                        if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
+                        {                           
+                            string tab = TypeCache.GetTableName(info.ConstraintType, null);
+                            fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
+                        }
+                        else
+                        {
+                            fieldName = info.MappingName.ToLower();
+                        }
                         if (columns.ContainsKey(fieldName))
                         {
                             var accessor = reflection.GetAccessor(info.MemberName);
                             action = new ActionItem<T>() { Set = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
-
                             leftColumns.Remove(fieldName);
                             actions.Add(action);
-                            object value = values[action.ValueIndex];
-                            action.Set((T)detailItem, value);
+                            action.SetValue(detailItem, values);
                         }
-                        #endregion
                     }
-                    else
+                    #endregion
+                    first = false;
+                    actionCount = actions.Count;
+                    leftColumnsCount = leftColumns.Count;
+                }
+                else
+                {
+                    for (int i = 1; i < actionCount; i++)
                     {
-                        #region 按属性
-                        if (columns.ContainsKey(nameLower))
-                        {
-                            var accessor = reflection.GetAccessor(info.MemberName);
-                            action = new ActionItem<T>() { Set = accessor.Set, Name = nameLower, ValueIndex = columns[nameLower] };
-
-                            leftColumns.Remove(nameLower);
-                            actions.Add(action);
-                            object value = values[action.ValueIndex];
-                            action.Set(detailItem, value);
-                        }
-                        #endregion
+                        actions[i].SetValue(detailItem, values);
                     }
+                }
+                #region 剩下的放索引
+                if (leftColumnsCount > 0)
+                {
+                    foreach (var item in leftColumns)
+                    {
+                        var col = item.Key;
+                        var n = col.LastIndexOf("__");
+                        if (n == -1)
+                        {
+                            continue;
+                        }
+                        var mapingName = col.Substring(n + 2);
+                        detailItem[mapingName] = values[item.Value];
 
+                    }
+                    detailItem.BoundChange = true;
                 }
                 #endregion
+                list.Add(detailItem);
             }
-            else
-            {
-                for (int i = 1; i < actions.Count; i++)
-                {
-                    var item = actions[i];
-                    object value = values[item.ValueIndex];
-                    item.Set(detailItem, value);
-                }
-            }
-
-            if (leftColumns.Count > 0)
-            {
-                foreach (var item in leftColumns)
-                {
-                    var col = item.Key;
-                    var n = col.LastIndexOf("__");
-                    if (n == -1)
-                    {
-                        continue;
-                    }
-                    var mapingName = col.Substring(n + 2);
-                    detailItem[mapingName] = values[item.Value];
-
-                }
-                detailItem.BoundChange = true;
-            }
-            return detailItem;
+            reader.Close();
+            sw.Stop();
+            runTime = sw.ElapsedMilliseconds;
+            //Console.WriteLine("CRL映射用时:" + runTime);
+            return list;
         }
+
         #endregion
         /// <summary>
         /// DataRead转为字典

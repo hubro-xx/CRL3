@@ -98,7 +98,7 @@ namespace CRL.Dynamic
             //var objOrigin = new T();
             while (reader.Read())
             {
-                object objInstance = reflection.CreateObject();
+                object objInstance = reflection.CreateObjectInstance();
         
                 object[] values = new object[columns.Count];
                 reader.GetValues(values);

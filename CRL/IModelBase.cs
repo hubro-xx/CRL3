@@ -99,6 +99,7 @@ namespace CRL
         public void BeginTracking()
         {
             OriginClone = Clone();
+            Changes = new ParameCollection();
         }
 
         /// <summary>

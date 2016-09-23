@@ -34,30 +34,13 @@ namespace CRL
     {
         public string TableName { get; set; }
 
-        Func<TObject> ObjectCreateDelegate;
+        public Func<TObject> CreateObjectInstance;
         private Dictionary<string, Accessor> accessorDict;
-
-        Func<TObject> CreateObjectGenerator(ConstructorInfo constructor)
-        {
-            Func<TObject> ret = null;
-            ParameterInfo[] parameters = constructor.GetParameters();
-            List<Expression> arguments = new List<Expression>(parameters.Length);
-            var body = Expression.New(constructor, arguments);
-            ret = Expression.Lambda<Func<TObject>>(body).Compile();
-            return ret;
-        }
 
         public ReflectionInfo(Type modelType)
         {
-            var info = modelType.GetConstructor(Type.EmptyTypes);
-            var act = CreateObjectGenerator(info);
-            ObjectCreateDelegate = act;
+            CreateObjectInstance = Expression.Lambda<Func<TObject>>(Expression.New(modelType)).Compile();
             InitInfo(modelType);
-            // PrimaryKey = primaryKey;
-        }
-        public TObject CreateObject()
-        {
-            return ObjectCreateDelegate();
         }
 
         private void InitInfo(Type modelType)
@@ -540,6 +523,7 @@ namespace CRL
                 {
                     setter(obj, Convert.ToByte(value));
                 }
+
             }
             protected override object DoGet(TObject obj)
             {

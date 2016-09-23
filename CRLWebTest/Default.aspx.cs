@@ -30,29 +30,23 @@ namespace WebTest
                 set;
             }
         }
-        long Test<T>() where T : CRL.IModel, new()
+        long Test()
         {
             var watch = new Stopwatch();
-            var model = new T();
-            var list = new List<T>();
-            var type=typeof(T);
-            var info = type.GetConstructor(Type.EmptyTypes);
-            
+            var mainType = typeof(classA);
             watch.Start();
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000000; i++)
             {
-                //var obj = act(null);
-                //var m = new T();
-                //var m = model.Clone() as T;
-                //list.Add(model);
-                //var m = Activator.CreateInstance<T>();
+                //var obj=System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
+                var obj2 = System.Activator.CreateInstance(mainType);
             }
             watch.Stop();
             return watch.ElapsedMilliseconds;
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            //var n=Test();
+            //Response.Write(n);
             TestFileMapping();
             //Response.End();
             //MongoDBTest.Test();
@@ -78,12 +72,12 @@ namespace WebTest
                 //var name = item.ProductName;
             }
             var query2 = Code.ProductDataManage.Instance.GetLambdaQuery();
-            query2.Select(b => new { b.ProductName, ss2 = b.PurchasePrice * b.Id });
+            query2.Select(b => new { name2 = b.ProductName, ss2 = b.PurchasePrice * b.Id });
             query2.Where(b => b.Id > 0);
             var result = query2.ToDynamic();
             foreach (var d in result)
             {
-                var a = d.ProductName;
+                var a = d.name2;
                 var c = d.ss2;
             }
             var query3 = Code.ProductDataManage.Instance.GetLambdaQuery();
