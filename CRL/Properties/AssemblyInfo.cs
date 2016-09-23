@@ -16,8 +16,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("CRL面向对象快速开发框架")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("hubro")]
-[assembly: AssemblyProduct("CRL3.0")]
-[assembly: AssemblyCopyright("Copyright © hubro 2013-2015")]
+[assembly: AssemblyProduct("CRL")]
+[assembly: AssemblyCopyright("Copyright © hubro 2013-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

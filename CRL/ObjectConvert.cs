@@ -390,7 +390,7 @@ namespace CRL
             }
             else
             {
-                for (int i = 1; i < actions.Count; i++)
+                for (int i = 0; i < actions.Count; i++)
                 {
                     ActionItem<T> item = actions[i];
                     item.Set((T)detailItem, values[item.ValueIndex]);
@@ -474,7 +474,7 @@ namespace CRL
                 }
                 else
                 {
-                    for (int i = 1; i < actionCount; i++)
+                    for (int i = 0; i < actionCount; i++)
                     {
                         actions[i].SetValue(detailItem, values);
                     }
