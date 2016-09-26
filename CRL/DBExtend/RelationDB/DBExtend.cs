@@ -340,13 +340,24 @@ namespace CRL.DBExtend.RelationDB
         {
             CheckTableCreated(typeof(T));
         }
-        //static Dictionary<string, List<string>> tableCache = new Dictionary<string, List<string>>();
+        static Dictionary<Type, bool> tableCheckedCache = new Dictionary<Type, bool>();
         /// <summary>
         /// 检查表是否被创建
         /// </summary>
         internal override void CheckTableCreated(Type type)
         {
             if (!SettingConfig.CheckModelTableMaping)
+            {
+                return;
+            }
+            lock (lockObj)
+            {
+                if (!tableCheckedCache.ContainsKey(type))
+                {
+                    tableCheckedCache.Add(type, false);
+                }
+            }
+            if (tableCheckedCache[type] == true)
             {
                 return;
             }
@@ -387,22 +398,19 @@ namespace CRL.DBExtend.RelationDB
                 }
                 string msg;
                 ModelCheck.CreateTable(type, db, out msg);
-                //RecoveryParams();
-                //if (!a)
-                //{
-                //    return;
-                //    throw new Exception(msg);
-                //}
+       
                 cacheInstance.SaveTable(dbName, table, tableName);
                 if (initDatas != null)
                 {
                     _DBAdapter.BatchInsert(initDatas, false);
                 }
+                tableCheckedCache[type] = true;
                 return;
                 #endregion
             }
             if (tb.ColumnChecked)
             {
+                tableCheckedCache[type] = true;
                 return;
             }
             //判断字段是否一致
@@ -431,6 +439,7 @@ namespace CRL.DBExtend.RelationDB
                 ExistsTableCache.ColumnBackgroundCheck.Add(db2, type);
                 tb.ColumnChecked2 = true;
             }
+            tableCheckedCache[type] = true;
         }
         #endregion
 

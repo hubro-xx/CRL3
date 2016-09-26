@@ -78,35 +78,6 @@ namespace CRL
                 return nullCheckMethod[type.BaseType](value);
             }
             return value;
-            #region old
-            if (type.BaseType == typeof(Enum))
-            {
-                value = (int)value;
-            }
-            else if (type == typeof(DateTime))
-            {
-                DateTime time = (DateTime)value;
-                if (time.Year == 1)
-                {
-                    value = DateTime.Now;
-                }
-            }
-            else if (type == typeof(byte[]))
-            {
-                if (value == null)
-                    return 0;
-            }
-            else if (type == typeof(Guid))
-            {
-                if (value == null)
-                    return Guid.NewGuid().ToString();
-            }
-            else if (type == typeof(string))
-            {
-                value = value + "";
-            }
-            return value;
-            #endregion
         }
         static Dictionary<Type, Func<object, object>> convertMethod = new Dictionary<Type, Func<object, object>>();
 
@@ -141,59 +112,12 @@ namespace CRL
             {
                 return convertMethod[type](value);
             }
-            //if (type.BaseType == typeof(Enum))
-            //{
-            //    return convertMethod[type.BaseType](value);
-            //}
             if (type.FullName.StartsWith("System.Nullable"))
             {
                 //Nullable<T> 可空属性
                 type = type.GenericTypeArguments[0];
             }
             return Convert.ChangeType(value, type);
-            #region 类型转换
-            if (type == typeof(Int32))
-            {
-                value = Convert.ToInt32(value);
-            }
-            else if (type == typeof(Int16))
-            {
-                value = Convert.ToInt16(value);
-            }
-            else if (type == typeof(Int64))
-            {
-                value = Convert.ToInt64(value);
-            }
-            else if (type == typeof(DateTime))
-            {
-                value = Convert.ToDateTime(value);
-            }
-            else if (type == typeof(Decimal))
-            {
-                value = Convert.ToDecimal(value);
-            }
-            else if (type == typeof(Double))
-            {
-                value = Convert.ToDouble(value);
-            }
-            else if (type == typeof(System.Byte[]))
-            {
-                value = (byte[])value;
-            }
-            else if (type.BaseType == typeof(System.Enum))
-            {
-                value = Convert.ToInt32(value);
-            }
-            else if (type == typeof(System.Boolean))
-            {
-                value = Convert.ToBoolean(value);
-            }
-            else if (type == typeof(Guid))
-            {
-                value = new Guid(value.ToString());
-            }
-            #endregion
-            return value;
         }
         #region GetDataReaderValue
         static Dictionary<Type, Func<DbDataReader, int, object>> convertDataReaderMethod = new Dictionary<Type, Func<DbDataReader, int, object>>();

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using CoreHelper;
+using System.Reflection;
 namespace CRL.LambdaQuery
 {
     internal class ExpressionVisitor
@@ -394,6 +395,19 @@ namespace CRL.LambdaQuery
                         string name = m.Member.Name;
                         var filed2 = TypeCache.GetProperties(m.Expression.Type, true)[name];
                         return new ExpressionValueObj { Value = Base.FormatFieldPrefix(__DBAdapter, m.Expression.Type, filed2.MappingName), IsMember = true };
+                    }
+                    else
+                    {
+                        ConstantExpression cExp = (ConstantExpression)m.Expression;
+                        if (m.Member.MemberType== MemberTypes.Field)
+                        {
+                            return ((FieldInfo)m.Member).GetValue(cExp.Value);
+                        }
+                        else if (m.Member.MemberType == MemberTypes.Property)
+                        {
+                            return ((PropertyInfo)m.Member).GetValue(cExp.Value, null);
+                        }
+
                     }
                 }
             }
