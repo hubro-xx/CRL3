@@ -81,8 +81,8 @@ namespace CRL.LambdaQuery
                 }
                 else
                 {
-                    QueryParames.Add("parame" + parIndex, par);
-                    par = "@parame" + parIndex;
+                    QueryParames.Add("par" + parIndex, par);
+                    par = "@par" + parIndex;
                     parIndex += 1;
                 }
             }
