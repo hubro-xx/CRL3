@@ -287,7 +287,17 @@ namespace CRL
             var db = DBExtend;
             return db.Delete<TModel>(id);
         }
-
+        /// <summary>
+        /// 按对象主键删除
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int Delete(IModel obj)
+        {
+            var db = DBExtend;
+            var v = obj.GetpPrimaryKeyValue();
+            return db.Delete<TModel>(v);
+        }
         /// <summary>
         /// 按条件删除[基本方法]
         /// </summary>

@@ -47,6 +47,11 @@ namespace WebTest
         {
             //var n=Test();
             //Response.Write(n);
+            var a = 10;
+            var item = new Code.ProductData() {  Id=10};
+            Code.ProductDataManage.Instance.Delete(b => b.Id == a);
+            Code.ProductDataManage.Instance.Delete(b => b.Id == item.Id);
+
             TestFileMapping();
             //Response.End();
             //MongoDBTest.Test();

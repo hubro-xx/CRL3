@@ -396,7 +396,7 @@ namespace CRL.LambdaQuery
                         var filed2 = TypeCache.GetProperties(m.Expression.Type, true)[name];
                         return new ExpressionValueObj { Value = Base.FormatFieldPrefix(__DBAdapter, m.Expression.Type, filed2.MappingName), IsMember = true };
                     }
-                    else
+                    else if (m.Expression is ConstantExpression)
                     {
                         ConstantExpression cExp = (ConstantExpression)m.Expression;
                         if (m.Member.MemberType== MemberTypes.Field)
@@ -408,6 +408,14 @@ namespace CRL.LambdaQuery
                             return ((PropertyInfo)m.Member).GetValue(cExp.Value, null);
                         }
 
+                    }
+                    else if (m.Expression is MemberExpression)
+                    {
+                        //todo 这里只处理了一级属性 如 item.Id 不支持item.Order.Id
+                        MemberExpression mExp = (MemberExpression)m.Expression;
+                        ConstantExpression cExp = (ConstantExpression)mExp.Expression;
+                        var data = ((FieldInfo)mExp.Member).GetValue(cExp.Value);
+                        return ((PropertyInfo)m.Member).GetValue(data, null);
                     }
                 }
             }
