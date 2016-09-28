@@ -43,14 +43,20 @@ namespace WebTest
             watch.Stop();
             return watch.ElapsedMilliseconds;
         }
+        public static Code.ProductData data2
+        {
+            get
+            {
+                return new Code.ProductData() { Id = 10 };
+            }
+        }
         protected void Page_Load(object sender, EventArgs e)
         {
             //var n=Test();
             //Response.Write(n);
             var a = 10;
             var item = new Code.ProductData() {  Id=10};
-            Code.ProductDataManage.Instance.Delete(b => b.Id == a);
-            Code.ProductDataManage.Instance.Delete(b => b.Id == item.Id);
+            Code.ProductDataManage.Instance.QueryItem(b=>b.Id==Default.data2.Id);
 
             TestFileMapping();
             //Response.End();

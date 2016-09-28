@@ -396,31 +396,41 @@ namespace CRL.LambdaQuery
                         var filed2 = TypeCache.GetProperties(m.Expression.Type, true)[name];
                         return new ExpressionValueObj { Value = Base.FormatFieldPrefix(__DBAdapter, m.Expression.Type, filed2.MappingName), IsMember = true };
                     }
-                    else if (m.Expression is ConstantExpression)
+                    else
                     {
-                        ConstantExpression cExp = (ConstantExpression)m.Expression;
-                        if (m.Member.MemberType== MemberTypes.Field)
-                        {
-                            return ((FieldInfo)m.Member).GetValue(cExp.Value);
-                        }
-                        else if (m.Member.MemberType == MemberTypes.Property)
-                        {
-                            return ((PropertyInfo)m.Member).GetValue(cExp.Value, null);
-                        }
-
-                    }
-                    else if (m.Expression is MemberExpression)
-                    {
-                        //todo 这里只处理了一级属性 如 item.Id 不支持item.Order.Id
-                        MemberExpression mExp = (MemberExpression)m.Expression;
-                        ConstantExpression cExp = (ConstantExpression)mExp.Expression;
-                        var data = ((FieldInfo)mExp.Member).GetValue(cExp.Value);
-                        return ((PropertyInfo)m.Member).GetValue(data, null);
+                        var v = GetMemberExpressionValue(m);
+                        return v;
                     }
                 }
             }
             //按编译
             return Expression.Lambda(expression).Compile().DynamicInvoke();
+        }
+        static object GetMemberExpressionValue(Expression exp)
+        {
+            if (exp.NodeType == ExpressionType.Constant)
+            {
+                return ((ConstantExpression)exp).Value;
+            }
+            if (exp.NodeType == ExpressionType.MemberAccess)
+            {
+                var mExp = (MemberExpression)exp;
+                object instance = null;
+                if (mExp.Expression != null)
+                {
+                    instance = GetMemberExpressionValue(mExp.Expression);
+                }
+                if (mExp.Member.MemberType == MemberTypes.Field)
+                {
+                    return ((FieldInfo)mExp.Member).GetValue(instance);
+                }
+                else if (mExp.Member.MemberType == MemberTypes.Property)
+                {
+                    return ((PropertyInfo)mExp.Member).GetValue(instance, null);
+                }
+                throw new Exception("未能解析" + mExp.Member.MemberType);
+            }
+            throw new Exception("未能解析" + exp.NodeType);
         }
     }
     internal class ExpressionValueObj
