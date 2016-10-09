@@ -71,7 +71,7 @@ namespace CRL
 
         /// <summary>
         /// 是否自动跟踪对象状态
-        /// 为否则需要调用对象BeginTracking,使更新时能识别
+        /// 为否则需要调用IMode.BeginTracking,使更新时能识别
         /// </summary>
         public static bool AutoTrackingModel = true;
 

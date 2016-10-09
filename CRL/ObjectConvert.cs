@@ -233,7 +233,7 @@ namespace CRL
             var sw = new Stopwatch();
             sw.Start();
             var list = new List<T>();
-            var typeArry = TypeCache.GetProperties(mainType, !setConstraintObj).Values;
+            var typeArry = TypeCache.GetQueryProperties(mainType);
             var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
@@ -263,6 +263,7 @@ namespace CRL
                 first = false;
             }
             reader.Close();
+            reader.Dispose();
             sw.Stop();
             runTime = sw.ElapsedMilliseconds;
             //Console.WriteLine("CRL映射用时:" + runTime);
@@ -314,9 +315,9 @@ namespace CRL
             }
             else
             {
-                for (int i = 0; i < actions.Count; i++)
+                foreach (var item in actions)
                 {
-                    ActionItem<T> item = actions[i];
+                    //ActionItem<T> item = actions[i];
                     item.Set((T)detailItem, values[item.ValueIndex]);
                 }
             }
@@ -344,11 +345,11 @@ namespace CRL
         #region 返回T 按IModel
         internal static List<T> DataReaderToIModelList<T>(DbDataReader reader, out double runTime, bool setConstraintObj = false) where T : IModel, new()
         {
-            var mainType=typeof(T);
+            var mainType = typeof(T);
             var sw = new Stopwatch();
             sw.Start();
             var list = new List<T>();
-            var typeArry = TypeCache.GetProperties(mainType, !setConstraintObj).Values;
+            var typeArry = TypeCache.GetQueryProperties(mainType);
             var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
@@ -359,8 +360,6 @@ namespace CRL
             var actions = new List<ActionItem<T>>();
             var first = true;
             object[] values = new object[columns.Count];
-            int actionCount = 0;
-            int leftColumnsCount = 0;
             while (reader.Read())
             {
                 reader.GetValues(values);
@@ -374,7 +373,7 @@ namespace CRL
                         ActionItem<T> action;
                         string fieldName;
                         if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
-                        {                           
+                        {
                             string tab = TypeCache.GetTableName(info.ConstraintType, null);
                             fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
                         }
@@ -393,37 +392,32 @@ namespace CRL
                     }
                     #endregion
                     first = false;
-                    actionCount = actions.Count;
-                    leftColumnsCount = leftColumns.Count;
                 }
                 else
                 {
-                    for (int i = 0; i < actionCount; i++)
+                    foreach (var ac in actions)
                     {
-                        actions[i].SetValue(detailItem, values);
+                        ac.SetValue(detailItem, values);
                     }
                 }
                 #region 剩下的放索引
-                if (leftColumnsCount > 0)
+                foreach (var item in leftColumns)
                 {
-                    foreach (var item in leftColumns)
+                    var col = item.Key;
+                    var n = col.LastIndexOf("__");
+                    if (n == -1)
                     {
-                        var col = item.Key;
-                        var n = col.LastIndexOf("__");
-                        if (n == -1)
-                        {
-                            continue;
-                        }
-                        var mapingName = col.Substring(n + 2);
-                        detailItem[mapingName] = values[item.Value];
-
+                        continue;
                     }
-                    detailItem.BoundChange = true;
+                    var mapingName = col.Substring(n + 2);
+                    detailItem[mapingName] = values[item.Value];
                 }
+                detailItem.BoundChange = true;
                 #endregion
                 list.Add(detailItem);
             }
             reader.Close();
+            reader.Dispose();
             sw.Stop();
             runTime = sw.ElapsedMilliseconds;
             //Console.WriteLine("CRL映射用时:" + runTime);

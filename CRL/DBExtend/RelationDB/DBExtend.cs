@@ -16,6 +16,7 @@ using System.Linq.Expressions;
 using System.Diagnostics;
 using System.Data.Common;
 using CRL.LambdaQuery;
+using System.Collections.Concurrent;
 namespace CRL.DBExtend.RelationDB
 {
     /// <summary>
@@ -340,7 +341,7 @@ namespace CRL.DBExtend.RelationDB
         {
             CheckTableCreated(typeof(T));
         }
-        static Dictionary<Type, bool> tableCheckedCache = new Dictionary<Type, bool>();
+        static ConcurrentDictionary<Type, bool> tableCheckedCache = new ConcurrentDictionary<Type, bool>();
         /// <summary>
         /// 检查表是否被创建
         /// </summary>
@@ -350,12 +351,9 @@ namespace CRL.DBExtend.RelationDB
             {
                 return;
             }
-            lock (lockObj)
+            if (!tableCheckedCache.ContainsKey(type))
             {
-                if (!tableCheckedCache.ContainsKey(type))
-                {
-                    tableCheckedCache.Add(type, false);
-                }
+                tableCheckedCache.TryAdd(type, false);
             }
             if (tableCheckedCache[type] == true)
             {

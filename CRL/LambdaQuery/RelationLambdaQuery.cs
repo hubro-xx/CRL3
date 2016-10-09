@@ -136,19 +136,14 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 获取查询字段字符串,按条件排除
         /// </summary>
-        /// <param name="removes"></param>
         /// <returns></returns>
-        internal override string GetQueryFieldString(Predicate<Attribute.FieldAttribute> removes = null)
+        internal string GetQueryFieldString2()
         {
             if (__QueryFields.Count == 0)
             {
                 SelectAll();
             }
             List<Attribute.FieldAttribute> queryFields = __QueryFields;
-            if (removes != null)
-            {
-                queryFields.RemoveAll(removes);
-            }
             //找出需要关联的字段
             List<Attribute.FieldAttribute> constraint = queryFields.FindAll(b => b.FieldType == Attribute.FieldType.关联字段);
             //找出关联和对应的字段
@@ -191,8 +186,7 @@ namespace CRL.LambdaQuery
                 }
                 else//关联对象
                 {
-                    AddInnerRelation(innerType, condition);
-                    queryFields.AddRange(innerFields.Values);
+
                 }
                 #endregion
             }
@@ -200,6 +194,62 @@ namespace CRL.LambdaQuery
             string fields = Base.GetQueryFields(queryFields);
             fields = ReplacePrefix(fields);
             return fields;
+        }
+
+        internal override string GetQueryFieldString()
+        {
+            if (__QueryFields.Count == 0)
+            {
+                SelectAll();
+            }
+            int tabIndex = 2;
+            string str = "";
+            foreach (Attribute.FieldAttribute a in __QueryFields)
+            {
+                if (a.FieldType == Attribute.FieldType.关联字段)
+                {
+                    #region 关联约束
+                    tabIndex += 1;
+                    if (a.FieldType == Attribute.FieldType.关联字段 && a.ConstraintType == null)//虚拟字段,没有设置关联类型
+                    {
+                        throw new Exception(string.Format("需指定关联类型:{0}.{1}.Attribute.Field.ConstraintType", typeof(T), a.MemberName));
+                    }
+                    if (string.IsNullOrEmpty(a.ConstraintField))//约束为空
+                    {
+                        continue;
+                    }
+                    var arry = a.ConstraintField.Replace("$", "").Split('=');
+                    string leftField = GetPrefix() + arry[0];
+                    var innerType = a.ConstraintType;
+                    //TypeCache.SetDBAdapterCache(innerType,dBAdapter);
+                    string rightField = GetPrefix(innerType) + arry[1];
+                    string condition = string.Format("{0}={1}", leftField, rightField);
+                    if (!string.IsNullOrEmpty(a.Constraint))
+                    {
+                        a.Constraint = Regex.Replace(a.Constraint, @"(.+?)\=", GetPrefix(innerType) + "$1=");//加上前缀
+                        condition += " and " + a.Constraint;
+                    }
+
+                    var innerFields = TypeCache.GetProperties(innerType, true);
+
+                    //var resultField = innerFields.Find(b => b.Name.ToUpper() == a.ConstraintResultField.ToUpper());
+                    var resultField = innerFields[a.ConstraintResultField];
+                    if (resultField == null)
+                    {
+                        throw new Exception(string.Format("在类型{0}找不到 ConstraintResultField {1}", innerType, a.ConstraintResultField));
+                    }
+                    AddInnerRelation(innerType, condition);
+                    #endregion
+                    str += string.Format("{0},", resultField.QueryFullScript);
+                }
+                else
+                {
+                    str += string.Format("{0},", a.QueryFullScript);
+                }
+            }
+            str = str.Substring(0, str.Length - 1);
+            str = ReplacePrefix(str);
+            return str;
         }
 
         /// <summary>

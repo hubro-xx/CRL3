@@ -46,11 +46,11 @@ namespace CRL
         private void InitInfo(Type modelType)
         {
             accessorDict = new Dictionary<string, Accessor>();
-            var Properties = TypeCache.GetProperties(modelType, false);
+            var Properties = TypeCache.GetQueryProperties(modelType);
             foreach (var kv in Properties)
             {
                 Accessor accessor = null;
-                var prop = kv.Value.GetPropertyInfo();
+                var prop = kv.GetPropertyInfo();
                 string propName = prop.Name.ToUpper();
                 var propType = prop.PropertyType;
 
@@ -272,7 +272,14 @@ namespace CRL
             }
             protected override void DoSet(TObject obj, object value)
             {
-                setter(obj, (int)value);
+                try
+                {
+                    setter(obj, (int)value);
+                }
+                catch
+                {
+                    setter(obj,Convert.ToInt32(value));
+                }
             }
             protected override object DoGet(TObject obj)
             {

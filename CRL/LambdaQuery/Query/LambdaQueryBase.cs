@@ -323,15 +323,17 @@ namespace CRL.LambdaQuery
         #endregion
         internal void SelectAll()
         {
-            var all = TypeCache.GetProperties(__MainType, false).Values;
+            //var all = TypeCache.GetProperties(__MainType, false).Values;
+            var all = TypeCache.GetQueryProperties(__MainType);
             __QueryFields.Clear();
             var aliasName = GetPrefix();
             foreach (var item in all)
             {
                 //item.SetFieldQueryScript(aliasName, true, false);
                 item.SetFieldQueryScript2(__DBAdapter, true, false, "");
-                __QueryFields.Add(item);
+                //__QueryFields.Add(item);
             }
+            __QueryFields = new List<Attribute.FieldAttribute>(all);
         }
 
         /// <summary>

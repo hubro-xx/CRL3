@@ -30,10 +30,10 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override List<TModel> QueryList<TModel>(LambdaQuery<TModel> query, out string cacheKey)
         {
+            cacheKey = "";
             CheckTableCreated<TModel>();
             if (query.SkipPage > 0)//按分页
             {
-                cacheKey = "";
                 return Page<TModel, TModel>(query);
             }
             string sql = "";
@@ -45,7 +45,7 @@ namespace CRL.DBExtend.RelationDB
             var cacheTime = query.__ExpireMinute;
             var compileSp = query.__CompileSp;
             List<TModel> list = new List<TModel>();
-            double runTime=0;
+            double runTime = 0;
             if (cacheTime <= 0)
             {
                 if (!compileSp)

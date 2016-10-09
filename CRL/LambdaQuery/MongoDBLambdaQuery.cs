@@ -228,7 +228,7 @@ namespace CRL.LambdaQuery
             throw new NotSupportedException();//不支持
         }
 
-        internal override string GetQueryFieldString(Predicate<Attribute.FieldAttribute> removes = null)
+        internal override string GetQueryFieldString()
         {
             return "";
         }

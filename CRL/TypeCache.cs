@@ -94,22 +94,6 @@ namespace CRL
             SetProperties(des);
             return des;
         }
-        //internal static void SetDBAdapterCache(Type type, DBAdapter.DBAdapterBase dBAdapter)
-        //{
-        //    var table = GetTable(type);
-        //    if (table.DBAdapter != null)
-        //    {
-        //        return;
-        //    }
-        //    table.DBAdapter = dBAdapter;
-        //}
-        //internal static DBAdapter.DBAdapterBase GetDBAdapterFromCache(Type type)
-        //{
-        //    var table = GetTable(type);
-        //    if (table.DBAdapter == null)
-        //        throw new Exception("未初始对应的适配器,在类型:" + type);
-        //    return table.DBAdapter;
-        //}
         /// <summary>
         /// 获取字段,并指定是否为基本查询字段(包函虚拟字段)
         /// </summary>
@@ -124,12 +108,29 @@ namespace CRL
             {
                 if (onlyField)
                 {
-                    if (item.FieldType != Attribute.FieldType.数据库字段 && item.FieldType != Attribute.FieldType.虚拟字段)
+                    if (item.FieldType == Attribute.FieldType.关联字段)
                     {
                         continue;
                     }
                 }
                 list.Add(item.MemberName, item.Clone());
+            }
+            return list;
+        }
+        public static List<Attribute.FieldAttribute> GetQueryProperties(Type type)
+        {
+            var table = GetTable(type);
+            var list = new List<Attribute.FieldAttribute>();
+            foreach (var item in table.Fields)
+            {
+                //if (onlyField)
+                //{
+                //    if (item.FieldType == Attribute.FieldType.关联字段)
+                //    {
+                //        continue;
+                //    }
+                //}
+                list.Add(item.Clone());
             }
             return list;
         }

@@ -224,7 +224,8 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQuery<T> UnSelect(Predicate<Attribute.FieldAttribute> match)
         {
-            var fields = TypeCache.GetProperties(typeof(T), false).Values.ToList();
+            //var fields = TypeCache.GetProperties(typeof(T), false).Values.ToList();
+            var fields = TypeCache.GetQueryProperties(typeof(T));
             if (match != null)
             {
                 fields.RemoveAll(match);
@@ -403,9 +404,8 @@ Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
         /// <summary>
         /// 获取查询字段字符串,按条件排除
         /// </summary>
-        /// <param name="removes"></param>
         /// <returns></returns>
-        internal abstract string GetQueryFieldString(Predicate<Attribute.FieldAttribute> removes = null);
+        internal abstract string GetQueryFieldString();
 
         /// <summary>
         /// 是否为关联更新/删除

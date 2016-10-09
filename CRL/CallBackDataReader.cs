@@ -29,14 +29,14 @@ namespace CRL
         public List<T> GetDataTResult<T>(out int outParame) where T : class,new()
         {
             var data = ObjectConvert.DataReaderToList<T>(reader, out runTime, false);
-            reader.Close();
+            //reader.Close();
             outParame = handler();
             return data;
         }
         public List<T> GetDataIModel<T>(out int outParame) where T : IModel, new()
         {
             var data = ObjectConvert.DataReaderToIModelList<T>(reader, out runTime, false);
-            reader.Close();
+            //reader.Close();
             outParame = handler();
             return data;
         }
@@ -44,7 +44,7 @@ namespace CRL
         {
             double runTime;
             var data = Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, out runTime);
-            reader.Close();
+            //reader.Close();
             outParame = handler();
             return data;
         }
@@ -52,7 +52,7 @@ namespace CRL
         {
             double runTime;
             var data = Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, resultSelector, out runTime);
-            reader.Close();
+            //reader.Close();
             outParame = handler();
             return data;
         }

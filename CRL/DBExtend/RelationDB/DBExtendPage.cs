@@ -30,6 +30,12 @@ namespace CRL.DBExtend.RelationDB
             query.RowCount = count;
             return list;
         }
+        /// <summary>
+        /// 分页
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public override List<TModel> Page<TModel>(LambdaQuery<TModel> query)
         {
             int count;
