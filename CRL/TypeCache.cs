@@ -123,13 +123,6 @@ namespace CRL
             var list = new List<Attribute.FieldAttribute>();
             foreach (var item in table.Fields)
             {
-                //if (onlyField)
-                //{
-                //    if (item.FieldType == Attribute.FieldType.关联字段)
-                //    {
-                //        continue;
-                //    }
-                //}
                 list.Add(item.Clone());
             }
             return list;

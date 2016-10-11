@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Dynamic;
+using Newtonsoft.Json;
 
 namespace CRL
 {
@@ -107,6 +108,7 @@ namespace CRL
         /// 判断重复为相同的属性值,AddTime除外,3秒内唯一
         /// </summary>
         [System.Xml.Serialization.XmlIgnore]
+        [JsonIgnore]
         protected internal virtual bool CheckRepeatedInsert
         {
             get
@@ -235,6 +237,7 @@ namespace CRL
         /// 不区分大小写
         /// </summary>
         [System.Xml.Serialization.XmlIgnore]
+        [JsonIgnore]
         public dynamic Bag
         {
             get
