@@ -56,9 +56,9 @@ namespace WebTest
             //Response.Write(n);
             var a = 10;
             var item = new Code.ProductData() {  Id=10};
-            Code.ProductDataManage.Instance.QueryItem(b=>b.Id==Default.data2.Id);
-
-            TestFileMapping();
+            Code.ProductDataManage.Instance.QueryItem(b => b.Id == Default.data2.Id);
+            //TestJoin();
+            //TestFileMapping();
             //Response.End();
             //MongoDBTest.Test();
             //TestAllQuery();
@@ -103,9 +103,9 @@ namespace WebTest
         {
             int id = 10;
             var query = Code.ProductDataManage.Instance.GetLambdaQuery();
-            var join = query.Join<Code.Order>((a, b) => a.Id == b.Id);
+            var join = query.Join<Code.Order>((a, b) => a.Id.ToString() == b.Id.ToString());
             join.SelectAppendValue(b => b.OrderId);
-            join.Where(b => b.OrderId == "222");
+            join.Where(b => b.OrderId == id.ToString());
             var sql = query.PrintQuery();
             var result = query.ToList();
             Response.Write(sql);

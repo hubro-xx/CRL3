@@ -55,7 +55,7 @@ namespace CRL.Attribute
             {
                 if (fieldType == Attribute.FieldType.NONE)
                 {
-                    var isSystemType = PropertyType.Namespace == "System" || PropertyType.BaseType.Name == "Enum";
+                    //var isSystemType = PropertyType.Namespace == "System" || PropertyType.BaseType.Name == "Enum";
                     if (!string.IsNullOrEmpty(VirtualField))
                     {
                         fieldType= Attribute.FieldType.虚拟字段;

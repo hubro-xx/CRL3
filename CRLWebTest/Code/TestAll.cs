@@ -14,12 +14,21 @@ namespace WebTest.Code
 {
     public class TestAll
     {
+        public static Code.ProductData data
+        {
+            get
+            {
+                return new ProductData() { Id = 99 };
+            }
+        }
         public static void TestQuery()
         {
             var instance = Code.ProductDataManage.Instance;
+            instance.QueryItem(1);
+            instance.QueryItem(b => b.Id == TestAll.data.Id);//多级变量
             var query = ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.TransType == TransType.In);
-            query.Select(b => new { b.InterFaceUser, bb = b.Id * b.Number
+            query.Select(b => new { b.InterFaceUser, bb = b.Id * b.Number,b.ProductName
                 });
             var year = DateTime.Now.Year;
             query.Where(b => b.Year == year);//虚拟字段
@@ -116,12 +125,12 @@ namespace WebTest.Code
             query = Code.ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.Id > 0);
             query.DistinctBy(b => new { b.ProductName });
-            query.DistinctCount();//表示count Distinct 结果名为Total
+            //query.DistinctCount();//表示count Distinct 结果名为Total
             var list5 = query.ToDynamic();
             foreach (var item in list5)
             {
-                var total = item.Total;
-                //var name = item.ProductName;
+                //var total = item.Total;
+                var name = item.ProductName;
             }
             #endregion
 
@@ -174,6 +183,7 @@ namespace WebTest.Code
             query2.Where(b => b.Id == 10);
             query2.Join<Code.Member>((a, b) => a.SupplierId == "10" && b.Name == "123");
             Code.ProductDataManage.Instance.Delete(query2);
+            Code.ProductDataManage.Instance.Delete(999);
             #endregion
 
             #region 缓存更新

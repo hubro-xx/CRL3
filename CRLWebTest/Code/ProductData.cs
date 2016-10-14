@@ -62,8 +62,10 @@ namespace WebTest.Code
         protected override System.Collections.IList GetInitData()
         {
             var list = new List<ProductData>();
-            list.Add(new ProductData() { BarCode = "123", Number = 10,UserId=1 });
-            list.Add(new ProductData() { BarCode = "456", Number = 10,UserId=2 });
+            for (int i = 0; i < 1000; i++)
+            {
+                list.Add(new ProductData() { InterFaceUser = "2222", ProductName = "product" + i, BarCode = "code" + i, UserId = 1, Number = i });
+            }
             return list;
         }
         /// <summary>
