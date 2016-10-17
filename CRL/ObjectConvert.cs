@@ -333,8 +333,8 @@ namespace CRL
                         continue;
                     }
                     var mapingName = col.Substring(n + 2);
-                    obj2[mapingName] = values[item.Value];
-
+                    //obj2[mapingName] = values[item.Value];
+                    obj2.SetIndexData(mapingName, values[item.Value]);
                 }
                 obj2.BoundChange = true;
             }
@@ -410,7 +410,8 @@ namespace CRL
                         continue;
                     }
                     var mapingName = col.Substring(n + 2);
-                    detailItem[mapingName] = values[item.Value];
+                    //detailItem[mapingName] = values[item.Value];
+                    detailItem.SetIndexData(mapingName, values[item.Value]);
                 }
                 detailItem.BoundChange = true;
                 #endregion

@@ -143,11 +143,16 @@ namespace CRL
                 }
                 return obj;
             }
-            set
-            {
-                Datas = Datas ?? new Dictionary<string, object>();
-                Datas[key.ToLower()] = value;
-            }
+            //set
+            //{
+            //    Datas = Datas ?? new Dictionary<string, object>();
+            //    Datas[key.ToLower()] = value;
+            //}
+        }
+        internal void SetIndexData(string key, object value)
+        {
+            Datas = Datas ?? new Dictionary<string, object>();
+            Datas[key.ToLower()] = value;
         }
         #endregion
 
