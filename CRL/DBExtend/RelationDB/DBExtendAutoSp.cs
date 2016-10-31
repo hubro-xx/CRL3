@@ -29,7 +29,7 @@ namespace CRL.DBExtend.RelationDB
         {
             if (!_DBAdapter.CanCompileSP)
             {
-                throw new Exception("当前数据库不支持动态编译");
+                throw new CRLException("当前数据库不支持动态编译");
             }
             sql = _DBAdapter.SqlFormat(sql);
             lock (lockObj)
@@ -83,7 +83,7 @@ namespace CRL.DBExtend.RelationDB
                 catch (Exception ero)
                 {
                     //RecoveryParams();
-                    throw new Exception("动态创建存储过程时发生错误:" + ero.Message);
+                    throw new CRLException("动态创建存储过程时发生错误:" + ero.Message);
                 }
             }
             return sp;

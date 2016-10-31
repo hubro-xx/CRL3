@@ -139,7 +139,7 @@ namespace CRL
                 var a = Datas.TryGetValue(key.ToLower(), out obj);
                 if (!a)
                 {
-                    throw new Exception(string.Format("对象:{0}不存在索引值:{1}", GetType(), key));
+                    throw new CRLException(string.Format("对象:{0}不存在索引值:{1}", GetType(), key));
                 }
                 return obj;
             }
@@ -149,7 +149,12 @@ namespace CRL
             //    Datas[key.ToLower()] = value;
             //}
         }
-        internal void SetIndexData(string key, object value)
+        /// <summary>
+        /// 设置索引值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void SetIndexData(string key, object value)
         {
             Datas = Datas ?? new Dictionary<string, object>();
             Datas[key.ToLower()] = value;

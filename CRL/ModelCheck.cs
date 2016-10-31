@@ -41,7 +41,7 @@ namespace CRL
             string result = "";
             if (string.IsNullOrEmpty(item.ColumnType))
             {
-                throw new Exception("ColumnType is null");
+                throw new CRLException("ColumnType is null");
             }
             string str = dbAdapter.GetCreateColumnScript(item);
             string indexScript = "";
@@ -87,7 +87,7 @@ namespace CRL
             string tableName = TypeCache.GetTableName(type, db.dbContext);
             foreach (Attribute.FieldAttribute item in columns)
             {
-                string sql = dbAdapter.GetSelectTop(item.MappingName, "from " + dbAdapter.KeyWordFormat(tableName), "", 1);
+                string sql = dbAdapter.GetSelectTop(item.MapingName, "from " + dbAdapter.KeyWordFormat(tableName), "", 1);
                 try
                 {
                     db.Execute(sql);
@@ -113,7 +113,7 @@ namespace CRL
             info.DefaultValue = defaultValue;
             if (info.ColumnType.Contains("{0}"))
             {
-                throw new Exception(string.Format("属性:{0} 需要指定长度 ColumnType:{1}", info.MemberName, info.ColumnType));
+                throw new CRLException(string.Format("属性:{0} 需要指定长度 ColumnType:{1}", info.MemberName, info.ColumnType));
             }
         }
         /// <summary>
@@ -204,7 +204,7 @@ namespace CRL
                 {
                     message = "创建表时发生错误 类型{0} {1}\r\n";
                     message = string.Format(message, type, ero.Message);
-                    throw new Exception(message);
+                    throw new CRLException(message);
                     //return false;
                 }
                 //CoreHelper.EventLog.Log(message, "", false);

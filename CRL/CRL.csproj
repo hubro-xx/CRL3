@@ -103,6 +103,7 @@
     <Compile Include="CacheServer\TcpServer.cs" />
     <Compile Include="CacheServer\ResultData.cs" />
     <Compile Include="CallBackDataReader.cs" />
+    <Compile Include="CRLException.cs" />
     <Compile Include="ModelCheck.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="DBAdapter\MongoDBAdapter.cs" />

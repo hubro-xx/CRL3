@@ -30,7 +30,7 @@ namespace CRL
             if (type == null && value == null)
             {
                 return DBNull.Value;
-                //throw new Exception("至少一项不能为空");
+                //throw new CRLException("至少一项不能为空");
             }
             if (value != null)
             {
@@ -44,7 +44,7 @@ namespace CRL
                 });
                 nullCheckMethod.Add(typeof(Enum), (a) =>
                 {
-                    return (int)a;
+                    return Convert.ToInt32(a);
                 });
                 nullCheckMethod.Add(typeof(DateTime), (a) =>
                 {
@@ -233,19 +233,18 @@ namespace CRL
             var sw = new Stopwatch();
             sw.Start();
             var list = new List<T>();
-            var typeArry = TypeCache.GetQueryProperties(mainType);
+            var typeArry = TypeCache.GetTable(mainType).Fields;
             var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 columns.Add(reader.GetName(i).ToLower(), i);
             }
-            var leftColumns = new Dictionary<string, int>(columns);
             var reflection = ReflectionHelper.GetInfo<T>();
             var actions = new List<ActionItem<T>>();
             var first = true;
 
             var canTuple = mainType == typeof(T);
-            object[] values = new object[columns.Count];
+            object[] values = new object[reader.FieldCount];
             while (reader.Read())
             {
                 object objInstance;
@@ -258,7 +257,7 @@ namespace CRL
                     objInstance = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
                 }
                 reader.GetValues(values);
-                var detailItem = DataReaderToObj<T>(columns, values, reflection, canTuple, objInstance, typeArry, actions, first, leftColumns) as T;
+                var detailItem = DataReaderToObj<T>(columns, values, reflection, canTuple, objInstance, typeArry, actions, first) as T;
                 list.Add(detailItem);
                 first = false;
             }
@@ -270,7 +269,7 @@ namespace CRL
             return list;
         }
 
-        internal static object DataReaderToObj<T>(Dictionary<string, int> columns, object[] values, ReflectionInfo<T> reflection, bool canTuple, object detailItem, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first, Dictionary<string, int> leftColumns) where T : class,new()
+        internal static object DataReaderToObj<T>(IDictionary<string,int> columns, object[] values, ReflectionInfo<T> reflection, bool canTuple, object detailItem, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first) where T : class,new()
         {
             IModel obj2 = null;
             if (detailItem is IModel)
@@ -293,7 +292,7 @@ namespace CRL
                     }
                     else
                     {
-                        fieldName = info.MappingName.ToLower();
+                        fieldName = info.MapingName.ToLower();
                     }
                     if (columns.ContainsKey(fieldName))
                     {
@@ -306,7 +305,7 @@ namespace CRL
                         {
                             action = new ActionItem<T>() { Set = info.SetValue, Name = fieldName, ValueIndex = columns[fieldName] };
                         }
-                        leftColumns.Remove(fieldName);
+                        columns.Remove(fieldName);
                         actions.Add(action);
                         action.Set((T)detailItem, values[action.ValueIndex]);
                     }
@@ -322,9 +321,9 @@ namespace CRL
                 }
             }
 
-            if (obj2 != null && leftColumns.Count > 0)
+            if (obj2 != null && columns.Count > 0)
             {
-                foreach (var item in leftColumns)
+                foreach (var item in columns)
                 {
                     var col = item.Key;
                     var n = col.LastIndexOf("__");
@@ -349,17 +348,16 @@ namespace CRL
             var sw = new Stopwatch();
             sw.Start();
             var list = new List<T>();
-            var typeArry = TypeCache.GetQueryProperties(mainType);
+            var typeArry = TypeCache.GetTable(mainType).Fields;
             var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 columns.Add(reader.GetName(i).ToLower(), i);
             }
-            var leftColumns = new Dictionary<string, int>(columns);
             var reflection = ReflectionHelper.GetInfo<T>();
             var actions = new List<ActionItem<T>>();
             var first = true;
-            object[] values = new object[columns.Count];
+            object[] values = new object[reader.FieldCount];
             while (reader.Read())
             {
                 reader.GetValues(values);
@@ -379,13 +377,13 @@ namespace CRL
                         }
                         else
                         {
-                            fieldName = info.MappingName.ToLower();
+                            fieldName = info.MapingName.ToLower();
                         }
                         if (columns.ContainsKey(fieldName))
                         {
                             var accessor = reflection.GetAccessor(info.MemberName);
                             action = new ActionItem<T>() { Set = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
-                            leftColumns.Remove(fieldName);
+                            columns.Remove(fieldName);
                             actions.Add(action);
                             action.SetValue(detailItem, values);
                         }
@@ -401,7 +399,7 @@ namespace CRL
                     }
                 }
                 #region 剩下的放索引
-                foreach (var item in leftColumns)
+                foreach (var item in columns)
                 {
                     var col = item.Key;
                     var n = col.LastIndexOf("__");
@@ -440,8 +438,10 @@ namespace CRL
             {
                 object data1 = reader[0];
                 object data2 = reader[1];
-                Tkey key = ConvertObject<Tkey>(data1);
-                TValue value = ConvertObject<TValue>(data2);
+                //Tkey key = ConvertObject<Tkey>(data1);
+                //TValue value = ConvertObject<TValue>(data2);
+                Tkey key = (Tkey)data1;
+                TValue value = (TValue)data2;
                 dic.Add(key, value);
             }
             reader.Close();

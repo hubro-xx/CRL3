@@ -37,10 +37,10 @@ namespace CRL.LambdaQuery
             __MainType = typeof(T);
             __DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(_dbContext);
             __UseTableAliasesName = _useTableAliasesName;
-            __Visitor = new ExpressionVisitor(__DBAdapter);
+            GetPrefix(__MainType);
+            __Visitor = new ExpressionVisitor(__DBAdapter, __Prefixs);
             //TypeCache.SetDBAdapterCache(typeof(T), dBAdapter);
-            GetPrefix(typeof(T));
-            QueryTableName = TypeCache.GetTableName(typeof(T), __DbContext);
+            QueryTableName = TypeCache.GetTableName(__MainType, __DbContext);
             startTime = DateTime.Now;
         }
         
@@ -118,7 +118,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 条件
         /// </summary>
-        protected string Condition = "";
+        protected StringBuilder Condition = new StringBuilder();
         ///// <summary>
         ///// 前几条
         ///// </summary>
@@ -146,6 +146,10 @@ namespace CRL.LambdaQuery
         /// </summary>
         internal bool __CompileSp;
 
+        /// <summary>
+        /// 是否自动跟踪对象状态
+        /// </summary>
+        internal bool __TrackingModel = true;
         #endregion
 
 
@@ -206,6 +210,16 @@ namespace CRL.LambdaQuery
             return this;
         }
         /// <summary>
+        ///设置当前查询是否跟踪对象状态
+        /// </summary>
+        /// <param name="trackingModel"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> WithTrackingModel(bool trackingModel = true)
+        {
+            __TrackingModel = trackingModel;
+            return this;
+        }
+        /// <summary>
         /// 设置分表查询时,union方式
         /// </summary>
         /// <param name="unionType"></param>
@@ -225,18 +239,21 @@ namespace CRL.LambdaQuery
         public LambdaQuery<T> UnSelect(Predicate<Attribute.FieldAttribute> match)
         {
             //var fields = TypeCache.GetProperties(typeof(T), false).Values.ToList();
-            var fields = TypeCache.GetQueryProperties(typeof(T));
-            if (match != null)
-            {
-                fields.RemoveAll(match);
-            }
+            var fields = TypeCache.GetTable(__MainType).Fields;
+            __QueryFields.Clear();
             //string aliasName = GetPrefix();
             foreach(var item in fields)
             {
                 //item.SetFieldQueryScript(aliasName, true, false);
-                item.SetFieldQueryScript2(__DBAdapter, true, false, "");
+                var item2 = item.Clone();
+                item2.SetFieldQueryScript2(__DBAdapter, GetPrefix(item2.ModelType), false, "");
+                __QueryFields.Add(item2);
             }
-            __QueryFields = fields;
+            if (match != null)
+            {
+                __QueryFields.RemoveAll(match);
+            }
+            //__QueryFields = fields;
             return this;
         }
         #endregion

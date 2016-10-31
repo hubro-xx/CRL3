@@ -43,12 +43,13 @@ namespace CRL
         }
         internal static Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(object id) where TModel : IModel, new()
         {
-            var table = TypeCache.GetTable(typeof(TModel));
+            var type = typeof(TModel);
+            var table = TypeCache.GetTable(type);
             if (table.PrimaryKey.PropertyType != id.GetType())
             {
-                throw new Exception("参数类型与主键类型定义不一致");
+                throw new CRLException("参数类型与主键类型定义不一致");
             }
-            var parameter = Expression.Parameter(typeof(TModel), "b");
+            var parameter = Expression.Parameter(type, "b");
             //创建常数 
             var constant = Expression.Constant(id);
             MemberExpression member = Expression.PropertyOrField(parameter, table.PrimaryKey.MemberName);
@@ -159,14 +160,10 @@ namespace CRL
             var assembly = System.Reflection.Assembly.GetExecutingAssembly().GetName();
             return assembly.Version.ToString();
         }
-        internal static string FormatFieldPrefix2(Type type, string fieldName)
-        {
-            return "{" + type.FullName + "}" + fieldName;
-        }
-        internal static string FormatFieldPrefix(DBAdapter.DBAdapterBase dBAdapter, Type type, string fieldName)
-        {
-            return "{" + type.FullName + "}" + dBAdapter.KeyWordFormat(fieldName);
-        }
+        //internal static string FormatFieldPrefix(DBAdapter.DBAdapterBase dBAdapter, Type type, string fieldName)
+        //{
+        //    return "{" + type.FullName + "}" + dBAdapter.KeyWordFormat(fieldName);
+        //}
         public static void Dispose()
         {
             MemoryDataCache.CacheService.StopWatch();

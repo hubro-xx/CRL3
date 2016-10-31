@@ -45,7 +45,7 @@ namespace CRL
                     //value = Expression.Lambda(right).Compile().DynamicInvoke();
                 }
                 //更改对象值
-                var pro = TypeCache.GetProperties(typeof(T), false);
+                var pro = TypeCache.GetProperties(typeof(T), true);
                 var field = pro[name];
                 //field.TupleSetValue<T>(obj, value);
                 Reflection.GetAccessor(field.MemberName).Set((T)obj, value);
@@ -85,7 +85,7 @@ namespace CRL
             MemberExpression mExp = (MemberExpression)expression.Body;
             string name = mExp.Member.Name;
             //更改对象值
-            var pro = TypeCache.GetProperties(typeof(T), false);
+            var pro = TypeCache.GetProperties(typeof(T), true);
             var field = pro[name];
             var Reflection = ReflectionHelper.GetInfo<T>();
             //field.TupleSetValue<T>(obj, value);
@@ -158,7 +158,7 @@ namespace CRL
             MemberExpression mExp = (MemberExpression)expression.Body;
             string name = mExp.Member.Name;
             //更改对象值
-            var pro = TypeCache.GetProperties(typeof(T), false);
+            var pro = TypeCache.GetProperties(typeof(T), true);
             var field = pro[name];
             dynamic origin = field.GetValue(obj);
             origin += value;

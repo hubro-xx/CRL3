@@ -142,7 +142,7 @@ namespace CRL.DBExtend.RelationDB
             }
             if (sql.IndexOf("$") > -1)
             {
-                throw new Exception("格式化SQL语句时发生错误,表名未被替换:" + sql);
+                throw new CRLException("格式化SQL语句时发生错误,表名未被替换:" + sql);
             }
             return sql;
         }
@@ -305,7 +305,7 @@ namespace CRL.DBExtend.RelationDB
         {
             if (currentTransStatus != TranStatus.未开始)
             {
-                throw new Exception("事务开始失败,已有未完成的事务");
+                throw new CRLException("事务开始失败,已有未完成的事务");
             }
             dbHelper.BeginTran();
             currentTransStatus = TranStatus.已开始;
@@ -317,7 +317,7 @@ namespace CRL.DBExtend.RelationDB
         {
             if (currentTransStatus != TranStatus.已开始)
             {
-                throw new Exception("事务回滚失败,没有需要回滚的事务");
+                throw new CRLException("事务回滚失败,没有需要回滚的事务");
             }
             dbHelper.RollbackTran();
             currentTransStatus = TranStatus.未开始;
@@ -329,7 +329,7 @@ namespace CRL.DBExtend.RelationDB
         {
             if (currentTransStatus != TranStatus.已开始)
             {
-                throw new Exception("事务提交失败,没有需要提交的事务");
+                throw new CRLException("事务提交失败,没有需要提交的事务");
             }
             dbHelper.CommitTran();
             currentTransStatus = TranStatus.未开始;

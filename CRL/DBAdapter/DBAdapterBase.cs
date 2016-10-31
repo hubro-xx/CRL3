@@ -62,7 +62,7 @@ namespace CRL.DBAdapter
             }
             if (db == null)
             {
-                throw new Exception("找不到对应的DBAdapte" + dbContext.DBHelper.CurrentDBType);
+                throw new CRLException("找不到对应的DBAdapte" + dbContext.DBHelper.CurrentDBType);
             }
             return db;
         }
@@ -108,7 +108,7 @@ namespace CRL.DBAdapter
             }
             if (!dic.ContainsKey(type))
             {
-                throw new Exception(string.Format("找不到对应的字段类型映射 {0} 在 {1}", type, this));
+                throw new CRLException(string.Format("找不到对应的字段类型映射 {0} 在 {1}", type, this));
             }
             return dic[type];
         }

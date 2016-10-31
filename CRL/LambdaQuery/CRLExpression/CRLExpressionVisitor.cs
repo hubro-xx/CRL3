@@ -210,7 +210,7 @@ namespace CRL.LambdaQuery.CRLExpression
             dic.Add("LessThan", creater.LessThan);
             if (!dic.ContainsKey(type))
             {
-                throw new Exception("没有对应的运算方法 " + type);
+                throw new CRLException("没有对应的运算方法 " + type);
             }
 
             if (left.Type == CRLExpressionType.MethodCall)//按方法运算 如 b.NameSubstring,Indexof(0,1)=="123"
@@ -241,7 +241,7 @@ namespace CRL.LambdaQuery.CRLExpression
             dic.Add("EndsWith", creater.EndsWith);
             if (!dic.ContainsKey(methodName))
             {
-                throw new Exception("没有对应的方法 " + methodName);
+                throw new CRLException("没有对应的方法 " + methodName);
             }
 
             return dic[methodName](propertyName, args.Split(','));
@@ -259,7 +259,7 @@ namespace CRL.LambdaQuery.CRLExpression
             dic.Add("IndexOf", creater.IndexOf);
             if (!dic.ContainsKey(methodName))
             {
-                throw new Exception("没有对应的方法 " + methodName);
+                throw new CRLException("没有对应的方法 " + methodName);
             }
 
             return dic[methodName](propertyName, args.Split(','));

@@ -56,7 +56,7 @@ namespace CRL.DBExtend.MongoDB
                     }
                     else
                     {
-                        throw new Exception("不支持此方法" + method);
+                        throw new CRLException("不支持此方法" + method);
                     }
                 }
                 var aggregate = collection.Aggregate().Match(query.__MongoDBFilter).Group(groupInfo);

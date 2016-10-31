@@ -24,7 +24,7 @@ namespace CRL.LambdaQuery
             dBAdapter = _dBAdapter;
             if (dBAdapter == null)
             {
-                throw new Exception("dBAdapter尚未初始化");
+                throw new CRLException("dBAdapter尚未初始化");
             }
         }
 
@@ -104,7 +104,7 @@ namespace CRL.LambdaQuery
             var args = methodInfo.Args;
             if (args.Count < 2)
             {
-                throw new Exception("Substring扩展方法需要两个参数,index,length");
+                throw new CRLException("Substring扩展方法需要两个参数,index,length");
             }
             return dBAdapter.SubstringFormat(field, (int)args[0], (int)args[1]);
             //return string.Format(" SUBSTRING({0},{1},{2})", field, args[0], args[1]);

@@ -71,7 +71,7 @@ namespace CRL
                 return ServerTypeSettings[typeName];
             }
             return null;
-            //throw new Exception("未在服务器上找到对应的数据处理类型;" + typeName);
+            //throw new CRLException("未在服务器上找到对应的数据处理类型;" + typeName);
         }
     }
 }

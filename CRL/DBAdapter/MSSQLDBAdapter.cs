@@ -131,7 +131,7 @@ end", spName, script);
         /// <returns></returns>
         public override string GetCreateColumnScript(Attribute.FieldAttribute field)
         {
-            string str = string.Format("alter table [{0}] add {1} {2}", field.TableName, field.MappingName, field.ColumnType);
+            string str = string.Format("alter table [{0}] add {1} {2}", field.TableName, field.MapingName, field.ColumnType);
             if (!string.IsNullOrEmpty(field.DefaultValue))
             {
                 str += string.Format(" default({0})", field.DefaultValue);
@@ -150,7 +150,7 @@ end", spName, script);
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
-            string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]([{1}])", filed.TableName, filed.MappingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
+            string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]([{1}])", filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
             return indexScript;
         }
 
@@ -170,15 +170,15 @@ end", spName, script);
             {
                 if (item.IsPrimaryKey)
                 {
-                    primaryKey = item.MappingName;
+                    primaryKey = item.MapingName;
                 }
                 string nullStr = item.NotNull ? "NOT NULL" : "";
-                string str = string.Format("[{0}] {1} {2} ", item.MappingName, item.ColumnType, nullStr);
+                string str = string.Format("[{0}] {1} {2} ", item.MapingName, item.ColumnType, nullStr);
                 list2.Add(str);
                 //生成默认值语句
                 if (!string.IsNullOrEmpty(item.DefaultValue))
                 {
-                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MappingName, item.DefaultValue);
+                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MapingName, item.DefaultValue);
                     defaultValues.Add(v);
                 }
             }
@@ -232,7 +232,11 @@ end", spName, script);
                 DataRow dr = tempTable.NewRow();
                 foreach (Attribute.FieldAttribute info in typeArry)
                 {
-                    string name = info.MappingName;
+                    if (info.FieldType != Attribute.FieldType.数据库字段)
+                    {
+                        continue;
+                    }
+                    string name = info.MapingName;
                     object value = info.GetValue(item);
                     if (!keepIdentity)
                     {
@@ -274,7 +278,11 @@ end", spName, script);
             string sql2 = "";
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                string name = info.MappingName;
+                if (info.FieldType != Attribute.FieldType.数据库字段)
+                {
+                    continue;
+                }
+                string name = info.MapingName;
                 if (info.IsPrimaryKey)
                 {
                     primaryKey = info;
@@ -296,7 +304,7 @@ end", spName, script);
                     }
                 }
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", info.MappingName);
+                sql1 += string.Format("{0},", info.MapingName);
                 sql2 += string.Format("@{0},", name);
                 helper.AddParam(name, value);
             }
@@ -515,7 +523,7 @@ set  nocount  on
             var dic = FieldMaping();
             if (!dic.ContainsKey(fieldType))
             {
-                throw new Exception(string.Format("没找到对应类型的转换{0} 在字段{1}", fieldType, field));
+                throw new CRLException(string.Format("没找到对应类型的转换{0} 在字段{1}", fieldType, field));
             }
             var type = dic[fieldType];
             type = string.Format(type, 100);
@@ -547,12 +555,12 @@ set  nocount  on
             foreach (Attribute.FieldAttribute item in fields)
             {
                 string nullStr = item.NotNull ? "NOT NULL" : "";
-                string str = string.Format("[{0}] {1} {2} ", item.MappingName, item.ColumnType, nullStr);
+                string str = string.Format("[{0}] {1} {2} ", item.MapingName, item.ColumnType, nullStr);
                 list2.Add(str);
                 //生成默认值语句
                 if (!string.IsNullOrEmpty(item.DefaultValue))
                 {
-                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MappingName, item.DefaultValue);
+                    string v = string.Format("ALTER TABLE [dbo].[{0}] ADD  CONSTRAINT [DF_{0}_{1}]  DEFAULT ({2}) FOR [{1}]", tableName, item.MapingName, item.DefaultValue);
                     defaultValues.Add(v);
                 }
             }

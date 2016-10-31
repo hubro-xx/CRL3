@@ -26,11 +26,11 @@ namespace CRL.DBExtend.MongoDB
         {
             if (query1.__GroupFields.Count > 0)
             {
-                throw new Exception("update不支持group查询");
+                throw new CRLException("update不支持group查询");
             }
             if (query1.__Relations.Count > 1)
             {
-                throw new Exception("update关联不支持多次");
+                throw new CRLException("update关联不支持多次");
             }
             if (setValue.Count == 0)
             {
@@ -46,7 +46,7 @@ namespace CRL.DBExtend.MongoDB
             {
                 if (item.Key.StartsWith("$"))
                 {
-                    throw new Exception("MongoDB不支持累加" + item.Key);
+                    throw new CRLException("MongoDB不支持累加" + item.Key);
                 }
                 update.Set(item.Key, item.Value);
             }
@@ -59,14 +59,14 @@ namespace CRL.DBExtend.MongoDB
             if (c.Count == 0)
             {
                 return 0;
-                //throw new Exception("更新集合为空");
+                //throw new CRLException("更新集合为空");
             }
             var keyValue = obj.GetpPrimaryKeyValue();
             var expression = Base.GetQueryIdExpression<TModel>(keyValue);
             var n = Update(expression,c);
             if (n == 0)
             {
-                throw new Exception("更新失败,找不到主键为 " + keyValue + " 的记录");
+                throw new CRLException("更新失败,找不到主键为 " + keyValue + " 的记录");
             }
             obj.CleanChanges();
             return n;

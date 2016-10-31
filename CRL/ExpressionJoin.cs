@@ -33,7 +33,7 @@ namespace CRL
         /// 可拼接的Lambda表达式
         /// </summary>
         /// <param name="expr1"></param>
-        public ExpressionJoin(Expression<Func<T, bool>> expr1)
+        public ExpressionJoin(Expression<Func<T, bool>> expr1=null)
         {
             currentExpression = expr1;
         }
@@ -43,8 +43,15 @@ namespace CRL
         /// <param name="expr2"></param>
         public void And(Expression<Func<T, bool>> expr2)
         {
-            var exp = And(currentExpression, expr2);
-            currentExpression = exp;
+            if (currentExpression != null)
+            {
+                var exp = And(currentExpression, expr2);
+                currentExpression = exp;
+            }
+            else
+            {
+                currentExpression = expr2;
+            }
         }
         /// <summary>
         /// 组合And
@@ -64,8 +71,15 @@ namespace CRL
         /// <param name="expr2"></param>
         public void Or(Expression<Func<T, bool>> expr2)
         {
-            var exp = Or(currentExpression, expr2);
-            currentExpression = exp;
+            if (currentExpression != null)
+            {
+                var exp = Or(currentExpression, expr2);
+                currentExpression = exp;
+            }
+            else
+            {
+                currentExpression = expr2;
+            }
         }
         /// <summary>
         /// 组合Or
@@ -86,6 +100,10 @@ namespace CRL
         /// <returns></returns>
         public IEnumerable<T> Where(IEnumerable<T> list)
         {
+            if (currentExpression == null)
+            {
+                return list;
+            }
             var result = list.Where(currentExpression.Compile());
             try
             {
@@ -111,7 +129,7 @@ namespace CRL
             Type type = list.FirstOrDefault().GetType();
             PropertyInfo propertyInfo = type.GetProperty(sortName);
             if (propertyInfo == null)
-                throw new Exception("找不到属性" + sortName);
+                throw new CRLException("找不到属性" + sortName);
             ParameterExpression parameter = Expression.Parameter(type, "");
             Expression body = Expression.Property(parameter, propertyInfo);
             Expression sourceExpression = list.AsQueryable().Expression;

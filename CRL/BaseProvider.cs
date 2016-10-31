@@ -29,7 +29,7 @@ namespace CRL
         {
             if (SettingConfig.GetDbAccess == null)
             {
-                throw new Exception("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
+                throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
             }
             var helper = SettingConfig.GetDbAccess(dbLocation);
             var dbContext = new DbContext(helper, dbLocation);
@@ -112,7 +112,7 @@ namespace CRL
             var proxy = CacheServerSetting.GetCurrentClient(typeof(TModel));
             if (proxy == null)
             {
-                throw new Exception("未在服务器上找到对应的数据处理类型:" + typeof(TModel).FullName);
+                throw new CRLException("未在服务器上找到对应的数据处理类型:" + typeof(TModel).FullName);
             }
             var data = proxy.Query(expression, out total, pageIndex, pageSize);
             return data;
@@ -172,7 +172,7 @@ namespace CRL
             return QueryFromCache(expression, out total, 0, 0);
         }
         /// <summary>
-        /// 从对象缓存中进行查询一项
+        /// 按主键从对象缓存中进行查询一项
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>

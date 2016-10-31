@@ -38,7 +38,7 @@ namespace WebTest
             //默认过期时间为5分钟
             //AllCache可重写条件和过期时间,在业务类中实现即可
             //当插入或更新当前类型对象时,此缓存中对应的项也会更新
-            var list = Code.ProductDataManage.Instance.QueryItemFromCache(b => b.Id ==1);
+            var list = Code.ProductDataManage.Instance.QueryItemFromCache(5);
         }
 
         protected void Button3_Click(object sender, EventArgs e)

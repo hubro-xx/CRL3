@@ -46,7 +46,7 @@ namespace CRL
         private void InitInfo(Type modelType)
         {
             accessorDict = new Dictionary<string, Accessor>();
-            var Properties = TypeCache.GetQueryProperties(modelType);
+            var Properties = TypeCache.GetTable(modelType).Fields;
             foreach (var kv in Properties)
             {
                 Accessor accessor = null;
@@ -207,7 +207,7 @@ namespace CRL
                 }
                 catch
                 {
-                    throw new Exception(string.Format("将值 {0} 赋值给类型{1}.{2}时失败,请检查对象类型和数据表字段类型是否一致", value + " " + value.GetType(), obj.GetType(), _prop));
+                    throw new CRLException(string.Format("将值 {0} 赋值给类型{1}.{2}时失败,请检查对象类型和数据表字段类型是否一致", value + " " + value.GetType(), obj.GetType(), _prop));
                 }
             }
 

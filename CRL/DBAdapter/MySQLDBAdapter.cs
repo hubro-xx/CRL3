@@ -89,7 +89,7 @@ EXECUTE  ' {1} ';
             //超过3000设为ntext
             if (propertyType == typeof(System.String) && info.Length > 3000)
             {
-                columnType = "varchar(8000)";
+                columnType = "varchar(max)";
             }
             if (info.Length > 0)
             {
@@ -122,7 +122,7 @@ EXECUTE  ' {1} ';
         /// <returns></returns>
         public override string GetCreateColumnScript(Attribute.FieldAttribute field)
         {
-            string str = string.Format("alter table `{0}` add {1} {2}", field.TableName, field.MappingName, field.ColumnType);
+            string str = string.Format("alter table `{0}` add {1} {2}", field.TableName, field.MapingName, field.ColumnType);
             if (!string.IsNullOrEmpty(field.DefaultValue))
             {
                 str += string.Format(" default '{0}' ", field.DefaultValue);
@@ -141,7 +141,7 @@ EXECUTE  ' {1} ';
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
-            string indexScript = string.Format("ALTER TABLE `{0}` ADD {2} ({1}) ", filed.TableName, filed.MappingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "INDEX index_name");
+            string indexScript = string.Format("ALTER TABLE `{0}` ADD {2} ({1}) ", filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "INDEX index_name");
             return indexScript;
         }
 
@@ -161,7 +161,7 @@ EXECUTE  ' {1} ';
                 string nullStr = item.NotNull ? "NOT NULL" : "";
                 var columnType = GetDBColumnType(item.PropertyType);
 
-                string str = string.Format("{0} {1} {2} ", item.MappingName, item.ColumnType, nullStr);
+                string str = string.Format("{0} {1} {2} ", item.MapingName, item.ColumnType, nullStr);
 
                 list2.Add(str);
                 
@@ -218,7 +218,11 @@ EXECUTE  ' {1} ';
             string sql2 = "";
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                string name = info.MappingName;
+                if (info.FieldType != Attribute.FieldType.数据库字段)
+                {
+                    continue;
+                }
+                string name = info.MapingName;
                 if (info.IsPrimaryKey)
                 {
                     primaryKey = info;
@@ -240,7 +244,7 @@ EXECUTE  ' {1} ';
                     }
                 }
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", info.MappingName);
+                sql1 += string.Format("{0},", info.MapingName);
                 sql2 += string.Format("?{0},", name);
                 helper.AddParam(name, value);
             }

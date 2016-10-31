@@ -110,7 +110,7 @@ namespace WebTest.Code
         /// <summary>
         /// 映射字段名为ProductName1
         /// </summary>
-        [CRL.Attribute.Field(MappingName = "ProductName1")]
+        [CRL.Attribute.Field(MapingName = "ProductName1")]
         public string ProductName
         {
             get;

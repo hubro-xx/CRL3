@@ -36,7 +36,7 @@ namespace CRL.Dynamic
             var a = ViewData.TryGetValue(binder.Name.ToLower(), out result);
             if (!a)
             {
-                throw new Exception(string.Format("动态字典Bag不存在索引值:{0}", binder.Name));
+                throw new CRLException(string.Format("动态字典Bag不存在索引值:{0}", binder.Name));
             }
             return a;
         }

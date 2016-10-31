@@ -38,7 +38,7 @@ namespace CRL.Sharding
         {
             if (SettingConfig.GetDbAccess == null)
             {
-                throw new Exception("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
+                throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
             }
             var helper = SettingConfig.GetDbAccess(dbLocation);
             var dbContext = new DbContext(helper, dbLocation);
@@ -59,7 +59,7 @@ namespace CRL.Sharding
         }
         public override void BatchInsert(List<TModel> list, bool keepIdentity = false)
         {
-            throw new Exception("暂不支持");
+            throw new CRLException("暂不支持");
             //todo 判断主数据索引是不是在当前定位
             base.BatchInsert(list, keepIdentity);
         }

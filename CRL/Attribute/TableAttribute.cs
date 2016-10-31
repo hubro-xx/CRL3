@@ -60,5 +60,9 @@ namespace CRL.Attribute
         /// 所有字段
         /// </summary>
         internal List<FieldAttribute> Fields = new List<FieldAttribute>();
+        /// <summary>
+        /// 只存基本数据库字段
+        /// </summary>
+        internal IgnoreCaseDictionary<FieldAttribute> FieldsDic = new IgnoreCaseDictionary<FieldAttribute>();
     }
 }

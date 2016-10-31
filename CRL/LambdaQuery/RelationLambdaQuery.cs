@@ -43,7 +43,12 @@ namespace CRL.LambdaQuery
             //    SelectAll();
             //}
             string condition = FormatExpression(expression.Body).SqlOut;
-            this.Condition += string.IsNullOrEmpty(Condition) ? condition : " and " + condition;
+            if (Condition.Length > 0)
+            {
+                condition = " and " + condition;
+            }
+            Condition.Append(condition);
+            //this.Condition += string.IsNullOrEmpty(Condition) ? condition : " and " + condition;
             return this;
         }
         /// <summary>
@@ -75,7 +80,7 @@ namespace CRL.LambdaQuery
                 __QueryOrderBy += ",";
             }
             var key = TypeCache.GetTable(typeof(T)).PrimaryKey;
-            __QueryOrderBy += string.Format(" {2}{0} {1}", key.MappingName, desc ? "desc" : "asc", GetPrefix());
+            __QueryOrderBy += string.Format(" {2}{0} {1}", key.MapingName, desc ? "desc" : "asc", GetPrefix());
             //QueryOrderBy = ReplacePrefix(QueryOrderBy);
             return this;
         }
@@ -87,7 +92,8 @@ namespace CRL.LambdaQuery
         public override LambdaQuery<T> Or(Expression<Func<T, bool>> expression)
         {
             string condition1 = FormatExpression(expression.Body).SqlOut;
-            this.Condition = string.Format("({0}) or {1}", Condition, condition1);
+            //this.Condition = string.Format("({0}) or {1}", Condition, condition1);
+            Condition.Append(string.Format(" or {0}", condition1));
             return this;
         }
         protected override LambdaQuery<T> InnerSelect<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
@@ -129,71 +135,13 @@ namespace CRL.LambdaQuery
             tableName = tableName + " " + GetPrefix(typeof(TInner));
             tableName = tableName.Substring(0, tableName.Length - 1);
             condition = string.Format("{0} {1}(select {2} from {3} where {4})", field1, type, field2, tableName + __DBAdapter.GetWithNolockFormat(), condition);
-            this.Condition += string.IsNullOrEmpty(Condition) ? condition : " and " + condition;
+            //this.Condition += string.IsNullOrEmpty(Condition) ? condition : " and " + condition;
+            if (Condition.Length > 0)
+            {
+                condition = " and " + condition;
+            }
+            Condition.Append(condition);
             return this;
-        }
-
-        /// <summary>
-        /// 获取查询字段字符串,按条件排除
-        /// </summary>
-        /// <returns></returns>
-        internal string GetQueryFieldString2()
-        {
-            if (__QueryFields.Count == 0)
-            {
-                SelectAll();
-            }
-            List<Attribute.FieldAttribute> queryFields = __QueryFields;
-            //找出需要关联的字段
-            List<Attribute.FieldAttribute> constraint = queryFields.FindAll(b => b.FieldType == Attribute.FieldType.关联字段);
-            //找出关联和对应的字段
-            int tabIndex = 2;
-            foreach (Attribute.FieldAttribute a in constraint)
-            {
-                #region 关联约束
-                tabIndex += 1;
-                if (a.FieldType == Attribute.FieldType.关联字段 && a.ConstraintType == null)//虚拟字段,没有设置关联类型
-                {
-                    throw new Exception(string.Format("需指定关联类型:{0}.{1}.Attribute.Field.ConstraintType", typeof(T), a.MemberName));
-                }
-                if (string.IsNullOrEmpty(a.ConstraintField))//约束为空
-                {
-                    continue;
-                }
-                var arry = a.ConstraintField.Replace("$", "").Split('=');
-                string leftField = GetPrefix() + arry[0];
-                var innerType = a.ConstraintType;
-                //TypeCache.SetDBAdapterCache(innerType,dBAdapter);
-                string rightField = GetPrefix(innerType) + arry[1];
-                string condition = string.Format("{0}={1}", leftField, rightField);
-                if (!string.IsNullOrEmpty(a.Constraint))
-                {
-                    a.Constraint = Regex.Replace(a.Constraint, @"(.+?)\=", GetPrefix(innerType) + "$1=");//加上前缀
-                    condition += " and " + a.Constraint;
-                }
-
-                var innerFields = TypeCache.GetProperties(innerType, true);
-                if (a.FieldType == Attribute.FieldType.关联字段)//只是关联字段
-                {
-                    //var resultField = innerFields.Find(b => b.Name.ToUpper() == a.ConstraintResultField.ToUpper());
-                    var resultField = innerFields[a.ConstraintResultField];
-                    if (resultField == null)
-                    {
-                        throw new Exception(string.Format("在类型{0}找不到 ConstraintResultField {1}", innerType, a.ConstraintResultField));
-                    }
-                    AddInnerRelation(innerType, condition);
-                    queryFields.Add(resultField);
-                }
-                else//关联对象
-                {
-
-                }
-                #endregion
-            }
-            queryFields = queryFields.FindAll(b => b.FieldType == Attribute.FieldType.数据库字段 || b.FieldType == Attribute.FieldType.虚拟字段);
-            string fields = Base.GetQueryFields(queryFields);
-            fields = ReplacePrefix(fields);
-            return fields;
         }
 
         internal override string GetQueryFieldString()
@@ -203,7 +151,7 @@ namespace CRL.LambdaQuery
                 SelectAll();
             }
             int tabIndex = 2;
-            string str = "";
+            var sb = new StringBuilder();
             foreach (Attribute.FieldAttribute a in __QueryFields)
             {
                 if (a.FieldType == Attribute.FieldType.关联字段)
@@ -212,7 +160,7 @@ namespace CRL.LambdaQuery
                     tabIndex += 1;
                     if (a.FieldType == Attribute.FieldType.关联字段 && a.ConstraintType == null)//虚拟字段,没有设置关联类型
                     {
-                        throw new Exception(string.Format("需指定关联类型:{0}.{1}.Attribute.Field.ConstraintType", typeof(T), a.MemberName));
+                        throw new CRLException(string.Format("需指定关联类型:{0}.{1}.Attribute.Field.ConstraintType", typeof(T), a.MemberName));
                     }
                     if (string.IsNullOrEmpty(a.ConstraintField))//约束为空
                     {
@@ -236,20 +184,19 @@ namespace CRL.LambdaQuery
                     var resultField = innerFields[a.ConstraintResultField];
                     if (resultField == null)
                     {
-                        throw new Exception(string.Format("在类型{0}找不到 ConstraintResultField {1}", innerType, a.ConstraintResultField));
+                        throw new CRLException(string.Format("在类型{0}找不到 ConstraintResultField {1}", innerType, a.ConstraintResultField));
                     }
                     AddInnerRelation(innerType, condition);
                     #endregion
-                    str += string.Format("{0},", resultField.QueryFullScript);
+                    sb.Append(string.Format("{0},", resultField.QueryFullScript));
                 }
                 else
                 {
-                    str += string.Format("{0},", a.QueryFullScript);
+                    sb.Append(string.Format("{0},", a.QueryFullScript));
                 }
             }
-            str = str.Substring(0, str.Length - 1);
-            str = ReplacePrefix(str);
-            return str;
+            var str2 = sb.ToString().Substring(0, sb.Length - 1);
+            return str2;
         }
 
         /// <summary>
@@ -258,42 +205,36 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         internal override string GetQueryConditions(bool withTableName = true)
         {
-            string where = Condition;
-            //where = string.IsNullOrEmpty(where) ? " 1=1 " : where;
+            var where = Condition;
             #region group判断
             if (__GroupFields.Count > 0)
             {
-                where += " group by ";
-                foreach (var item in __GroupFields)
-                {
-                    where += item.QueryField + ",";
-                }
-                where = where.Substring(0, where.Length - 1);
+                where.Append(" group by ");
+                where.Append(string.Join(",", __GroupFields.Select(b => b.QueryField)));
             }
             if (!string.IsNullOrEmpty(Having))
             {
-                where += " having " + Having;
+                where.Append(" having " + Having);
             }
             #endregion
-            string part = "";
+            StringBuilder part = new StringBuilder();
             if (withTableName)
             {
-                part += string.Format("{0} t1 {1}", __DBAdapter.KeyWordFormat(QueryTableName), __DBAdapter.GetWithNolockFormat());
+                part.Append(string.Format("{0} t1 {1}", __DBAdapter.KeyWordFormat(QueryTableName), __DBAdapter.GetWithNolockFormat()));
             }
             if (_IsRelationUpdate)
             {
-                if (!string.IsNullOrEmpty(where))
+                if (where.Length > 0)
                 {
-                    part += string.Format(" where {0}", where);
+                    part.Append(string.Format(" where {0}", where));
                 }
             }
             else
             {
                 string join = string.Join(" ", __Relations.Values);
-                part += string.Format(" {0}{1}", join, string.IsNullOrEmpty(where) ? " " : " where " + where);
+                part.Append(string.Format(" {0}{1}", join, where.Length == 0 ? " " : " where " + where));
             }
-            part = ReplacePrefix(part);
-            return part;
+            return part.ToString();
         }
         /// <summary>
         /// 获取排序 带 order by
@@ -327,14 +268,14 @@ namespace CRL.LambdaQuery
                 fields = string.Format(" count({0}) as Total", fields);
                 if (__QueryFields.Count > 1)
                 {
-                    throw new Exception("distinct 时,不能count多个字段 " + fields);
+                    throw new CRLException("distinct 时,不能count多个字段 " + fields);
                 }
             }
 
             var part = " from " + GetQueryConditions();
 
             var orderBy = GetOrderBy();
-            string sql = "";
+            StringBuilder sql = new StringBuilder();
             //当设置了分表关联
             if (__DbContext.UseSharding && __UnionType != Sharding.UnionType.None)
             {
@@ -346,21 +287,22 @@ namespace CRL.LambdaQuery
                 {
                     var table = tables[i];
                     var part1 = part.Replace("from " + __DBAdapter.KeyWordFormat(tableName), "from " + __DBAdapter.KeyWordFormat(table.PartName));
-                    sql += __DBAdapter.GetSelectTop(fields, part1, "", TakeNum);
+                    sql.Append(__DBAdapter.GetSelectTop(fields, part1, "", TakeNum));
                     if (i < tables.Count - 1)
                     {
-                        sql += "\r\n" + union + "\r\n";
+                        sql.Append("\r\n" + union + "\r\n");
                     }
                 }
-                sql += orderBy;
+                sql.Append(orderBy);
             }
             else
             {
-                sql = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
+                var sql2 = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
+                sql.Append(sql2);
             }
             var ts = DateTime.Now - startTime;
             AnalyticalTime = ts.TotalMilliseconds;
-            return sql;
+            return sql.ToString();
         }
     }
 }

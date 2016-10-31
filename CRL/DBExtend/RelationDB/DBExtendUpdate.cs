@@ -38,13 +38,13 @@ namespace CRL.DBExtend.RelationDB
                     name = name.Substring(1, name.Length - 1);
                     if (!fields.ContainsKey(name))
                     {
-                        throw new Exception("找不到对应的字段,在" + typeof(T) + ",名称" + name);
+                        throw new CRLException("找不到对应的字段,在" + typeof(T) + ",名称" + name);
                     }
                     var field = fields[name];
                     string value1 = value.ToString();
                     //未处理空格
-                    value1 = System.Text.RegularExpressions.Regex.Replace(value1, name + @"([\+\-])", field.MappingName + "$1", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                    name = field.MappingName;
+                    value1 = System.Text.RegularExpressions.Regex.Replace(value1, name + @"([\+\-])", field.MapingName + "$1", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    name = field.MapingName;
                     value = value1;
                     setString += string.Format(" {0}={1},", _DBAdapter.KeyWordFormat(name), value);
                 }
@@ -55,29 +55,29 @@ namespace CRL.DBExtend.RelationDB
 
                         if (!fields.ContainsKey(name))
                         {
-                            throw new Exception("找不到对应的字段,在" + typeof(T) + ",名称" + name);
+                            throw new CRLException("找不到对应的字段,在" + typeof(T) + ",名称" + name);
                         }
                         var field = fields[name];
-                        name = field.MappingName;//转换映射名
+                        name = field.MapingName;//转换映射名
 
                         var fields2 = TypeCache.GetProperties(joinType, true);
                         var value1 = System.Text.RegularExpressions.Regex.Match(value.ToString(), @"\$(\w+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Groups[1].Value;
                         if (!fields2.ContainsKey(value1))
                         {
-                            throw new Exception("找不到对应的字段,在" + joinType + ",名称" + value1);
+                            throw new CRLException("找不到对应的字段,在" + joinType + ",名称" + value1);
                         }
                         var field2 = fields2[value1];
-                        value = value.ToString().Replace("$" + value1, "t2." + field2.MappingName);//右边字段需加前辍
+                        value = value.ToString().Replace("$" + value1, "t2." + field2.MapingName);//右边字段需加前辍
                         name = string.Format("t1.{0}", name);
                     }
                     else
                     {
                         if (!fields.ContainsKey(name))
                         {
-                            throw new Exception("找不到对应的字段,在" + typeof(T) + ",名称" + name);
+                            throw new CRLException("找不到对应的字段,在" + typeof(T) + ",名称" + name);
                         }
                         var field = fields[name];
-                        name = field.MappingName;//转换映射名
+                        name = field.MapingName;//转换映射名
                         string parame = string.Format("@{0}", name, dbContext.parIndex);
                         AddParam(name, value);
                         dbContext.parIndex += 1;
@@ -125,17 +125,17 @@ namespace CRL.DBExtend.RelationDB
             if (c.Count == 0)
             {
                 return 0;
-                //throw new Exception("更新集合为空");
+                //throw new CRLException("更新集合为空");
             }
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
             var keyValue = primaryKey.GetValue(obj);
-            string where = string.Format("{0}=@{0}", primaryKey.MappingName);
-            AddParam(primaryKey.MappingName, keyValue);
+            string where = string.Format("{0}=@{0}", primaryKey.MapingName);
+            AddParam(primaryKey.MapingName, keyValue);
             int n = Update<TModel>(c, where);
             UpdateCacheItem(obj, c);
             if (n == 0)
             {
-                throw new Exception("更新失败,找不到主键为 " + keyValue + " 的记录");
+                throw new CRLException("更新失败,找不到主键为 " + keyValue + " 的记录");
             }
             obj.CleanChanges();
             return n;
@@ -154,11 +154,11 @@ namespace CRL.DBExtend.RelationDB
             var query1 = query as RelationLambdaQuery<TModel>;
             if (query1.__GroupFields.Count > 0)
             {
-                throw new Exception("update不支持group查询");
+                throw new CRLException("update不支持group查询");
             }
             if (query1.__Relations.Count > 1)
             {
-                throw new Exception("update关联不支持多次");
+                throw new CRLException("update关联不支持多次");
             }
             if (updateValue.Count == 0)
             {

@@ -113,7 +113,8 @@ namespace CRL
         /// <param name="obj"></param>
         internal void CheckData(IModel obj)
         {
-            var types = CRL.TypeCache.GetProperties(obj.GetType(), true).Values;
+            //var types = CRL.TypeCache.GetProperties(obj.GetType(), true).Values;
+            var types = TypeCache.GetTable(obj.GetType()).Fields;
             string msg;
             var sb = new StringBuilder();
             //检测数据约束
@@ -129,12 +130,12 @@ namespace CRL
                     if (p.NotNull && string.IsNullOrEmpty(value))
                     {
                         msg = string.Format("对象{0}属性{1}值不能为空", obj.GetType(), p.MemberName);
-                        throw new Exception(msg);
+                        throw new CRLException(msg);
                     }
                     if (value.Length > p.Length && p.Length < 3000)
                     {
                         msg = string.Format("对象{0}属性{1}长度超过了设定值{2}", obj.GetType(), p.MemberName, p.Length);
-                        throw new Exception(msg);
+                        throw new CRLException(msg);
                     }
                 }
             }
@@ -143,7 +144,7 @@ namespace CRL
                 string concurrentKey = "insertRepeatedCheck_" + CoreHelper.StringHelper.EncryptMD5(sb.ToString());
                 if (!CoreHelper.ConcurrentControl.Check(concurrentKey, 3))
                 {
-                    throw new Exception("检测到有重复提交的数据");
+                    throw new CRLException("检测到有重复提交的数据");
                 }
             }
             //校验数据
@@ -151,7 +152,7 @@ namespace CRL
             if (!string.IsNullOrEmpty(msg))
             {
                 msg = string.Format("数据校验证失败,在类型{0} {1} 请核对校验规则", obj.GetType(), msg);
-                throw new Exception(msg);
+                throw new CRLException(msg);
             }
         }
 
@@ -258,7 +259,7 @@ namespace CRL
             var _helper = _dbContext.DBHelper;
             if (_helper == null)
             {
-                throw new Exception("数据访问对象未实例化,请实现CRL.SettingConfig.GetDbAccess");
+                throw new CRLException("数据访问对象未实例化,请实现CRL.SettingConfig.GetDbAccess");
             }
             GUID = Guid.NewGuid();
             dbHelper = _helper;
@@ -776,7 +777,7 @@ namespace CRL
             if (c.Count == 0)
             {
                 return 0;
-                //throw new Exception("更新集合为空");
+                //throw new CRLException("更新集合为空");
             }
             var n = Update(expression, c);
             model.CleanChanges();
@@ -839,7 +840,7 @@ namespace CRL
                     var f = fields[key];
                     if (f == null)
                         continue;
-                    if (f.IsPrimaryKey || f.FieldType == Attribute.FieldType.虚拟字段)
+                    if (f.IsPrimaryKey || f.FieldType != Attribute.FieldType.数据库字段)
                         continue;
                     var value = item.Value;
                     //如果表示值为被追加 名称为$name
@@ -863,7 +864,7 @@ namespace CRL
             var origin = obj.OriginClone;
             if (origin == null)
             {
-                throw new Exception("_originClone为空,请确认此对象是由查询创建");
+                throw new CRLException("_originClone为空,请确认此对象是由查询创建");
             }
             foreach (var f in fields.Values)
             {

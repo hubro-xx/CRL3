@@ -18,11 +18,22 @@ namespace CRL.LambdaQuery
     {
         DbContext dbContext;
         DBAdapter.DBAdapterBase __DBAdapter;
-        public ExpressionVisitor(DBAdapter.DBAdapterBase _DBAdapter)
+        /// <summary>
+        /// 字段前辍 t1.
+        /// </summary>
+        Dictionary<Type, string> Prefixs;
+        public ExpressionVisitor(DBAdapter.DBAdapterBase _DBAdapter, Dictionary<Type, string> __Prefixs)
         {
+            Prefixs = __Prefixs;
             __DBAdapter = _DBAdapter;
             dbContext = _DBAdapter.dbContext;
         }
+
+        string FormatFieldPrefix(Type type, string fieldName)
+        {
+            return Prefixs[type] + __DBAdapter.KeyWordFormat(fieldName);
+        }
+
         /// <summary>
         /// 处理后的查询参数
         /// </summary>
@@ -55,7 +66,7 @@ namespace CRL.LambdaQuery
                 var dic = MethodAnalyze.GetMethos(_DBAdapter);
                 if (!dic.ContainsKey(method.MethodName))
                 {
-                    throw new Exception("LambdaQuery不支持方法" + method.MethodName);
+                    throw new CRLException("LambdaQuery不支持方法" + method.MethodName);
                 }
                 int newParIndex = parIndex;
                 par = dic[method.MethodName](method, ref newParIndex, AddParame);
@@ -63,10 +74,9 @@ namespace CRL.LambdaQuery
             }
 
             //字段会返回替换符
-            bool needPar = par.IndexOf("{") <= -1;//是否需要参数化处理
+            bool needPar = par1.Type == CRLExpression.CRLExpressionType.Value;//是否需要参数化处理
             if (!needPar)
             {
-                par = par.Replace("{VirtualField}", "");
                 par1.Data = par;
                 return par1;
             }
@@ -134,19 +144,15 @@ namespace CRL.LambdaQuery
                     var filed = TypeCache.GetProperties(type, true)[fieldName];
                     if (filed == null)
                     {
-                        throw new Exception("类型 " + type.Name + "." + fieldName + " 不是数据库字段,请检查查询条件");
+                        throw new CRLException("类型 " + type.Name + "." + fieldName + " 不是数据库字段,请检查查询条件");
                     }
                     if (!string.IsNullOrEmpty(filed.VirtualField))//按虚拟字段
                     {
-                        //如果没有使用$前辍
-                        if (!filed.VirtualField.Contains("$"))
-                        {
-                            filed.VirtualField = "{VirtualField}" + filed.VirtualField;
-                        }
                         //return filed.VirtualField;
-                        return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = filed.VirtualField };
+                        var queryField = filed.VirtualField.Replace("{" + type.FullName + "}", Prefixs[type]);//替换前辍
+                        return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
                     }
-                    var field = Base.FormatFieldPrefix(__DBAdapter, type, filed.MappingName);//格式化为别名
+                    var field = FormatFieldPrefix(type, filed.MapingName);//格式化为别名
                     //return field;
                     return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = field };
                 }
@@ -211,7 +217,7 @@ namespace CRL.LambdaQuery
                 //if (!dic.ContainsKey(methodName))
                 //{
                 //    //return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
-                //    throw new Exception("LambdaQuery不支持方法" + mcExp.Method.Name);
+                //    throw new CRLException("LambdaQuery不支持方法" + mcExp.Method.Name);
                 //}
                 string field = "";
                 #region par
@@ -227,7 +233,7 @@ namespace CRL.LambdaQuery
                     var mExpression = mcExp.Object as MemberExpression;
                     var type = mExpression.Expression.Type;
                     var filed2 = TypeCache.GetProperties(type, true)[field];
-                    field = Base.FormatFieldPrefix(__DBAdapter, type, filed2.MappingName);
+                    field = FormatFieldPrefix(type, filed2.MapingName);
                     if (mcExp.Arguments.Count > 0)
                     {
                         var obj = GetParameExpressionValue(mcExp.Arguments[0]);
@@ -324,11 +330,11 @@ namespace CRL.LambdaQuery
                 {
                     return RouteExpressionHandler(ue.Operand);
                 }
-                throw new Exception("未处理的一元运算" + ue.NodeType);
+                throw new CRLException("未处理的一元运算" + ue.NodeType);
             }
             else
             {
-                throw new Exception("不支持此语法解析:" + exp);
+                throw new CRLException("不支持此语法解析:" + exp);
             }
         }
         void AddParame(string name, object value)
@@ -336,8 +342,38 @@ namespace CRL.LambdaQuery
             QueryParames.Add(name, value);
             //parIndex += 1;
         }
+        static Dictionary<ExpressionType, string> expressionTypeCache = new Dictionary<ExpressionType, string>();
         public static string ExpressionTypeCast(ExpressionType expType)
         {
+            if (expressionTypeCache.Count == 0)
+            {
+                expressionTypeCache.Add(ExpressionType.And, "&");
+                expressionTypeCache.Add(ExpressionType.AndAlso, " AND ");
+                expressionTypeCache.Add(ExpressionType.Equal, "=");
+                expressionTypeCache.Add(ExpressionType.GreaterThan, ">");
+                expressionTypeCache.Add(ExpressionType.GreaterThanOrEqual, ">=");
+                expressionTypeCache.Add(ExpressionType.LessThan, "<");
+                expressionTypeCache.Add(ExpressionType.LessThanOrEqual, "<=");
+                expressionTypeCache.Add(ExpressionType.NotEqual, "<>");
+                expressionTypeCache.Add(ExpressionType.Or, "|");
+                expressionTypeCache.Add(ExpressionType.OrElse, " OR ");
+                expressionTypeCache.Add(ExpressionType.Add, "+");
+                expressionTypeCache.Add(ExpressionType.AddChecked, "+");
+                expressionTypeCache.Add(ExpressionType.Subtract, "-");
+                expressionTypeCache.Add(ExpressionType.SubtractChecked, "-");
+                expressionTypeCache.Add(ExpressionType.Multiply, "*");
+                expressionTypeCache.Add(ExpressionType.MultiplyChecked, "*");
+                expressionTypeCache.Add(ExpressionType.Divide, "/");
+                expressionTypeCache.Add(ExpressionType.Not, "!=");
+            }
+            string type;
+            var a = expressionTypeCache.TryGetValue(expType, out type);
+            if (a)
+            {
+                return type;
+            }
+            throw new InvalidCastException("不支持的运算符" + expType);
+            #region old
             switch (expType)
             {
                 case ExpressionType.And:
@@ -376,6 +412,7 @@ namespace CRL.LambdaQuery
                 default:
                     throw new InvalidCastException("不支持的运算符" + expType);
             }
+            #endregion
         }
         object GetParameExpressionValue(Expression expression)
         {
@@ -394,7 +431,7 @@ namespace CRL.LambdaQuery
                     {
                         string name = m.Member.Name;
                         var filed2 = TypeCache.GetProperties(m.Expression.Type, true)[name];
-                        return new ExpressionValueObj { Value = Base.FormatFieldPrefix(__DBAdapter, m.Expression.Type, filed2.MappingName), IsMember = true };
+                        return new ExpressionValueObj { Value = FormatFieldPrefix(m.Expression.Type, filed2.MapingName), IsMember = true };
                     }
                     else
                     {
@@ -428,9 +465,9 @@ namespace CRL.LambdaQuery
                 {
                     return ((PropertyInfo)mExp.Member).GetValue(instance, null);
                 }
-                throw new Exception("未能解析" + mExp.Member.MemberType);
+                throw new CRLException("未能解析" + mExp.Member.MemberType);
             }
-            throw new Exception("未能解析" + exp.NodeType);
+            throw new CRLException("未能解析" + exp.NodeType);
         }
     }
     internal class ExpressionValueObj

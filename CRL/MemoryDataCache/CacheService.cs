@@ -73,11 +73,16 @@ namespace CRL.MemoryDataCache
         {
             if (obj == null)
             {
-                throw new Exception("obj is null");
+                //throw new CRLException("obj is null");
+                return;
             }
             if (!cacheDatas.ContainsKey(typeKey))
                 return;
             var data = cacheDatas[typeKey].Data as Dictionary<string, TItem>;
+            if (data == null)
+            {
+                return;
+            }
             var keyValue = obj.GetpPrimaryKeyValue().ToString();
             if (!data.ContainsKey(keyValue))
             {
@@ -90,7 +95,7 @@ namespace CRL.MemoryDataCache
             TItem originObj = data[keyValue];
             if (c != null)//按更改的值
             {
-                var fields = TypeCache.GetProperties(obj.GetType(), false);
+                var fields = TypeCache.GetProperties(obj.GetType(), true);
                 var Reflection = ReflectionHelper.GetInfo<TItem>();
                 foreach (var f in c)
                 {

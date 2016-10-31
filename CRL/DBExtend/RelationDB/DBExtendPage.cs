@@ -77,7 +77,7 @@ namespace CRL.DBExtend.RelationDB
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(typeof(TModel));
-                rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MappingName);
+                rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
             var condition = query1.GetQueryConditions();
@@ -130,7 +130,7 @@ namespace CRL.DBExtend.RelationDB
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(typeof(TModel));
-                rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MappingName);
+                rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
             var condition = query1.GetQueryConditions();
@@ -182,12 +182,12 @@ namespace CRL.DBExtend.RelationDB
             var fields = query1.GetQueryFieldString();
             if (!conditions.Contains("group"))
             {
-                throw new Exception("缺少group语法");
+                throw new CRLException("缺少group语法");
             }
             var rowOver = query1.__QueryOrderBy;
             if (string.IsNullOrEmpty(rowOver))
             {
-                throw new Exception("Group分页需指定Group排序字段");
+                throw new CRLException("Group分页需指定Group排序字段");
                 //var table = TypeCache.GetTable(typeof(T));
                 //rowOver = string.Format("t1.{0} desc", table.PrimaryKey.Name);
             }
@@ -235,12 +235,12 @@ namespace CRL.DBExtend.RelationDB
             var fields = query1.GetQueryFieldString();
             if (!condition.Contains("group"))
             {
-                throw new Exception("缺少group语法");
+                throw new CRLException("缺少group语法");
             }
             var rowOver = query1.__QueryOrderBy;
             if (string.IsNullOrEmpty(rowOver))
             {
-                throw new Exception("Group分页需指定Group排序字段");
+                throw new CRLException("Group分页需指定Group排序字段");
                 //var table = TypeCache.GetTable(typeof(T));
                 //rowOver = string.Format("t1.{0} desc", table.PrimaryKey.Name);
             }

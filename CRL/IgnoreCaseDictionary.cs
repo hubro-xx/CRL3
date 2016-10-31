@@ -15,17 +15,20 @@ namespace CRL
     /// <summary>
     /// 不区分大小的字典
     /// </summary>
-    public class IgnoreCaseDictionary<T> : Dictionary<string, T> where T : class
+    public class IgnoreCaseDictionary<T> : Dictionary<string, T>
     {
         Dictionary<string, string> keyMaping = new Dictionary<string, string>();
         string getKey(string key)
         {
             var key2 = key.ToUpper();
-            if (!keyMaping.ContainsKey(key2))
+            string value;
+            var a = keyMaping.TryGetValue(key2, out value);
+            if (!a)
             {
                 keyMaping[key2] = key;
+                return key;
             }
-            return keyMaping[key2];
+            return value;
         }
         /// <summary>
         /// 获取键值,按小写
@@ -36,9 +39,9 @@ namespace CRL
         {
             get
             {
-                T obj = null;
+                T obj = default(T);
                 TryGetValue(getKey(key), out obj);
-                return obj as T;
+                return (T)obj;
             }
             set
             {

@@ -71,7 +71,7 @@ namespace CRL.DBExtend.RelationDB
             }
             ClearParame();
             query.RowCount = list.Count;
-            if (SettingConfig.AutoTrackingModel)
+            if (SettingConfig.AutoTrackingModel && query.__TrackingModel)
             {
                 SetOriginClone(list);
             }

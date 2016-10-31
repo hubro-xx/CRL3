@@ -126,7 +126,7 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public override string GetCreateColumnScript(Attribute.FieldAttribute field)
         {
-            string str = string.Format("alter table {0} add {1} {2};", field.TableName, field.MappingName, field.ColumnType);
+            string str = string.Format("alter table {0} add {1} {2};", field.TableName, field.MapingName, field.ColumnType);
             if (!string.IsNullOrEmpty(field.DefaultValue))
             {
                 str += string.Format(" default '{0}' ", field.DefaultValue);
@@ -145,8 +145,8 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
-            string indexName = string.Format("pk_{0}_{1}", filed.TableName, filed.MappingName);
-            string indexScript = string.Format("create {3} index {0} on {1}({2}); ", indexName, filed.TableName, filed.MappingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
+            string indexName = string.Format("pk_{0}_{1}", filed.TableName, filed.MapingName);
+            string indexScript = string.Format("create {3} index {0} on {1}({2}); ", indexName, filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
             return indexScript;
         }
 
@@ -166,11 +166,11 @@ namespace CRL.DBAdapter
             {
                 if (item.IsPrimaryKey)
                 {
-                    primaryKey = item.MappingName;
+                    primaryKey = item.MapingName;
                 }
                 var columnType = GetDBColumnType(item.PropertyType);
                 string nullStr = item.NotNull ? "NOT NULL" : "";
-                string str = string.Format("{0} {1} {2} ", item.MappingName, item.ColumnType, nullStr);
+                string str = string.Format("{0} {1} {2} ", item.MapingName, item.ColumnType, nullStr);
 
                 list2.Add(str);
 
@@ -254,7 +254,11 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             int id = Convert.ToInt32(helper.ExecScalar(sqlGetIndex));
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                string name = info.MappingName;
+                if (info.FieldType != Attribute.FieldType.数据库字段)
+                {
+                    continue;
+                }
+                string name = info.MapingName;
                 if (info.IsPrimaryKey && !info.KeepIdentity)
                 {
                     //continue;//手动插入ID
@@ -272,16 +276,16 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
                     }
                 }
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", info.MappingName);
-                sql2 += string.Format("@{0},", info.MappingName);
-                helper.AddParam(info.MappingName, value);
+                sql1 += string.Format("{0},", info.MapingName);
+                sql2 += string.Format("@{0},", info.MapingName);
+                helper.AddParam(info.MapingName, value);
             }
             sql1 = sql1.Substring(0, sql1.Length - 1);
             sql2 = sql2.Substring(0, sql2.Length - 1);
             sql += sql1 + ") values( " + sql2 + ")";
             sql = SqlFormat(sql);
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
-            helper.SetParam(primaryKey.MappingName, id);
+            helper.SetParam(primaryKey.MapingName, id);
             helper.Execute(sql);
             //var helper2 = helper as CoreHelper.OracleHelper;
             //int id = helper2.Insert(sql,sequenceName);

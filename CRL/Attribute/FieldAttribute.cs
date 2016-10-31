@@ -37,7 +37,7 @@ namespace CRL.Attribute
         {
             get
             {
-                if (MappingName.ToLower() == "id")
+                if (MapingName.ToLower() == "id")
                 {
                     return true;
                 }
@@ -117,7 +117,7 @@ namespace CRL.Attribute
         /// 映射字段名
         /// MongoDB不支持表和字段别名
         /// </summary>
-        public string MappingName
+        public string MapingName
         {
             get
             {
@@ -147,21 +147,22 @@ namespace CRL.Attribute
         /// <param name="withTablePrefix">是否生按表生成前辍,关联时用 如Table__Name</param>
         /// <param name="mapingName">别名,空则按字段名,没有AS</param>
         /// <param name="fieldName">自定义查询字段名,空则按Name</param>
-        internal void SetFieldQueryScript2(DBAdapter.DBAdapterBase _DBAdapter, bool usePrefix, bool withTablePrefix, string mapingName,string fieldName="")
+        internal void SetFieldQueryScript2(DBAdapter.DBAdapterBase _DBAdapter, string usePrefix, bool withTablePrefix, string mapingName,string fieldName="")
         {
             string query = "";
-            if (usePrefix)
+            if (!string.IsNullOrEmpty(usePrefix))
             {
-                query += "{" + ModelType.FullName + "}";
+                //query += "{" + ModelType.FullName + "}";
+                query += usePrefix;
             }
             if (string.IsNullOrEmpty(fieldName))
             {
-                fieldName = withTablePrefix ? MappingName : _DBAdapter.KeyWordFormat(MappingName);
+                fieldName = withTablePrefix ? MapingName : _DBAdapter.KeyWordFormat(MapingName);
             }
             //判断虚拟字段
             if (FieldType == Attribute.FieldType.虚拟字段)
             {
-                query = VirtualField;
+                query = VirtualField.Replace("{" + ModelType.FullName + "}", usePrefix);//替换前辍
                 mapingName = MemberName;
             }
             else
@@ -325,7 +326,7 @@ namespace CRL.Attribute
             //}
             //catch(Exception ero)
             //{
-            //    throw new Exception(ero.Message + " 在属性" + propertyInfo.Name + " " + propertyInfo.PropertyType);
+            //    throw new CRLException(ero.Message + " 在属性" + propertyInfo.Name + " " + propertyInfo.PropertyType);
             //}
             propertyInfo.SetValue(obj, value, null);
         }

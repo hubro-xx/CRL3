@@ -54,9 +54,19 @@ namespace WebTest
         {
             //var n=Test();
             //Response.Write(n);
-            var a = 10;
-            var item = new Code.ProductData() {  Id=10};
-            Code.ProductDataManage.Instance.QueryItem(b => b.Id == Default.data2.Id);
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+
+            query.Select(b => new
+            {
+                b.Id,b.ProductName
+            });
+            var year = DateTime.Now.Year;
+            query.Where(b => b.Year == year);//虚拟字段
+
+            query.Where(b => 0 < b.Id);//不再区分左边右边了
+    
+            query.OrderBy(b => b.Id * 1);
+            var list = query.ToDictionary<int,string>();
             //TestJoin();
             //TestFileMapping();
             //Response.End();
