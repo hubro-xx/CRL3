@@ -33,6 +33,7 @@ namespace WebTest.Code
             var year = DateTime.Now.Year;
             query.Where(b => b.Year == year);//虚拟字段
             #region 扩展方法
+            query.Where(b => b.IsTop);//没有运算符的bool一元运算
             query.Where(b => 0 < b.Id);//不再区分左边右边了
             query.Where(b => b.Id < b.Number);//直接比较可以解析通过
             query.Where(b => b.ProductName.Contains("122"));//包含字符串

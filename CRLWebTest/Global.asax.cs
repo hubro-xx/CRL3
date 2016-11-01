@@ -55,14 +55,14 @@ namespace WebTest
             //增加处理规则
             CRL.CacheServerSetting.AddCacheServerDealDataRule(typeof(Code.ProductData), Code.ProductDataManage.Instance.DeaCacheCommand);
             //启动服务端
-            var cacheServer = new CRL.CacheServer.TcpServer(1129);
+            var cacheServer = new CRL.CacheServer.TcpServer(1136);
             cacheServer.Start();
             #endregion
 
             //实现缓存客户端调用
             //有多个服务器添加多个
             //要使用缓存服务,需要设置ProductDataManage.QueryCacheFromRemote 为 true
-            CRL.CacheServerSetting.AddTcpServerListen("127.0.0.1", 1129);
+            CRL.CacheServerSetting.AddTcpServerListen("127.0.0.1", 1136);
             CRL.CacheServerSetting.Init();
         }
 

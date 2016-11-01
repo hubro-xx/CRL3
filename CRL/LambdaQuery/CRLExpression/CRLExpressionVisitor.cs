@@ -222,7 +222,6 @@ namespace CRL.LambdaQuery.CRLExpression
             }
             else//按属性运算 如b.Id==1
             {
-                //todo 暂不支持属性间比较  b=>b.Id>b.Number
                 var member = creater.CreatePropertyExpression(left.Data.ToString());
                 return dic[type](member, right.Data);
             }

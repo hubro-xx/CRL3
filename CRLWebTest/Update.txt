@@ -266,6 +266,7 @@
 	修改了一些关键字错误
 2016-9-10
 	增加SettingConfig.AutoTrackingModel 以设置是否自动跟踪对象更改
+	增加WithTrackingModel查询设置,联合一起用
 	增加IModel.BeginTracking方法,手动跟踪对象更改
 2016-9-22
 	优化映射,更快了
@@ -278,3 +279,6 @@
 	版本升级为4.1
 2016-10-20
 	优化字符串操作
+2016-11-01
+	修正了bool一元运算解析
+	query.Where(b => b.IsTop);解析为IsTop=1

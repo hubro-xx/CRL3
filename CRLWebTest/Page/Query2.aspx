@@ -22,12 +22,13 @@
                 query.Where(b => 10 > b.Id);和query.Where(b => b.Id < 10 ); 等效
             </li>
             <li>
-                支持字段类型转换运行<br />
+                支持字段类型转换运算<br />
                 query.Where(b => b.Id.ToString() == "123"); 等效为 cast(id as nvarchar)
             </li>
             <li>
                 一元运算支持
                 <br />
+                query.Where(b => b.IsTop);//没有运算符的bool一元运算<br />
                 query.Where(b => !b.IsTop)//等效为 isTop!=1 目前只处理了BOOL类型
                 <br />
                 query.Where(b => !b.ProductName.Contains("122"))//BOOL类型的扩展方法同样支持

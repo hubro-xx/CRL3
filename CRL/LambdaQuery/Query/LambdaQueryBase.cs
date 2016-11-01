@@ -338,7 +338,7 @@ namespace CRL.LambdaQuery
             //string condition;
             if (expressionBody == null)
                 return null;
-            var result = __Visitor.RouteExpressionHandler(expressionBody);
+            var result = __Visitor.RouteExpressionHandler(expressionBody,firstLevel:true);
             if (string.IsNullOrEmpty(result.SqlOut))//没有构成树
             {
                 string typeStr2 = "";
@@ -357,7 +357,7 @@ namespace CRL.LambdaQuery
             string condition;
             if (expressionBody == null)
                 return "";
-            condition = __Visitor.RouteExpressionHandler(expressionBody).SqlOut;
+            condition = __Visitor.RouteExpressionHandler(expressionBody,firstLevel:true).SqlOut;
             //GetPrefix(typeof(TInner));
             condition = ReplacePrefix(condition);
             return condition;

@@ -108,6 +108,25 @@ namespace CRL.LambdaQuery
             string typeStr = ExpressionTypeCast(type);
 
             var rightPar = RouteExpressionHandler(right);
+            #region 修正bool值一元运算
+            //t1.isTop=1
+            if (leftPar.Type == CRLExpression.CRLExpressionType.Binary && rightPar.Type == CRLExpression.CRLExpressionType.Name)
+            {
+                var proType = ((MemberExpression)right).Type;
+                if (proType == typeof(bool))
+                {
+                    rightPar.Data = rightPar.Data + "=1";
+                }
+            }
+            else if (rightPar.Type == CRLExpression.CRLExpressionType.Binary && leftPar.Type == CRLExpression.CRLExpressionType.Name)
+            {
+                var proType = ((MemberExpression)left).Type;
+                if (proType == typeof(bool))
+                {
+                    leftPar.Data = leftPar.Data + "=1";
+                }
+            }
+            #endregion
             string typeStr2;
             leftPar = DealParame(leftPar, typeStr, out typeStr2);
             sb.Append(leftPar.Data);
@@ -124,9 +143,15 @@ namespace CRL.LambdaQuery
             return e;
         }
 
-        public CRLExpression.CRLExpression RouteExpressionHandler(Expression exp, ExpressionType? nodeType = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <param name="nodeType"></param>
+        /// <param name="firstLevel">是否首次调用,来用修正bool一元运算</param>
+        /// <returns></returns>
+        public CRLExpression.CRLExpression RouteExpressionHandler(Expression exp, ExpressionType? nodeType = null, bool firstLevel = false)
         {
-            //todo 解析不了不带运算符的一元运算 如 b=>b.IsNew
             if (exp is BinaryExpression)
             {
                 BinaryExpression be = (BinaryExpression)exp;
@@ -154,6 +179,11 @@ namespace CRL.LambdaQuery
                     }
                     var field = FormatFieldPrefix(type, filed.MapingName);//格式化为别名
                     //return field;
+                    if (firstLevel)
+                    {
+                        //修正bool值一元运算 t1.isTop=1
+                        field += "=1";
+                    }
                     return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = field };
                 }
                 #endregion
@@ -240,21 +270,13 @@ namespace CRL.LambdaQuery
                         args.Add(obj);
                     }
                 }
-                
                 if (mcExp.Arguments.Count > 1)
                 {
-                    var obj = GetParameExpressionValue(mcExp.Arguments[1]);
-                    args.Add(obj);
-                }
-                if (mcExp.Arguments.Count > 2)
-                {
-                    var obj = GetParameExpressionValue(mcExp.Arguments[2]);
-                    args.Add(obj);
-                }
-                if (mcExp.Arguments.Count > 3)
-                {
-                    var obj = GetParameExpressionValue(mcExp.Arguments[3]);
-                    args.Add(obj);
+                    for (int i = 1; i < mcExp.Arguments.Count; i++)
+                    {
+                        var obj = GetParameExpressionValue(mcExp.Arguments[i]);
+                        args.Add(obj);
+                    }
                 }
                 #endregion
                 //int newParIndex = parIndex;
