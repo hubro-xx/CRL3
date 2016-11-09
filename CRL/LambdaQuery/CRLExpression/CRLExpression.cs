@@ -61,6 +61,7 @@ namespace CRL.LambdaQuery.CRLExpression
 
 
         [System.Xml.Serialization.XmlIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public string SqlOut
         {
             get;

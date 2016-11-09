@@ -56,6 +56,7 @@ namespace CRL
             var body = Expression.Equal(member, constant);
             //获取Lambda表达式
             var lambda = Expression.Lambda<Func<TModel, Boolean>>(body, parameter);
+            //var pr = lambda.Compile();
             return lambda;
         }
         /// <summary>

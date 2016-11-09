@@ -142,7 +142,7 @@ namespace CRL
             if (obj.CheckRepeatedInsert)
             {
                 string concurrentKey = "insertRepeatedCheck_" + CoreHelper.StringHelper.EncryptMD5(sb.ToString());
-                if (!CoreHelper.ConcurrentControl.Check(concurrentKey, 3))
+                if (!CoreHelper.ConcurrentControl.Check(concurrentKey, 1))
                 {
                     throw new CRLException("检测到有重复提交的数据");
                 }

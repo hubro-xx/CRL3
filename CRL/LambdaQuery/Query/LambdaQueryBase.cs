@@ -192,7 +192,7 @@ namespace CRL.LambdaQuery
                 //    mExp = (MemberExpression)expressionBody;
                 //}
                 mExp = (MemberExpression)expressionBody;
-                var aliasName = GetPrefix(mExp.Expression.Type);
+                //var aliasName = GetPrefix(mExp.Expression.Type);
                 var f = allFilds[mExp.Expression.Type][mExp.Member.Name].Clone();
                 //f.SetFieldQueryScript(aliasName, true, false);
                 f.SetFieldQueryScript2(__DBAdapter, GetPrefix(f.ModelType), withTablePrefix, "");
@@ -357,7 +357,7 @@ namespace CRL.LambdaQuery
             string condition;
             if (expressionBody == null)
                 return "";
-            condition = __Visitor.RouteExpressionHandler(expressionBody,firstLevel:true).SqlOut;
+            condition = __Visitor.RouteExpressionHandler(expressionBody, firstLevel: true).SqlOut;
             //GetPrefix(typeof(TInner));
             condition = ReplacePrefix(condition);
             return condition;

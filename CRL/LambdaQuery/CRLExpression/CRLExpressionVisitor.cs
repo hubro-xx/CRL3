@@ -208,6 +208,7 @@ namespace CRL.LambdaQuery.CRLExpression
             dic.Add("Less", creater.Less);
             dic.Add("GreaterThan", creater.GreaterThan);
             dic.Add("LessThan", creater.LessThan);
+            //todo 更多方法解析
             if (!dic.ContainsKey(type))
             {
                 throw new CRLException("没有对应的运算方法 " + type);
@@ -238,6 +239,7 @@ namespace CRL.LambdaQuery.CRLExpression
             dic.Add("Contains", creater.Contains);
             dic.Add("StartsWith", creater.StartsWith);
             dic.Add("EndsWith", creater.EndsWith);
+            //todo 更多方法解析
             if (!dic.ContainsKey(methodName))
             {
                 throw new CRLException("没有对应的方法 " + methodName);

@@ -43,12 +43,19 @@ namespace CRL.LambdaQuery
                     .Equal(value)
                     .ToLambda<Func<T, bool>>(parameter);
         }
+        ParameterExpression currentParameter = null;
         /// <summary>
         /// 创建参数
         /// </summary>
         private ParameterExpression CreateParameter()
         {
-            return Expression.Parameter(typeof(T), "b");
+            if (currentParameter == null)
+            {
+                //expression.Compile()时
+                //只能创建一次,否则提示跨作用域
+                currentParameter = Expression.Parameter(typeof(T), "b");
+            }
+            return currentParameter;
         }
 
         #endregion

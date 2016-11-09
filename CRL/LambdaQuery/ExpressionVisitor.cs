@@ -166,25 +166,26 @@ namespace CRL.LambdaQuery
                 {
                     var fieldName = mExp.Member.Name;
                     var type = mExp.Expression.Type;
-                    var filed = TypeCache.GetProperties(type, true)[fieldName];
-                    if (filed == null)
+                    CRL.Attribute.FieldAttribute field ;
+                    var a = TypeCache.GetProperties(type, true).TryGetValue(fieldName, out field);
+                    if (!a)
                     {
                         throw new CRLException("类型 " + type.Name + "." + fieldName + " 不是数据库字段,请检查查询条件");
                     }
-                    if (!string.IsNullOrEmpty(filed.VirtualField))//按虚拟字段
+                    if (!string.IsNullOrEmpty(field.VirtualField))//按虚拟字段
                     {
                         //return filed.VirtualField;
-                        var queryField = filed.VirtualField.Replace("{" + type.FullName + "}", Prefixs[type]);//替换前辍
+                        var queryField = field.VirtualField.Replace("{" + type.FullName + "}", Prefixs[type]);//替换前辍
                         return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
                     }
-                    var field = FormatFieldPrefix(type, filed.MapingName);//格式化为别名
+                    var fieldStr = FormatFieldPrefix(type, field.MapingName);//格式化为别名
                     //return field;
                     if (firstLevel)
                     {
                         //修正bool值一元运算 t1.isTop=1
-                        field += "=1";
+                        fieldStr += "=1";
                     }
-                    return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = field };
+                    return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr };
                 }
                 #endregion
                 var obj = GetParameExpressionValue(mExp);
