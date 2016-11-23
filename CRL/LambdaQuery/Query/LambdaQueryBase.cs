@@ -477,6 +477,10 @@ namespace CRL.LambdaQuery
         internal abstract string GetQuery();
         internal List<Attribute.FieldMapping> GetFieldMapping()
         {
+            if (__QueryFields.Count == 0)
+            {
+                SelectAll();
+            }
             return __QueryFields.Select(b => b.FieldMapping).ToList();
         }
     }
