@@ -1,3 +1,4 @@
+using CRL.LambdaQuery.Mapping;
 /**
 * CRL 快速开发框架 V4.0
 * Copyright (c) 2016 Hubro All rights reserved.
@@ -119,83 +120,7 @@ namespace CRL
             }
             return Convert.ChangeType(value, type);
         }
-        #region GetDataReaderValue
-        static Dictionary<Type, Func<DbDataReader, int, object>> convertDataReaderMethod = new Dictionary<Type, Func<DbDataReader, int, object>>();
-        internal static object GetDataReaderValue(DbDataReader _reader, Type propType, int _index)
-        {
-            if (propType.IsEnum)
-            {
-                propType = propType.GetEnumUnderlyingType();
-            }
-            if (propType.FullName.StartsWith("System.Nullable"))
-            {
-                //Nullable<T> 可空属性
-                propType = propType.GenericTypeArguments[0];
-            }
-            if (convertDataReaderMethod.Count == 0)
-            {
-                convertDataReaderMethod.Add(typeof(string), (reader, index) =>
-                {
-                    return reader.GetString(index);
-                });
-                convertDataReaderMethod.Add(typeof(int), (reader, index) =>
-                {
-                    return reader.GetInt32(index);
-                });
-                convertDataReaderMethod.Add(typeof(DateTime), (reader, index) =>
-                {
-                    return reader.GetDateTime(index);
-                });
-                convertDataReaderMethod.Add(typeof(long), (reader, index) =>
-                {
-                    return reader.GetInt64(index);
-                });
-                convertDataReaderMethod.Add(typeof(float), (reader, index) =>
-                {
-                    return reader.GetFloat(index);
-                });
-                convertDataReaderMethod.Add(typeof(double), (reader, index) =>
-                {
-                    return reader.GetDouble(index);
-                });
-                convertDataReaderMethod.Add(typeof(Guid), (reader, index) =>
-                {
-                    return reader.GetGuid(index);
-                });
-                convertDataReaderMethod.Add(typeof(short), (reader, index) =>
-                {
-                    return reader.GetInt16(index);
-                });
-                convertDataReaderMethod.Add(typeof(byte), (reader, index) =>
-                {
-                    return reader.GetByte(index);
-                });
-                convertDataReaderMethod.Add(typeof(char), (reader, index) =>
-                {
-                    return reader.GetChar(index);
-                });
-                convertDataReaderMethod.Add(typeof(decimal), (reader, index) =>
-                {
-                    return reader.GetDecimal(index);
-                });
-                convertDataReaderMethod.Add(typeof(byte[]), (reader, index) =>
-                {
-                    return reader.GetValue(index);
-                });
-                convertDataReaderMethod.Add(typeof(bool), (reader, index) =>
-                {
-                    return reader.GetBoolean(index);
-                });
-            }
-            Func<DbDataReader, int, object> method;
-            var a = convertDataReaderMethod.TryGetValue(propType, out method);
-            if (a)
-            {
-                return method(_reader, _index);
-            }
-            return _reader.GetValue(_index);
-        }
-        #endregion
+        
         /// <summary>
         /// 转换为为强类型
         /// </summary>
@@ -214,206 +139,89 @@ namespace CRL
         internal struct ActionItem<T>
         {
             public Action<T, object> Set;
+            public Action<object, object> Set2;
+            public void DoSet(T obj ,object[] values)
+            {
+                if (Set != null)
+                {
+                    Set(obj, values[ValueIndex]);
+                }
+                else
+                {
+                    Set2(obj, values[ValueIndex]);
+                }
+            }
             public string Name;
             public int ValueIndex;
-            public void SetValue(T item, object[] values)
+            void SetValue(T item, object[] values)
             {
                 Set(item, values[ValueIndex]);
             }
         }
         #region 返回object
-        internal static List<TItem> DataReaderToList<TItem>(DbDataReader reader, out double runTime, bool setConstraintObj = false) where TItem : class, new()
-        {
-            var mainType = typeof(TItem);
-            return DataReaderToList<TItem>(reader, mainType, out runTime, setConstraintObj);
-        }
-        internal static List<T> DataReaderToList<T>(DbDataReader reader, Type mainType, out double runTime, bool setConstraintObj = false) where T : class, new()
+        /// <summary>
+        /// 仅缓存查询用
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="mainType"></param>
+        /// <param name="mapping"></param>
+        /// <param name="runTime"></param>
+        /// <returns></returns>
+        internal static List<object> DataReaderToObjectList(DbDataReader reader, Type mainType, List<Attribute.FieldMapping> mapping,out double runTime)
         {
             //rem mainType 不一定为T
             var sw = new Stopwatch();
             sw.Start();
-            var list = new List<T>();
+            var list = new List<object>();
             var typeArry = TypeCache.GetTable(mainType).Fields;
             var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 columns.Add(reader.GetName(i).ToLower(), i);
             }
-            var reflection = ReflectionHelper.GetInfo<T>();
-            var actions = new List<ActionItem<T>>();
-            var first = true;
+            var actions = new List<ActionItem<object>>();
 
-            var canTuple = mainType == typeof(T);
             object[] values = new object[reader.FieldCount];
-            while (reader.Read())
+            foreach (var mp in mapping)
             {
-                object objInstance;
-                if (canTuple)
+                var fieldName = mp.QueryName.ToLower();
+                var info = typeArry.Find(b => b.MemberName == mp.MappingName);
+                if (info == null)
                 {
-                    objInstance = reflection.CreateObjectInstance();
+                    continue;
                 }
-                else
-                {
-                    objInstance = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
-                }
-                reader.GetValues(values);
-                var detailItem = DataReaderToObj<T>(columns, values, reflection, canTuple, objInstance, typeArry, actions, first) as T;
-                list.Add(detailItem);
-                first = false;
+                var action = new ActionItem<object>() { Set2 = info.SetValue, Name = mp.MappingName, ValueIndex = columns[fieldName] };
+                columns.Remove(fieldName);
+                actions.Add(action);
             }
-            reader.Close();
-            reader.Dispose();
-            sw.Stop();
-            runTime = sw.ElapsedMilliseconds;
-            //Console.WriteLine("CRL映射用时:" + runTime);
-            return list;
-        }
-
-        internal static object DataReaderToObj<T>(IDictionary<string,int> columns, object[] values, ReflectionInfo<T> reflection, bool canTuple, object detailItem, IEnumerable<Attribute.FieldAttribute> typeArry, List<ActionItem<T>> actions, bool first) where T : class,new()
-        {
-            IModel obj2 = null;
-            if (detailItem is IModel)
-            {
-                obj2 = detailItem as IModel;
-                obj2.BoundChange = false;
-            }
-            //return detailItem;
-            if (first)
-            {
-                #region foreach field
-                foreach (Attribute.FieldAttribute info in typeArry)
-                {
-                    ActionItem<T> action;
-                    string fieldName;
-                    if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
-                    {
-                        string tab = TypeCache.GetTableName(info.ConstraintType, null);
-                        fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
-                    }
-                    else
-                    {
-                        fieldName = info.MapingName.ToLower();
-                    }
-                    if (columns.ContainsKey(fieldName))
-                    {
-                        if (canTuple)
-                        {
-                            var accessor = reflection.GetAccessor(info.MemberName);
-                            action = new ActionItem<T>() { Set = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
-                        }
-                        else
-                        {
-                            action = new ActionItem<T>() { Set = info.SetValue, Name = fieldName, ValueIndex = columns[fieldName] };
-                        }
-                        columns.Remove(fieldName);
-                        actions.Add(action);
-                        action.Set((T)detailItem, values[action.ValueIndex]);
-                    }
-                }
-                #endregion
-            }
-            else
-            {
-                foreach (var item in actions)
-                {
-                    //ActionItem<T> item = actions[i];
-                    item.Set((T)detailItem, values[item.ValueIndex]);
-                }
-            }
-
-            if (obj2 != null && columns.Count > 0)
-            {
-                foreach (var item in columns)
-                {
-                    var col = item.Key;
-                    var n = col.LastIndexOf("__");
-                    if (n == -1)
-                    {
-                        continue;
-                    }
-                    var mapingName = col.Substring(n + 2);
-                    //obj2[mapingName] = values[item.Value];
-                    obj2.SetIndexData(mapingName, values[item.Value]);
-                }
-                obj2.BoundChange = true;
-            }
-            return detailItem;
-        }
-
-        #endregion
-        #region 返回T 按IModel
-        internal static List<T> DataReaderToIModelList<T>(DbDataReader reader, out double runTime, bool setConstraintObj = false) where T : IModel, new()
-        {
-            var mainType = typeof(T);
-            var sw = new Stopwatch();
-            sw.Start();
-            var list = new List<T>();
-            var typeArry = TypeCache.GetTable(mainType).Fields;
-            var columns = new Dictionary<string, int>();
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                columns.Add(reader.GetName(i).ToLower(), i);
-            }
-            var reflection = ReflectionHelper.GetInfo<T>();
-            var actions = new List<ActionItem<T>>();
-            var first = true;
-            object[] values = new object[reader.FieldCount];
             while (reader.Read())
             {
                 reader.GetValues(values);
-                T detailItem = reflection.CreateObjectInstance();
-                detailItem.BoundChange = false;
-                if (first)
+                var detailItem = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
+                foreach (var ac in actions)
                 {
-                    #region foreach field
-                    foreach (Attribute.FieldAttribute info in typeArry)
-                    {
-                        ActionItem<T> action;
-                        string fieldName;
-                        if (info.FieldType == Attribute.FieldType.关联字段)//按外部字段
-                        {
-                            string tab = TypeCache.GetTableName(info.ConstraintType, null);
-                            fieldName = info.GetTableFieldFormat(tab, info.ConstraintResultField).ToLower();
-                        }
-                        else
-                        {
-                            fieldName = info.MapingName.ToLower();
-                        }
-                        if (columns.ContainsKey(fieldName))
-                        {
-                            var accessor = reflection.GetAccessor(info.MemberName);
-                            action = new ActionItem<T>() { Set = accessor.Set, Name = fieldName, ValueIndex = columns[fieldName] };
-                            columns.Remove(fieldName);
-                            actions.Add(action);
-                            action.SetValue(detailItem, values);
-                        }
-                    }
-                    #endregion
-                    first = false;
-                }
-                else
-                {
-                    foreach (var ac in actions)
-                    {
-                        ac.SetValue(detailItem, values);
-                    }
+                    ac.DoSet(detailItem, values);
                 }
                 #region 剩下的放索引
-                foreach (var item in columns)
+                //按IModel算
+                if (columns.Count > 0)
                 {
-                    var col = item.Key;
-                    var n = col.LastIndexOf("__");
-                    if (n == -1)
+                    var model = detailItem as IModel;
+                    foreach (var item in columns)
                     {
-                        continue;
+                        var col = item.Key;
+                        var n = col.LastIndexOf("__");
+                        if (n == -1)
+                        {
+                            continue;
+                        }
+                        var mapingName = col.Substring(n + 2);
+                        model.SetIndexData(mapingName, values[item.Value]);
                     }
-                    var mapingName = col.Substring(n + 2);
-                    //detailItem[mapingName] = values[item.Value];
-                    detailItem.SetIndexData(mapingName, values[item.Value]);
                 }
-                detailItem.BoundChange = true;
                 #endregion
                 list.Add(detailItem);
+
             }
             reader.Close();
             reader.Dispose();
@@ -422,7 +230,71 @@ namespace CRL
             //Console.WriteLine("CRL映射用时:" + runTime);
             return list;
         }
-
+        #endregion
+        #region 返回指定类型
+        /// <summary>
+        /// 返回指定类型,支持强类型和匿名类型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="queryInfo"></param>
+        /// <returns></returns>
+        internal static List<T> DataReaderToSpecifiedList<T>(DbDataReader reader,QueryInfo<T> queryInfo)
+        {
+            var objCreater = queryInfo.ObjCreater;
+            var mapping = queryInfo.Mapping;
+            var list = new List<T>();
+            var columns = new Dictionary<string, int>();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columns.Add(reader.GetName(i).ToLower(), i);
+            }
+            var actions = new List<ActionItem<T>>();
+            object[] values = new object[reader.FieldCount];
+            foreach (var mp in mapping)
+            {
+                var fieldName = mp.QueryName.ToLower();
+                var accessor = queryInfo.Reflection.GetAccessor(mp.MappingName);
+                if (accessor == null)
+                    continue;
+                var action = new ActionItem<T>() { Set = accessor.Set, Name = mp.MappingName, ValueIndex = columns[fieldName] };
+                columns.Remove(fieldName);
+                actions.Add(action);
+            }
+            while (reader.Read())
+            {
+                reader.GetValues(values);
+                var dataContainer = new DataContainer(values);
+                T detailItem = objCreater(dataContainer);
+                foreach (var ac in actions)
+                {
+                    ac.DoSet(detailItem, values);
+                }
+                #region 剩下的放索引
+                //按IModel算
+                if (columns.Count > 0)
+                {
+                    var model = detailItem as IModel;
+                    foreach (var item in columns)
+                    {
+                        var col = item.Key;
+                        var n = col.LastIndexOf("__");
+                        if (n == -1)
+                        {
+                            continue;
+                        }
+                        var mapingName = col.Substring(n + 2);
+                        model.SetIndexData(mapingName, values[item.Value]);
+                    }
+                }
+                #endregion
+                list.Add(detailItem);
+            }
+            reader.Close();
+            reader.Dispose();
+            //Console.WriteLine("CRL映射用时:" + runTime);
+            return list;
+        }
         #endregion
         /// <summary>
         /// DataRead转为字典

@@ -28,20 +28,18 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="query"></param>
         /// <param name="cacheKey">cacheKey</param>
         /// <returns></returns>
-        public override List<TModel> QueryList<TModel>(LambdaQuery<TModel> query, out string cacheKey)
+        public override List<TModel> QueryOrFromCache<TModel>(LambdaQuery<TModel> query, out string cacheKey)
         {
             cacheKey = "";
             CheckTableCreated<TModel>();
             if (query.SkipPage > 0)//按分页
             {
-                return Page<TModel, TModel>(query);
+                return QueryResult<TModel>(query);
             }
-            string sql = "";
             cacheKey = "";
-            query.FillParames(this);
-            sql = query.GetQuery();
-            sql = _DBAdapter.SqlFormat(sql);
             System.Data.Common.DbDataReader reader;
+            query.FillParames(this);
+            var sql = query.GetQuery();
             var cacheTime = query.__ExpireMinute;
             var compileSp = query.__CompileSp;
             List<TModel> list = new List<TModel>();
@@ -62,12 +60,14 @@ namespace CRL.DBExtend.RelationDB
                     reader = dbHelper.RunDataReader(sp);
                 }
                 query.ExecuteTime += dbHelper.ExecuteTime;
-                list = ObjectConvert.DataReaderToIModelList<TModel>(reader, out runTime, true);
+                //list = ObjectConvert.DataReaderToIModelList<TModel>(reader, out runTime);
+                var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetFieldMapping());
+                list = ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
                 query.MapingTime += runTime;
             }
             else
             {
-                list = MemoryDataCache.CacheService.GetCacheList<TModel>(sql, cacheTime, dbHelper, out cacheKey).Values.ToList();
+                list = MemoryDataCache.CacheService.GetCacheList<TModel>(sql, query.GetFieldMapping(), cacheTime, dbHelper, out cacheKey).Values.ToList();
             }
             ClearParame();
             query.RowCount = list.Count;

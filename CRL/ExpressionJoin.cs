@@ -11,7 +11,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-
+using CRL.LambdaQuery;
 namespace CRL
 {
     /// <summary>
@@ -20,6 +20,17 @@ namespace CRL
     /// <typeparam name="T"></typeparam>
     public class ExpressionJoin<T> where T : class
     {
+        IEnumerable<T> data;
+        /// <summary>
+        /// 列表筛选
+        /// </summary>
+        /// <param name="_data"></param>
+        /// <param name="expr1"></param>
+        public ExpressionJoin(IEnumerable<T> _data, Expression<Func<T, bool>> expr1 = null)
+        {
+            data = _data;
+            currentExpression = expr1;
+        }
         Expression<Func<T, bool>> currentExpression;
         /// <summary>
         /// 获取最终表达式
@@ -29,14 +40,7 @@ namespace CRL
         {
             return currentExpression;
         }
-        /// <summary>
-        /// 可拼接的Lambda表达式
-        /// </summary>
-        /// <param name="expr1"></param>
-        public ExpressionJoin(Expression<Func<T, bool>> expr1=null)
-        {
-            currentExpression = expr1;
-        }
+ 
         /// <summary>
         /// 当前条件And
         /// </summary>
@@ -45,25 +49,13 @@ namespace CRL
         {
             if (currentExpression != null)
             {
-                var exp = And(currentExpression, expr2);
+                var exp = currentExpression.And(expr2);
                 currentExpression = exp;
             }
             else
             {
                 currentExpression = expr2;
             }
-        }
-        /// <summary>
-        /// 组合And
-        /// </summary>
-        /// <param name="expr1"></param>
-        /// <param name="expr2"></param>
-        /// <returns></returns>
-        public Expression<Func<T, bool>> And(Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2)
-        {
-            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
-            var newExpr = Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
-            return newExpr as Expression<Func<T, bool>>;
         }
         /// <summary>
         /// 当前条件Or
@@ -73,7 +65,7 @@ namespace CRL
         {
             if (currentExpression != null)
             {
-                var exp = Or(currentExpression, expr2);
+                var exp = currentExpression.Or(expr2);
                 currentExpression = exp;
             }
             else
@@ -81,82 +73,47 @@ namespace CRL
                 currentExpression = expr2;
             }
         }
-        /// <summary>
-        /// 组合Or
-        /// </summary>
-        /// <param name="expr1"></param>
-        /// <param name="expr2"></param>
-        /// <returns></returns>
-        public Expression<Func<T, bool>> Or(Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2)
-        {
-            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
-            var newExpr = Expression.Lambda<Func<T, bool>>(Expression.OrElse(expr1.Body, invokedExpr), expr1.Parameters);
-            return newExpr as Expression<Func<T, bool>>;
-        }
-        /// <summary>
-        /// 查询出结果
-        /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public IEnumerable<T> Where(IEnumerable<T> list)
-        {
-            if (currentExpression == null)
-            {
-                return list;
-            }
-            var result = list.Where(currentExpression.Compile());
-            try
-            {
-                result.Count();
-            }
-            catch
-            {
-                return new List<T>();
-            }
-            return result;
-        }
+    
         /// <summary>
         /// 动态排序
         /// </summary>
-        /// <param name="list"></param>
         /// <param name="sortName"></param>
         /// <param name="desc"></param>
         /// <returns></returns>
-        public IEnumerable<T> OrderBy(IEnumerable<T> list, string sortName, bool desc)
+        public IEnumerable<T> OrderBy(string sortName, bool desc)
         {
-            if (list == null || list.Count() == 0)
-                return list;
-            Type type = list.FirstOrDefault().GetType();
+            if (data == null || data.Count() == 0)
+                return data;
+            Type type =typeof(T);
             PropertyInfo propertyInfo = type.GetProperty(sortName);
             if (propertyInfo == null)
                 throw new CRLException("找不到属性" + sortName);
             ParameterExpression parameter = Expression.Parameter(type, "");
             Expression body = Expression.Property(parameter, propertyInfo);
-            Expression sourceExpression = list.AsQueryable().Expression;
+            Expression sourceExpression = data.AsQueryable().Expression;
             Type sourcePropertyType = propertyInfo.PropertyType;
             Expression lambda = Expression.Call(typeof(Queryable),
                 desc ? "OrderByDescending" : "OrderBy",
                 new Type[] { type, sourcePropertyType }
                 , sourceExpression, Expression.Lambda(body, parameter)
                 );
-            return list.AsQueryable().Provider.CreateQuery<T>(lambda);
+            return data.AsQueryable().Provider.CreateQuery<T>(lambda);
         }
 
         /// <summary>
         /// 动态排序
         /// </summary>
-        /// <param name="list"></param>
         /// <param name="resultSelector"></param>
         /// <param name="desc"></param>
         /// <returns></returns>
-        public IEnumerable<T> OrderBy<TKey>(IEnumerable<T> list, Expression<Func<T, TKey>> resultSelector, bool desc)
+        public IEnumerable<T> OrderBy<TKey>(Expression<Func<T, TKey>> resultSelector, bool desc)
         {
-            if (list == null || list.Count() == 0)
-                return list;
+            if (data == null || data.Count() == 0)
+                return data;
             MemberExpression mExp = (MemberExpression)resultSelector.Body;
             var type=typeof(T);
 
-            Expression sourceExpression = list.AsQueryable().Expression;
+            Expression sourceExpression = data.AsQueryable().Expression;
             Type sourcePropertyType = mExp.Type;
 
             Expression lambda = Expression.Call(typeof(Queryable),
@@ -164,8 +121,20 @@ namespace CRL
                 new Type[] { type, sourcePropertyType }
                 , sourceExpression, resultSelector
                 );
-            return list.AsQueryable().Provider.CreateQuery<T>(lambda);
+            return data.AsQueryable().Provider.CreateQuery<T>(lambda);
         }
-
+        /// <summary>
+        /// 查询出结果
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<T> ToList()
+        {
+            if (currentExpression == null)
+            {
+                return data;
+            }
+            var result = data.Where(currentExpression.Compile()).ToList();
+            return result;
+        }
     }
 }

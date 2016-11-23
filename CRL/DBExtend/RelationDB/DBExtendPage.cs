@@ -15,68 +15,68 @@ namespace CRL.DBExtend.RelationDB
     public sealed partial class DBExtend
     {
         #region 分页
-        /// <summary>
-        /// 动态对象分页
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public override List<dynamic> PageDynamic<TModel>(LambdaQuery<TModel> query)
-        {
-            int count;
-            var reader = GetPageReader(query);
-            var list = reader.GetDataDynamic(out count);
-            query.MapingTime += reader.runTime;
-            query.RowCount = count;
-            return list;
-        }
-        /// <summary>
-        /// 分页
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public override List<TModel> Page<TModel>(LambdaQuery<TModel> query)
-        {
-            int count;
-            var reader = GetPageReader(query);
-            var list = reader.GetDataIModel<TModel>(out count);
-            query.MapingTime += reader.runTime;
-            query.RowCount = count;
-            return list;
-        }
-        /// <summary>
-        /// 指定对象分页
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public override List<TResult> Page<TModel, TResult>(LambdaQuery<TModel> query)
-        {
-            int count;
-            var reader = GetPageReader(query);
-            var list = reader.GetDataTResult<TResult>(out count);
-            query.MapingTime += reader.runTime;
-            query.RowCount = count;
-            return list;
-        }
+        ///// <summary>
+        ///// 动态对象分页
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <param name="query"></param>
+        ///// <returns></returns>
+        //public override List<dynamic> PageDynamic<TModel>(LambdaQuery<TModel> query)
+        //{
+        //    int count;
+        //    var reader = GetPageReader(query);
+        //    var list = reader.GetDataDynamic(out count);
+        //    query.MapingTime += reader.runTime;
+        //    query.RowCount = count;
+        //    return list;
+        //}
+        ///// <summary>
+        ///// 分页
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <param name="query"></param>
+        ///// <returns></returns>
+        //public override List<TModel> Page<TModel>(LambdaQuery<TModel> query)
+        //{
+        //    int count;
+        //    var reader = GetPageReader(query);
+        //    var list = reader.GetDataTResult<TModel>(false, out count, query.GetFieldMapping());
+        //    query.MapingTime += reader.runTime;
+        //    query.RowCount = count;
+        //    return list;
+        //}
+        ///// <summary>
+        ///// 指定对象分页
+        ///// </summary>
+        ///// <typeparam name="TResult"></typeparam>
+        ///// <param name="query"></param>
+        ///// <returns></returns>
+        //public override List<TResult> Page<TResult>(LambdaQueryBase query)
+        //{
+        //    int count;
+        //    var reader = GetPageReader(query);
+        //    var list = reader.GetDataTResult<TResult>(false, out count, query.GetFieldMapping());
+        //    query.MapingTime += reader.runTime;
+        //    query.RowCount = count;
+        //    return list;
+        //}
+        #endregion
+        #region 按存储过程
         /// <summary>
         /// 按编译
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="query"></param>
+        /// <param name="query1"></param>
         /// <returns></returns>
-        CallBackDataReader GetSpPageReader<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
+        CallBackDataReader GetSpPageReader(LambdaQueryBase query1)
         {
-            var query1 = query as RelationLambdaQuery<TModel>;
-            CheckTableCreated<TModel>();
+            //var query1 = query as RelationLambdaQuery<TModel>;
+            CheckTableCreated(query1.__MainType);
             //var fields = query.GetQueryFieldString(b => b.Length > 500 || b.PropertyType == typeof(byte[]));
             var fields = query1.GetQueryFieldString();
             var rowOver = query1.__QueryOrderBy;
             if (string.IsNullOrEmpty(rowOver))
             {
-                var table = TypeCache.GetTable(typeof(TModel));
+                var table = TypeCache.GetTable(query1.__MainType);
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
@@ -108,12 +108,10 @@ namespace CRL.DBExtend.RelationDB
         /// <summary>
         /// GROUP和是否编译判断
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="query"></param>
+        /// <param name="query1"></param>
         /// <returns></returns>
-        internal CallBackDataReader GetPageReader<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
+        internal CallBackDataReader GetPageReader(LambdaQueryBase query1)
         {
-            var query1 = query as RelationLambdaQuery<TModel>;
             if (query1.__GroupFields.Count > 0)
             {
                 return GetGroupPageReader(query1);
@@ -123,13 +121,13 @@ namespace CRL.DBExtend.RelationDB
                 return GetSpPageReader(query1);
             }
 
-            CheckTableCreated<TModel>();
+            CheckTableCreated(query1.__MainType);
             //var fields = query.GetQueryFieldString(b => b.Length > 500 || b.PropertyType == typeof(byte[]));
             var fields = query1.GetQueryFieldString();
             var rowOver = query1.__QueryOrderBy;
             if (string.IsNullOrEmpty(rowOver))
             {
-                var table = TypeCache.GetTable(typeof(TModel));
+                var table = TypeCache.GetTable(query1.__MainType);
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
@@ -171,13 +169,12 @@ namespace CRL.DBExtend.RelationDB
         /// <summary>
         /// 按编译
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="query"></param>
+        /// <param name="query1"></param>
         /// <returns></returns>
-        CallBackDataReader GetSpGroupPageReader<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
+        CallBackDataReader GetSpGroupPageReader(LambdaQueryBase query1)
         {
-            var query1 = query as RelationLambdaQuery<TModel>;
-            CheckTableCreated<TModel>();
+            //var query1 = query as RelationLambdaQuery<TModel>;
+            CheckTableCreated(query1.__MainType);
             var conditions = query1.GetQueryConditions();
             var fields = query1.GetQueryFieldString();
             if (!conditions.Contains("group"))
@@ -220,17 +217,16 @@ namespace CRL.DBExtend.RelationDB
         /// <summary>
         /// 按是否能编译
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="query"></param>
+        /// <param name="query1"></param>
         /// <returns></returns>
-        CallBackDataReader GetGroupPageReader<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
+        CallBackDataReader GetGroupPageReader(LambdaQueryBase query1)
         {
-            var query1 = query as RelationLambdaQuery<TModel>;
+            //var query1 = query as RelationLambdaQuery<TModel>;
             if (_DBAdapter.CanCompileSP && query1.__CompileSp)
             {
                 return GetSpGroupPageReader(query1);
             }
-            CheckTableCreated<TModel>();
+            CheckTableCreated(query1.__MainType);
             var condition = query1.GetQueryConditions();
             var fields = query1.GetQueryFieldString();
             if (!condition.Contains("group"))

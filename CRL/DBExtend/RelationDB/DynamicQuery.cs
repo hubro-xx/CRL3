@@ -51,29 +51,77 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override List<dynamic> QueryDynamic<T>(LambdaQuery<T> query)
         {
-            var reader = GetQueryDynamicReader(query);
-            double runTime;
-            var list = Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, out runTime);
-            query.MapingTime += runTime;
-            query.RowCount = list.Count;
-            return list;
+            if (query.SkipPage > 0)
+            {
+                int count;
+                var reader = GetPageReader(query);
+                var list = reader.GetDataDynamic(out count);
+                query.MapingTime += reader.runTime;
+                query.RowCount = count;
+                return list;
+            }
+            else
+            {
+                var reader = GetQueryDynamicReader(query);
+                double runTime;
+                var list = Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, out runTime);
+                query.MapingTime += runTime;
+                query.RowCount = list.Count;
+                return list;
+            }
         }
         /// <summary>
         /// 按select返回指定类型
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public override List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery<TModel> query)
+        public override List<TResult> QueryResult<TResult>(LambdaQueryBase query)
         {
-            var reader = GetQueryDynamicReader(query);
-            double runTime;
-            var list = ObjectConvert.DataReaderToList<TResult>(reader, out runTime, false);
-            query.MapingTime += runTime;
-            query.RowCount = list.Count;
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<TResult>(false, query.GetFieldMapping());
+            if (query.SkipPage > 0)
+            {
+                var reader = GetPageReader(query);
+                int count;
+                var list = reader.GetDataTResult<TResult>(queryInfo, out count);
+                query.RowCount = count;
+                return list;
+            }
+            else
+            {
+                var reader = GetQueryDynamicReader(query);
+                var list = ObjectConvert.DataReaderToSpecifiedList<TResult>(reader, queryInfo);
+                query.RowCount = list.Count;
+                return list;
+            }
+        }
+
+        /// <summary>
+        /// 按匿名对象
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="newExpression"></param>
+        /// <returns></returns>
+        public override List<TResult> QueryResult<TResult>(LambdaQueryBase query, NewExpression newExpression)
+        {
+            List<TResult> list;
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<TResult>(true, null, newExpression.Constructor);
+            if (query.SkipPage > 0)
+            {
+                var reader = GetPageReader(query);
+                int count;
+                list = reader.GetDataTResult<TResult>(queryInfo, out count);
+                query.RowCount = count;
+            }
+            else
+            {
+                var reader = GetQueryDynamicReader(query);
+                list = ObjectConvert.DataReaderToSpecifiedList<TResult>(reader, queryInfo);
+            }
             return list;
         }
+
         /// <summary>
         /// 返回首列结果
         /// </summary>
@@ -82,7 +130,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override dynamic QueryScalar<TModel>(LambdaQuery<TModel> query)
         {
-            query.Top(1);
+            query.TakeNum = 1;
             var reader = GetQueryDynamicReader(query);
             var a = reader.Read();
             if (!a)
@@ -96,12 +144,11 @@ namespace CRL.DBExtend.RelationDB
         /// <summary>
         /// 返回动态对象的查询
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        internal System.Data.Common.DbDataReader GetQueryDynamicReader<TModel>(LambdaQuery<TModel> query) where TModel : CRL.IModel, new()
+        internal System.Data.Common.DbDataReader GetQueryDynamicReader(LambdaQueryBase query)
         {
-            CheckTableCreated<TModel>();
+            CheckTableCreated(query.__MainType);
             string sql = "";
             query.FillParames(this);
             sql = query.GetQuery();
@@ -125,27 +172,6 @@ namespace CRL.DBExtend.RelationDB
             ClearParame();
             return reader;
 
-        }
-
-        /// <summary>
-        /// 按筛选返回匿名类型
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="resultSelector"></param>
-        /// <returns></returns>
-        public override List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery<TModel> query, Expression<Func<TModel, TResult>> resultSelector)
-        {
-            //todo 由于不能自动识别TResult,只能按当前类型筛选
-            CheckTableCreated<TModel>();
-            query.Select(resultSelector.Body);
-            var reader = GetQueryDynamicReader(query);
-            double runTime;
-            var list = Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, resultSelector, out runTime);
-            query.MapingTime += runTime;
-            query.RowCount = list.Count;
-            return list;
         }
     }
 }

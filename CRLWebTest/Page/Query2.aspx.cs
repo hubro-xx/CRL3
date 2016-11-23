@@ -88,26 +88,28 @@ namespace WebTest
             query.Where(b => b.Id > 0);
             query.Top(10);
             //选择GROUP字段
-            query.Select(b => new
-            {
-                b.BarCode,
-                sum2 = b.SUM(x => x.Number * x.Id),//等效为 sum(Number*Id) as sum2
-                total = b.BarCode.COUNT(),//等效为count(BarCode) as total
-                sum1 = b.Number.SUM(),//等效为sum(Number) as sum1
-                b.ProductName
-            });
+
             //GROUP条件
             query.GroupBy(b => new { b.BarCode, b.ProductName });
             //having
             query.GroupHaving(b => b.Number.SUM() >= 0);
             //设置排序
             query.OrderBy(b => b.BarCode.Count(), true);//等效为 order by count(BarCode) desc
+            var view = query.SelectV(b => new
+            {
+                b.BarCode,
+                sum2 = b.SUM(x => x.Number * x.Id),//等效为 sum(Number*Id) as sum2
+                total = b.BarCode.COUNT(),//等效为count(BarCode) as total
+                sum1 = b.Number.SUM(),//等效为sum(Number) as sum1
+                b.ProductName,
+                avg = b.Number.AVG(),
+            });
             txtOutput.Visible = true;
             txtOutput.Text = query.PrintQuery();
-            var list = query.ToDynamic();
-            foreach (dynamic item in list)
+            var list = view.ToList();
+            foreach (var item in list)
             {
-                var str = string.Format("{0}______{1} {2} {3}<br>", item.BarCode, item.ProductName, item.total, item.sum1);//动态对象
+                var str = string.Format("{0}______{1} {2} {3} {4}<br>", item.BarCode, item.ProductName, item.total, item.sum1, item.avg);//动态对象
                 Response.Write(str);
             }
         }
@@ -116,17 +118,17 @@ namespace WebTest
         {
             var query = Code.ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.Id > 0);
-            query.DistinctBy(b => new { b.ProductName, b.BarCode });
+            var view = query.DistinctBy(b => new { b.ProductName, b.BarCode });
             //query.DistinctCount();//表示count Distinct 结果名为Total
-            var list = query.ToDynamic();
+            //var list = query.ToDynamic();
+            var list = view.ToList();
             txtOutput.Visible = true;
             txtOutput.Text = query.PrintQuery();
-            foreach (dynamic item in list)
+            foreach (var item in list)
             {
                 var str = string.Format("{0}______{1}<br>", item.ProductName, item.BarCode);//动态对象
                 Response.Write(str);
             }
         }
-
     }
 }

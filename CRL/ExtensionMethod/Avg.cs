@@ -23,9 +23,9 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="origin"></param>
         /// <returns></returns>
-        public static int AVG<T>(this T origin) where T : struct
+        public static T AVG<T>(this T origin) where T : struct
         {
-            return 0;
+            return default(T);
         }
         /// <summary>
         /// 表示Avg此字段
@@ -33,9 +33,9 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="origin"></param>
         /// <returns></returns>
-        public static int AVG<T>(this Nullable<T> origin) where T : struct
+        public static T AVG<T>(this Nullable<T> origin) where T : struct
         {
-            return 0;
+            return default(T);
         }
         /// <summary>
         /// 表示Avg一个属性二元运算 如 AVG(b=>b.Num*b.Price)
@@ -45,9 +45,9 @@ namespace CRL
         /// <param name="origin"></param>
         /// <param name="resultSelector"></param>
         /// <returns></returns>
-        public static int AVG<T, TResult>(this T origin, Expression<Func<T, TResult>> resultSelector) where T : IModel
+        public static TResult AVG<T, TResult>(this T origin, Expression<Func<T, TResult>> resultSelector) where T : IModel
         {
-            return 0;
+            return default(TResult);
         }
     }
 }

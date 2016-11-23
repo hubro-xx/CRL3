@@ -62,9 +62,8 @@
     <Reference Include="MongoDB.Driver.Core">
       <HintPath>..\packages\MongoDB.Driver.Core.2.2.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ref\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -102,8 +101,14 @@
     <Compile Include="CacheServer\TcpPoolClient.cs" />
     <Compile Include="CacheServer\TcpServer.cs" />
     <Compile Include="CacheServer\ResultData.cs" />
-    <Compile Include="CallBackDataReader.cs" />
+    <Compile Include="DBExtend\CallBackDataReader.cs" />
     <Compile Include="CRLException.cs" />
+    <Compile Include="LambdaQuery\Mapping\DataContainer.cs" />
+    <Compile Include="LambdaQuery\Mapping\DataExtensions.cs" />
+    <Compile Include="LambdaQuery\Mapping\QueryInfo.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryViewJoin.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryResultSelect.cs" />
+    <Compile Include="LambdaQuery\Query\TypeQuery.cs" />
     <Compile Include="ModelCheck.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="DBAdapter\MongoDBAdapter.cs" />
@@ -167,7 +172,7 @@
     <Compile Include="LambdaQuery\Query\Group.cs" />
     <Compile Include="LambdaQuery\Query\Join.cs" />
     <Compile Include="LambdaQuery\Query\JoinType.cs" />
-    <Compile Include="LambdaQuery\LambdaCompileCache.cs" />
+    <Compile Include="LambdaQuery\ConstantValueVisitor.cs" />
     <Compile Include="LambdaQuery\LambdaCreater.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQuery.cs" />
     <Compile Include="ExtensionMethod\ExtensionMethod.cs" />
@@ -182,7 +187,6 @@
     <Compile Include="MemoryDataCache\QueryItem.cs" />
     <Compile Include="MemoryDataCache\UpdateItem.cs" />
     <Compile Include="ObjectConvert.cs" />
-    <Compile Include="ParameCollection.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

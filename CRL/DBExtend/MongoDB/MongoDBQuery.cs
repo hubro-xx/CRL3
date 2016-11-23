@@ -132,50 +132,54 @@ namespace CRL.DBExtend.MongoDB
             return result;
         }
 
-        public override List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query)
+        //public override List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query)
+        //{
+        //    var result = GetDynamicResult(query);
+        //    var type = typeof(TResult);
+        //    var pro = type.GetProperties();
+        //    var list = new List<TResult>();
+        //    var reflection = ReflectionHelper.GetInfo<TResult>();
+        //    foreach (var item in result)
+        //    {
+        //        var dict = item as IDictionary<string, object>;
+        //        var obj = (TResult)System.Activator.CreateInstance(type);
+        //        foreach (var f in pro)
+        //        {
+        //            string columnName = f.Name;
+        //            if (dict.ContainsKey(columnName))
+        //            {
+        //                object value = dict[columnName];
+        //                //f.SetValue(obj, value);
+        //                //var tuple = Tuple.GetCacheDelegate<TResult>(type, pro, columnName);
+        //                //tuple.SetValue(obj, value);
+        //                var access = reflection.GetAccessor(columnName);
+        //                access.Set((TResult)obj, value);
+        //            }
+        //        }
+        //        list.Add(obj);
+        //    }
+        //    return list;
+        //}
+        public override List<TResult> QueryResult<TResult>(LambdaQueryBase query)
         {
-            var result = GetDynamicResult(query);
-            var type = typeof(TResult);
-            var pro = type.GetProperties();
-            var list = new List<TResult>();
-            var reflection = ReflectionHelper.GetInfo<TResult>();
-            foreach (var item in result)
-            {
-                var dict = item as IDictionary<string, object>;
-                var obj = (TResult)System.Activator.CreateInstance(type);
-                foreach (var f in pro)
-                {
-                    string columnName = f.Name;
-                    if (dict.ContainsKey(columnName))
-                    {
-                        object value = dict[columnName];
-                        //f.SetValue(obj, value);
-                        //var tuple = Tuple.GetCacheDelegate<TResult>(type, pro, columnName);
-                        //tuple.SetValue(obj, value);
-                        var access = reflection.GetAccessor(columnName);
-                        access.Set((TResult)obj, value);
-                    }
-                }
-                list.Add(obj);
-            }
-            return list;
+            throw new NotImplementedException();
         }
 
-        public override List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query, System.Linq.Expressions.Expression<Func<TModel, TResult>> resultSelector)
-        {
-            query.Select(resultSelector.Body);
-            var result = GetDynamicResult(query);
-            List<TResult> list = new List<TResult>();
-            foreach (var item in result)
-            {
-                var obj = resultSelector.Compile()(item);
-                list.Add(obj);
-            }
-            return list;
-        }
+        //public override List<TResult> QueryDynamic<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query, System.Linq.Expressions.Expression<Func<TModel, TResult>> resultSelector)
+        //{
+        //    query.Select(resultSelector.Body);
+        //    var result = GetDynamicResult(query);
+        //    List<TResult> list = new List<TResult>();
+        //    foreach (var item in result)
+        //    {
+        //        var obj = resultSelector.Compile()(item);
+        //        list.Add(obj);
+        //    }
+        //    return list;
+        //}
 
 
-        public override List<TModel> QueryList<TModel>(LambdaQuery.LambdaQuery<TModel> query1, out string cacheKey)
+        public override List<TModel> QueryOrFromCache<TModel>(LambdaQuery.LambdaQuery<TModel> query1, out string cacheKey)
         {
             cacheKey = "none";
             var query = query1 as MongoDBLambdaQuery<TModel>;
@@ -226,6 +230,14 @@ namespace CRL.DBExtend.MongoDB
             var first = result.First() as IDictionary<string, object>;
             var keys = first.Keys.ToList();
             return first[keys.First()];
+        }
+        //public override List<TResult2> QueryDynamic<TModel, TResult, TResult2>(LambdaQuery<TModel> query, Expression<Func<TModel, TResult, TResult2>> resultSelector)
+        //{
+        //    throw new NotImplementedException();
+        //}
+        public override List<TResult> QueryResult<TResult>(LambdaQuery.LambdaQueryBase query, NewExpression newExpression)
+        {
+            throw new NotImplementedException();
         }
     }
 }

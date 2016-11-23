@@ -38,14 +38,14 @@ namespace CRL.LambdaQuery
             __DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(_dbContext);
             __UseTableAliasesName = _useTableAliasesName;
             GetPrefix(__MainType);
-            __Visitor = new ExpressionVisitor(__DBAdapter, __Prefixs);
+            __Visitor = new ExpressionVisitor(this);
             //TypeCache.SetDBAdapterCache(typeof(T), dBAdapter);
             QueryTableName = TypeCache.GetTableName(__MainType, __DbContext);
             startTime = DateTime.Now;
         }
         
         /// <summary>
-        /// 返回查询唯一值
+        /// 返回查询语句
         /// </summary>
         /// <returns></returns>
         public override string ToString()
@@ -55,52 +55,6 @@ namespace CRL.LambdaQuery
             //return string.Format("{0}{1}{2}{3}", __QueryTop, fields, QueryTableName, Condition);
         }
         #region 字段
-        /// <summary>
-        /// 在分表情况下,联合查询所有表方式
-        /// </summary>
-        internal Sharding.UnionType __UnionType;
-        /// <summary>
-        /// 查询返回的总行数
-        /// </summary>
-        public int RowCount = 0;
-        /// <summary>
-        /// 缓存查询过期时间
-        /// </summary>
-        internal int __ExpireMinute = 0;
-        /// <summary>
-        /// 处理后的查询参数
-        /// </summary>
-        ParameCollection QueryParames
-        {
-            get
-            {
-                return __Visitor.QueryParames;
-            }
-        }
-        /// <summary>
-        /// 语法解析时间
-        /// </summary>
-        public double AnalyticalTime = 0;
-        /// <summary>
-        /// 语句执行时间
-        /// </summary>
-        public double ExecuteTime;
-        /// <summary>
-        /// 对象转换时间
-        /// </summary>
-        public double MapingTime=0;
-        /// <summary>
-        /// 填充参数
-        /// </summary>
-        /// <param name="db"></param>
-        internal void FillParames(AbsDBExtend db)
-        {
-            //db.ClearParams();
-            foreach (var n in QueryParames)
-            {
-                db.SetParam(n.Key, n.Value);
-            }
-        }
 
         internal List<Attribute.FieldAttribute> GetQueryFields()
         {
@@ -129,22 +83,10 @@ namespace CRL.LambdaQuery
         internal string __FieldFunctionFormat = "";
 
         /// <summary>
-        /// 获取记录条数
-        /// </summary>
-        public int TakeNum = 0;
-        /// <summary>
-        /// 分页索引,要分页,设为大于1
-        /// </summary>
-        public int SkipPage = 0;
-
-        /// <summary>
         /// group having
         /// </summary>
         protected string Having = "";
-        /// <summary>
-        /// 是否编译为存储过程
-        /// </summary>
-        internal bool __CompileSp;
+
 
         /// <summary>
         /// 是否自动跟踪对象状态
@@ -224,40 +166,11 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="unionType"></param>
         /// <returns></returns>
-        public LambdaQuery<T> ShardingUnion(Sharding.UnionType unionType)
+        public LambdaQuery<T> ShardingUnion(UnionType unionType)
         {
-            __UnionType = unionType;
+            __ShanrdingUnionType = unionType;
             return this;
         }
-        #region UnSelect
-
-        /// <summary>
-        /// 按条件排除字段
-        /// </summary>
-        /// <param name="match"></param>
-        /// <returns></returns>
-        public LambdaQuery<T> UnSelect(Predicate<Attribute.FieldAttribute> match)
-        {
-            //var fields = TypeCache.GetProperties(typeof(T), false).Values.ToList();
-            var fields = TypeCache.GetTable(__MainType).Fields;
-            __QueryFields.Clear();
-            //string aliasName = GetPrefix();
-            foreach(var item in fields)
-            {
-                //item.SetFieldQueryScript(aliasName, true, false);
-                var item2 = item.Clone();
-                item2.SetFieldQueryScript2(__DBAdapter, GetPrefix(item2.ModelType), false, "");
-                __QueryFields.Add(item2);
-            }
-            if (match != null)
-            {
-                __QueryFields.RemoveAll(match);
-            }
-            //__QueryFields = fields;
-            return this;
-        }
-        #endregion
-
         #region Select
 
         /// <summary>
@@ -274,7 +187,26 @@ namespace CRL.LambdaQuery
             }
             return Select(resultSelector.Body);
         }
-        
+        /// <summary>
+        /// 返回强类型结果选择
+        /// 兼容老写法
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="resultSelector">为空则选择所有</param>
+        /// <returns></returns>
+        public LambdaQueryResultSelect<T, TResult> SelectV<TResult>(Expression<Func<T, TResult>> resultSelector = null)
+        {
+            //var fields = GetSelectField(true, resultSelector.Body, false, typeof(T));
+            if (resultSelector == null)
+            {
+                SelectAll();
+            }
+            else
+            {
+                Select(resultSelector.Body);
+            }
+            return new LambdaQueryResultSelect<T, TResult>(this, resultSelector.Body);
+        }
         /// <summary>
         /// 按resultSelectorBody
         /// </summary>
@@ -282,9 +214,31 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         internal LambdaQuery<T> Select(Expression resultSelectorBody)
         {
+            if (resultSelectorBody is ParameterExpression)
+            {
+                //按选择所有属性
+                SelectAll();
+                return this;
+            }
             var fields = GetSelectField(true,resultSelectorBody, false, typeof(T));
             __QueryFields = fields;
             return this;
+        }
+        /// <summary>
+        /// 创建一个相同上下文的Query
+        /// </summary>
+        /// <typeparam name="T2"></typeparam>
+        /// <returns></returns>
+        public LambdaQuery<T2> CreateQuery<T2>() where T2 : IModel, new()
+        {
+            var query = LambdaQueryFactory.CreateLambdaQuery<T2>(__DbContext);
+            //重新排列前辍
+            query.__Prefixs.Clear();
+            query.__Prefixs[typeof(T)] = __Prefixs[typeof(T)];
+            query.prefixIndex = base.prefixIndex;
+            query.GetPrefix(typeof(T2));
+            query.__FromDbContext = true;
+            return query;
         }
         #endregion
 
@@ -323,95 +277,132 @@ namespace CRL.LambdaQuery
         public abstract LambdaQuery<T> Or(Expression<Func<T, bool>> expression);
         #endregion
 
-        #region exists
+        #region select值判断
+
         /// <summary>
         /// 按查询exists
         /// 等效为exixts(select field from table2)
         /// </summary>
-        /// <typeparam name="TInner"></typeparam>
-        /// <param name="innerField"></param>
-        /// <param name="expression"></param>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public LambdaQuery<T> Exists<TInner>(Expression<Func<TInner, object>> innerField,
-Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
+        public LambdaQuery<T> Exists<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query)
         {
-            return InnerSelect<TInner>(null, innerField, expression, "exists");
+            return InnerSelect(null, query, "exists");
         }
+
         /// <summary>
         /// 按查询not exists
-        /// 等效为not exixts(select field from table2)
+        /// 等效为 not exixts(select field from table2)
         /// </summary>
-        /// <typeparam name="TInner"></typeparam>
-        /// <param name="innerField"></param>
-        /// <param name="expression"></param>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public LambdaQuery<T> NotExists<TInner>(Expression<Func<TInner, object>> innerField,
-Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
+        public LambdaQuery<T> NotExists<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query)
         {
-            return InnerSelect<TInner>(null, innerField, expression, "not exists");
+            return InnerSelect(null, query, "not exists");
         }
-        #endregion
 
-        #region select值判断
         /// <summary>
         /// 按查询in
         /// 等效为table.field in(select field from table2)
         /// </summary>
-        /// <typeparam name="TInner"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="query"></param>
         /// <param name="outField"></param>
-        /// <param name="innerField"></param>
-        /// <param name="expression"></param>
+        /// <param name="expression">内关联</param>
         /// <returns></returns>
-        public LambdaQuery<T> In<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
-    Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
+        public LambdaQuery<T> In<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query, Expression<Func<T, TResult>> outField, Expression<Func<T, T2, bool>> expression = null)
         {
-            return InnerSelect<TInner>(outField, innerField, expression, "in");
+            return InnerSelect(outField, query, "in", expression);
         }
+
         /// <summary>
         /// 按查询not in
         /// 等效为table.field not in(select field from table2)
         /// </summary>
-        /// <typeparam name="TInner"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="query"></param>
         /// <param name="outField"></param>
-        /// <param name="innerField"></param>
-        /// <param name="expression"></param>
         /// <returns></returns>
-        public LambdaQuery<T> NotIn<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
-Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
+        public LambdaQuery<T> NotIn<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query, Expression<Func<T, TResult>> outField)
         {
-            return InnerSelect<TInner>(outField, innerField, expression, "not in");
+            return InnerSelect(outField, query, "not in");
         }
+
         /// <summary>
         /// 按=
         /// 等效为table.field =(select field from table2)
         /// </summary>
-        /// <typeparam name="TInner"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="query"></param>
         /// <param name="outField"></param>
-        /// <param name="innerField"></param>
-        /// <param name="expression"></param>
         /// <returns></returns>
-        public LambdaQuery<T> Equal<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
-Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
+        public LambdaQuery<T> Equal<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query, Expression<Func<T, TResult>> outField)
         {
-            return InnerSelect<TInner>(outField, innerField, expression, "=");
+            return InnerSelect(outField, query, "=");
         }
+       
         /// <summary>
         /// 按!=
         /// 等效为table.field !=(select field from table2)
         /// </summary>
-        /// <typeparam name="TInner"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="query"></param>
         /// <param name="outField"></param>
-        /// <param name="innerField"></param>
-        /// <param name="expression"></param>
         /// <returns></returns>
-        public LambdaQuery<T> NotEqual<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
-Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
+        public LambdaQuery<T> NotEqual<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query, Expression<Func<T, TResult>> outField)
         {
-            return InnerSelect<TInner>(outField, innerField, expression, "!=");
+            return InnerSelect(outField, query, "!=");
         }
 
-        protected abstract LambdaQuery<T> InnerSelect<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
-     Expression<Func<T, TInner, bool>> expression, string type) where TInner : IModel, new();
+        protected LambdaQuery<T> InnerSelect<T2, TResult>(Expression<Func<T, TResult>> outField, LambdaQueryResultSelect<T2, TResult> query, string type, Expression<Func<T, T2, bool>> expression = null)
+        {
+            if (!query.BaseQuery.__FromDbContext)
+            {
+                throw new CRLException("关联需要由LambdaQuery.CreateQuery创建");
+            }
+            MemberExpression m1 = null;
+            //object 会生成UnaryExpression表达式 Convert(b=>b.UserId)
+            if (outField != null)//兼容exists 可能为空
+            {
+                if (outField.Body is UnaryExpression)
+                {
+                    m1 = (outField.Body as UnaryExpression).Operand as MemberExpression;
+                }
+                else
+                {
+                    m1 = outField.Body as MemberExpression;
+                }
+            }
+            string field1 = "";
+            if (outField != null)
+            {
+                field1 = string.Format("{0}{1}", GetPrefix(), __DBAdapter.KeyWordFormat(m1.Member.Name));
+            }
+            string condition = "";
+            var query2 = query.BaseQuery.GetQuery();
+            if (expression != null)
+            {
+                //内部关联
+                GetPrefix(typeof(T2));
+                string condition2 = FormatJoinExpression(expression.Body);
+                query2 += " and " + condition2;
+            }
+            condition = string.Format("{0} {1}({2})", field1, type, query2);
+            if (Condition.Length > 0)
+            {
+                condition = " and " + condition;
+            }
+            Condition.Append(condition);
+            return this;
+        }
         #endregion
         #endregion
 
@@ -419,31 +410,16 @@ Expression<Func<T, TInner, bool>> expression) where TInner : IModel, new()
         
 
         /// <summary>
-        /// 获取查询字段字符串,按条件排除
-        /// </summary>
-        /// <returns></returns>
-        internal abstract string GetQueryFieldString();
-
-        /// <summary>
         /// 是否为关联更新/删除
         /// </summary>
         internal bool _IsRelationUpdate = false;
-        /// <summary>
-        /// 获取查询条件串,带表名
-        /// </summary>
-        /// <returns></returns>
-        internal abstract string GetQueryConditions(bool withTableName = true);
+
         /// <summary>
         /// 获取排序 带 order by
         /// </summary>
         /// <returns></returns>
         internal abstract string GetOrderBy();
 
-        /// <summary>
-        /// 获取完整查询
-        /// </summary>
-        /// <returns></returns>
-        internal abstract string GetQuery();
         /// <summary>
         /// 输出当前查询语句
         /// </summary>

@@ -57,6 +57,7 @@ left:500px;
                             menus.Add("关联查询", "/page/Query3.aspx");
                             menus.Add("分页查询", "/page/Pager.aspx");
                             menus.Add("扩展方法查询", "/page/ExtensionMethod.aspx");
+                            menus.Add("使用嵌套查询", "/page/QueryView.aspx");
                             menus.Add("更新数据", "/page/Update.aspx");
                             menus.Add("删除数据", "/page/Delete.aspx");
                             menus.Add("使用缓存", "/page/Cache.aspx");

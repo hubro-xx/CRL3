@@ -65,7 +65,6 @@ namespace CRL.LambdaQuery
                 __QueryOrderBy += ",";
             }
             __QueryOrderBy += string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
-            __QueryOrderBy = ReplacePrefix(__QueryOrderBy);
             return this;
         }
         /// <summary>
@@ -96,7 +95,7 @@ namespace CRL.LambdaQuery
             Condition.Append(string.Format(" or {0}", condition1));
             return this;
         }
-        protected override LambdaQuery<T> InnerSelect<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
+        LambdaQuery<T> __InnerSelect<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
     Expression<Func<T, TInner, bool>> expression, string type)
         {
             MemberExpression m1 = null, m2;
@@ -186,7 +185,7 @@ namespace CRL.LambdaQuery
                     {
                         throw new CRLException(string.Format("在类型{0}找不到 ConstraintResultField {1}", innerType, a.ConstraintResultField));
                     }
-                    AddInnerRelation(innerType, condition);
+                    AddInnerRelation(new TypeQuery(innerType), JoinType.Inner, condition);
                     #endregion
                     sb.Append(string.Format("{0},", resultField.QueryFullScript));
                 }
@@ -205,7 +204,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         internal override string GetQueryConditions(bool withTableName = true)
         {
-            var where = Condition;
+            var where = new StringBuilder(Condition.ToString());
             #region group判断
             if (__GroupFields.Count > 0)
             {
@@ -220,7 +219,9 @@ namespace CRL.LambdaQuery
             StringBuilder part = new StringBuilder();
             if (withTableName)
             {
-                part.Append(string.Format("{0} t1 {1}", __DBAdapter.KeyWordFormat(QueryTableName), __DBAdapter.GetWithNolockFormat()));
+                var prex1 = GetPrefix(__MainType);
+                prex1 = prex1.Remove(prex1.Length-1);
+                part.Append(string.Format("{0} {1} {2}", __DBAdapter.KeyWordFormat(QueryTableName), prex1, __DBAdapter.GetWithNolockFormat()));
             }
             if (_IsRelationUpdate)
             {
@@ -248,7 +249,6 @@ namespace CRL.LambdaQuery
                 orderBy = TypeCache.GetTable(typeof(T)).DefaultSort;
             }
             orderBy = string.IsNullOrEmpty(orderBy) ? orderBy : " order by " + orderBy;
-            orderBy = ReplacePrefix(orderBy);
             return orderBy;
         }
         /// <summary>
@@ -264,7 +264,7 @@ namespace CRL.LambdaQuery
             }
             if (distinctCount)
             {
-                fields = System.Text.RegularExpressions.Regex.Replace(fields,@" as \w+"," ");//替换别名
+                fields = System.Text.RegularExpressions.Regex.Replace(fields,@" as \w+","");//替换别名
                 fields = string.Format(" count({0}) as Total", fields);
                 if (__QueryFields.Count > 1)
                 {
@@ -276,12 +276,13 @@ namespace CRL.LambdaQuery
 
             var orderBy = GetOrderBy();
             StringBuilder sql = new StringBuilder();
-            //当设置了分表关联
-            if (__DbContext.UseSharding && __UnionType != Sharding.UnionType.None)
+            //当设置了分表联合查询
+            if (__DbContext.UseSharding && __ShanrdingUnionType != UnionType.None)
             {
+                #region 当设置了分表联合查询
                 string tableName = TypeCache.GetTable(typeof(T)).TableName;
                 var tables = Sharding.DBService.GetAllTable(__DbContext.DBLocation.ShardingDataBase, tableName);
-                string union = __UnionType == Sharding.UnionType.Union ? "union" : "union all";
+                string unionType = __ShanrdingUnionType == UnionType.Union ? "union" : "union all";
                 //var dbExtend = new DBExtend(dbContext); //todo 检查分表是否被创建
                 for (int i = 0; i < tables.Count; i++)
                 {
@@ -290,15 +291,39 @@ namespace CRL.LambdaQuery
                     sql.Append(__DBAdapter.GetSelectTop(fields, part1, "", TakeNum));
                     if (i < tables.Count - 1)
                     {
-                        sql.Append("\r\n" + union + "\r\n");
+                        sql.Append("\r\n " + unionType + " \r\n");
                     }
                 }
+                orderBy = System.Text.RegularExpressions.Regex.Replace(orderBy, @"t\d+\.", "");
                 sql.Append(orderBy);
+                #endregion
             }
             else
             {
-                var sql2 = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
-                sql.Append(sql2);
+
+                if (__Unions.Count == 0)
+                {
+                    var sql2 = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
+                    sql.Append(sql2);
+                }
+                else//按有关联
+                {
+                    #region 联合查询
+                    var sql2 = __DBAdapter.GetSelectTop(fields, part, "", TakeNum);
+                    sql.Append(sql2);
+                    foreach (var unionQuery in __Unions)
+                    {
+                        var query = unionQuery.query;
+                        query.__QueryOrderBy = "";
+                        string unionType = unionQuery.unionType == UnionType.Union ? "union" : "union all";
+                        var sqlUnoin = query.GetQuery();
+                        sql.Append("\r\n " + unionType + " \r\n");
+                        sql.Append("\r\n " + sqlUnoin + " \r\n");
+                    }
+                    orderBy = System.Text.RegularExpressions.Regex.Replace(orderBy, @"t\d+\.", " ");
+                    sql.Append(orderBy);
+                    #endregion
+                }
             }
             var ts = DateTime.Now - startTime;
             AnalyticalTime = ts.TotalMilliseconds;

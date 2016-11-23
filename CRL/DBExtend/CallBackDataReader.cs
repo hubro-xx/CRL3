@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace CRL
@@ -26,17 +27,9 @@ namespace CRL
             reader = _reader;
             handler = _handler;
         }
-        public List<T> GetDataTResult<T>(out int outParame) where T : class,new()
+        public List<T> GetDataTResult<T>(LambdaQuery.Mapping.QueryInfo<T> queryInfo,out int outParame)
         {
-            var data = ObjectConvert.DataReaderToList<T>(reader, out runTime, false);
-            //reader.Close();
-            outParame = handler();
-            return data;
-        }
-        public List<T> GetDataIModel<T>(out int outParame) where T : IModel, new()
-        {
-            var data = ObjectConvert.DataReaderToIModelList<T>(reader, out runTime, false);
-            //reader.Close();
+            var data = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
             outParame = handler();
             return data;
         }
@@ -44,14 +37,6 @@ namespace CRL
         {
             double runTime;
             var data = Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, out runTime);
-            //reader.Close();
-            outParame = handler();
-            return data;
-        }
-        public List<TResult> GetDataDynamic<T, TResult>(Expression<Func<T, TResult>> resultSelector, out int outParame) where T : IModel, new()
-        {
-            double runTime;
-            var data = Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, resultSelector, out runTime);
             //reader.Close();
             outParame = handler();
             return data;

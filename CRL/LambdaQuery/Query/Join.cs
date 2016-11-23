@@ -49,27 +49,44 @@ namespace CRL.LambdaQuery
         {
             var query2 = new LambdaQueryJoin<T, TJoin>(this);
             var innerType = typeof(TJoin);
-            __JoinTypes.Add(innerType, joinType);
+            //__JoinTypes.Add(new TypeQuery(innerType), joinType);
+            //firstJoinType = innerType;
             GetPrefix(innerType);
             string condition = FormatJoinExpression(expression.Body);
-            AddInnerRelation(innerType, condition);
+            AddInnerRelation(new TypeQuery(innerType), joinType, condition);
             return query2;
         }
-        ///// <summary>
-        ///// 创建一个JOIN查询分支
-        ///// </summary>
-        ///// <typeparam name="TJoin">关联类型</typeparam>
-        ///// <returns></returns>
-        //public LambdaQueryJoin2<T, TJoin, TJoin2> Join<TJoin, TJoin2>(Expression<Func<T, TJoin, TJoin2, bool>> expression, JoinType joinType = JoinType.Inner) where TJoin : IModel, new()
-        //    where TJoin2 : IModel, new()
-        //{
-        //    var query2 = new LambdaQueryJoin2<T, TJoin, TJoin2>(this);
-        //    var innerType = typeof(TJoin);
-        //    JoinTypes.Add(typeof(TJoin), joinType);
-        //    JoinTypes.Add(typeof(TJoin2), joinType);
-        //    string condition = FormatJoinExpression(expression);
-        //    AddInnerRelation(innerType, condition);
-        //    return query2;
-        //}
+        /// <summary>
+        /// 创建关联一个强类型查询
+        /// </summary>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <typeparam name="TJoinResult"></typeparam>
+        /// <param name="resultSelect"></param>
+        /// <param name="expression"></param>
+        /// <param name="joinType"></param>
+        /// <returns></returns>
+        public LambdaQueryViewJoin<T, TJoin, TJoinResult> Join<TJoin, TJoinResult>(LambdaQueryResultSelect<TJoin, TJoinResult> resultSelect, Expression<Func<T, TJoinResult, bool>> expression, JoinType joinType = JoinType.Inner) 
+        {
+            if(!resultSelect.BaseQuery.__FromDbContext)
+            {
+                throw new CRLException("关联需要由LambdaQuery.CreateQuery创建");
+            }
+            var query2 = new LambdaQueryViewJoin<T, TJoin, TJoinResult>(this, resultSelect);
+            var innerType = typeof(TJoin);
+            //__JoinTypes.Add(new TypeQuery(innerType, "T_" + prefixIndex), joinType);
+            var prefix1 = GetPrefix(innerType);
+            var prefix2 = GetPrefix(typeof(TJoinResult));
+            var typeQuery = new TypeQuery(innerType, prefix2);
+            var baseQuery = resultSelect.BaseQuery;
+            foreach (var kv in baseQuery.QueryParames)
+            {
+                QueryParames[kv.Key] = kv.Value;
+            }
+            string innerQuery = baseQuery.GetQuery();
+            typeQuery.InnerQuery = innerQuery;
+            string condition = FormatJoinExpression(expression.Body);
+            AddInnerRelation(typeQuery, joinType, condition);
+            return query2;
+        }
     }
 }

@@ -55,5 +55,6 @@ namespace CRL.MemoryDataCache
         /// 查询次数
         /// </summary>
         public int QueryCount = 0;
+        public List<Attribute.FieldMapping> Mapping;
     }
 }

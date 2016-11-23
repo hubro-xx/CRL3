@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -23,7 +24,16 @@ namespace WebTest.Page
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            Code.TestAll.TestQuery();
+            var array = typeof(Code.TestAll).GetMethods(BindingFlags.Static | BindingFlags.Public);
+            var instance = new Code.TestAll();
+            foreach (var item in array)
+            {
+                if (item.Name == "TestUpdate")
+                {
+                    continue;
+                }
+                item.Invoke(instance, null);
+            }
             Response.Write("OK");
         }
 

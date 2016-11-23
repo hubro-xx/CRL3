@@ -25,7 +25,7 @@ namespace CRL
         /// <summary>
         /// 数据库架构类型
         /// </summary>
-        protected DataBaseArchitecture DataBaseArchitecture
+        internal DataBaseArchitecture DataBaseArchitecture
         {
             get
             {
@@ -560,33 +560,30 @@ namespace CRL
         #endregion
 
         #region Page
-        /// <summary>
-        /// 返回指定类型分页
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public abstract List<TResult> Page<TModel, TResult>(CRL.LambdaQuery.LambdaQuery<TModel> query)
-            where TModel : CRL.IModel, new()
-            where TResult : class, new();
+        ///// <summary>
+        ///// 返回指定类型分页
+        ///// </summary>
+        ///// <typeparam name="TResult"></typeparam>
+        ///// <param name="query"></param>
+        ///// <returns></returns>
+        //public abstract List<TResult> Page<TResult>(CRL.LambdaQuery.LambdaQueryBase query);
 
-        /// <summary>
-        /// 返回当前类型分页
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public abstract List<TModel> Page<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query)
-            where TModel : CRL.IModel, new();
+        ///// <summary>
+        ///// 返回当前类型分页
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <param name="query"></param>
+        ///// <returns></returns>
+        //public abstract List<TModel> Page<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query)
+        //    where TModel : CRL.IModel, new();
 
-        /// <summary>
-        /// 返回动态对象分页
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public abstract List<dynamic> PageDynamic<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query) where TModel : CRL.IModel, new();
+        ///// <summary>
+        ///// 返回动态对象分页
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <param name="query"></param>
+        ///// <returns></returns>
+        //public abstract List<dynamic> PageDynamic<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query) where TModel : CRL.IModel, new();
         #endregion
 
         #region QueryDynamic
@@ -597,25 +594,31 @@ namespace CRL
         /// <param name="query"></param>
         /// <returns></returns>
         public abstract List<dynamic> QueryDynamic<T>(CRL.LambdaQuery.LambdaQuery<T> query) where T : CRL.IModel, new();
+        ///// <summary>
+        ///// 返回自定义对象
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <typeparam name="TResult"></typeparam>
+        ///// <param name="query"></param>
+        ///// <returns></returns>
+        //public abstract List<TResult> QueryDynamic<TModel, TResult>(CRL.LambdaQuery.LambdaQuery<TModel> query)
+        //    where TModel : CRL.IModel, new();
         /// <summary>
-        /// 返回自定义对象
+        /// 返回指定对象
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public abstract List<TResult> QueryDynamic<TModel, TResult>(CRL.LambdaQuery.LambdaQuery<TModel> query)
-            where TModel : CRL.IModel, new()
-            where TResult : class, new();
+        public abstract List<TResult> QueryResult<TResult>(CRL.LambdaQuery.LambdaQueryBase query);
+        
         /// <summary>
-        /// 按筛选返回动态对象
+        /// 按筛选返回匿名对象
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
-        /// <param name="resultSelector"></param>
+        /// <param name="newExpression"></param>
         /// <returns></returns>
-        public abstract List<TResult> QueryDynamic<TModel, TResult>(CRL.LambdaQuery.LambdaQuery<TModel> query, System.Linq.Expressions.Expression<Func<TModel, TResult>> resultSelector) where TModel : CRL.IModel, new();
+        public abstract List<TResult> QueryResult<TResult>(LambdaQuery.LambdaQueryBase query, NewExpression newExpression);
         #endregion
 
         #region query item
@@ -677,7 +680,7 @@ namespace CRL
         public List<TModel> QueryList<TModel>(LambdaQuery.LambdaQuery<TModel> query) where TModel : CRL.IModel, new()
         {
             string key;
-            return QueryList<TModel>(query, out key);
+            return QueryOrFromCache<TModel>(query, out key);
         }
         /// <summary>
         /// 返回多项结果
@@ -686,7 +689,7 @@ namespace CRL
         /// <param name="query"></param>
         /// <param name="cacheKey"></param>
         /// <returns></returns>
-        public abstract List<TModel> QueryList<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query, out string cacheKey) where TModel : CRL.IModel, new();
+        public abstract List<TModel> QueryOrFromCache<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query, out string cacheKey) where TModel : CRL.IModel, new();
         #endregion
 
         #region 存储过程

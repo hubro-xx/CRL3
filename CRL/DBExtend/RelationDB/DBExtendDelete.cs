@@ -100,7 +100,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 var kv = query1.__Relations.First();
                 var t1 = query1.QueryTableName;
-                var t2 = TypeCache.GetTableName(kv.Key, query1.__DbContext);
+                var t2 = TypeCache.GetTableName(kv.Key.OriginType, query1.__DbContext);
                 var join = kv.Value;
                 join = join.Substring(join.IndexOf(" on ") + 3);
                 if (!string.IsNullOrEmpty(conditions))

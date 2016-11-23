@@ -41,7 +41,7 @@ namespace CRL
                 }
                 else
                 {
-                    value = LambdaCompileCache.GetParameExpressionValue(right);
+                    value = ConstantValueVisitor.GetParameExpressionValue(right);
                     //value = Expression.Lambda(right).Compile().DynamicInvoke();
                 }
                 //更改对象值

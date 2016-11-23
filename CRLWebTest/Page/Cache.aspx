@@ -44,12 +44,12 @@
     #endregion
 
     #region 优化后查找 只需一次
-    CRL.ExpressionJoin<Code.ProductData> query = new CRL.ExpressionJoin<Code.ProductData>(b=>b.Id>0);
+    var query = new CRL.ExpressionJoin&lt;Code.ProductData>(list, b => b.Id > 0);
     if (a)
     {
         query.And(b => b.Number > 10);//and 一个查询条件
     }
-    list2 = query.Where(list);//返回查询结果 只作一次内存查找
+    list2 = query.ToList();//返回查询结果 只作一次内存查找
     #endregion
     </pre>
 </asp:Content>

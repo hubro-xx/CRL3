@@ -16,7 +16,7 @@ namespace CRL
     /// <summary>
     /// 数据库架构
     /// </summary>
-    public enum DataBaseArchitecture
+    internal enum DataBaseArchitecture
     {
         /// <summary>
         /// 关系型

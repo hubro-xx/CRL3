@@ -12,6 +12,52 @@ using System.Web;
 
 namespace WebTest.Code
 {
+    public class TestModelManage : CRL.BaseProvider<TestModel>
+    {
+        public static TestModelManage Instance
+        {
+            get
+            {
+                return new TestModelManage();
+            }
+        }
+    }
+    [CRL.Attribute.Table(TableName = "TestModel_1")]
+    public class TestModel : CRL.IModel
+    {
+        protected override bool CheckRepeatedInsert
+        {
+            get
+            {
+                return false;
+            }
+        }
+        [CRL.Attribute.Field(IsPrimaryKey = true)]
+        public int Id
+        {
+            get;
+            set;
+        }
+        [CRL.Attribute.Field(Length = 50)]
+        public string Name
+        {
+            get;
+            set;
+        }
+        public string Name2
+        {
+            get;
+            set;
+        }
+        public override string CheckData()
+        {
+            if (Name!="hubro")
+            {
+                return "输入的值?";
+            }
+            return base.CheckData();
+        }
+    }
     [CRL.Attribute.Table(TableName="table1")]//映射表名为table1
     public class ModelTest:CRL.IModelBase
     {

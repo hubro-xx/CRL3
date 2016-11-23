@@ -20,14 +20,12 @@ namespace CRL.LambdaQuery
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="TJoin"></typeparam>
     public sealed class LambdaQueryJoin<T, TJoin>
-        where T : IModel, new()
-        where TJoin : IModel, new()
     {
         /// <summary>
         /// 关联查询分支
         /// </summary>
         /// <param name="query"></param>
-        public LambdaQueryJoin(LambdaQueryBase query)
+        internal LambdaQueryJoin(LambdaQueryBase query)
         {
             BaseQuery = query;
         }
@@ -41,7 +39,7 @@ namespace CRL.LambdaQuery
         public LambdaQueryJoin<T, TJoin> Where(Expression<Func<TJoin, bool>> expression)
         {
             string condition = BaseQuery.FormatExpression(expression.Body).SqlOut;
-            BaseQuery.AddInnerRelationCondition(typeof(TJoin), condition);
+            BaseQuery.AddInnerRelationCondition(new TypeQuery(typeof(TJoin)), condition);
             return this;
         }
         /// <summary>
@@ -120,10 +118,10 @@ namespace CRL.LambdaQuery
             //    .Join<Code.Order>((a, b) => a.Id == b.Id);
             var query2 = new LambdaQueryJoin<TJoin, TJoin2>(BaseQuery);
             var innerType = typeof(TJoin2);
-            BaseQuery.__JoinTypes.Add(innerType, joinType);
+            //BaseQuery.__JoinTypes.Add(new TypeQuery(innerType), joinType);
             BaseQuery.GetPrefix(innerType);
             string condition = BaseQuery.FormatJoinExpression(expression.Body);
-            BaseQuery.AddInnerRelation(innerType, condition);
+            BaseQuery.AddInnerRelation(new TypeQuery(innerType), joinType, condition);
             return query2;
         }
         /// <summary>

@@ -38,7 +38,8 @@ namespace WebTest
             //默认过期时间为5分钟
             //AllCache可重写条件和过期时间,在业务类中实现即可
             //当插入或更新当前类型对象时,此缓存中对应的项也会更新
-            var list = Code.ProductDataManage.Instance.QueryItemFromCache(5);
+            var item = Code.ProductDataManage.Instance.QueryItemFromCache(5);
+            var list = Code.ProductDataManage.Instance.QueryFromCache(b => b.Id < 10);
         }
 
         protected void Button3_Click(object sender, EventArgs e)
@@ -54,12 +55,12 @@ namespace WebTest
             #endregion
 
             #region 优化后查找 只需一次
-            CRL.ExpressionJoin<Code.ProductData> query = new CRL.ExpressionJoin<Code.ProductData>(b=>b.Id>0);
+            var query = new CRL.ExpressionJoin<Code.ProductData>(list, b => b.Id > 0);
             if (a)
             {
                 query.And(b => b.Number > 10);//and 一个查询条件
             }
-            list2 = query.Where(list);//返回查询结果 只作一次内存查找
+            list2 = query.ToList();//返回查询结果 只作一次内存查找
             #endregion
         }
     }

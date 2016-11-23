@@ -29,8 +29,7 @@ namespace WebTest
 
         protected void Button2_Click(object sender, EventArgs e)
         {
-            //Code.ProductDataManage.Instance.ImportFromJson("json串", b => b.Id > 0);
-            
+            Code.ProductDataManage.Instance.ImportFromJson("json串", b => b.Id > 0);
         }
     }
 }

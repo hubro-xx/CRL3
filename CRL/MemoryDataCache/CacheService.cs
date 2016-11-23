@@ -122,37 +122,24 @@ namespace CRL.MemoryDataCache
             string log = string.Format("更新缓存中的一项[{0}]", obj.GetModelKey());
             CoreHelper.EventLog.Log(log, "DataCache", false);
         }
-        /// <summary>
-        /// 获取缓存
-        /// 缓存在进程重启后才失效
-        /// </summary>
-        /// <param name="qeury">表名或查询语句,存储过程前加exec </param>
-        /// <param name="timeOut">失效分钟</param>
-        /// <param name="helper">DBHelper对象,如果Params有值,则按参数缓存,慎用,会造成大量缓存</param>
-        /// <returns></returns>
-        internal static Dictionary<string, TItem> GetCacheList<TItem>(string qeury, int timeOut, DBHelper helper) where TItem : IModel, new()
-        {
-            string key = "";
-            return GetCacheList<TItem>(qeury, timeOut, helper, out key);
-        }
 
-        internal static Dictionary<string, TItem> GetCacheList<TItem>(string qeury, int timeOut, DBHelper helper, out string key) where TItem : IModel, new()
+        internal static Dictionary<string, TItem> GetCacheList<TItem>(string query,List<Attribute.FieldMapping> mapping, int timeOut, DBHelper helper, out string key) where TItem : IModel, new()
         {
             Type type = typeof(TItem);
-            qeury = qeury.ToLower();
+            query = query.ToLower();
             string Params = "";
             foreach (KeyValuePair<string, object> item in helper.Params)
             {
                 Params += item.Key + ":" + item.Value;
             }
             //按参数进行缓存
-            key = StringHelper.EncryptMD5(qeury + Params);
+            key = StringHelper.EncryptMD5(query + Params);
             //初始缓存
             //lock (lockObj)
             //{
                 if (!cacheDatas.ContainsKey(key))
                 {
-                    cacheDatas.TryAdd(key, new MemoryDataCacheItem() { Data = null, TimeOut = timeOut, DBHelper = helper, Query = qeury, Params = new Dictionary<string, object>(helper.Params), Type = type });
+                    cacheDatas.TryAdd(key, new MemoryDataCacheItem() { Data = null, Mapping = mapping, TimeOut = timeOut, DBHelper = helper, Query = query, Params = new Dictionary<string, object>(helper.Params), Type = type });
                     if (typeCache.ContainsKey(type))
                     {
                         typeCache[type].Add(key);
@@ -175,7 +162,7 @@ namespace CRL.MemoryDataCache
             //首次查询
             if (dataItem.QueryCount == 0)
             {
-                var data = QueryData(key, type, qeury, helper);
+                var data = QueryData(key, type, query, mapping, helper);
                 dataItem.Data = ObjectConvert.ConvertToDictionary<TItem>(data);
                 dataItem.Count = data.Count;
                 dataItem.QueryCount = 1;
@@ -196,7 +183,7 @@ namespace CRL.MemoryDataCache
         }
 
 
-        static List<object> QueryData(string key,Type type, string query, DBHelper helper)
+        static List<object> QueryData(string key,Type type, string query,List<Attribute.FieldMapping> mapping, DBHelper helper)
         {
             if (cacheDatas.Count > 1000)
             {
@@ -222,7 +209,10 @@ namespace CRL.MemoryDataCache
                 reader = helper.ExecDataReader(sql);
             }
             double runTime;
-            var list = ObjectConvert.DataReaderToList<object>(reader, type,out runTime, true);
+            var list = ObjectConvert.DataReaderToObjectList(reader, type, mapping, out runTime);
+            //var queryInfo = new LambdaQuery.Mapping.QueryInfo<object>(false, mapping);
+            //var list = ObjectConvert.DataReaderToIModelList2<object>(reader, queryInfo);
+
             string par = "";
             foreach (KeyValuePair<string, object> item in helper.Params)
             {
@@ -301,7 +291,7 @@ namespace CRL.MemoryDataCache
                 helper.Params = cacheItem.Params;
                 try
                 {
-                    var data = QueryData(key, cacheItem.Type, cacheItem.Query, helper);
+                    var data = QueryData(key, cacheItem.Type, cacheItem.Query, cacheItem.Mapping, helper);
                     //将新数据放放UpdateData中, 下次调用时填入Data
                     cacheItem.UpdatedData = data;
                     cacheItem.UpdateTime = DateTime.Now;
@@ -408,7 +398,7 @@ namespace CRL.MemoryDataCache
                     }
                     if (ts.TotalSeconds > timeOutSecend && needUpdate)
                     {
-                        needUpdates.Add(new UpdateItem() { Key = item.Key, TableName = item.Value.Query, DBHelper = item.Value.DBHelper, Params = item.Value.Params, UpdateTime = item.Value.UpdateTime, Type = item.Value.Type });
+                        needUpdates.Add(new UpdateItem() { Key = item.Key, TableName = item.Value.Query, DBHelper = item.Value.DBHelper, Params = item.Value.Params, UpdateTime = item.Value.UpdateTime, Type = item.Value.Type, Mapping = item.Value.Mapping });
                     }
                 }
             }
@@ -437,7 +427,7 @@ namespace CRL.MemoryDataCache
                     DBHelper helper = item.DBHelper;
                     helper.Params = item.Params;
                     //将新数据放放UpdateData中, 下次调用时填入Data
-                    var data = QueryData(item.Key, item.Type, item.TableName, helper);
+                    var data = QueryData(item.Key, item.Type, item.TableName, item.Mapping, helper);
                     cacheDatas[item.Key].UpdateTime = DateTime.Now;
                     cacheDatas[item.Key].UpdatedData = data;
                     cacheDatas[item.Key].Data = null;

@@ -178,10 +178,10 @@ namespace CRL.DBExtend.RelationDB
 
             if (query1.__Relations.Count > 0)
             {
-                string setString = ForamtSetValue<TModel>(updateValue,query.__JoinTypes.Keys.First());
                 var kv = query1.__Relations.First();
+                string setString = ForamtSetValue<TModel>(updateValue, kv.Key.OriginType);
                 var t1 = query1.QueryTableName;
-                var t2 = TypeCache.GetTableName(kv.Key, query1.__DbContext);
+                var t2 = TypeCache.GetTableName(kv.Key.OriginType, query1.__DbContext);
                 var join = query1.__Relations[kv.Key];
                 join = join.Substring(join.IndexOf(" on ") + 3);
                 if (!string.IsNullOrEmpty(conditions))

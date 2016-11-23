@@ -17,24 +17,25 @@ namespace CRL.DBExtend.MongoDB
 {
     public sealed partial class MongoDB
     {
-        public override List<TResult> Page<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query1)
-        {
-            var result = QueryList(query1);
-            if (typeof(TResult) == typeof(TModel))
-            {
-                return result as List<TResult>;
-            }
-            return result.ToType<TResult>();
-        }
-        public override List<TModel> Page<TModel>(LambdaQuery<TModel> query)
-        {
-            var result = QueryList(query);
-            return result;
-        }
-        public override List<dynamic> PageDynamic<TModel>(LambdaQuery.LambdaQuery<TModel> query1)
-        {
-            return GetDynamicResult(query1);
-        }
+        //public override List<TResult> Page<TResult>(LambdaQuery.LambdaQueryBase query1)
+        //{
+        //    throw new NotSupportedException();
+        //    //var result = QueryList(query1);
+        //    //if (typeof(TResult) == typeof(TModel))
+        //    //{
+        //    //    return result as List<TResult>;
+        //    //}
+        //    //return result.ToType<TResult>();
+        //}
+        //public override List<TModel> Page<TModel>(LambdaQuery<TModel> query)
+        //{
+        //    var result = QueryList(query);
+        //    return result;
+        //}
+        //public override List<dynamic> PageDynamic<TModel>(LambdaQuery.LambdaQuery<TModel> query1)
+        //{
+        //    return GetDynamicResult(query1);
+        //}
 
         
     }

@@ -181,7 +181,7 @@ namespace CRL
             string id = key.ToString();
             if (QueryCacheFromRemote)
             {
-                var expression = Base.GetQueryIdExpression<TModel>(id);
+                var expression = Base.GetQueryIdExpression<TModel>(key);
                 return QueryItemFromCache(expression);
             }
             else
@@ -249,7 +249,7 @@ namespace CRL
                         var primaryKey = TypeCache.GetTable(typeof(TModel)).PrimaryKey.MemberName;
                         if (member.Member.Name.ToUpper() == primaryKey.ToUpper())
                         {
-                            var value = LambdaCompileCache.GetParameExpressionValue(binary.Right).ToString();
+                            var value = ConstantValueVisitor.GetParameExpressionValue(binary.Right).ToString();
                             //var value = (int)Expression.Lambda(binary.Right).Compile().DynamicInvoke();
                             var all = GetCache(CacheQuery());
                             if(all==null)
@@ -305,7 +305,7 @@ namespace CRL
             if (!TypeCache.ModelKeyCache.ContainsKey(type))
             {
                 var db = GetDbHelper();//避开事务控制,使用新的连接
-                var list2 = db.QueryList<TModel>(query, out dataCacheKey);
+                var list2 = db.QueryOrFromCache<TModel>(query, out dataCacheKey);
                 list = ObjectConvert.ConvertToDictionary<TModel>(list2);
                 lock (lockObj)
                 {

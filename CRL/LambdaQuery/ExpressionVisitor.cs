@@ -21,12 +21,19 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 字段前辍 t1.
         /// </summary>
-        Dictionary<Type, string> Prefixs;
-        public ExpressionVisitor(DBAdapter.DBAdapterBase _DBAdapter, Dictionary<Type, string> __Prefixs)
+        Dictionary<Type, string> Prefixs
         {
-            Prefixs = __Prefixs;
-            __DBAdapter = _DBAdapter;
-            dbContext = _DBAdapter.dbContext;
+            get
+            {
+                return lambdaQueryBase.__Prefixs;
+            }
+        }
+        LambdaQueryBase lambdaQueryBase;
+        public ExpressionVisitor(LambdaQueryBase _lambdaQueryBase)
+        {
+            lambdaQueryBase = _lambdaQueryBase;
+            __DBAdapter = lambdaQueryBase.__DBAdapter;
+            dbContext = __DBAdapter.dbContext;
         }
 
         string FormatFieldPrefix(Type type, string fieldName)
@@ -166,6 +173,12 @@ namespace CRL.LambdaQuery
                 {
                     var fieldName = mExp.Member.Name;
                     var type = mExp.Expression.Type;
+                    if (type.BaseType == typeof(object))//按匿名类
+                    {
+                        var queryField = FormatFieldPrefix(type, fieldName);
+                        return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
+                    }
+ 
                     CRL.Attribute.FieldAttribute field ;
                     var a = TypeCache.GetProperties(type, true).TryGetValue(fieldName, out field);
                     if (!a)
@@ -458,39 +471,13 @@ namespace CRL.LambdaQuery
                     }
                     else
                     {
-                        var v = GetMemberExpressionValue(m);
+                        var v = ConstantValueVisitor.GetMemberExpressionValue(m);
                         return v;
                     }
                 }
             }
             //按编译
             return Expression.Lambda(expression).Compile().DynamicInvoke();
-        }
-        static object GetMemberExpressionValue(Expression exp)
-        {
-            if (exp.NodeType == ExpressionType.Constant)
-            {
-                return ((ConstantExpression)exp).Value;
-            }
-            if (exp.NodeType == ExpressionType.MemberAccess)
-            {
-                var mExp = (MemberExpression)exp;
-                object instance = null;
-                if (mExp.Expression != null)
-                {
-                    instance = GetMemberExpressionValue(mExp.Expression);
-                }
-                if (mExp.Member.MemberType == MemberTypes.Field)
-                {
-                    return ((FieldInfo)mExp.Member).GetValue(instance);
-                }
-                else if (mExp.Member.MemberType == MemberTypes.Property)
-                {
-                    return ((PropertyInfo)mExp.Member).GetValue(instance, null);
-                }
-                throw new CRLException("未能解析" + mExp.Member.MemberType);
-            }
-            throw new CRLException("未能解析" + exp.NodeType);
         }
     }
     internal class ExpressionValueObj

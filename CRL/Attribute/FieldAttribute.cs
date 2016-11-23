@@ -155,6 +155,17 @@ namespace CRL.Attribute
                 //query += "{" + ModelType.FullName + "}";
                 query += usePrefix;
             }
+            this.FieldMapping = new FieldMapping() { QueryName = MapingName, MappingName = mapingName };
+            if (!string.IsNullOrEmpty(mapingName))
+            {
+                FieldMapping.QueryName = mapingName;
+                FieldMapping.MappingName = mapingName;
+            }
+            else
+            {
+                FieldMapping.QueryName = MapingName;
+                FieldMapping.MappingName = MemberName;
+            }
             if (string.IsNullOrEmpty(fieldName))
             {
                 fieldName = withTablePrefix ? MapingName : _DBAdapter.KeyWordFormat(MapingName);
@@ -171,15 +182,20 @@ namespace CRL.Attribute
             }
             QueryField = query;
             var mappNameFull = fieldName;
+         
             if (!string.IsNullOrEmpty(mapingName))
             {
                 //MapingName = mapingName;
                 mappNameFull = mapingName;
             }
+ 
             if (withTablePrefix)
             {
+                FieldMapping.MappingName = mappNameFull;
                 mappNameFull = GetTableFieldFormat(TableName, mappNameFull);
+                FieldMapping.QueryName = mappNameFull;
             }
+
             //MapingName = mappNameFull;
             //别名不为空或有表前辍
             if (!string.IsNullOrEmpty(mapingName) || withTablePrefix)
@@ -330,9 +346,27 @@ namespace CRL.Attribute
             //}
             propertyInfo.SetValue(obj, value, null);
         }
+        /// <summary>
+        /// MongoDB用
+        /// </summary>
         internal FieldQuery FieldQuery;
+        internal FieldMapping FieldMapping;
     }
-
+    public class FieldMapping
+    {
+        /// <summary>
+        /// 查询名
+        /// </summary>
+        public string QueryName;
+        /// <summary>
+        /// 映射名
+        /// </summary>
+        public string MappingName;
+        public override string ToString()
+        {
+            return string.Format("Q:{0} M:{1}", QueryName, MappingName);
+        }
+    }
     internal class FieldQuery
     {
         /// <summary>

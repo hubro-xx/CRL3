@@ -79,6 +79,5 @@ namespace CRL.DBExtend.MongoDB
             }
             return ObjectConvert.ConvertObject<TType>(result);
         }
-
     }
 }

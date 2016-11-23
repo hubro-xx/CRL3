@@ -108,6 +108,7 @@
     <Content Include="Page\Sharding.aspx" />
     <Content Include="Page\TableExistsCache.aspx" />
     <Content Include="Page\TestAll.aspx" />
+    <Content Include="Page\QueryView.aspx" />
     <Content Include="pay.aspx" />
     <Content Include="Resources\sp_ExecuteScript_ORACLE.sql" />
     <Content Include="Resources\sp_page_MSSql.sql" />
@@ -292,6 +293,13 @@
     </Compile>
     <Compile Include="Page\TestAll.aspx.designer.cs">
       <DependentUpon>TestAll.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\QueryView.aspx.cs">
+      <DependentUpon>QueryView.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\QueryView.aspx.designer.cs">
+      <DependentUpon>QueryView.aspx</DependentUpon>
     </Compile>
     <Compile Include="pay.aspx.cs">
       <DependentUpon>pay.aspx</DependentUpon>

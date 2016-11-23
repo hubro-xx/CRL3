@@ -132,7 +132,6 @@ namespace CRL.LambdaQuery
                     name = right.Data;
                     value = left.Data;
                 }
-                name = ReplacePrefix(name.ToString());
                 switch (_expressionType)
                 {
                     case ExpressionType.Equal:
@@ -223,10 +222,6 @@ namespace CRL.LambdaQuery
             return this;
         }
         #region NotSupported
-        protected override LambdaQuery<T> InnerSelect<TInner>(System.Linq.Expressions.Expression<Func<T, object>> outField, System.Linq.Expressions.Expression<Func<TInner, object>> innerField, System.Linq.Expressions.Expression<Func<T, TInner, bool>> expression, string type)
-        {
-            throw new NotSupportedException();//不支持
-        }
 
         internal override string GetQueryFieldString()
         {

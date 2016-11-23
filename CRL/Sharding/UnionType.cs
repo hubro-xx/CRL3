@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CRL.Sharding
+namespace CRL
 {
     /// <summary>
     /// 分表联合查询时,关联方式

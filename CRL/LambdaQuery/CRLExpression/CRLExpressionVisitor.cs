@@ -53,7 +53,7 @@ namespace CRL.LambdaQuery.CRLExpression
                     return new CRLExpression() { Type = CRLExpressionType.Name, Data = mExp.Member.Name };
                 }
                 //var obj = Expression.Lambda(mExp).Compile().DynamicInvoke();
-                var obj = LambdaCompileCache.GetParameExpressionValue(mExp);
+                var obj = ConstantValueVisitor.GetParameExpressionValue(mExp);
                 if (obj is Enum)
                 {
                     obj = (int)obj;
@@ -83,7 +83,7 @@ namespace CRL.LambdaQuery.CRLExpression
                     {
                         //not like b.BarCode.Contains("abc")
                         //按变量或常量编译值
-                        var obj = LambdaCompileCache.GetParameExpressionValue(exp);
+                        var obj = ConstantValueVisitor.GetParameExpressionValue(exp);
                         return new CRLExpression() { Type = CRLExpressionType.Value, Data = obj };
                     }
                 }
@@ -91,7 +91,7 @@ namespace CRL.LambdaQuery.CRLExpression
                 {
                     //var cExp = mcExp.Object as ConstantExpression;
                     //like b.BarCode == aa()
-                    var obj = LambdaCompileCache.GetParameExpressionValue(exp);
+                    var obj = ConstantValueVisitor.GetParameExpressionValue(exp);
                     return new CRLExpression() { Type = CRLExpressionType.Value, Data = obj };
                 }
                 string methodName = mcExp.Method.Name;
@@ -105,28 +105,19 @@ namespace CRL.LambdaQuery.CRLExpression
                 else
                 {
                     field = mcExp.Object.ToString().Split('.')[1];
-                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[0]);
+                    var obj = ConstantValueVisitor.GetParameExpressionValue(mcExp.Arguments[0]);
                     args.Add(obj);
                     //args.Add(Expression.Lambda(mcExp.Arguments[0]).Compile().DynamicInvoke());
                 }
                 if (mcExp.Arguments.Count > 1)
                 {
-                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[1]);
-                    args.Add(obj);
-                    //args.Add(Expression.Lambda(mcExp.Arguments[1]).Compile().DynamicInvoke());
+                    for (int i = 1; i < mcExp.Arguments.Count; i++)
+                    {
+                        var obj = ConstantValueVisitor.GetParameExpressionValue(mcExp.Arguments[i]);
+                        args.Add(obj);
+                    }
                 }
-                if (mcExp.Arguments.Count > 2)
-                {
-                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[2]);
-                    args.Add(obj);
-                    //args.Add(Expression.Lambda(mcExp.Arguments[2]).Compile().DynamicInvoke());
-                }
-                if (mcExp.Arguments.Count > 3)
-                {
-                    var obj = LambdaCompileCache.GetParameExpressionValue(mcExp.Arguments[3]);
-                    args.Add(obj);
-                    //args.Add(Expression.Lambda(mcExp.Arguments[3]).Compile().DynamicInvoke());
-                }
+
                 var methodCall = string.Format("{0}|{1}|{2}", field, methodName, string.Join(",", args));
                 return new CRLExpression() { Type = CRLExpressionType.MethodCall, Data = methodCall };
                 throw new NotSupportedException("暂不支持");

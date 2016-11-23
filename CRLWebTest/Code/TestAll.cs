@@ -14,22 +14,13 @@ namespace WebTest.Code
 {
     public class TestAll
     {
-        public static Code.ProductData data
-        {
-            get
-            {
-                return new ProductData() { Id = 99 };
-            }
-        }
         public static void TestQuery()
         {
             var instance = Code.ProductDataManage.Instance;
             instance.QueryItem(1);
-            instance.QueryItem(b => b.Id == TestAll.data.Id);//多级变量
             var query = ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.TransType == TransType.In);
-            query.Select(b => new { b.InterFaceUser, bb = b.Id * b.Number,b.ProductName
-                });
+           
             var year = DateTime.Now.Year;
             query.Where(b => b.Year == year);//虚拟字段
             #region 扩展方法
@@ -54,13 +45,31 @@ namespace WebTest.Code
             query.Where(b => b.Id.ToString() == "123");//支持Cast转换
             query.Page(2, 1);
             query.OrderBy(b => b.Id * 1);
+            var result = query.SelectV(b => new
+            {
+                b.InterFaceUser,
+                bb = b.Id * b.Number,
+                b.ProductName
+            }).ToList();
             var sql1 = query.PrintQuery();
-            var list = query.ToDynamic();
             #endregion
-
+        }
+        public static void TestView()
+        {
+            var q1 = Code.OrderManage.Instance.GetLambdaQuery();
+            var q2 = q1.CreateQuery<Code.ProductData>();
+            q2.Where(b => b.Id > 0);
+            var view = q2.CreateQuery<Code.Member>().GroupBy(b => b.Name).Where(b => b.Id > 0).SelectV(b => new { b.Name, aa = b.Id.COUNT() });//GROUP查询
+            var view2 = q2.Join(view, (a, b) => a.CategoryName == b.Name).Select((a, b) => new { ss1 = a.UserId, ss2 = b.aa });//关联GROUP
+            q1.Join(view2, (a, b) => a.Id == b.ss1).Select((a, b) => new { a.Id, b.ss1 });//再关联
+            //var result = view2.ToList();
+            var sql = q1.ToString();
+        }
+        public static void TestJoin()
+        {
             #region 关联
             //索引值
-            query = ProductDataManage.Instance.GetLambdaQuery();
+            var query = ProductDataManage.Instance.GetLambdaQuery();
             var join = query.Join<Code.Member>((a, b) => a.UserId == b.Id && a.BarCode.Contains("1"))
                 .SelectAppendValue(b => b.Mobile).OrderBy(b => b.Id, true);
             join.Where(b => b.AccountNo == "123");//按join追加条件
@@ -84,18 +93,25 @@ namespace WebTest.Code
             query = ProductDataManage.Instance.GetLambdaQuery();
             query.Join<Code.Member>((a, b) => a.UserId == b.Id && a.BarCode.Contains("1"))
                 .SelectAppendValue(b => b.Mobile).OrderBy(b => b.Id, true).Join<Code.Order>((a, b) => a.Id == b.UserId);
+
             //按IN查询
             query = ProductDataManage.Instance.GetLambdaQuery();
-            query.In<Code.Member>(b => b.UserId, b => b.Id, (a, b) => a.SupplierId == "10" && b.Name == "123");
+            var query2 = query.CreateQuery<Code.Member>();
+            var view = query2.Where(b => b.Name == "123").SelectV(b => b.Id);
+            query.In(view, b => b.UserId);
             var sql2 = query.PrintQuery();
             //按exists
             query = ProductDataManage.Instance.GetLambdaQuery();
-            query.Exists<Code.Order>(b => b.UserId, (a, b) => a.SupplierId == "10" && b.Status == 2);
+            query2 = query.CreateQuery<Code.Member>();
+            var view2 = query2.Where(b => b.Name == "123").SelectV(b => b.Id);
+            query.Exists(view2);
             sql2 = query.PrintQuery();
             #endregion
-
+        }
+        public static void TestGroup()
+        {
             #region GROUP
-            query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.Id > 0);
             //选择GROUP字段
             query.Select(b => new
@@ -107,7 +123,7 @@ namespace WebTest.Code
                 num1 = b.SUM(x => x.Number * x.Id),
                 num2 = b.MAX(x => x.Number * x.Id),
                 num3 = b.MIN(x => x.Number * x.Id),
-                num4 = b.AVG(x => x.Number * x.Id) 
+                num4 = b.AVG(x => x.Number * x.Id)
             });
             //GROUP条件
             query.GroupBy(b => new { b.ProductName });
@@ -116,14 +132,16 @@ namespace WebTest.Code
             //设置排序
             query.OrderBy(b => b.BarCode.Count(), true);//等效为 order by count(BarCode) desc
             var list4 = query.ToDynamic();
-            foreach(var item in list4)
+            foreach (var item in list4)
             {
                 var total = item.total;
             }
             #endregion
-
+        }
+        public static void TestDistinct()
+        {
             #region DISTINCT
-            query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.Id > 0);
             query.DistinctBy(b => new { b.ProductName });
             //query.DistinctCount();//表示count Distinct 结果名为Total
@@ -134,8 +152,20 @@ namespace WebTest.Code
                 var name = item.ProductName;
             }
             #endregion
-
+        }
+        public static void TestUnion()
+        {
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            var query2 = query.CreateQuery<Code.Order>();
+            var view1 = query.SelectV(b => new { a1 = b.Id, a2 = b.ProductName });
+            var view2 = query2.SelectV(b => new { a1 = b.Id, a2 = b.Remark });
+            var result = view1.Union(view2).OrderBy(b => b.a1).OrderBy(b => b.a2, false).ToList();
+            string sql = query.ToString();
+        }
+        public static void TestFunc()
+        {
             #region 函数
+            var instance = Code.ProductDataManage.Instance;
             //按条件id>0,合计Number列
             var sum = instance.Sum(b => b.Id > 0, b => b.Number * b.UserId);
             //按条件id>0,进行总计
@@ -143,11 +173,42 @@ namespace WebTest.Code
             var max = instance.Max(b => b.Id > 0, b => b.Id);
             var min = instance.Min(b => b.Id > 0, b => b.Id);
             //使用语句进行函数查询
-            query = ProductDataManage.Instance.GetLambdaQuery();
+            var query = ProductDataManage.Instance.GetLambdaQuery();
             query.Select(b => b.Number.SUM());
             decimal sum2 = query.ToScalar();
             #endregion
         }
+
+        public static void TestFileMapping()
+        {
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query.Where(b => b.Id > 0);
+            query.DistinctBy(b => new { b.ProductName });
+            query.DistinctCount();//表示count Distinct 结果名为Total
+            var list5 = query.ToDynamic();
+            foreach (var item in list5)
+            {
+                var total = item.Total;
+                //var name = item.ProductName;
+            }
+            var query2 = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query2.Select(b => new { name2 = b.ProductName, ss2 = b.PurchasePrice * b.Id });
+            query2.Where(b => b.Id > 0);
+            var result = query2.ToDynamic();
+            foreach (var d in result)
+            {
+                var a = d.name2;
+                var c = d.ss2;
+            }
+            var query3 = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query3.Join<Code.Member>((a, b) => a.UserId == b.Id).SelectAppendValue(b => b.Name);
+            var resutl3 = query3.ToList();
+            foreach (var d in resutl3)
+            {
+                var a = d.Bag.Name;
+            }
+        }
+
         public static void TestUpdate()
         {
             var instance = Code.ProductDataManage.Instance;
@@ -189,7 +250,7 @@ namespace WebTest.Code
 
             #region 缓存更新
             //按编号为1的数据
-            var item = Code.ProductDataManage.Instance.QueryFromCache(b => b.Id > 0).FirstOrDefault();
+            var item = Code.ProductDataManage.Instance.QueryItemFromCache(b => b.Id > 0);
             item.CheckNull("item");
             var guid = Guid.NewGuid().ToString().Substring(0,8);
             item.Change(b => b.SupplierName, guid);

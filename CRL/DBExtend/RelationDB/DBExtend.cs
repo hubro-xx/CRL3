@@ -170,7 +170,12 @@ namespace CRL.DBExtend.RelationDB
             sql = _DBAdapter.SqlFormat(sql);
             var reader = GetDataReader(sql, types);
             double runTime;
-            return ObjectConvert.DataReaderToList<T>(reader, out runTime);
+            //return ObjectConvert.DataReaderToList<T>(reader, out runTime);
+            var pro = TypeCache.GetTable(typeof(T)).Fields;
+            var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, mapping);
+            var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
+            return list;
         }
         
         DbDataReader GetDataReader(string sql, params Type[] types)
@@ -256,7 +261,12 @@ namespace CRL.DBExtend.RelationDB
             var reader = dbHelper.RunDataReader(sp);
             ClearParame();
             double runTime;
-            return ObjectConvert.DataReaderToList<T>(reader, out runTime);
+            //return ObjectConvert.DataReaderToList<T>(reader, out runTime);
+            var pro = TypeCache.GetTable(typeof(T)).Fields;
+            var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, mapping);
+            var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
+            return list;
         }
         /// <summary>
         /// 执行一个存储过程
@@ -348,6 +358,10 @@ namespace CRL.DBExtend.RelationDB
         internal override void CheckTableCreated(Type type)
         {
             if (!SettingConfig.CheckModelTableMaping)
+            {
+                return;
+            }
+            if (!type.IsSubclassOf(typeof(IModel)))
             {
                 return;
             }

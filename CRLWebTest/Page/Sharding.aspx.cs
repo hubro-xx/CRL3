@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using CRL.Sharding;
+using CRL;
 namespace WebTest.Page
 {
     public partial class Sharding : System.Web.UI.Page

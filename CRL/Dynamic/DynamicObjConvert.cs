@@ -16,25 +16,8 @@ namespace CRL.Dynamic
 {
     internal class DynamicObjConvert
     {
-        static dynamic getDataRow(DataRow dr)
-        {
-            dynamic obj = new System.Dynamic.ExpandoObject();
-            var dict = obj as IDictionary<string, object>;
-            foreach (DataColumn col in dr.Table.Columns)
-            {
-                dict.Add(col.ColumnName, dr[col.ColumnName]);
-            }
-            return obj;
-        }
-        public static IEnumerable<dynamic> _DataTableToDynamic(DataTable dt)
-        {
-            foreach (DataRow row in dt.Rows)
-            {
-                var d = getDataRow(row);
-                yield return d;
-            }
-        }
-        static dynamic getDataRow(List<string> columns,object[] values)
+
+        static dynamic getRow(List<string> columns,object[] values)
         {
             dynamic obj = new System.Dynamic.ExpandoObject();
             var dict = obj as IDictionary<string, object>;
@@ -60,46 +43,8 @@ namespace CRL.Dynamic
             {
                 object[] values = new object[columns.Count];
                 reader.GetValues(values);
-                var d = getDataRow(columns, values);
+                var d = getRow(columns, values);
                 list.Add(d);
-            }
-            reader.Close();
-            runTime = (DateTime.Now - time).TotalMilliseconds;
-            return list;
-        }
-        /// <summary>
-        /// 返回匿名类型
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="reader"></param>
-        /// <param name="resultSelector"></param>
-        /// <param name="runTime"></param>
-        /// <returns></returns>
-        public static List<TResult> DataReaderToDynamic<T, TResult>(System.Data.Common.DbDataReader reader, Expression<Func<T, TResult>> resultSelector, out double runTime) where T : IModel, new()
-        {
-            var time = DateTime.Now;
-            List<TResult> list = new List<TResult>();
-            var typeArry = TypeCache.GetProperties(typeof(T), true).Values;
-            var columns = new Dictionary<string, int>();
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                columns.Add(reader.GetName(i).ToLower(), i);
-            }
-            var reflection = ReflectionHelper.GetInfo<T>();
-            var actions = new List<CRL.ObjectConvert.ActionItem<T>>();
-            var first = true;
-            //var objOrigin = new T();
-            while (reader.Read())
-            {
-                object objInstance = reflection.CreateObjectInstance();
-        
-                object[] values = new object[columns.Count];
-                reader.GetValues(values);
-                var detailItem = ObjectConvert.DataReaderToObj<T>(columns, values, reflection, true, objInstance, typeArry, actions, first) as T;
-                var result = resultSelector.Compile()(detailItem);
-                list.Add(result);
-                first = false;
             }
             reader.Close();
             runTime = (DateTime.Now - time).TotalMilliseconds;

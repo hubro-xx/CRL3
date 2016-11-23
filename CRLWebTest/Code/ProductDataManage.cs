@@ -18,6 +18,10 @@ namespace WebTest.Code
     /// </summary>
     public class ProductDataManage : CRL.BaseProvider<ProductData>
     {
+        protected override CRL.LambdaQuery.LambdaQuery<ProductData> CacheQuery()
+        {
+            return GetLambdaQuery().Where(b => b.Id < 1000).Expire(10); ;
+        }
         /// <summary>
         /// 对象被更新时,是否通知缓存服务器
         /// </summary>
@@ -25,7 +29,7 @@ namespace WebTest.Code
         {
             get
             {
-                return true;
+                return false;
             }
         }
         /// <summary>

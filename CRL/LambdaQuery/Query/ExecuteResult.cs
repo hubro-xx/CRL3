@@ -53,23 +53,7 @@ namespace CRL.LambdaQuery
         public List<dynamic> ToDynamic()
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            if (SkipPage > 0)
-            {
-                return db.PageDynamic(this);
-            }
             return db.QueryDynamic(this);
-        }
-        /// <summary>
-        /// 按select返回匿名对象
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="resultSelector"></param>
-        /// <returns></returns>
-        public List<TResult> ToDynamic<TResult>(Expression<Func<T, TResult>> resultSelector)
-        {
-            //只能做到当前对象筛选
-            var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            return db.QueryDynamic(this, resultSelector);
         }
         /// <summary>
         /// 返回指定类型
@@ -81,11 +65,7 @@ namespace CRL.LambdaQuery
             where TResult : class,new()
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            if (SkipPage > 0)
-            {
-                return db.Page<T, TResult>(this);
-            }
-            return db.QueryDynamic<T, TResult>(this);
+            return db.QueryResult<TResult>(this);
         }
         /// <summary>
         /// 返回当前类型
@@ -95,11 +75,6 @@ namespace CRL.LambdaQuery
         public List<T> ToList()
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            //如果是筛选后的结果,属性可能匹配不上
-            if (SkipPage > 0)
-            {
-                return db.Page<T>(this);
-            }
             return db.QueryList(this);
         }
         /// <summary>

@@ -13,7 +13,7 @@ namespace CRL
     internal static class ReflectionHelper
     {
         static Dictionary<Type, object> ReflectionInfoCache = new Dictionary<Type, object>(50);
-        public static ReflectionInfo<TObject> GetInfo<TObject>()
+        public static ReflectionInfo<TObject> GetInfo<TObject>(System.Reflection.ConstructorInfo constructor = null)
         {
             var type = typeof(TObject);
             object info;
@@ -30,7 +30,7 @@ namespace CRL
         }
     }
 
-    class ReflectionInfo<TObject>
+    public class ReflectionInfo<TObject>
     {
         public string TableName { get; set; }
 
@@ -42,6 +42,7 @@ namespace CRL
             CreateObjectInstance = Expression.Lambda<Func<TObject>>(Expression.New(modelType)).Compile();
             InitInfo(modelType);
         }
+
 
         private void InitInfo(Type modelType)
         {
@@ -177,7 +178,7 @@ namespace CRL
         public Accessor GetAccessor(string fieldName)
         {
             Accessor accessor;
-            return accessorDict[fieldName.ToUpper()];
+            //return accessorDict[fieldName.ToUpper()];
             if (accessorDict.TryGetValue(fieldName.ToUpper(), out accessor))
             {
                 return accessor;
