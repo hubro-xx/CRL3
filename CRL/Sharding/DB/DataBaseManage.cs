@@ -18,12 +18,20 @@ namespace CRL.Sharding.DB
         {
             get { return new DataBaseManage(); }
         }
+        /// <summary>
+        /// 清除配置
+        /// </summary>
         public void CleanData()
         {
             DBExtend.Delete<DataBase>(b=>b.Id>0);
             DBExtend.Delete<Table>(b => b.Id > 0);
             DBExtend.Delete<TablePart>(b => b.Id > 0);
         }
+        /// <summary>
+        /// 创建库配置
+        /// 多次调用递增处理
+        /// </summary>
+        /// <param name="item"></param>
         public void Create(DataBase item)
         {
             var db = QueryItem(b => b.Id > 0, true);

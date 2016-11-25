@@ -11,18 +11,20 @@ namespace CRL.LambdaQuery
     /// 关联视图查询
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TJoin"></typeparam>
-    public sealed class LambdaQueryViewJoin<T, TJoin, TJoinResult>
+    /// <typeparam name="TJoinResult"></typeparam>
+    public sealed class LambdaQueryViewJoin<T, TJoinResult>
         where T : IModel, new()
     {
+        LambdaQueryResultSelect<TJoinResult> resultSelect;
         /// <summary>
         /// 关联查询分支
         /// </summary>
         /// <param name="query"></param>
-        /// <param name="resultSelect"></param>
-        internal LambdaQueryViewJoin(LambdaQuery<T> query, LambdaQueryResultSelect<TJoin, TJoinResult> resultSelect)
+        /// <param name="_resultSelect"></param>
+        internal LambdaQueryViewJoin(LambdaQuery<T> query, LambdaQueryResultSelect<TJoinResult> _resultSelect)
         {
             BaseQuery = query;
+            resultSelect = _resultSelect;
         }
         LambdaQuery<T> BaseQuery;
 
@@ -31,21 +33,23 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="resultSelector"></param>
         /// <returns></returns>
-        public LambdaQueryResultSelect<TJoinResult, TJoinResult2> Select<TJoinResult2>(Expression<Func<T, TJoinResult, TJoinResult2>> resultSelector)
+        public LambdaQueryResultSelect<TJoinResult2> Select<TJoinResult2>(Expression<Func<T, TJoinResult, TJoinResult2>> resultSelector)
             where TJoinResult2 : class
         {
-            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, false, typeof(T), typeof(TJoin));
+            var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
+            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, false, parameters);
             var prefix1 = BaseQuery.GetPrefix(typeof(TJoinResult));
-            var prefix2 = BaseQuery.GetPrefix(typeof(TJoin));
+            var prefix2 = BaseQuery.GetPrefix(resultSelect.InnerType);
+            //替换匿名前辍
             foreach (var item in resultFields)
             {
-                if (item.QueryFullScript.StartsWith(prefix1))
+                if (item.QueryFullScript.Contains(prefix1))
                 {
                     item.QueryFullScript = item.QueryFullScript.Replace(prefix1, prefix2);
                 }
             }
             BaseQuery.__QueryFields = resultFields;
-            return new LambdaQueryResultSelect<TJoinResult, TJoinResult2>(BaseQuery, resultSelector.Body);
+            return new LambdaQueryResultSelect<TJoinResult2>(BaseQuery, resultSelector.Body);
         }
         /// <summary>
         /// 选择TJoin关联值到对象内部索引
@@ -60,12 +64,14 @@ namespace CRL.LambdaQuery
             {
                 BaseQuery.SelectAll();
             }
-            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, true, typeof(TJoin));
+            var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
+            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, true, parameters);
             var prefix1 = BaseQuery.GetPrefix(typeof(TJoinResult));
-            var prefix2 = BaseQuery.GetPrefix(typeof(TJoin));
+            var prefix2 = BaseQuery.GetPrefix(resultSelect.InnerType);
+            //替换匿名前辍
             foreach (var item in resultFields)
             {
-                if (item.QueryFullScript.StartsWith(prefix1))
+                if (item.QueryFullScript.Contains(prefix1))
                 {
                     item.QueryFullScript = item.QueryFullScript.Replace(prefix1, prefix2);
                 }
@@ -80,10 +86,11 @@ namespace CRL.LambdaQuery
         /// <param name="expression"></param>
         /// <param name="desc"></param>
         /// <returns></returns>
-        public LambdaQueryViewJoin<T, TJoin, TJoinResult> OrderBy<TResult>(Expression<Func<TJoin, TResult>> expression, bool desc = true) 
+        public LambdaQueryViewJoin<T, TJoinResult> OrderBy<TResult>(Expression<Func<TJoinResult, TResult>> expression, bool desc = true) 
         {
             //var innerType = typeof(TJoin);
-            var fields = BaseQuery.GetSelectField(false, expression.Body, false, typeof(T), typeof(TJoin));
+            var parameters = expression.Parameters.Select(b => b.Type).ToArray();
+            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters);
             if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
             {
                 BaseQuery.__QueryOrderBy += ",";

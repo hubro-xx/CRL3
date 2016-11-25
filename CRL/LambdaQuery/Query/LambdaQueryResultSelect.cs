@@ -10,12 +10,17 @@ namespace CRL.LambdaQuery
     /// <summary>
     /// 返回强类型选择结果查询
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <typeparam name="TResult"></typeparam>
-    public sealed class LambdaQueryResultSelect<T, TResult>
+    public sealed class LambdaQueryResultSelect<TResult>
     {
-
         Expression resultSelectorBody;
+        public Type InnerType
+        {
+            get
+            {
+                return BaseQuery.__MainType;
+            }
+        }
         internal LambdaQueryResultSelect(LambdaQueryBase query, Expression _resultSelectorBody)
         {
             resultSelectorBody=_resultSelectorBody;
@@ -27,33 +32,36 @@ namespace CRL.LambdaQuery
         /// 联合查询
         /// 会清除父查询的排序
         /// </summary>
-        /// <typeparam name="T2"></typeparam>
         /// <typeparam name="TResult2"></typeparam>
-        /// <param name="view2"></param>
+        /// <param name="resultSelect"></param>
         /// <param name="unionType"></param>
         /// <returns></returns>
-        public LambdaQueryResultSelect<T, TResult> Union<T2, TResult2>(LambdaQueryResultSelect<T2, TResult2> view2, UnionType unionType = UnionType.UnionAll)
+        public LambdaQueryResultSelect<TResult> Union<TResult2>(LambdaQueryResultSelect<TResult2> resultSelect, UnionType unionType = UnionType.UnionAll)
         {
             BaseQuery.__QueryOrderBy = "";//清除OrderBy
-            BaseQuery.AddUnion(view2.BaseQuery, unionType);
+            BaseQuery.AddUnion(resultSelect.BaseQuery, unionType);
             return this;
         }
+        string __QueryOrderBy = "";
         /// <summary>
         /// 设置排序
+        /// 会重置原排序
         /// </summary>
         /// <typeparam name="TResult2"></typeparam>
         /// <param name="expression"></param>
         /// <param name="desc"></param>
         /// <returns></returns>
-        public LambdaQueryResultSelect<T, TResult> OrderBy<TResult2>(Expression<Func<TResult, TResult2>> expression, bool desc = true)
+        public LambdaQueryResultSelect<TResult> OrderBy<TResult2>(Expression<Func<TResult, TResult2>> expression, bool desc = true)
         {
-            var fields = BaseQuery.GetSelectField(false, expression.Body, false, typeof(T));
+            var parameters = expression.Parameters.Select(b => b.Type).ToArray();
+            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters);
             var orderBy = string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
-            if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
+            if (!string.IsNullOrEmpty(__QueryOrderBy))
             {
-                BaseQuery.__QueryOrderBy += ",";
+                __QueryOrderBy += ",";
             }
-            BaseQuery.__QueryOrderBy += orderBy;
+            __QueryOrderBy += orderBy;
+            BaseQuery.__QueryOrderBy = __QueryOrderBy;
             return this;
         }
         /// <summary>
@@ -63,6 +71,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public List<TResult2> ToList<TResult2>()
         {
+            //todo MongoDB未实现
             var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
             return db.QueryResult<TResult2>(BaseQuery);
         }
@@ -72,6 +81,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public List<TResult> ToList()
         {
+            //todo MongoDB未实现
             var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
             if (resultSelectorBody is NewExpression)
             {
@@ -79,6 +89,16 @@ namespace CRL.LambdaQuery
                 return db.QueryResult<TResult>(BaseQuery, newExpression);
             }
             throw new CRLException("ToList不支持此表达式 " + resultSelectorBody);
+        }
+        /// <summary>
+        /// 返回动态类型
+        /// </summary>
+        /// <returns></returns>
+        public List<dynamic> ToDynamic()
+        { 
+            //todo MongoDB未实现
+            var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
+            return db.QueryDynamic(BaseQuery);
         }
     }
 }

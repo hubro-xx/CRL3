@@ -73,7 +73,7 @@ namespace CRL.LambdaQuery
                 var dic = MethodAnalyze.GetMethos(_DBAdapter);
                 if (!dic.ContainsKey(method.MethodName))
                 {
-                    throw new CRLException("LambdaQuery不支持方法" + method.MethodName);
+                    throw new CRLException("LambdaQuery不支持扩展方法" + method.MemberQueryName + "." + method.MethodName);
                 }
                 int newParIndex = parIndex;
                 par = dic[method.MethodName](method, ref newParIndex, AddParame);
@@ -229,82 +229,117 @@ namespace CRL.LambdaQuery
             else if (exp is MethodCallExpression)
             {
                 MethodCallExpression mcExp = (MethodCallExpression)exp;
-                
-                if (mcExp.Object is MemberExpression)
-                {
-                    var mExp = mcExp.Object as MemberExpression;
-                    if (mExp.Expression.NodeType != ExpressionType.Parameter)
-                    {
-                        //not like b.BarCode.Contains("abc")
-                        //按变量或常量编译值
-                        var obj = GetParameExpressionValue(exp);
-                        //return obj + "";
-                        return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
-                    }
-                }
-                else if (mcExp.Object is ConstantExpression)
-                {
-                    //var cExp = mcExp.Object as ConstantExpression;
-                    //like b.BarCode == aa()
-                    var obj = GetParameExpressionValue(exp);
-                    //return obj + "";
-                    return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
-                }
-                //var _DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(dbContext);
-                //var methodAnalyze = new CRL.LambdaQuery.MethodAnalyze(_DBAdapter);
-
-                #region 方法
-                //请扩展ExtensionMethod的方法
+                var arguments = new List<object>();
+                var allArguments = mcExp.Arguments;
+                MemberExpression memberExpression;
+                Expression args;
+                int argsIndex = 0;
+                string methodField = "";
+                string memberName = "";
                 string methodName = mcExp.Method.Name;
-                parIndex += 1;
-                //var dic = MethodAnalyze.GetMethos(_DBAdapter);
-                //if (!dic.ContainsKey(methodName))
-                //{
-                //    //return Expression.Lambda(exp).Compile().DynamicInvoke() + "";
-                //    throw new CRLException("LambdaQuery不支持方法" + mcExp.Method.Name);
-                //}
-                string field = "";
-                #region par
-                List<object> args = new List<object>();
-                if (mcExp.Object == null)
+                if (mcExp.Method.IsStatic)//区分静态方法还是实例方法
                 {
-                    field = RouteExpressionHandler(mcExp.Arguments[0]).Data.ToString();
+                    args = allArguments[0];//like b.Name.IsNull("22")
+                    argsIndex = 1;
                 }
                 else
                 {
-                    field = mcExp.Object.ToString().Split('.')[1];
-
-                    var mExpression = mcExp.Object as MemberExpression;
-                    var type = mExpression.Expression.Type;
-                    var filed2 = TypeCache.GetProperties(type, true)[field];
-                    field = FormatFieldPrefix(type, filed2.MapingName);
-                    if (mcExp.Arguments.Count > 0)
-                    {
-                        var obj = GetParameExpressionValue(mcExp.Arguments[0]);
-                        args.Add(obj);
-                    }
+                    args = mcExp.Object;//like b.Id.ToString()
                 }
-                if (mcExp.Arguments.Count > 1)
+                if (args is ParameterExpression)
                 {
-                    for (int i = 1; i < mcExp.Arguments.Count; i++)
+                    var exp2 = mcExp.Arguments[1] as UnaryExpression;
+                    var type = exp2.Operand.GetType();
+                    var p = type.GetProperty("Body");
+                    var exp3 = p.GetValue(exp2.Operand, null) as Expression;
+                    methodField = RouteExpressionHandler(exp3).SqlOut;
+                    memberName = "";
+                }
+                else if (args is UnaryExpression)//like a.Code.Count()
+                {
+                    memberExpression = (args as UnaryExpression).Operand as MemberExpression;
+                    memberName = memberExpression.Member.Name;
+                    methodField = FormatFieldPrefix(memberExpression.Expression.Type, memberExpression.Member.Name);
+                }
+                else if (args is MemberExpression)
+                {
+                    //like a.Code
+                    memberExpression = args as MemberExpression;
+                    memberName = memberExpression.Member.Name;
+                    var type = memberExpression.Expression.Type;
+                    if (type.IsSubclassOf(typeof(IModel)))
                     {
-                        var obj = GetParameExpressionValue(mcExp.Arguments[i]);
-                        args.Add(obj);
+                        memberName = TypeCache.GetProperties(type, true)[memberExpression.Member.Name].MapingName;
+                    }
+                    methodField = FormatFieldPrefix(memberExpression.Expression.Type, memberName);
+                    for (int i = argsIndex; i < allArguments.Count; i++)
+                    {
+                        var obj = GetParameExpressionValue(allArguments[i]);
+                        arguments.Add(obj);
                     }
                 }
+                else if (args is ConstantExpression)//按常量
+                {
+                    var obj = ConstantValueVisitor.GetParameExpressionValue(args);
+                    arguments.Add(obj);
+                }
+                else
+                {
+                    throw new CRLException("不支持此语法解析:" + args);
+                }
+                //if (mcExp.Object is MemberExpression)
+                //{
+                //    var mExp = mcExp.Object as MemberExpression;
+                //    if (mExp.Expression.NodeType != ExpressionType.Parameter)
+                //    {
+                //        //not like b.BarCode.Contains("abc")
+                //        //按变量或常量编译值
+                //        var obj = GetParameExpressionValue(exp);
+                //        //return obj + "";
+                //        return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
+                //    }
+                //}
+                //else if (mcExp.Object is ConstantExpression)
+                //{
+                //    //var cExp = mcExp.Object as ConstantExpression;
+                //    //like b.BarCode == aa()
+                //    var obj = GetParameExpressionValue(exp);
+                //    //return obj + "";
+                //    return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
+                //}
+                //请扩展ExtensionMethod的方法
+
+                //parIndex += 1;
+                //string field = "";
+                #region par
+                //if (mcExp.Method.IsStatic)//区分静态方法还是实例方法
+                //{
+                //    //like b.Name.IsNull("22")
+                //    field = RouteExpressionHandler(mcExp.Arguments[0]).Data.ToString();
+                //    argsIndex = 1;
+                //}
+                //else
+                //{
+                //    //like b.Id.ToString()
+                //    var mExpression = mcExp.Object as MemberExpression;
+                //    field = mExpression.Member.Name;
+                //    var type = mExpression.Expression.Type;
+                //    var filed2 = TypeCache.GetProperties(type, true)[field];
+                //    field = FormatFieldPrefix(type, filed2.MapingName);
+                //}
+                //for (int i = argsIndex; i < mcExp.Arguments.Count; i++)
+                //{
+                //    var obj = GetParameExpressionValue(mcExp.Arguments[i]);
+                //    allArgs.Add(obj);
+                //}
                 #endregion
-                //int newParIndex = parIndex;
                 if (nodeType == null)
                 {
                     nodeType = ExpressionType.Equal;
                 }
-                //var result = dic[methodName](field, nodeType.Value, ref newParIndex, AddParame, args.ToArray());
-                //parIndex = newParIndex;
-                //return result;
-                var methodInfo = new CRLExpression.MethodCallObj() { Args = args, ExpressionType = nodeType.Value, MemberName = field.Substring(field.LastIndexOf("}") + 1), MethodName = methodName, MemberQueryName = field };
+                var methodInfo = new CRLExpression.MethodCallObj() { Args = arguments, ExpressionType = nodeType.Value, MemberName = memberName, MethodName = methodName, MemberQueryName = methodField };
                 methodInfo.ReturnType = mcExp.Type;
                 return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.MethodCall, Data = methodInfo };
-                #endregion
             }
             else if (exp is ConstantExpression)
             {
@@ -373,7 +408,7 @@ namespace CRL.LambdaQuery
                 throw new CRLException("不支持此语法解析:" + exp);
             }
         }
-        void AddParame(string name, object value)
+        public void AddParame(string name, object value)
         {
             QueryParames.Add(name, value);
             //parIndex += 1;

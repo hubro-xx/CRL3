@@ -327,6 +327,10 @@ namespace CRL.DBAdapter
         {
             return string.Format("lower({0})", field);
         }
+        public virtual string IsNull(string field, object value)
+        {
+            return string.Format("isnull({0},{1})", field, value);
+        }
         #endregion
 
         /// <summary>

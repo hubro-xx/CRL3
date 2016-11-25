@@ -59,20 +59,20 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 创建关联一个强类型查询
         /// </summary>
-        /// <typeparam name="TJoin"></typeparam>
         /// <typeparam name="TJoinResult"></typeparam>
         /// <param name="resultSelect"></param>
         /// <param name="expression"></param>
         /// <param name="joinType"></param>
         /// <returns></returns>
-        public LambdaQueryViewJoin<T, TJoin, TJoinResult> Join<TJoin, TJoinResult>(LambdaQueryResultSelect<TJoin, TJoinResult> resultSelect, Expression<Func<T, TJoinResult, bool>> expression, JoinType joinType = JoinType.Inner) 
+        public LambdaQueryViewJoin<T, TJoinResult> Join<TJoinResult>(LambdaQueryResultSelect<TJoinResult> resultSelect, Expression<Func<T, TJoinResult, bool>> expression, JoinType joinType = JoinType.Inner) 
         {
             if(!resultSelect.BaseQuery.__FromDbContext)
             {
                 throw new CRLException("关联需要由LambdaQuery.CreateQuery创建");
             }
-            var query2 = new LambdaQueryViewJoin<T, TJoin, TJoinResult>(this, resultSelect);
-            var innerType = typeof(TJoin);
+            var query2 = new LambdaQueryViewJoin<T, TJoinResult>(this, resultSelect);
+            //var innerType = typeof(TSource);
+            var innerType = resultSelect.InnerType;
             //__JoinTypes.Add(new TypeQuery(innerType, "T_" + prefixIndex), joinType);
             var prefix1 = GetPrefix(innerType);
             var prefix2 = GetPrefix(typeof(TJoinResult));

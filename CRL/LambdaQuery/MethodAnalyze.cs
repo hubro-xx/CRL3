@@ -53,6 +53,7 @@ namespace CRL.LambdaQuery
                 methodDic.Add("In", In);
                 methodDic.Add("Substring", Substring);
                 methodDic.Add("COUNT", Count);
+                methodDic.Add("Count", Count);
                 methodDic.Add("SUM", Sum);
                 methodDic.Add("MAX", Max);
                 methodDic.Add("MIN", Min);
@@ -67,11 +68,22 @@ namespace CRL.LambdaQuery
                 methodDic.Add("ToBoolean", CaseToType);
                 methodDic.Add("ToDateTime", CaseToType);
                 methodDic.Add("ToInt16", CaseToType);
+                methodDic.Add("Parse", CaseToType);
                 methodDic.Add("ToSingle", CaseToType);
                 methodDic.Add("ToUpper", ToUpper);
                 methodDic.Add("ToLower", ToLower);
+                methodDic.Add("IsNull", IsNull);
             }
             return methodDic;
+        }
+        public string IsNull(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            var args = methodInfo.Args.First();
+            string parName = string.Format("@isnull{0}", parIndex);
+            parIndex += 1;
+            addParame(parName, args);
+            return dBAdapter.IsNull(field, parName);
         }
         public string ToUpper(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
@@ -94,6 +106,13 @@ namespace CRL.LambdaQuery
         public string CaseToType(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
             var field = methodInfo.MemberQueryName;
+            if (string.IsNullOrEmpty(field))//按转换常量算
+            {
+                string parName = string.Format("@case{0}", parIndex);
+                parIndex += 1;
+                addParame(parName, methodInfo.Args.First());
+                field = parName;
+            }
             return dBAdapter.CastField(field, methodInfo.ReturnType);
         }
 

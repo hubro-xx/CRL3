@@ -18,7 +18,7 @@
             </ul>
                 </li>
                 <li><strong>开发效率</strong>:不需要额外工具生成,不需要繁琐的拼接字符串,通过代码复用,大大提高开发速度</li>
-                <li><strong>运行效率</strong>:在对象映射上作了缓存处理,查询效率几乎等于手写SQL效率,注:CRL对象查询默认是 with(nolock) 
+                <li><strong>运行效率</strong>:对象映射作了很大优化,并且CRL对象查询默认是 with(nolock) 
                 </li>
                 <li><strong>缓存支持</strong>:光操作数据,没缓存怎么能行, 通过对象缓存绑定,很轻松实现缓存创建和调用
             <br />

@@ -46,10 +46,9 @@ namespace CRL.DBExtend.RelationDB
         /// <summary>
         /// 返回动态对象
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public override List<dynamic> QueryDynamic<T>(LambdaQuery<T> query)
+        public override List<dynamic> QueryDynamic(LambdaQueryBase query)
         {
             if (query.SkipPage > 0)
             {

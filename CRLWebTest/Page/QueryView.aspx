@@ -9,9 +9,9 @@
             同时增加了以下几种方式
             <ul>
                 <li>关联子查询<br />
-                    public LambdaQueryViewJoin&lt;T, TJoin, TJoinResult> Join&lt;TJoin, TJoinResult>(LambdaQueryResultSelect&lt;TJoin, TJoinResult> resultSelect, Expression&lt;Func&lt;T, TJoinResult, bool>&gt; expression, JoinType joinType = JoinType.Inner) </li>
+                    public LambdaQueryViewJoin&lt;T, TJoinResult> Join&lt;TJoinResult>(LambdaQueryResultSelect&lt;TJoinResult> resultSelect, Expression&lt;Func&lt;T, TJoinResult, bool>&gt; expression, JoinType joinType = JoinType.Inner) </li>
                 <li>联合查询<br />
-                    public LambdaQueryResultSelect&lt;T, TResult> Union&lt;T2, TResult2>(LambdaQueryResultSelect&lt;T2, TResult2> view2, UnionType unionType = UnionType.UnionAll)</li>
+                    public LambdaQueryResultSelect&lt;TResult> Union&lt;TResult2>(LambdaQueryResultSelect&lt;TResult2> resultSelect, UnionType unionType = UnionType.UnionAll)</li>
                 <li>
                     In,Exists查询也改为子查询形式
                 </li>

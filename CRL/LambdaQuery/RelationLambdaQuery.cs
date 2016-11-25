@@ -59,7 +59,8 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public override LambdaQuery<T> OrderBy<TResult>(Expression<Func<T, TResult>> expression, bool desc = true)
         {
-            var fields = GetSelectField(false, expression.Body, false, typeof(T));
+            var parameters = expression.Parameters.Select(b => b.Type).ToArray();
+            var fields = GetSelectField(false, expression.Body, false, parameters);
             if (!string.IsNullOrEmpty(__QueryOrderBy))
             {
                 __QueryOrderBy += ",";
@@ -295,7 +296,7 @@ namespace CRL.LambdaQuery
                     }
                 }
                 orderBy = System.Text.RegularExpressions.Regex.Replace(orderBy, @"t\d+\.", "");
-                sql.Append(orderBy);
+                sql.Append("\r\n " + orderBy);
                 #endregion
             }
             else
@@ -318,10 +319,10 @@ namespace CRL.LambdaQuery
                         string unionType = unionQuery.unionType == UnionType.Union ? "union" : "union all";
                         var sqlUnoin = query.GetQuery();
                         sql.Append("\r\n " + unionType + " \r\n");
-                        sql.Append("\r\n " + sqlUnoin + " \r\n");
+                        sql.Append(sqlUnoin);
                     }
                     orderBy = System.Text.RegularExpressions.Regex.Replace(orderBy, @"t\d+\.", " ");
-                    sql.Append(orderBy);
+                    sql.Append("\r\n " + orderBy);
                     #endregion
                 }
             }

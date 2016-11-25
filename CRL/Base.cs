@@ -41,7 +41,7 @@ namespace CRL
             }
             return str;
         }
-        internal static Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(object id) where TModel : IModel, new()
+        internal static Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(object id)
         {
             var type = typeof(TModel);
             var table = TypeCache.GetTable(type);

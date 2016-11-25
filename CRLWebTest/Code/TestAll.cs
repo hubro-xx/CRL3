@@ -14,7 +14,24 @@ namespace WebTest.Code
 {
     public class TestAll
     {
-        public static void TestQuery()
+        public static void TestSelect()
+        {
+            var query = ProductDataManage.Instance.GetLambdaQuery();
+            //query.Where(b => DateTime.Parse("2016-02-11") == DateTime.Now);
+            //query.Where(b => int.Parse(b.InterFaceUser) == 123);//支持Cast转换
+            var result = query.Where(b => b.Id < 10).SelectV(b => new
+            {
+                b.InterFaceUser,
+                bb = b.Id * b.Number,
+                b.ProductName,
+                id1 = Convert.ToString(b.Id),
+                id2 = b.Id.ToString(),
+                name2 = b.CategoryName.Substring(0, 2),
+                time2 = DateTime.Parse("2016-02-11")
+            }).ToList();
+            var sql = query.ToString();
+        }
+        public static void TestMethod()
         {
             var instance = Code.ProductDataManage.Instance;
             instance.QueryItem(1);
@@ -43,14 +60,11 @@ namespace WebTest.Code
             query.Where(b => b.ProductName.LikeLeft("123"));// %like
             query.Where(b => b.ProductName.LikeRight("123"));// like%
             query.Where(b => b.Id.ToString() == "123");//支持Cast转换
+            query.Where(b => Convert.ToString(b.Id) == "123");//支持Cast转换
+            query.Where(b => int.Parse(b.InterFaceUser) == 123);//支持Cast转换
             query.Page(2, 1);
             query.OrderBy(b => b.Id * 1);
-            var result = query.SelectV(b => new
-            {
-                b.InterFaceUser,
-                bb = b.Id * b.Number,
-                b.ProductName
-            }).ToList();
+            var result = query.ToList();
             var sql1 = query.PrintQuery();
             #endregion
         }
@@ -61,9 +75,28 @@ namespace WebTest.Code
             q2.Where(b => b.Id > 0);
             var view = q2.CreateQuery<Code.Member>().GroupBy(b => b.Name).Where(b => b.Id > 0).SelectV(b => new { b.Name, aa = b.Id.COUNT() });//GROUP查询
             var view2 = q2.Join(view, (a, b) => a.CategoryName == b.Name).Select((a, b) => new { ss1 = a.UserId, ss2 = b.aa });//关联GROUP
-            q1.Join(view2, (a, b) => a.Id == b.ss1).Select((a, b) => new { a.Id, b.ss1 });//再关联
+            q1.Join(view2, (a, b) => a.Id == b.ss1).Select((a, b) => new { a.Id, b.ss1 }).ToList();//再关联
+            //q1.Join(view2, (a, b) => a.Id == b.ss1).SelectAppendValue(b => b.ss1);//存入索引
             //var result = view2.ToList();
             var sql = q1.ToString();
+        }
+        public static void TestJoin1()
+        {
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            var query2 = query.CreateQuery<Code.Order>();
+            //筛选
+            var viewJoin = query2.Where(b => b.Id > 10).SelectV(b => new { b.UserId, b.OrderId });
+            var result2 = query.Join(viewJoin, (a, b) => a.UserId == b.UserId).Select((a, b) => new { a.CategoryName, orderid = b.OrderId.IsNull("22"), id2=b.UserId.ToString()}).ToList();
+            var sql = query.ToString();
+        }
+        public static void TestJoin2()
+        {
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            var query2 = query.CreateQuery<Code.Order>();
+            //按索引值
+            var viewJoin = query2.Where(b => b.Id > 10).SelectV(b => new { b.UserId, b.OrderId });
+            var result2 = query.Join(viewJoin, (a, b) => a.UserId == b.UserId).SelectAppendValue((b) => new { b.OrderId }).ToList();
+            var sql = query.ToString();
         }
         public static void TestJoin()
         {
@@ -94,20 +127,27 @@ namespace WebTest.Code
             query.Join<Code.Member>((a, b) => a.UserId == b.Id && a.BarCode.Contains("1"))
                 .SelectAppendValue(b => b.Mobile).OrderBy(b => b.Id, true).Join<Code.Order>((a, b) => a.Id == b.UserId);
 
-            //按IN查询
-            query = ProductDataManage.Instance.GetLambdaQuery();
-            var query2 = query.CreateQuery<Code.Member>();
-            var view = query2.Where(b => b.Name == "123").SelectV(b => b.Id);
-            query.In(view, b => b.UserId);
             var sql2 = query.PrintQuery();
-            //按exists
-            query = ProductDataManage.Instance.GetLambdaQuery();
-            query2 = query.CreateQuery<Code.Member>();
-            var view2 = query2.Where(b => b.Name == "123").SelectV(b => b.Id);
-            query.Exists(view2);
-            sql2 = query.PrintQuery();
+           
             #endregion
         }
+        public static void TestIn()
+        { 
+            //按IN查询
+            var query = ProductDataManage.Instance.GetLambdaQuery();
+            var query2 = query.CreateQuery<Code.Member>();
+            var view = query2.Where(b => b.Name == "123").SelectV(b => b.Id);
+            var result = query.In(view, b => b.UserId).ToList();
+        }
+        public static void TestExists()
+        {
+            //按exists
+            var query = ProductDataManage.Instance.GetLambdaQuery();
+            var query2 = query.CreateQuery<Code.Member>();
+            var view2 = query2.Where(b => b.Name == "123").SelectV(b => b.Id);
+            var result = query.Exists(view2).ToList();
+            var sql2 = query.PrintQuery();
+    }
         public static void TestGroup()
         {
             #region GROUP
@@ -155,8 +195,8 @@ namespace WebTest.Code
         }
         public static void TestUnion()
         {
-            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
-            var query2 = query.CreateQuery<Code.Order>();
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery().Where(b => b.Id < 200);
+            var query2 = query.CreateQuery<Code.Order>().Where(b => b.Id < 200);
             var view1 = query.SelectV(b => new { a1 = b.Id, a2 = b.ProductName });
             var view2 = query2.SelectV(b => new { a1 = b.Id, a2 = b.Remark });
             var result = view1.Union(view2).OrderBy(b => b.a1).OrderBy(b => b.a2, false).ToList();

@@ -44,7 +44,9 @@ namespace WebTest.Page
             query.Where(b => !string.IsNullOrEmpty(b.BarCode));
             int LastDays = 30;
             query.Where(b => b.AddTime.DateDiff(CRL.DatePart.dd, DateTime.Now) < LastDays);
-            query.PrintQuery();
+            var result = query.ToList();
+            var sql = query.ToString();
+            Response.Write(sql);
             //var list = Code.ProductDataManage.Instance.QueryList(query);
         }
     }

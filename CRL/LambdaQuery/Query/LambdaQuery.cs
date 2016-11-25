@@ -194,7 +194,7 @@ namespace CRL.LambdaQuery
         /// <typeparam name="TResult"></typeparam>
         /// <param name="resultSelector">为空则选择所有</param>
         /// <returns></returns>
-        public LambdaQueryResultSelect<T, TResult> SelectV<TResult>(Expression<Func<T, TResult>> resultSelector = null)
+        public LambdaQueryResultSelect<TResult> SelectV<TResult>(Expression<Func<T, TResult>> resultSelector = null)
         {
             //var fields = GetSelectField(true, resultSelector.Body, false, typeof(T));
             if (resultSelector == null)
@@ -205,7 +205,7 @@ namespace CRL.LambdaQuery
             {
                 Select(resultSelector.Body);
             }
-            return new LambdaQueryResultSelect<T, TResult>(this, resultSelector.Body);
+            return new LambdaQueryResultSelect<TResult>(this, resultSelector.Body);
         }
         /// <summary>
         /// 按resultSelectorBody
@@ -283,11 +283,10 @@ namespace CRL.LambdaQuery
         /// 按查询exists
         /// 等效为exixts(select field from table2)
         /// </summary>
-        /// <typeparam name="T2"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public LambdaQuery<T> Exists<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query)
+        public LambdaQuery<T> Exists<TResult>(LambdaQueryResultSelect<TResult> query)
         {
             return InnerSelect(null, query, "exists");
         }
@@ -296,11 +295,10 @@ namespace CRL.LambdaQuery
         /// 按查询not exists
         /// 等效为 not exixts(select field from table2)
         /// </summary>
-        /// <typeparam name="T2"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public LambdaQuery<T> NotExists<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query)
+        public LambdaQuery<T> NotExists<TResult>(LambdaQueryResultSelect<TResult> query)
         {
             return InnerSelect(null, query, "not exists");
         }
@@ -309,27 +307,24 @@ namespace CRL.LambdaQuery
         /// 按查询in
         /// 等效为table.field in(select field from table2)
         /// </summary>
-        /// <typeparam name="T2"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <param name="outField"></param>
-        /// <param name="expression">内关联</param>
         /// <returns></returns>
-        public LambdaQuery<T> In<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query, Expression<Func<T, TResult>> outField, Expression<Func<T, T2, bool>> expression = null)
+        public LambdaQuery<T> In<TResult>(LambdaQueryResultSelect<TResult> query, Expression<Func<T, TResult>> outField)
         {
-            return InnerSelect(outField, query, "in", expression);
+            return InnerSelect(outField, query, "in");
         }
 
         /// <summary>
         /// 按查询not in
         /// 等效为table.field not in(select field from table2)
         /// </summary>
-        /// <typeparam name="T2"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <param name="outField"></param>
         /// <returns></returns>
-        public LambdaQuery<T> NotIn<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query, Expression<Func<T, TResult>> outField)
+        public LambdaQuery<T> NotIn<TResult>(LambdaQueryResultSelect<TResult> query, Expression<Func<T, TResult>> outField)
         {
             return InnerSelect(outField, query, "not in");
         }
@@ -338,12 +333,11 @@ namespace CRL.LambdaQuery
         /// 按=
         /// 等效为table.field =(select field from table2)
         /// </summary>
-        /// <typeparam name="T2"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <param name="outField"></param>
         /// <returns></returns>
-        public LambdaQuery<T> Equal<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query, Expression<Func<T, TResult>> outField)
+        public LambdaQuery<T> Equal<TResult>(LambdaQueryResultSelect<TResult> query, Expression<Func<T, TResult>> outField)
         {
             return InnerSelect(outField, query, "=");
         }
@@ -352,21 +346,25 @@ namespace CRL.LambdaQuery
         /// 按!=
         /// 等效为table.field !=(select field from table2)
         /// </summary>
-        /// <typeparam name="T2"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="query"></param>
         /// <param name="outField"></param>
         /// <returns></returns>
-        public LambdaQuery<T> NotEqual<T2, TResult>(LambdaQueryResultSelect<T2, TResult> query, Expression<Func<T, TResult>> outField)
+        public LambdaQuery<T> NotEqual<TResult>(LambdaQueryResultSelect<TResult> query, Expression<Func<T, TResult>> outField)
         {
             return InnerSelect(outField, query, "!=");
         }
 
-        protected LambdaQuery<T> InnerSelect<T2, TResult>(Expression<Func<T, TResult>> outField, LambdaQueryResultSelect<T2, TResult> query, string type, Expression<Func<T, T2, bool>> expression = null)
+        LambdaQuery<T> InnerSelect<TResult>(Expression<Func<T, TResult>> outField, LambdaQueryResultSelect<TResult> query, string type, string innerJoinSql="")
         {
             if (!query.BaseQuery.__FromDbContext)
             {
                 throw new CRLException("关联需要由LambdaQuery.CreateQuery创建");
+            }
+            var baseQuery = query.BaseQuery;
+            foreach (var kv in baseQuery.QueryParames)
+            {
+                QueryParames[kv.Key] = kv.Value;
             }
             MemberExpression m1 = null;
             //object 会生成UnaryExpression表达式 Convert(b=>b.UserId)
@@ -388,12 +386,9 @@ namespace CRL.LambdaQuery
             }
             string condition = "";
             var query2 = query.BaseQuery.GetQuery();
-            if (expression != null)
+            if (!string.IsNullOrEmpty(innerJoinSql))
             {
-                //内部关联
-                GetPrefix(typeof(T2));
-                string condition2 = FormatJoinExpression(expression.Body);
-                query2 += " and " + condition2;
+                query2 += " and " + innerJoinSql;
             }
             condition = string.Format("{0} {1}({2})", field1, type, query2);
             if (Condition.Length > 0)

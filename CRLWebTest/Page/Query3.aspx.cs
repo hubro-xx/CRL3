@@ -91,7 +91,7 @@ namespace WebTest.Page
             query.Where(b => b.ProductId == "0");
             var query2 = query.CreateQuery<Code.Member>();
             var view = query2.Where(b => b.Id > 0).SelectV(b => b.Id);
-            query.In(view, b => b.Id, (a, b) => a.UserId == b.Id);
+            query.In(view, b => b.Id);
             //query.Exists(view);
             //等效为 product.UserId in(select UserId from order where product.SupplierId=10 and order.status=2)
             txtOutput.Visible = true;

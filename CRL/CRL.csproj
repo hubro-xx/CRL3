@@ -103,6 +103,7 @@
     <Compile Include="CacheServer\ResultData.cs" />
     <Compile Include="DBExtend\CallBackDataReader.cs" />
     <Compile Include="CRLException.cs" />
+    <Compile Include="ExtensionMethod\IsNull.cs" />
     <Compile Include="LambdaQuery\Mapping\DataContainer.cs" />
     <Compile Include="LambdaQuery\Mapping\DataExtensions.cs" />
     <Compile Include="LambdaQuery\Mapping\QueryInfo.cs" />

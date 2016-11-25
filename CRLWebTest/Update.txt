@@ -289,3 +289,6 @@
 2016-11-22
 	增加了Union查询
 	版本升级到4.2
+2016-11-25
+	字段筛选也支持函数了,和条件筛选一致
+	Select((a, b) => new { a.CategoryName, orderid = b.OrderId.IsNull("22") })

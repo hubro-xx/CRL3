@@ -18,6 +18,13 @@ namespace CRL.Sharding.DB
         {
             get { return new TableManage(); }
         }
+        /// <summary>
+        /// 创建表配置
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="table"></param>
+        /// <param name="error"></param>
+        /// <returns></returns>
         public bool Create(DataBase db, Table table,out string error)
         {
             error = "";

@@ -28,7 +28,7 @@ namespace WebTest
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-            Code.TestAll.TestUnion();
+            Code.TestAll.TestSelect();
         }
     }
 }

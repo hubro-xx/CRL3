@@ -26,14 +26,15 @@ namespace CRL.LambdaQuery
         /// <typeparam name="TResult"></typeparam>
         /// <param name="resultSelector"></param>
         /// <returns></returns>
-        public LambdaQueryResultSelect<T, TResult> DistinctBy<TResult>(Expression<Func<T, TResult>> resultSelector)
+        public LambdaQueryResultSelect<TResult> DistinctBy<TResult>(Expression<Func<T, TResult>> resultSelector)
         {
             Top(0);
-            var fields = GetSelectField(true, resultSelector.Body, false, typeof(T));
+            var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
+            var fields = GetSelectField(true, resultSelector.Body, false, parameters);
             __DistinctFields = true;
             __FieldFunctionFormat = " DISTINCT {0}";
             __QueryFields = fields;
-            return new LambdaQueryResultSelect<T, TResult>(this, resultSelector.Body);
+            return new LambdaQueryResultSelect<TResult>(this, resultSelector.Body);
             //return this;
         }
         internal bool distinctCount = false;

@@ -18,6 +18,12 @@ namespace CRL.Sharding.DB
         {
             get { return new TablePartManage(); }
         }
+        /// <summary>
+        /// 创建表分区配置
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="error"></param>
+        /// <returns></returns>
         public bool Create(Table table,  out string error)
         {
             error = "";

@@ -590,10 +590,9 @@ namespace CRL
         /// <summary>
         /// 返回动态对象
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public abstract List<dynamic> QueryDynamic<T>(CRL.LambdaQuery.LambdaQuery<T> query) where T : CRL.IModel, new();
+        public abstract List<dynamic> QueryDynamic(CRL.LambdaQuery.LambdaQueryBase query);
         ///// <summary>
         ///// 返回自定义对象
         ///// </summary>

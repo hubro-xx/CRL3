@@ -274,40 +274,83 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         string getSelectMethodCall(Expression expression, out string memberName)
         {
-            var method = expression as MethodCallExpression;
-            MemberExpression memberExpression;
-            var args = method.Arguments[0];
-            memberName = "";
-            string methodArgs = "";
-            if (args is ParameterExpression)
+            var methodCallObj = __Visitor.RouteExpressionHandler(expression).Data as CRLExpression.MethodCallObj;
+            memberName = methodCallObj.MethodName;
+            #region old
+            //var arguments = new List<object>();
+            //var method = expression as MethodCallExpression;
+            //MemberExpression memberExpression;
+            //var allArguments = method.Arguments;
+            //string methodField = "";
+            //memberName = "";
+            //Expression args;
+            //int argsIndex = 0;
+            //if (method.Method.IsStatic)//区分静态方法还是实例方法
+            //{
+            //    args = allArguments[0];//like b.Name.IsNull("22")
+            //    argsIndex = 1;
+            //}
+            //else
+            //{
+            //    args = method.Object;//like b.Id.ToString()
+            //}
+            //memberName = "";
+            //if (args is ParameterExpression)
+            //{
+            //    var exp2 = method.Arguments[1] as UnaryExpression;
+            //    var type = exp2.Operand.GetType();
+            //    var p = type.GetProperty("Body");
+            //    var exp3 = p.GetValue(exp2.Operand, null) as Expression;
+            //    methodField = getSeletctBinary(exp3);
+            //    memberName = "";
+            //}
+            //else if (args is UnaryExpression)//like a.Code.Count()
+            //{
+            //    memberExpression = (args as UnaryExpression).Operand as MemberExpression;
+            //    memberName = memberExpression.Member.Name;
+            //    methodField = GetPrefix(memberExpression.Expression.Type) + memberExpression.Member.Name;
+            //}
+            //else if (args is MemberExpression)
+            //{
+            //    //like a.Code
+            //    memberExpression = args as MemberExpression;
+            //    memberName = memberExpression.Member.Name;
+            //    var type = memberExpression.Expression.Type;
+            //    if (type.IsSubclassOf(typeof(IModel)))
+            //    {
+            //        memberName = TypeCache.GetProperties(type, true)[memberExpression.Member.Name].MapingName;
+            //    }
+            //    methodField = GetPrefix(memberExpression.Expression.Type) + memberName;
+            //    for (int i = argsIndex; i < allArguments.Count; i++)
+            //    {
+            //        var obj = __Visitor.RouteExpressionHandler(allArguments[i]).Data;
+            //        arguments.Add(obj);
+            //    }
+            //}
+            //else if (args is ConstantExpression)//按常量
+            //{
+            //    var obj = ConstantValueVisitor.GetParameExpressionValue(args);
+            //    arguments.Add(obj);
+            //}
+            //else
+            //{ 
+            //    throw new CRLException("不支持此语法解析:" + args);
+            //}
+            //string methodName = method.Method.Name;
+            //查询判断,like isnull(t3.OrderId,'22')
+            //var method2 = new CRLExpression.MethodCallObj() { Args = arguments, MethodName = methodName, MemberQueryName = methodField, ReturnType = method.Method.ReturnType };
+            #endregion
+            var dic = MethodAnalyze.GetMethos(__DBAdapter);
+            if (!dic.ContainsKey(methodCallObj.MethodName))
             {
-                var exp2 = method.Arguments[1] as UnaryExpression;
-                var type = exp2.Operand.GetType();
-                var p = type.GetProperty("Body");
-                var exp3 = p.GetValue(exp2.Operand, null) as Expression;
-                methodArgs = getSeletctBinary(exp3);
-                memberName = "";
+                throw new CRLException("LambdaQuery不支持扩展方法" + methodCallObj.MemberQueryName + "." + methodCallObj.MethodName);
             }
-            else if (args is UnaryExpression)//like a.Code.Count()
-            {
-                memberExpression = (args as UnaryExpression).Operand as MemberExpression;
-                memberName = memberExpression.Member.Name;
-                methodArgs = GetPrefix(memberExpression.Expression.Type) + memberExpression.Member.Name;
-            }
-            else if (args is MemberExpression)
-            {
-                //like a.Code
-                memberExpression = args as MemberExpression;
-                memberName = memberExpression.Member.Name;
-                methodArgs = GetPrefix(memberExpression.Expression.Type) + memberExpression.Member.Name;
-            }
-            else
-            {
-                throw new CRLException("不支持此语法解析:" + args);
-            }
-            string methodName = method.Method.Name;
+            int newParIndex = __DbContext.parIndex;
 
-            return string.Format("{0}({1})", methodName, methodArgs);
+            var par = dic[methodCallObj.MethodName](methodCallObj, ref newParIndex, __Visitor.AddParame);
+            __DbContext.parIndex = newParIndex;
+            return par;
+            //return string.Format("{0}({1})", methodName, methodField);
         }
         /// <summary>
         /// 返回二元运算调用
