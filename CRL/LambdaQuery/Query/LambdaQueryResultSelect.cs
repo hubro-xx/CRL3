@@ -14,7 +14,7 @@ namespace CRL.LambdaQuery
     public sealed class LambdaQueryResultSelect<TResult>
     {
         Expression resultSelectorBody;
-        public Type InnerType
+        internal Type InnerType
         {
             get
             {

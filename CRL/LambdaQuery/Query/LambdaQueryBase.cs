@@ -99,6 +99,7 @@ namespace CRL.LambdaQuery
                 db.SetParam(n.Key, n.Value);
             }
         }
+        internal bool __WithNoLock = true;
         #region 解析选择的字段
         /// <summary>
         /// 解析选择的字段
@@ -274,7 +275,17 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         string getSelectMethodCall(Expression expression, out string memberName)
         {
-            var methodCallObj = __Visitor.RouteExpressionHandler(expression).Data as CRLExpression.MethodCallObj;
+            var cRLExpression = __Visitor.RouteExpressionHandler(expression);
+            memberName = "";
+            if (cRLExpression.Type == CRLExpression.CRLExpressionType.Value)
+            {
+                //值类型返回参数值
+                var parName = "@cons" + __DbContext.parIndex;
+                __DbContext.parIndex += 1;
+                __Visitor.AddParame(parName, cRLExpression.Data);
+                return parName;
+            }
+            var methodCallObj = cRLExpression.Data as CRLExpression.MethodCallObj;
             memberName = methodCallObj.MethodName;
             #region old
             //var arguments = new List<object>();
@@ -470,7 +481,7 @@ namespace CRL.LambdaQuery
             }
             else
             {
-                tableName = string.Format("{0} {1} {2}", __DBAdapter.KeyWordFormat(tableName), aliasName, __DBAdapter.GetWithNolockFormat());
+                tableName = string.Format("{0} {1} {2}", __DBAdapter.KeyWordFormat(tableName), aliasName, __DBAdapter.GetWithNolockFormat(__WithNoLock));
             }
             string str = string.Format(" {0} join {1} on {2}", joinType, tableName, condition);
             if (!__Relations.ContainsKey(typeQuery))
@@ -518,13 +529,13 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <returns></returns>
         internal abstract string GetQuery();
-        internal List<Attribute.FieldMapping> GetFieldMapping()
+        internal IEnumerable<Attribute.FieldMapping> GetFieldMapping()
         {
             if (__QueryFields.Count == 0)
             {
                 SelectAll();
             }
-            return __QueryFields.Select(b => b.FieldMapping).ToList();
+            return __QueryFields.Select(b => b.FieldMapping);
         }
     }
 }

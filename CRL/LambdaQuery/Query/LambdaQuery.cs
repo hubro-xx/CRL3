@@ -129,6 +129,17 @@ namespace CRL.LambdaQuery
             return this;
         }
         /// <summary>
+        /// MSSQL WithNoLock
+        /// 使用WithNoLock会增加一些查询响应时间,但会增加查询效率,减少数据库锁定
+        /// </summary>
+        /// <param name="_nolock"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> WithNoLock(bool _nolock = true)
+        {
+            __WithNoLock = _nolock;
+            return this;
+        }
+        /// <summary>
         /// 设定分页参数
         /// </summary>
         /// <param name="pageSize"></param>
@@ -178,7 +189,7 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="resultSelector">like b=>new {b.Name}</param>
         /// <returns></returns>
-        public LambdaQuery<T> Select(Expression<Func<T, object>> resultSelector)
+        public LambdaQuery<T> Select<TResult>(Expression<Func<T, TResult>> resultSelector)
         {
             if (resultSelector == null)
             {
@@ -196,7 +207,6 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQueryResultSelect<TResult> SelectV<TResult>(Expression<Func<T, TResult>> resultSelector = null)
         {
-            //var fields = GetSelectField(true, resultSelector.Body, false, typeof(T));
             if (resultSelector == null)
             {
                 SelectAll();
@@ -277,128 +287,7 @@ namespace CRL.LambdaQuery
         public abstract LambdaQuery<T> Or(Expression<Func<T, bool>> expression);
         #endregion
 
-        #region select值判断
-
-        /// <summary>
-        /// 按查询exists
-        /// 等效为exixts(select field from table2)
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public LambdaQuery<T> Exists<TResult>(LambdaQueryResultSelect<TResult> query)
-        {
-            return InnerSelect(null, query, "exists");
-        }
-
-        /// <summary>
-        /// 按查询not exists
-        /// 等效为 not exixts(select field from table2)
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public LambdaQuery<T> NotExists<TResult>(LambdaQueryResultSelect<TResult> query)
-        {
-            return InnerSelect(null, query, "not exists");
-        }
-
-        /// <summary>
-        /// 按查询in
-        /// 等效为table.field in(select field from table2)
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="outField"></param>
-        /// <returns></returns>
-        public LambdaQuery<T> In<TResult>(LambdaQueryResultSelect<TResult> query, Expression<Func<T, TResult>> outField)
-        {
-            return InnerSelect(outField, query, "in");
-        }
-
-        /// <summary>
-        /// 按查询not in
-        /// 等效为table.field not in(select field from table2)
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="outField"></param>
-        /// <returns></returns>
-        public LambdaQuery<T> NotIn<TResult>(LambdaQueryResultSelect<TResult> query, Expression<Func<T, TResult>> outField)
-        {
-            return InnerSelect(outField, query, "not in");
-        }
-
-        /// <summary>
-        /// 按=
-        /// 等效为table.field =(select field from table2)
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="outField"></param>
-        /// <returns></returns>
-        public LambdaQuery<T> Equal<TResult>(LambdaQueryResultSelect<TResult> query, Expression<Func<T, TResult>> outField)
-        {
-            return InnerSelect(outField, query, "=");
-        }
-       
-        /// <summary>
-        /// 按!=
-        /// 等效为table.field !=(select field from table2)
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="outField"></param>
-        /// <returns></returns>
-        public LambdaQuery<T> NotEqual<TResult>(LambdaQueryResultSelect<TResult> query, Expression<Func<T, TResult>> outField)
-        {
-            return InnerSelect(outField, query, "!=");
-        }
-
-        LambdaQuery<T> InnerSelect<TResult>(Expression<Func<T, TResult>> outField, LambdaQueryResultSelect<TResult> query, string type, string innerJoinSql="")
-        {
-            if (!query.BaseQuery.__FromDbContext)
-            {
-                throw new CRLException("关联需要由LambdaQuery.CreateQuery创建");
-            }
-            var baseQuery = query.BaseQuery;
-            foreach (var kv in baseQuery.QueryParames)
-            {
-                QueryParames[kv.Key] = kv.Value;
-            }
-            MemberExpression m1 = null;
-            //object 会生成UnaryExpression表达式 Convert(b=>b.UserId)
-            if (outField != null)//兼容exists 可能为空
-            {
-                if (outField.Body is UnaryExpression)
-                {
-                    m1 = (outField.Body as UnaryExpression).Operand as MemberExpression;
-                }
-                else
-                {
-                    m1 = outField.Body as MemberExpression;
-                }
-            }
-            string field1 = "";
-            if (outField != null)
-            {
-                field1 = string.Format("{0}{1}", GetPrefix(), __DBAdapter.KeyWordFormat(m1.Member.Name));
-            }
-            string condition = "";
-            var query2 = query.BaseQuery.GetQuery();
-            if (!string.IsNullOrEmpty(innerJoinSql))
-            {
-                query2 += " and " + innerJoinSql;
-            }
-            condition = string.Format("{0} {1}({2})", field1, type, query2);
-            if (Condition.Length > 0)
-            {
-                condition = " and " + condition;
-            }
-            Condition.Append(condition);
-            return this;
-        }
-        #endregion
+        
         #endregion
 
         #region 获取解析值

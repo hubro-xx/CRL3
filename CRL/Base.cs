@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Data;
 using System.Text.RegularExpressions;
 using System.Linq.Expressions;
+using System.Diagnostics;
 
 namespace CRL
 {
@@ -22,25 +23,6 @@ namespace CRL
     /// </summary>
     public class Base
     {
-
-        /// <summary>
-        /// 获取查询字段,并自动转换虚拟字段
-        /// </summary>
-        /// <param name="typeArry"></param>
-        /// <returns></returns>
-        internal static string GetQueryFields(IEnumerable<Attribute.FieldAttribute> typeArry)
-        {
-            string str = "";
-            foreach (Attribute.FieldAttribute info in typeArry)
-            {
-                str += string.Format("{0},", info.QueryFullScript);
-            }
-            if (str.Length > 1)
-            {
-                str = str.Substring(0, str.Length - 1);
-            }
-            return str;
-        }
         internal static Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(object id)
         {
             var type = typeof(TModel);

@@ -98,7 +98,7 @@ namespace CRL.DBAdapter
             throw new NotImplementedException();
         }
 
-        public override string GetWithNolockFormat()
+        public override string GetWithNolockFormat(bool v)
         {
             throw new NotImplementedException();
         }

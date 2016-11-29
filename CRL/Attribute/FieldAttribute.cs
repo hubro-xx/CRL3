@@ -352,7 +352,7 @@ namespace CRL.Attribute
         internal FieldQuery FieldQuery;
         internal FieldMapping FieldMapping;
     }
-    public class FieldMapping
+    struct FieldMapping
     {
         /// <summary>
         /// 查询名
@@ -367,7 +367,7 @@ namespace CRL.Attribute
             return string.Format("Q:{0} M:{1}", QueryName, MappingName);
         }
     }
-    internal class FieldQuery
+    struct FieldQuery
     {
         /// <summary>
         /// 字段名

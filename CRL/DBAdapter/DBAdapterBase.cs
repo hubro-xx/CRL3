@@ -195,7 +195,7 @@ namespace CRL.DBAdapter
         /// 获取with nolock语法
         /// </summary>
         /// <returns></returns>
-        public abstract string GetWithNolockFormat();
+        public abstract string GetWithNolockFormat(bool v);
         #endregion
 
         #region  系统查询

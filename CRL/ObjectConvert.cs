@@ -136,28 +136,22 @@ namespace CRL
             var type = typeof(T);
             return (T)ConvertObject(type, obj);
         }
-        internal struct ActionItem<T>
+        struct ActionItem<T>
         {
             public Action<T, object> Set;
             public Action<object, object> Set2;
-            public void DoSet(T obj ,object[] values)
-            {
-                if (Set != null)
-                {
-                    Set(obj, values[ValueIndex]);
-                }
-                else
-                {
-                    Set2(obj, values[ValueIndex]);
-                }
-            }
             public string Name;
             public int ValueIndex;
-            void SetValue(T item, object[] values)
+            public void SetValue(T item, object[] values)
             {
                 Set(item, values[ValueIndex]);
             }
+            public void SetValue2(object item, object[] values)
+            {
+                Set2(item, values[ValueIndex]);
+            }
         }
+
         #region 返回object
         /// <summary>
         /// 仅缓存查询用
@@ -167,7 +161,7 @@ namespace CRL
         /// <param name="mapping"></param>
         /// <param name="runTime"></param>
         /// <returns></returns>
-        internal static List<object> DataReaderToObjectList(DbDataReader reader, Type mainType, List<Attribute.FieldMapping> mapping,out double runTime)
+        internal static List<object> DataReaderToObjectList(DbDataReader reader, Type mainType, IEnumerable<Attribute.FieldMapping> mapping, out double runTime)
         {
             //rem mainType 不一定为T
             var sw = new Stopwatch();
@@ -200,7 +194,7 @@ namespace CRL
                 var detailItem = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
                 foreach (var ac in actions)
                 {
-                    ac.DoSet(detailItem, values);
+                    ac.SetValue2(detailItem, values);
                 }
                 #region 剩下的放索引
                 //按IModel算
@@ -239,10 +233,10 @@ namespace CRL
         /// <param name="reader"></param>
         /// <param name="queryInfo"></param>
         /// <returns></returns>
-        internal static List<T> DataReaderToSpecifiedList<T>(DbDataReader reader,QueryInfo<T> queryInfo)
+        internal static List<T> DataReaderToSpecifiedList<T>(DbDataReader reader, QueryInfo<T> queryInfo)
         {
             var objCreater = queryInfo.ObjCreater;
-            var mapping = queryInfo.Mapping;
+            var mapping = queryInfo.Mapping.ToArray();
             var list = new List<T>();
             var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
@@ -251,8 +245,9 @@ namespace CRL
             }
             var actions = new List<ActionItem<T>>();
             object[] values = new object[reader.FieldCount];
-            foreach (var mp in mapping)
+            for (int i = 0; i < mapping.Count();i++ )
             {
+                var mp = mapping[i];
                 var fieldName = mp.QueryName.ToLower();
                 var accessor = queryInfo.Reflection.GetAccessor(mp.MappingName);
                 if (accessor == null)
@@ -261,14 +256,27 @@ namespace CRL
                 columns.Remove(fieldName);
                 actions.Add(action);
             }
+            var _actions = actions.ToArray();
+            var sw = new Stopwatch();
+            sw.Start();
+            int actionsCount = actions.Count;
             while (reader.Read())
             {
                 reader.GetValues(values);
-                var dataContainer = new DataContainer(values);
-                T detailItem = objCreater(dataContainer);
-                foreach (var ac in actions)
+                T detailItem ;
+                if (queryInfo.AnonymousClass)
                 {
-                    ac.DoSet(detailItem, values);
+                    var dataContainer = new DataContainer(values);
+                    detailItem = objCreater(dataContainer);
+                }
+                else
+                {
+                    detailItem = queryInfo.Reflection.CreateObjectInstance();
+                }
+                for (int i = 0; i < actionsCount; i++)
+                {
+                    var ac = _actions[i];
+                    ac.Set(detailItem, values[ac.ValueIndex]);
                 }
                 #region 剩下的放索引
                 //按IModel算
@@ -290,9 +298,10 @@ namespace CRL
                 #endregion
                 list.Add(detailItem);
             }
+            sw.Stop();
+            //Console.WriteLine("映射用时:" + sw.ElapsedMilliseconds);
             reader.Close();
             reader.Dispose();
-            //Console.WriteLine("CRL映射用时:" + runTime);
             return list;
         }
         #endregion

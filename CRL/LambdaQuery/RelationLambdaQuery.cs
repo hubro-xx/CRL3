@@ -134,7 +134,7 @@ namespace CRL.LambdaQuery
             var tableName = TypeCache.GetTableName(typeof(TInner), __DbContext);
             tableName = tableName + " " + GetPrefix(typeof(TInner));
             tableName = tableName.Substring(0, tableName.Length - 1);
-            condition = string.Format("{0} {1}(select {2} from {3} where {4})", field1, type, field2, tableName + __DBAdapter.GetWithNolockFormat(), condition);
+            condition = string.Format("{0} {1}(select {2} from {3} where {4})", field1, type, field2, tableName + __DBAdapter.GetWithNolockFormat(__WithNoLock), condition);
             //this.Condition += string.IsNullOrEmpty(Condition) ? condition : " and " + condition;
             if (Condition.Length > 0)
             {
@@ -206,23 +206,13 @@ namespace CRL.LambdaQuery
         internal override string GetQueryConditions(bool withTableName = true)
         {
             var where = new StringBuilder(Condition.ToString());
-            #region group判断
-            if (__GroupFields.Count > 0)
-            {
-                where.Append(" group by ");
-                where.Append(string.Join(",", __GroupFields.Select(b => b.QueryField)));
-            }
-            if (!string.IsNullOrEmpty(Having))
-            {
-                where.Append(" having " + Having);
-            }
-            #endregion
+            
             StringBuilder part = new StringBuilder();
             if (withTableName)
             {
                 var prex1 = GetPrefix(__MainType);
                 prex1 = prex1.Remove(prex1.Length-1);
-                part.Append(string.Format("{0} {1} {2}", __DBAdapter.KeyWordFormat(QueryTableName), prex1, __DBAdapter.GetWithNolockFormat()));
+                part.Append(string.Format("{0} {1} {2}", __DBAdapter.KeyWordFormat(QueryTableName), prex1, __DBAdapter.GetWithNolockFormat(__WithNoLock)));
             }
             if (_IsRelationUpdate)
             {
@@ -236,6 +226,18 @@ namespace CRL.LambdaQuery
                 string join = string.Join(" ", __Relations.Values);
                 part.Append(string.Format(" {0}{1}", join, where.Length == 0 ? " " : " where " + where));
             }
+            #region group判断
+            if (__GroupFields.Count > 0)
+            {
+                part.Append(" group by ");
+                part.Append(string.Join(",", __GroupFields.Select(b => b.QueryField)));
+            }
+            if (!string.IsNullOrEmpty(Having))
+            {
+                part.Append(" having " + Having);
+            }
+            #endregion
+
             return part.ToString();
         }
         /// <summary>
@@ -307,7 +309,7 @@ namespace CRL.LambdaQuery
                     var sql2 = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
                     sql.Append(sql2);
                 }
-                else//按有关联
+                else
                 {
                     #region 联合查询
                     var sql2 = __DBAdapter.GetSelectTop(fields, part, "", TakeNum);

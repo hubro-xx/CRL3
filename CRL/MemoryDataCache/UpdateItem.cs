@@ -24,6 +24,6 @@ namespace CRL.MemoryDataCache
         public Dictionary<string, object> Params;
         public DateTime UpdateTime;
         public Type Type;
-        public List<Attribute.FieldMapping> Mapping;
+        public IEnumerable<Attribute.FieldMapping> Mapping;
     }
 }

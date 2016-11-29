@@ -60,13 +60,13 @@ end", spName, script);
             dic.Add(typeof(System.Int32), "int");
             dic.Add(typeof(System.Int16), "SMALLINT");
             dic.Add(typeof(System.Enum), "int");
-            dic.Add(typeof(System.Byte), "SMALLINT");
+            dic.Add(typeof(System.Byte), "[tinyint]");
             dic.Add(typeof(System.DateTime), "datetime");
             dic.Add(typeof(System.UInt16), "SMALLINT");
             dic.Add(typeof(System.Int64), "bigint");
             dic.Add(typeof(System.Object), "nvarchar(30)");
             dic.Add(typeof(System.Byte[]), "varbinary({0})");
-            dic.Add(typeof(System.Guid), "nvarchar(50)");
+            dic.Add(typeof(System.Guid), "uniqueidentifier");
             return dic;
         }
         /// <summary>
@@ -327,9 +327,13 @@ end", spName, script);
         /// 获取 with(nolock)
         /// </summary>
         /// <returns></returns>
-        public override string GetWithNolockFormat()
+        public override string GetWithNolockFormat(bool v)
         {
-            return " with(nolock)";
+            if (!v)
+            {
+                return "";
+            }
+            return " with (nolock)";
         }
         /// <summary>
         /// 获取前几条语句

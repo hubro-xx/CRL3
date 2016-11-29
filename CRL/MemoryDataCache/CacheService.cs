@@ -123,7 +123,7 @@ namespace CRL.MemoryDataCache
             CoreHelper.EventLog.Log(log, "DataCache", false);
         }
 
-        internal static Dictionary<string, TItem> GetCacheList<TItem>(string query,List<Attribute.FieldMapping> mapping, int timeOut, DBHelper helper, out string key) where TItem : IModel, new()
+        internal static Dictionary<string, TItem> GetCacheList<TItem>(string query, IEnumerable<Attribute.FieldMapping> mapping, int timeOut, DBHelper helper, out string key) where TItem : IModel, new()
         {
             Type type = typeof(TItem);
             query = query.ToLower();
@@ -183,7 +183,7 @@ namespace CRL.MemoryDataCache
         }
 
 
-        static List<object> QueryData(string key,Type type, string query,List<Attribute.FieldMapping> mapping, DBHelper helper)
+        static List<object> QueryData(string key, Type type, string query, IEnumerable<Attribute.FieldMapping> mapping, DBHelper helper)
         {
             if (cacheDatas.Count > 1000)
             {

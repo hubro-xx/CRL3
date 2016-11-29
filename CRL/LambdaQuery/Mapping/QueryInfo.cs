@@ -10,30 +10,39 @@ namespace CRL.LambdaQuery.Mapping
 {
     internal class QueryInfo<T>
     {
-        public QueryInfo(bool anonymousClass, List<Attribute.FieldMapping> mapping = null, ConstructorInfo constructor = null)
+        static System.Collections.Concurrent.ConcurrentDictionary<Type, Delegate> DelegateCache = new System.Collections.Concurrent.ConcurrentDictionary<Type, Delegate>();
+        public QueryInfo(bool anonymousClass, IEnumerable<Attribute.FieldMapping> mapping = null, ConstructorInfo constructor = null)
         {
-            //AnonymousClass = anonymousClass;
             mapping = mapping ?? new List<Attribute.FieldMapping>();
             Mapping = mapping;
+            AnonymousClass = anonymousClass;
             if (anonymousClass)
             {
+                Delegate dg;
+                //缓存处理
+                var a = DelegateCache.TryGetValue(typeof(T), out dg);
+                if (a)
+                {
+                    ObjCreater = (Func<DataContainer, T>)dg;
+                    return;
+                }
                 ObjCreater = CreateObjectGenerator<T>(constructor);
+                DelegateCache.TryAdd(typeof(T), ObjCreater);
             }
             else
             {
-                ObjCreater = CreateObjectGenerator<T>(typeof(T).GetConstructor(Type.EmptyTypes));
                 Reflection = ReflectionHelper.GetInfo<T>();
             }
         }
-        //public bool AnonymousClass;
-        public List<Attribute.FieldMapping> Mapping;
+        public bool AnonymousClass;
+        public IEnumerable<Attribute.FieldMapping> Mapping;
         public Func<DataContainer, T> ObjCreater;
         public ReflectionInfo<T> Reflection;
 
         Func<DataContainer, TObject> CreateObjectGenerator<TObject>(ConstructorInfo constructor)
         {
             Func<DataContainer, TObject> ret = null;
-            var parame = Expression.Parameter(typeof(DataContainer), "parame");
+            var parame = Expression.Parameter(typeof(DataContainer), "par");
             ParameterInfo[] parameters = constructor.GetParameters();
             List<Expression> arguments = new List<Expression>(parameters.Length);
             foreach (ParameterInfo parameter in parameters)

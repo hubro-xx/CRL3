@@ -283,10 +283,11 @@ namespace CRL.LambdaQuery
                     var obj = ConstantValueVisitor.GetParameExpressionValue(args);
                     arguments.Add(obj);
                 }
-                else
-                {
-                    throw new CRLException("不支持此语法解析:" + args);
-                }
+                //else
+                //{
+                //    throw new CRLException("不支持此语法解析:" + args);
+                //}
+                #region old
                 //if (mcExp.Object is MemberExpression)
                 //{
                 //    var mExp = mcExp.Object as MemberExpression;
@@ -311,7 +312,7 @@ namespace CRL.LambdaQuery
 
                 //parIndex += 1;
                 //string field = "";
-                #region par
+       
                 //if (mcExp.Method.IsStatic)//区分静态方法还是实例方法
                 //{
                 //    //like b.Name.IsNull("22")
@@ -336,6 +337,14 @@ namespace CRL.LambdaQuery
                 if (nodeType == null)
                 {
                     nodeType = ExpressionType.Equal;
+                }
+                if (string.IsNullOrEmpty(methodField))
+                {
+                    //当是常量转换方法
+                    //like DateTime.Parse("2016-02-11")
+                    var method = mcExp.Method;
+                    var obj = method.Invoke(null, arguments.ToArray());
+                    return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
                 }
                 var methodInfo = new CRLExpression.MethodCallObj() { Args = arguments, ExpressionType = nodeType.Value, MemberName = memberName, MethodName = methodName, MemberQueryName = methodField };
                 methodInfo.ReturnType = mcExp.Type;

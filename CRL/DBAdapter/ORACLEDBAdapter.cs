@@ -295,7 +295,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         /// 获取 with(nolock)
         /// </summary>
         /// <returns></returns>
-        public override string GetWithNolockFormat()
+        public override string GetWithNolockFormat(bool v)
         {
             return "";
         }

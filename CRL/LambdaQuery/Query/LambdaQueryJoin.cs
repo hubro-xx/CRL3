@@ -48,7 +48,7 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="resultSelector"></param>
         /// <returns></returns>
-        public LambdaQueryJoin<T, TJoin> Select(Expression<Func<T, TJoin, object>> resultSelector) 
+        public LambdaQueryJoin<T, TJoin> Select<TResult>(Expression<Func<T, TJoin, TResult>> resultSelector) 
         {
             //在关联两次以上,可调用以下方法指定关联对象获取对应的字段
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
@@ -57,12 +57,24 @@ namespace CRL.LambdaQuery
             return this;
         }
         /// <summary>
+        /// 返回强类型结果选择
+        /// 兼容老写法
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
+        public LambdaQueryResultSelect<TResult> SelectV<TResult>(Expression<Func<T, TJoin, TResult>> resultSelector)
+        {
+            Select(resultSelector);
+            return new LambdaQueryResultSelect<TResult>(BaseQuery, resultSelector.Body);
+        }
+
+        /// <summary>
         /// 选择TJoin关联值到对象内部索引
         /// 可调用多次,不要重复
         /// </summary>
         /// <param name="resultSelector"></param>
         /// <returns></returns>
-        public LambdaQueryJoin<T, TJoin> SelectAppendValue(Expression<Func<TJoin, object>> resultSelector)
+        public LambdaQueryJoin<T, TJoin> SelectAppendValue<TResult>(Expression<Func<TJoin, TResult>> resultSelector)
         {
             //var innerType = typeof(TJoin);
             if (BaseQuery.__QueryFields.Count == 0)
@@ -80,7 +92,7 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="resultSelector"></param>
         /// <returns></returns>
-        public LambdaQueryJoin<T, TJoin> GroupBy(Expression<Func<T, TJoin, object>> resultSelector)
+        public LambdaQueryJoin<T, TJoin> GroupBy<TResult>(Expression<Func<T, TJoin, TResult>> resultSelector)
         {
             //在关联两次以上,可调用以下方法指定关联对象获取对应的字段
             //var innerType = typeof(TJoin);

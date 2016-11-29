@@ -79,7 +79,39 @@ namespace Core.Mvc
                 return CRL.Package.RoleAuthorize.EmployeeBusiness.CurrentUser;
             }
         }
-
+        #region 访问权限控制
+        /// <summary>
+        /// 检测菜单访问权限
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckAccess()
+        {
+            bool a = CRL.Package.RoleAuthorize.AccessControlBusiness.Instance.CheckAccess(CurrentSystemId, CurrentUser.Id);
+            return a;
+        }
+        /// <summary>
+        /// 返回没有权限提示
+        /// </summary>
+        /// <returns></returns>
+        public System.Web.Mvc.ActionResult NotAuthorityResult(bool json = false)
+        {
+            var menu = CRL.Package.RoleAuthorize.MenuBusiness.Instance.GetMenuByUrl(CurrentSystemId);
+            string message;
+            if (menu == null)
+            {
+                message = string.Format("没有权限进行此操作,请联系管理员分配权限 \n地址:[{0}]", Request.Path);
+            }
+            else
+            {
+                message = string.Format("没有权限进行此操作,请联系管理员分配权限 \n菜单:[{0}] 地址:[{1}]", menu.Name, menu.Url);
+            }
+            if (json)
+            {
+                return JsonResult(false, message);
+            }
+            return PageContent("没有权限", message);
+        }
+        #endregion
         /// <summary>
         /// 检测重复提交表单
         /// </summary>

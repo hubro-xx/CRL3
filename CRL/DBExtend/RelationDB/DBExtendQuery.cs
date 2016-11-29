@@ -48,10 +48,6 @@ namespace CRL.DBExtend.RelationDB
             {
                 if (!compileSp)
                 {
-                    if (query.TakeNum > 0)
-                    {
-                        dbHelper.AutoFormatWithNolock = false;
-                    }
                     reader = dbHelper.ExecDataReader(sql);
                 }
                 else//生成储过程
@@ -60,7 +56,6 @@ namespace CRL.DBExtend.RelationDB
                     reader = dbHelper.RunDataReader(sp);
                 }
                 query.ExecuteTime += dbHelper.ExecuteTime;
-                //list = ObjectConvert.DataReaderToIModelList<TModel>(reader, out runTime);
                 var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetFieldMapping());
                 list = ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
                 query.MapingTime += runTime;
