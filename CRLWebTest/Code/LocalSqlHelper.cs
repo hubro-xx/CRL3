@@ -21,6 +21,7 @@ namespace WebTest.Code
 {
     public class LocalSqlHelper
     {
+
         static CoreHelper.DBHelper CreateDbHelper(string name)
         {
             string connString;

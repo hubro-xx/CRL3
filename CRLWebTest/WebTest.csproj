@@ -48,9 +48,30 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Chloe">
+      <HintPath>..\packages\ORMS\Chloe.dll</HintPath>
+    </Reference>
+    <Reference Include="Chloe.SqlServer">
+      <HintPath>..\packages\ORMS\Chloe.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="CoreHelper, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\CoreHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\ORMS\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\ORMS\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Farseer.Net">
+      <HintPath>..\packages\ORMS\Farseer.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Farseer.Net.Sql">
+      <HintPath>..\packages\ORMS\Farseer.Net.Sql.dll</HintPath>
+    </Reference>
+    <Reference Include="Loogn.OrmLite">
+      <HintPath>..\packages\ORMS\Loogn.OrmLite.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="MongoDB.Bson">
@@ -61,6 +82,9 @@
     </Reference>
     <Reference Include="MongoDB.Driver.Core">
       <HintPath>..\packages\MongoDB.Driver.Core.2.2.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SqlSugar">
+      <HintPath>..\packages\ORMS\SqlSugar.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -106,6 +130,7 @@
     <Content Include="Page\Query2.aspx" />
     <Content Include="Page\Query3.aspx" />
     <Content Include="Page\Sharding.aspx" />
+    <Content Include="Page\SpeedTest.aspx" />
     <Content Include="Page\TableExistsCache.aspx" />
     <Content Include="Page\TestAll.aspx" />
     <Content Include="Page\QueryView.aspx" />
@@ -126,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code\ClassGuid.cs" />
+    <Compile Include="Code\Dapper.cs" />
     <Compile Include="Code\Member.cs" />
     <Compile Include="Code\MemberManage.cs" />
     <Compile Include="Code\ModelTest.cs" />
@@ -133,6 +159,14 @@
     <Compile Include="Code\Sharding\MemberManage.cs" />
     <Compile Include="Code\Sharding\OrderManage.cs" />
     <Compile Include="Code\TestAll.cs" />
+    <Compile Include="Code\Test\CRLManage.cs" />
+    <Compile Include="Code\Test\EFContext.cs" />
+    <Compile Include="Code\Test\FS\FSContext.cs" />
+    <Compile Include="Code\Test\FS\TestEntity.cs" />
+    <Compile Include="Code\Test\MappingSpeedTest.cs" />
+    <Compile Include="Code\Test\SugarDao.cs" />
+    <Compile Include="Code\Test\SW.cs" />
+    <Compile Include="Code\Test\TestEntity.cs" />
     <Compile Include="CRLExpressionTest.aspx.cs">
       <DependentUpon>CRLExpressionTest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -279,6 +313,13 @@
     </Compile>
     <Compile Include="Page\Sharding.aspx.designer.cs">
       <DependentUpon>Sharding.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\SpeedTest.aspx.cs">
+      <DependentUpon>SpeedTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\SpeedTest.aspx.designer.cs">
+      <DependentUpon>SpeedTest.aspx</DependentUpon>
     </Compile>
     <Compile Include="Page\TableExistsCache.aspx.cs">
       <DependentUpon>TableExistsCache.aspx</DependentUpon>

@@ -18,14 +18,6 @@ namespace WebTest
 {
     public partial class Default : System.Web.UI.Page
     {
-
-        public static Code.ProductData data2
-        {
-            get
-            {
-                return new Code.ProductData() { Id = 10 };
-            }
-        }
         protected void Page_Load(object sender, EventArgs e)
         {
             Code.TestAll.TestSelect();
