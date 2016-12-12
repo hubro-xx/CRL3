@@ -155,7 +155,7 @@ namespace CRL.Attribute
                 //query += "{" + ModelType.FullName + "}";
                 query += usePrefix;
             }
-            this.FieldMapping = new FieldMapping() { QueryName = MapingName, MappingName = mapingName };
+            this.FieldMapping = new FieldMapping() { QueryName = MapingName, MappingName = mapingName, PropertyType = PropertyType, WithTablePrefix = withTablePrefix };
             if (!string.IsNullOrEmpty(mapingName))
             {
                 FieldMapping.QueryName = mapingName;
@@ -366,6 +366,8 @@ namespace CRL.Attribute
         {
             return string.Format("Q:{0} M:{1}", QueryName, MappingName);
         }
+        public Type PropertyType;
+        public bool WithTablePrefix;
     }
     struct FieldQuery
     {

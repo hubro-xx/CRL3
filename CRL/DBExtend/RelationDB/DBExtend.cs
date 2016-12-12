@@ -169,7 +169,7 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = _DBAdapter.SqlFormat(sql);
             var reader = GetDataReader(sql, types);
-            double runTime;
+            //double runTime;
             //return ObjectConvert.DataReaderToList<T>(reader, out runTime);
             var pro = TypeCache.GetTable(typeof(T)).Fields;
             var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();

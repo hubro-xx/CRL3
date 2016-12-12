@@ -16,11 +16,11 @@ namespace CRL.LambdaQuery.Mapping
             {
                 propType = propType.GetEnumUnderlyingType();
             }
-            if (propType.FullName.StartsWith("System.Nullable"))
-            {
-                //Nullable<T> 可空属性
-                propType = propType.GenericTypeArguments[0];
-            }
+            //if (propType.FullName.StartsWith("System.Nullable"))
+            //{
+            //    //Nullable<T> 可空属性
+            //    propType = propType.GenericTypeArguments[0];
+            //}
             MethodInfo result;
             var Type2 = typeof(DataExtensions);
             if (methods.Count == 0)
@@ -47,82 +47,122 @@ namespace CRL.LambdaQuery.Mapping
         #region method
         public static short GetInt16(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (short)obj;
+            var obj = data.GetValue<short>();
+            return obj;
+        }
+        public static short? GetInt16Nullable(DataContainer data)
+        {
+            var obj = data.GetValue<short>();
+            return obj;
         }
         public static int GetInt32(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (int)obj;
+            var obj = data.GetValue<int>();
+            return obj;
+        }
+        public static int? GetInt32Nullable(DataContainer data)
+        {
+            var obj = data.GetValue<int>();
+            return obj;
         }
         public static long GetInt64(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (long)obj;
+            var obj = data.GetValue<long>();
+            return obj;
         }
-
+        public static long? GetInt64Nullable(DataContainer data)
+        {
+            var obj = data.GetValue<long>();
+            return obj;
+        }
         public static decimal GetDecimal(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (decimal)obj;
+            var obj = data.GetValue<decimal>();
+            return obj;
         }
-
+        public static decimal? GetDecimalNullable(DataContainer data)
+        {
+            var obj = data.GetValue<decimal>();
+            return obj;
+        }
         public static double GetDouble(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (double)obj;
+            var obj = data.GetValue<double>();
+            return obj;
+        }
+        public static double? GetDoubleNullable(DataContainer data)
+        {
+            var obj = data.GetValue<double>();
+            return obj;
         }
         public static float GetFloat(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (float)obj;
+            var obj = data.GetValue<float>();
+            return obj;
         }
-
+        public static float? GetFloatNullable(DataContainer data)
+        {
+            var obj = data.GetValue<float>();
+            return obj;
+        }
         public static bool GetBoolean(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (bool)obj;
+            var obj = data.GetValue<bool>();
+            return obj;
+        }
+        public static bool? GetBooleanNullable(DataContainer data)
+        {
+            var obj = data.GetValue<bool>();
+            return obj;
         }
         public static DateTime GetDateTime(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (DateTime)obj;
+            var obj = data.GetValue<DateTime>();
+            return obj;
+        }
+        public static DateTime? GetDateTimeNullable(DataContainer data)
+        {
+            var obj = data.GetValue<DateTime>();
+            return obj;
         }
         public static Guid GetGuid(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (Guid)obj;
+            var obj = data.GetValue<Guid>();
+            return obj;
+        }
+        public static Guid? GetGuidNullable(DataContainer data)
+        {
+            var obj = data.GetValue<Guid>();
+            return obj;
         }
         public static byte GetByte(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (byte)obj;
+            var obj = data.GetValue<byte>();
+            return obj;
         }
-
+        public static byte? GetByteNullable(DataContainer data)
+        {
+            var obj = data.GetValue<byte>();
+            return obj;
+        }
         public static char GetChar(DataContainer data)
         {
-            var obj = data.GetValue();
-            return (char)obj;
+            var obj = data.GetValue<char>();
+            return obj;
         }
-
+        public static char? GetCharNullable(DataContainer data)
+        {
+            var obj = data.GetValue<char>();
+            return obj;
+        }
         public static string GetString(DataContainer data)
         {
-            var obj = data.GetValue();
-            if (obj == DBNull.Value)
-            {
-                return null;
-            }
-
-            return (string)obj;
+            var obj = data.GetValue<string>();
+            return obj;
         }
         public static object GetValue(DataContainer data)
         {
-            var obj = data.GetValue();
-            if (obj == DBNull.Value)
-            {
-                return null;
-            }
-
+            var obj = data.GetValue<object>();
             return obj;
         }
         #endregion

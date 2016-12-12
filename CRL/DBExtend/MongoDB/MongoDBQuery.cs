@@ -25,7 +25,8 @@ namespace CRL.DBExtend.MongoDB
         List<dynamic> GetDynamicResult<TModel>(LambdaQuery.LambdaQuery<TModel> query1) where TModel : IModel, new()
         {
             var query = query1 as MongoDBLambdaQuery<TModel>;
-            var selectField = query.__QueryFields;
+            //var selectField = query.__QueryFields;
+            var selectField = query._CurrentSelectFieldCache.fields;
             var collection = _MongoDB.GetCollection<TModel>(query.QueryTableName);
             var pageIndex = query1.SkipPage;
             var pageSize = query1.TakeNum;
@@ -75,7 +76,7 @@ namespace CRL.DBExtend.MongoDB
                 {
                     dynamic obj = new System.Dynamic.ExpandoObject();
                     var dict = obj as IDictionary<string, object>;
-                    foreach (var f in query.__QueryFields)
+                    foreach (var f in selectField)
                     {
                         string columnName = f.FieldQuery.MemberName;
                         object value = item[columnName];
@@ -114,7 +115,7 @@ namespace CRL.DBExtend.MongoDB
                 {
                     dynamic obj = new System.Dynamic.ExpandoObject();
                     var dict = obj as IDictionary<string, object>;
-                    foreach (var f in query.__QueryFields)
+                    foreach (var f in selectField)
                     {
                         string columnName = f.FieldQuery.MemberName;
                         object value = f.GetValue(item);

@@ -15,6 +15,7 @@ using System.Data;
 using System.Text.RegularExpressions;
 using System.Linq.Expressions;
 using System.Diagnostics;
+using CRL.LambdaQuery.Mapping;
 
 namespace CRL
 {

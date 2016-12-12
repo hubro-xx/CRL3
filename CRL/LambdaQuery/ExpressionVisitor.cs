@@ -84,7 +84,7 @@ namespace CRL.LambdaQuery
             bool needPar = par1.Type == CRLExpression.CRLExpressionType.Value;//是否需要参数化处理
             if (!needPar)
             {
-                par1.Data = par;
+                par1.DataParamed = par;
                 return par1;
             }
             if (needPar)
@@ -104,16 +104,57 @@ namespace CRL.LambdaQuery
                     parIndex += 1;
                 }
             }
-            par1.Data = par;
+            par1.DataParamed = par;
             return par1;
         }
+        static Dictionary<string, CRLExpression.CRLExpression> BinaryExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
+        bool IsMemberParameter(Expression exp)
+        {
+            if (exp is MemberExpression)
+            {
+                var mExp = exp as MemberExpression;
+                if (mExp.Expression == null)
+                    return false;
+                return mExp.Expression.NodeType == ExpressionType.Parameter;
+            }
+            return false;
+        }
+        static ExpressionType[] binaryTypes= new ExpressionType[] { ExpressionType.Equal, ExpressionType.GreaterThan, ExpressionType.GreaterThanOrEqual, ExpressionType.LessThan, ExpressionType.LessThanOrEqual, ExpressionType.NotEqual };
         CRLExpression.CRLExpression BinaryExpressionHandler(Expression left, Expression right, ExpressionType type)
         {
+            var isBinary = binaryTypes.Contains(type);
+            string key = "";
+            string typeStr = ExpressionTypeCast(type);
+            if (isBinary)
+            {
+                #region 二元运算缓存
+                CRLExpression.CRLExpression cacheItem;
+                key = string.Join("-", Prefixs) + left + type.ToString() + right;
+                var a = BinaryExpressionCache.TryGetValue(key, out cacheItem);
+                if (a)
+                {
+                    CRLExpression.CRLExpression p2;
+                    string __typeStr2;
+                    if (IsMemberParameter(left))
+                    {
+                        p2 = RouteExpressionHandler(right);
+                        var par2 = DealParame(p2, typeStr, out __typeStr2);
+                        cacheItem.SqlOut = string.Format("({0}{1}{2})", cacheItem.Left.Data, __typeStr2, par2.DataParamed);
+                    }
+                    else
+                    {
+                        p2 = RouteExpressionHandler(left);
+                        var par2 = DealParame(p2, typeStr, out __typeStr2);
+                        cacheItem.SqlOut = string.Format("({0}{1}{2})", par2.DataParamed, __typeStr2, cacheItem.Right.Data);
+                    }
+                    cacheItem.Data = cacheItem.SqlOut;
+                    return cacheItem;
+                }
+                #endregion
+            }
             StringBuilder sb = new StringBuilder();
             sb.Append("(");
             var leftPar = RouteExpressionHandler(left);
-            string typeStr = ExpressionTypeCast(type);
-
             var rightPar = RouteExpressionHandler(right);
             #region 修正bool值一元运算
             //t1.isTop=1
@@ -122,7 +163,7 @@ namespace CRL.LambdaQuery
                 var proType = ((MemberExpression)right).Type;
                 if (proType == typeof(bool))
                 {
-                    rightPar.Data = rightPar.Data + "=1";
+                    rightPar.Data = rightPar.Data.ToString().Split('=')[0] + "=1";
                 }
             }
             else if (rightPar.Type == CRLExpression.CRLExpressionType.Binary && leftPar.Type == CRLExpression.CRLExpressionType.Name)
@@ -130,24 +171,36 @@ namespace CRL.LambdaQuery
                 var proType = ((MemberExpression)left).Type;
                 if (proType == typeof(bool))
                 {
-                    leftPar.Data = leftPar.Data + "=1";
+                    leftPar.Data = leftPar.Data.ToString().Split('=')[0] + "=1";
                 }
             }
             #endregion
             string typeStr2;
             leftPar = DealParame(leftPar, typeStr, out typeStr2);
-            sb.Append(leftPar.Data);
+            sb.Append(leftPar.DataParamed);
             rightPar = DealParame(rightPar, typeStr, out typeStr2);
             sb.Append(typeStr2);
-            sb.Append(rightPar.Data);
+            sb.Append(rightPar.DataParamed);
             sb.Append(")");
             //return sb.ToString();
-            var types = new ExpressionType[] { ExpressionType.Equal, ExpressionType.GreaterThan, ExpressionType.GreaterThanOrEqual, ExpressionType.LessThan, ExpressionType.LessThanOrEqual, ExpressionType.NotEqual };
-            var isBinary = types.Contains(type);
+
             var e = new CRLExpression.CRLExpression() { ExpressionType = type.ToString(), Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpression.CRLExpressionType.Binary : CRLExpression.CRLExpressionType.Tree };
             e.SqlOut = sb.ToString();
             e.Data = e.SqlOut;
+            if (isBinary)
+            {
+                BinaryExpressionCache[key] = e;
+            }
             return e;
+        }
+        static Dictionary<string, CRLExpression.CRLExpression> MemberExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
+        static Dictionary<string, MethodCallExpressionCacheItem> MethodCallExpressionCache = new Dictionary<string, MethodCallExpressionCacheItem>();
+        class MethodCallExpressionCacheItem
+        {
+            public CRLExpression.CRLExpression CRLExpression;
+            public int argsIndex;//为0则是实例方法
+            public bool isConstantMethod;
+            public bool isStatic;
         }
 
         /// <summary>
@@ -171,12 +224,21 @@ namespace CRL.LambdaQuery
                 MemberExpression mExp = (MemberExpression)exp;
                 if (mExp.Expression != null && mExp.Expression.NodeType == ExpressionType.Parameter) //like b.Name==b.Name1 或b.Name
                 {
+                    string key = string.Join("-", Prefixs) + mExp.Member.Name + firstLevel;
+                    CRLExpression.CRLExpression val;
+                    var a1 = MemberExpressionCache.TryGetValue(key, out val);
+                    if (a1)
+                    {
+                        return val;
+                    }
                     var fieldName = mExp.Member.Name;
                     var type = mExp.Expression.Type;
-                    if (type.BaseType == typeof(object))//按匿名类
+                    if (mExp.Member.ReflectedType.Name.StartsWith("<>f__AnonymousType"))//按匿名类
                     {
                         var queryField = FormatFieldPrefix(type, fieldName);
-                        return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
+                        var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
+                        MemberExpressionCache[key] = exp2;
+                        return exp2;
                     }
  
                     CRL.Attribute.FieldAttribute field ;
@@ -189,7 +251,9 @@ namespace CRL.LambdaQuery
                     {
                         //return filed.VirtualField;
                         var queryField = field.VirtualField.Replace("{" + type.FullName + "}", Prefixs[type]);//替换前辍
-                        return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
+                        var exp2= new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
+                        MemberExpressionCache[key] = exp2;
+                        return exp2;
                     }
                     var fieldStr = FormatFieldPrefix(type, field.MapingName);//格式化为别名
                     //return field;
@@ -198,10 +262,13 @@ namespace CRL.LambdaQuery
                         //修正bool值一元运算 t1.isTop=1
                         fieldStr += "=1";
                     }
-                    return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr };
+                    var exp3= new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr };
+                    MemberExpressionCache[key] = exp3;
+                    return exp3;
                 }
                 #endregion
-                var obj = GetParameExpressionValue(mExp);
+                bool isConstant;
+                var obj = GetParameExpressionValue(mExp, out isConstant);
                 if (obj is Enum)
                 {
                     obj = (int)obj;
@@ -211,7 +278,7 @@ namespace CRL.LambdaQuery
                     obj = Convert.ToInt32(obj);
                 }
                 //return obj + "";
-                return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
+                return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj, IsConstantValue = isConstant };
             }
             else if (exp is NewArrayExpression)
             {
@@ -231,22 +298,52 @@ namespace CRL.LambdaQuery
                 MethodCallExpression mcExp = (MethodCallExpression)exp;
                 var arguments = new List<object>();
                 var allArguments = mcExp.Arguments;
-                MemberExpression memberExpression;
-                Expression args;
                 int argsIndex = 0;
-                string methodField = "";
-                string memberName = "";
-                string methodName = mcExp.Method.Name;
+                Expression firstArgs;
                 if (mcExp.Method.IsStatic)//区分静态方法还是实例方法
                 {
-                    args = allArguments[0];//like b.Name.IsNull("22")
+                    firstArgs = allArguments[0];//like b.Name.IsNull("22")
                     argsIndex = 1;
                 }
                 else
                 {
-                    args = mcExp.Object;//like b.Id.ToString()
+                    firstArgs = mcExp.Object;//like b.Id.ToString()
                 }
-                if (args is ParameterExpression)
+
+                MethodCallExpressionCacheItem methodCache;
+                #region 缓存处理
+                string key = string.Join("-", Prefixs) + exp + nodeType;
+                var exists = MethodCallExpressionCache.TryGetValue(key, out methodCache);
+                if (exists)
+                {
+                    if (!methodCache.isConstantMethod)
+                    {
+                        var methodCall = methodCache.CRLExpression.Data as CRLExpression.MethodCallObj;
+                        if (methodCall.Args.Count > 0)
+                        {
+                            for (int i = 0; i < allArguments.Count; i++)
+                            {
+                                bool isConstant1;
+                                var obj = GetParameExpressionValue(allArguments[i], out isConstant1);
+                                arguments.Add(obj);
+                            }
+                            methodCall.Args = arguments;
+                        }
+                    }
+                    methodCache.CRLExpression.SqlOut = "";
+                    return methodCache.CRLExpression;
+                }
+                #endregion
+                #region MethodCallExpression
+                bool isConstantMethod = false;
+
+                MemberExpression memberExpression;
+
+                string methodField = "";
+                string memberName = "";
+                string methodName = mcExp.Method.Name;
+                
+                if (firstArgs is ParameterExpression)
                 {
                     var exp2 = mcExp.Arguments[1] as UnaryExpression;
                     var type = exp2.Operand.GetType();
@@ -255,85 +352,61 @@ namespace CRL.LambdaQuery
                     methodField = RouteExpressionHandler(exp3).SqlOut;
                     memberName = "";
                 }
-                else if (args is UnaryExpression)//like a.Code.Count()
+                else if (firstArgs is UnaryExpression)//like a.Code.Count()
                 {
-                    memberExpression = (args as UnaryExpression).Operand as MemberExpression;
+                    memberExpression = (firstArgs as UnaryExpression).Operand as MemberExpression;
                     memberName = memberExpression.Member.Name;
                     methodField = FormatFieldPrefix(memberExpression.Expression.Type, memberExpression.Member.Name);
                 }
-                else if (args is MemberExpression)
+                else if (firstArgs is MemberExpression)
                 {
                     //like a.Code
-                    memberExpression = args as MemberExpression;
+                    memberExpression = firstArgs as MemberExpression;
                     memberName = memberExpression.Member.Name;
                     var type = memberExpression.Expression.Type;
                     if (type.IsSubclassOf(typeof(IModel)))
                     {
                         memberName = TypeCache.GetProperties(type, true)[memberExpression.Member.Name].MapingName;
                     }
-                    methodField = FormatFieldPrefix(memberExpression.Expression.Type, memberName);
-                    for (int i = argsIndex; i < allArguments.Count; i++)
+                    if (memberExpression.Expression.NodeType == ExpressionType.Parameter)
                     {
-                        var obj = GetParameExpressionValue(allArguments[i]);
+                        methodField = FormatFieldPrefix(memberExpression.Expression.Type, memberName);
+                        var allConstant = true;
+                        for (int i = argsIndex; i < allArguments.Count; i++)
+                        {
+                            bool isConstant2;
+                            var obj = GetParameExpressionValue(allArguments[i], out isConstant2);
+                            if (!isConstant2)
+                            {
+                                allConstant = true;
+                            }
+                            arguments.Add(obj);
+                        }
+                        if (allConstant)
+                        {
+                            isConstantMethod = true;
+                        }
+                    }
+                    else
+                    {
+                        //like Convert.ToDateTime(times)
+                        var obj = ConstantValueVisitor.GetParameExpressionValue(firstArgs);
                         arguments.Add(obj);
+                        isConstantMethod = true;
                     }
                 }
-                else if (args is ConstantExpression)//按常量
+                else if (firstArgs is ConstantExpression)//按常量
                 {
-                    var obj = ConstantValueVisitor.GetParameExpressionValue(args);
+                    //like DateTime.Parse("2016-02-11 12:56"),
+                    isConstantMethod = true;
+                    var obj = ConstantValueVisitor.GetParameExpressionValue(firstArgs);
                     arguments.Add(obj);
                 }
                 //else
                 //{
                 //    throw new CRLException("不支持此语法解析:" + args);
                 //}
-                #region old
-                //if (mcExp.Object is MemberExpression)
-                //{
-                //    var mExp = mcExp.Object as MemberExpression;
-                //    if (mExp.Expression.NodeType != ExpressionType.Parameter)
-                //    {
-                //        //not like b.BarCode.Contains("abc")
-                //        //按变量或常量编译值
-                //        var obj = GetParameExpressionValue(exp);
-                //        //return obj + "";
-                //        return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
-                //    }
-                //}
-                //else if (mcExp.Object is ConstantExpression)
-                //{
-                //    //var cExp = mcExp.Object as ConstantExpression;
-                //    //like b.BarCode == aa()
-                //    var obj = GetParameExpressionValue(exp);
-                //    //return obj + "";
-                //    return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
-                //}
-                //请扩展ExtensionMethod的方法
-
-                //parIndex += 1;
-                //string field = "";
-       
-                //if (mcExp.Method.IsStatic)//区分静态方法还是实例方法
-                //{
-                //    //like b.Name.IsNull("22")
-                //    field = RouteExpressionHandler(mcExp.Arguments[0]).Data.ToString();
-                //    argsIndex = 1;
-                //}
-                //else
-                //{
-                //    //like b.Id.ToString()
-                //    var mExpression = mcExp.Object as MemberExpression;
-                //    field = mExpression.Member.Name;
-                //    var type = mExpression.Expression.Type;
-                //    var filed2 = TypeCache.GetProperties(type, true)[field];
-                //    field = FormatFieldPrefix(type, filed2.MapingName);
-                //}
-                //for (int i = argsIndex; i < mcExp.Arguments.Count; i++)
-                //{
-                //    var obj = GetParameExpressionValue(mcExp.Arguments[i]);
-                //    allArgs.Add(obj);
-                //}
-                #endregion
+                
                 if (nodeType == null)
                 {
                     nodeType = ExpressionType.Equal;
@@ -344,11 +417,18 @@ namespace CRL.LambdaQuery
                     //like DateTime.Parse("2016-02-11")
                     var method = mcExp.Method;
                     var obj = method.Invoke(null, arguments.ToArray());
-                    return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
+                    var exp2= new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
+                    var cache = new MethodCallExpressionCacheItem() { CRLExpression = exp2, argsIndex = argsIndex, isConstantMethod = isConstantMethod, isStatic = mcExp.Method.IsStatic };
+                    MethodCallExpressionCache[key] = cache;
+                    return exp2;
                 }
                 var methodInfo = new CRLExpression.MethodCallObj() { Args = arguments, ExpressionType = nodeType.Value, MemberName = memberName, MethodName = methodName, MemberQueryName = methodField };
                 methodInfo.ReturnType = mcExp.Type;
-                return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.MethodCall, Data = methodInfo };
+                #endregion
+                var exp4= new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.MethodCall, Data = methodInfo };
+                var cache2 = new MethodCallExpressionCacheItem() { CRLExpression = exp4, argsIndex = argsIndex, isConstantMethod = isConstantMethod };
+                MethodCallExpressionCache[key] = cache2;
+                return exp4;
             }
             else if (exp is ConstantExpression)
             {
@@ -374,11 +454,12 @@ namespace CRL.LambdaQuery
                         returnValue = cExp.Value;
                     }
                 }
-                return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = returnValue };
+                return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = returnValue, IsConstantValue = true };
                 #endregion
             }
             else if (exp is UnaryExpression)
             {
+                #region UnaryExpression
                 UnaryExpression ue = ((UnaryExpression)exp);
                 if (ue.Operand is MethodCallExpression)
                 {
@@ -411,6 +492,7 @@ namespace CRL.LambdaQuery
                     return RouteExpressionHandler(ue.Operand);
                 }
                 throw new CRLException("未处理的一元运算" + ue.NodeType);
+                #endregion
             }
             else
             {
@@ -494,11 +576,13 @@ namespace CRL.LambdaQuery
             }
             #endregion
         }
-        object GetParameExpressionValue(Expression expression)
+        object GetParameExpressionValue(Expression expression, out bool isConstant)
         {
+            isConstant = false;
             //只能处理常量
             if (expression is ConstantExpression)
             {
+                isConstant = true;
                 ConstantExpression cExp = (ConstantExpression)expression;
                 return cExp.Value;
             }
@@ -515,7 +599,7 @@ namespace CRL.LambdaQuery
                     }
                     else
                     {
-                        var v = ConstantValueVisitor.GetMemberExpressionValue(m);
+                        var v = ConstantValueVisitor.GetMemberExpressionValue(m, out isConstant);
                         return v;
                     }
                 }

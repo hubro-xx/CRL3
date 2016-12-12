@@ -36,6 +36,7 @@ namespace CRL.LambdaQuery.CRLExpression
         /// 二元运算类型
         /// </summary>
         public ExpressionType ExpressionType;
-        public List<object> Args;
+        public List<object> Args = null;
     }
+
 }

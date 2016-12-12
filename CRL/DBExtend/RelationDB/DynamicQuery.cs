@@ -130,15 +130,16 @@ namespace CRL.DBExtend.RelationDB
         public override dynamic QueryScalar<TModel>(LambdaQuery<TModel> query)
         {
             query.TakeNum = 1;
-            var reader = GetQueryDynamicReader(query);
-            var a = reader.Read();
-            if (!a)
+            using (var reader = GetQueryDynamicReader(query))
             {
-                return null;
+                var a = reader.Read();
+                if (!a)
+                {
+                    return null;
+                }
+                var result = reader[0];
+                return result;
             }
-            var result = reader[0];
-            reader.Close();
-            return result;
         }
         /// <summary>
         /// 返回动态对象的查询

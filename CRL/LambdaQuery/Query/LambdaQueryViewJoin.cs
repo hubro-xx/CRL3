@@ -37,7 +37,8 @@ namespace CRL.LambdaQuery
             where TJoinResult2 : class
         {
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
-            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, false, parameters);
+            var selectField = BaseQuery.GetSelectField(true, resultSelector.Body, false, parameters);
+            var resultFields = selectField.fields;
             var prefix1 = BaseQuery.GetPrefix(typeof(TJoinResult));
             var prefix2 = BaseQuery.GetPrefix(resultSelect.InnerType);
             //替换匿名前辍
@@ -48,7 +49,9 @@ namespace CRL.LambdaQuery
                     item.QueryFullScript = item.QueryFullScript.Replace(prefix1, prefix2);
                 }
             }
-            BaseQuery.__QueryFields = resultFields;
+            selectField.queryFieldString = BaseQuery.GetQueryFieldsString(resultFields);
+            BaseQuery._CurrentSelectFieldCache = selectField;
+            //BaseQuery.__QueryFields = resultFields;
             return new LambdaQueryResultSelect<TJoinResult2>(BaseQuery, resultSelector.Body);
         }
         /// <summary>
@@ -60,12 +63,16 @@ namespace CRL.LambdaQuery
         public LambdaQuery<T> SelectAppendValue<TJoinResult2>(Expression<Func<TJoinResult, TJoinResult2>> resultSelector)
         {
             //var innerType = typeof(TJoin);
-            if (BaseQuery.__QueryFields.Count == 0)
+            //if (BaseQuery.__QueryFields.Count == 0)
+            //{
+            //    BaseQuery.SelectAll();
+            //}
+            if (BaseQuery._CurrentSelectFieldCache==null)
             {
                 BaseQuery.SelectAll();
             }
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
-            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, true, parameters);
+            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, true, parameters).fields;
             var prefix1 = BaseQuery.GetPrefix(typeof(TJoinResult));
             var prefix2 = BaseQuery.GetPrefix(resultSelect.InnerType);
             //替换匿名前辍
@@ -77,7 +84,8 @@ namespace CRL.LambdaQuery
                 }
             }
 
-            BaseQuery.__QueryFields.AddRange(resultFields);
+            //BaseQuery.__QueryFields.AddRange(resultFields);
+            BaseQuery._CurrentAppendSelectField.AddRange(resultFields);
             return BaseQuery as LambdaQuery<T>;
         }
         /// <summary>
@@ -90,7 +98,7 @@ namespace CRL.LambdaQuery
         {
             //var innerType = typeof(TJoin);
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
-            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters);
+            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).fields;
             if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
             {
                 BaseQuery.__QueryOrderBy += ",";

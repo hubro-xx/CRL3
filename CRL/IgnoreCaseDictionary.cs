@@ -17,6 +17,13 @@ namespace CRL
     /// </summary>
     public class IgnoreCaseDictionary<T> : Dictionary<string, T>
     {
+        public IgnoreCaseDictionary()
+        {
+        }
+        public IgnoreCaseDictionary(IDictionary<string, T> dic)
+            : base(dic)
+        {
+        }
         Dictionary<string, string> keyMaping = new Dictionary<string, string>();
         string getKey(string key)
         {
@@ -77,6 +84,12 @@ namespace CRL
     /// </summary>
     public class ParameCollection : IgnoreCaseDictionary<object>
     {
-
+        public ParameCollection()
+        {
+        }
+        public ParameCollection(IDictionary<string, object> dic)
+            : base(dic)
+        {
+        }
     }
 }

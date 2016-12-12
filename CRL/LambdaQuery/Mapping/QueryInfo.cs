@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CRL.LambdaQuery.Mapping
 {
-    internal class QueryInfo<T>
+    internal class QueryInfo<TSource>
     {
         static System.Collections.Concurrent.ConcurrentDictionary<Type, Delegate> DelegateCache = new System.Collections.Concurrent.ConcurrentDictionary<Type, Delegate>();
         public QueryInfo(bool anonymousClass, IEnumerable<Attribute.FieldMapping> mapping = null, ConstructorInfo constructor = null)
@@ -20,40 +20,92 @@ namespace CRL.LambdaQuery.Mapping
             {
                 Delegate dg;
                 //缓存处理
-                var a = DelegateCache.TryGetValue(typeof(T), out dg);
+                var a = DelegateCache.TryGetValue(typeof(TSource), out dg);
                 if (a)
                 {
-                    ObjCreater = (Func<DataContainer, T>)dg;
+                    ObjCreater = (Func<DataContainer, TSource>)dg;
                     return;
                 }
-                ObjCreater = CreateObjectGenerator<T>(constructor);
-                DelegateCache.TryAdd(typeof(T), ObjCreater);
+                ObjCreater = CreateObjectGenerator<TSource>(constructor);
+                DelegateCache.TryAdd(typeof(TSource), ObjCreater);
             }
             else
             {
-                Reflection = ReflectionHelper.GetInfo<T>();
+                Reflection = ReflectionHelper.GetInfo<TSource>();
             }
+
+            //if (!anonymousClass)
+            //{
+            //    Reflection = ReflectionHelper.GetInfo<TSource>();
+            //} 
+            //Delegate dg;
+            ////缓存处理
+            //var a = DelegateCache.TryGetValue(typeof(TSource), out dg);
+            //if (a)
+            //{
+            //    ObjCreater = (Func<DataContainer, TSource>)dg;
+            //    return;
+            //}
+            //else
+            //{
+            //    if (anonymousClass)
+            //    {
+            //        ObjCreater = CreateObjectGenerator<TSource>(constructor);
+            //    }
+            //    else
+            //    {
+            //        ObjCreater = CreateObjectGenerator2<TSource>(mapping);
+            //    }
+            //    DelegateCache.TryAdd(typeof(TSource), ObjCreater);
+            //}
         }
         public bool AnonymousClass;
         public IEnumerable<Attribute.FieldMapping> Mapping;
-        public Func<DataContainer, T> ObjCreater;
-        public ReflectionInfo<T> Reflection;
+        public Func<DataContainer, TSource> ObjCreater;
+        public ReflectionInfo<TSource> Reflection;
 
-        Func<DataContainer, TObject> CreateObjectGenerator<TObject>(ConstructorInfo constructor)
+        static Func<DataContainer, T> CreateObjectGenerator<T>(ConstructorInfo constructor)
         {
-            Func<DataContainer, TObject> ret = null;
             var parame = Expression.Parameter(typeof(DataContainer), "par");
             ParameterInfo[] parameters = constructor.GetParameters();
             List<Expression> arguments = new List<Expression>(parameters.Length);
-            foreach (ParameterInfo parameter in parameters)
+            foreach (var parameter in parameters)
             {
                 var method = DataExtensions.GetMethod(parameter.ParameterType);
                 var getValue = Expression.Call(method, parame);
                 arguments.Add(getValue);
             }
             var body = Expression.New(constructor, arguments);
-            ret = Expression.Lambda<Func<DataContainer, TObject>>(body, parame).Compile();
+            var ret = Expression.Lambda<Func<DataContainer, T>>(body, parame).Compile();
             return ret;
         }
+        static Func<DataContainer, T> CreateObjectGenerator2<T>(IEnumerable<Attribute.FieldMapping> mapping)
+        {
+            var objectType = typeof(T);
+            var fields = TypeCache.GetProperties(objectType, true);
+            var parame = Expression.Parameter(typeof(DataContainer), "par");
+            var memberBindings = new List<MemberBinding>();
+            //按顺序生成Binding
+            foreach (var mp in mapping)
+            {
+                if (!fields.ContainsKey(mp.MappingName))
+                {
+                    continue;
+                }
+                var m = fields[mp.MappingName].GetPropertyInfo();
+                var method = DataExtensions.GetMethod(m.PropertyType);
+                Expression getValue = Expression.Call(method, parame);
+                if (m.PropertyType.IsEnum)
+                {
+                    getValue = Expression.Convert(getValue, m.PropertyType);
+                }
+                var bind = (MemberBinding)Expression.Bind(m, getValue);
+                memberBindings.Add(bind);
+            }
+            Expression expr = Expression.MemberInit(Expression.New(objectType), memberBindings);
+            var ret = Expression.Lambda<Func<DataContainer, T>>(expr, parame);
+            return ret.Compile();
+        }
+
     }
 }

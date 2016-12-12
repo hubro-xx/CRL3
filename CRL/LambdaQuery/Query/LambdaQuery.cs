@@ -56,15 +56,6 @@ namespace CRL.LambdaQuery
         }
         #region 字段
 
-        internal List<Attribute.FieldAttribute> GetQueryFields()
-        {
-            if (__QueryFields.Count == 0)
-            {
-                SelectAll();
-            }
-            return __QueryFields;
-        }
-
         /// <summary>
         /// 查询的表名
         /// </summary>
@@ -230,8 +221,9 @@ namespace CRL.LambdaQuery
                 SelectAll();
                 return this;
             }
-            var fields = GetSelectField(true,resultSelectorBody, false, typeof(T));
-            __QueryFields = fields;
+            var info = GetSelectField(true, resultSelectorBody, false, typeof(T));
+            _CurrentSelectFieldCache = info;
+            //__QueryFields = fields;
             return this;
         }
         /// <summary>
@@ -324,8 +316,6 @@ namespace CRL.LambdaQuery
             return log;
         }
         #endregion
-
-        
 
     }
 }

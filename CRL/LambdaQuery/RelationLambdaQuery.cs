@@ -60,7 +60,7 @@ namespace CRL.LambdaQuery
         public override LambdaQuery<T> OrderBy<TResult>(Expression<Func<T, TResult>> expression, bool desc = true)
         {
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
-            var fields = GetSelectField(false, expression.Body, false, parameters);
+            var fields = GetSelectField(false, expression.Body, false, parameters).fields;
             if (!string.IsNullOrEmpty(__QueryOrderBy))
             {
                 __QueryOrderBy += ",";
@@ -143,60 +143,20 @@ namespace CRL.LambdaQuery
             Condition.Append(condition);
             return this;
         }
-
         internal override string GetQueryFieldString()
         {
-            if (__QueryFields.Count == 0)
+            //var allFields = GetQueryFields();
+            if (_CurrentSelectFieldCache == null)
             {
                 SelectAll();
             }
-            int tabIndex = 2;
-            var sb = new StringBuilder();
-            foreach (Attribute.FieldAttribute a in __QueryFields)
+            var str = _CurrentSelectFieldCache.queryFieldString;
+            if (_CurrentAppendSelectField.Count > 0)
             {
-                if (a.FieldType == Attribute.FieldType.关联字段)
-                {
-                    #region 关联约束
-                    tabIndex += 1;
-                    if (a.FieldType == Attribute.FieldType.关联字段 && a.ConstraintType == null)//虚拟字段,没有设置关联类型
-                    {
-                        throw new CRLException(string.Format("需指定关联类型:{0}.{1}.Attribute.Field.ConstraintType", typeof(T), a.MemberName));
-                    }
-                    if (string.IsNullOrEmpty(a.ConstraintField))//约束为空
-                    {
-                        continue;
-                    }
-                    var arry = a.ConstraintField.Replace("$", "").Split('=');
-                    string leftField = GetPrefix() + arry[0];
-                    var innerType = a.ConstraintType;
-                    //TypeCache.SetDBAdapterCache(innerType,dBAdapter);
-                    string rightField = GetPrefix(innerType) + arry[1];
-                    string condition = string.Format("{0}={1}", leftField, rightField);
-                    if (!string.IsNullOrEmpty(a.Constraint))
-                    {
-                        a.Constraint = Regex.Replace(a.Constraint, @"(.+?)\=", GetPrefix(innerType) + "$1=");//加上前缀
-                        condition += " and " + a.Constraint;
-                    }
-
-                    var innerFields = TypeCache.GetProperties(innerType, true);
-
-                    //var resultField = innerFields.Find(b => b.Name.ToUpper() == a.ConstraintResultField.ToUpper());
-                    var resultField = innerFields[a.ConstraintResultField];
-                    if (resultField == null)
-                    {
-                        throw new CRLException(string.Format("在类型{0}找不到 ConstraintResultField {1}", innerType, a.ConstraintResultField));
-                    }
-                    AddInnerRelation(new TypeQuery(innerType), JoinType.Inner, condition);
-                    #endregion
-                    sb.Append(string.Format("{0},", resultField.QueryFullScript));
-                }
-                else
-                {
-                    sb.Append(string.Format("{0},", a.QueryFullScript));
-                }
+                str += (string.IsNullOrEmpty(str) ? "" : ",") + string.Join(",", _CurrentAppendSelectField.Select(b => b.QueryFullScript));
             }
-            var str2 = sb.ToString().Substring(0, sb.Length - 1);
-            return str2;
+            return str;
+            
         }
 
         /// <summary>
@@ -269,7 +229,7 @@ namespace CRL.LambdaQuery
             {
                 fields = System.Text.RegularExpressions.Regex.Replace(fields,@" as \w+","");//替换别名
                 fields = string.Format(" count({0}) as Total", fields);
-                if (__QueryFields.Count > 1)
+                if (_CurrentSelectFieldCache.fields.Count > 1)
                 {
                     throw new CRLException("distinct 时,不能count多个字段 " + fields);
                 }

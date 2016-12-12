@@ -19,9 +19,16 @@ namespace CRL.LambdaQuery
     {
         public static object GetParameExpressionValue(Expression expression)
         {
+            bool isConstant;
+            return GetParameExpressionValue(expression, out isConstant);
+        }
+        public static object GetParameExpressionValue(Expression expression,out bool isConstant)
+        {
+            isConstant = false;
             //只能处理常量
             if (expression is ConstantExpression)
             {
+                isConstant = true;
                 ConstantExpression cExp = (ConstantExpression)expression;
                 return cExp.Value;
             }
@@ -39,7 +46,7 @@ namespace CRL.LambdaQuery
                     }
                     else
                     {
-                        var v = GetMemberExpressionValue(m);
+                        var v = GetMemberExpressionValue(m, out isConstant);
                         return v;
                     }
                 }
@@ -47,10 +54,12 @@ namespace CRL.LambdaQuery
             //按编译
             return Expression.Lambda(expression).Compile().DynamicInvoke();
         }
-        public static object GetMemberExpressionValue(Expression exp)
+        public static object GetMemberExpressionValue(Expression exp, out bool isConstant)
         {
+            isConstant = false;
             if (exp.NodeType == ExpressionType.Constant)
             {
+                isConstant = true;
                 return ((ConstantExpression)exp).Value;
             }
             if (exp.NodeType == ExpressionType.MemberAccess)
@@ -59,7 +68,7 @@ namespace CRL.LambdaQuery
                 object instance = null;
                 if (mExp.Expression != null)
                 {
-                    instance = GetMemberExpressionValue(mExp.Expression);
+                    instance = GetMemberExpressionValue(mExp.Expression, out isConstant);
                 }
                 if (mExp.Member.MemberType == MemberTypes.Field)
                 {

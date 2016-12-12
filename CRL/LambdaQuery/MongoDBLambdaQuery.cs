@@ -13,7 +13,6 @@ using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Linq.Expressions;
 using System.Collections;
 namespace CRL.LambdaQuery
 {
@@ -188,7 +187,7 @@ namespace CRL.LambdaQuery
         {
             //var sortBuild = Builders<T>.Sort;
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
-            var field = GetSelectField(false, expression.Body, false, parameters).First();
+            var field = GetSelectField(false, expression.Body, false, parameters).fields.First();
             if (desc)
             {
                 _MongoDBSort = _MongoDBSort.Descending(field.MemberName);

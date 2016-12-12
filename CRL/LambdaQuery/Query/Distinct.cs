@@ -19,7 +19,7 @@ namespace CRL.LambdaQuery
 {
     public abstract partial class LambdaQuery<T> : LambdaQueryBase where T : IModel, new()
     {
-        internal bool __DistinctFields = false;
+
         /// <summary>
         /// 表示 Distinct字段
         /// </summary>
@@ -31,9 +31,10 @@ namespace CRL.LambdaQuery
             Top(0);
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
             var fields = GetSelectField(true, resultSelector.Body, false, parameters);
+            _CurrentSelectFieldCache = fields;
             __DistinctFields = true;
             __FieldFunctionFormat = " DISTINCT {0}";
-            __QueryFields = fields;
+            //__QueryFields = fields;
             return new LambdaQueryResultSelect<TResult>(this, resultSelector.Body);
             //return this;
         }

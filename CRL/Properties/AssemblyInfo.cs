@@ -8,6 +8,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security;
 
 // 有关程序集的常规信息通过下列属性集
 // 控制。更改这些属性值可修改
@@ -20,6 +21,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright © hubro 2013-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+//[assembly: System.Security.Permissions.SecurityPermissionAttribute(System.Security.Permissions.SecurityAction.RequestRefuse,SkipVerification=true)]
+//[assembly: SecurityRules(SecurityRuleSet.Level1, SkipVerificationInFullTrust = true)]
 
 // 将 ComVisible 设置为 false 使此程序集中的类型
 // 对 COM 组件不可见。如果需要从 COM 访问此程序集中的类型，

@@ -52,8 +52,12 @@ namespace CRL.LambdaQuery
         {
             //在关联两次以上,可调用以下方法指定关联对象获取对应的字段
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
-            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, false, parameters);
-            BaseQuery.__QueryFields.AddRange(resultFields);
+            var selectFieldItem = BaseQuery.GetSelectField(true, resultSelector.Body, false, parameters);
+            //BaseQuery.__QueryFields.AddRange(resultFields);
+            selectFieldItem.queryFieldString = "";
+            BaseQuery._CurrentSelectFieldCache = selectFieldItem;
+            BaseQuery._CurrentAppendSelectField.AddRange(selectFieldItem.fields);
+            //BaseQuery.currentSelectFieldCache.queryFieldString += "," + BaseQuery.GetQueryFieldsString(resultFields);
             return this;
         }
         /// <summary>
@@ -77,13 +81,18 @@ namespace CRL.LambdaQuery
         public LambdaQueryJoin<T, TJoin> SelectAppendValue<TResult>(Expression<Func<TJoin, TResult>> resultSelector)
         {
             //var innerType = typeof(TJoin);
-            if (BaseQuery.__QueryFields.Count == 0)
+            //if (BaseQuery.__QueryFields.Count == 0)
+            //{
+            //    BaseQuery.SelectAll();
+            //}
+            if (BaseQuery._CurrentSelectFieldCache==null)
             {
                 BaseQuery.SelectAll();
             }
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
-            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, true, parameters);
-            BaseQuery.__QueryFields.AddRange(resultFields);
+            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, true, parameters).fields;
+            //BaseQuery.__QueryFields.AddRange(resultFields);
+            BaseQuery._CurrentAppendSelectField.AddRange(resultFields);
             return this;
         }
         /// <summary>
@@ -97,7 +106,7 @@ namespace CRL.LambdaQuery
             //在关联两次以上,可调用以下方法指定关联对象获取对应的字段
             //var innerType = typeof(TJoin);
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
-            var resultFields = BaseQuery.GetSelectField(false, resultSelector.Body, false, parameters);
+            var resultFields = BaseQuery.GetSelectField(false, resultSelector.Body, false, parameters).fields;
             BaseQuery.__GroupFields.AddRange(resultFields);
             return this;
         }
@@ -111,7 +120,7 @@ namespace CRL.LambdaQuery
         {
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
             //var innerType = typeof(TJoin);
-            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters);
+            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).fields;
             if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
             {
                 BaseQuery.__QueryOrderBy += ",";

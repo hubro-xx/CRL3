@@ -164,8 +164,9 @@ namespace CRL
         internal static List<object> DataReaderToObjectList(DbDataReader reader, Type mainType, IEnumerable<Attribute.FieldMapping> mapping, out double runTime)
         {
             //rem mainType 不一定为T
-            var sw = new Stopwatch();
-            sw.Start();
+            //var sw = new Stopwatch();
+            //sw.Start();
+            runTime = 0;
             var list = new List<object>();
             var typeArry = TypeCache.GetTable(mainType).Fields;
             var columns = new Dictionary<string, int>();
@@ -188,11 +189,13 @@ namespace CRL
                 columns.Remove(fieldName);
                 actions.Add(action);
             }
+            var _actions = actions.ToArray();
+            int actionsCount = actions.Count;
             while (reader.Read())
             {
                 reader.GetValues(values);
                 var detailItem = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
-                foreach (var ac in actions)
+                foreach (var ac in _actions)
                 {
                     ac.SetValue2(detailItem, values);
                 }
@@ -219,8 +222,8 @@ namespace CRL
             }
             reader.Close();
             reader.Dispose();
-            sw.Stop();
-            runTime = sw.ElapsedMilliseconds;
+            //sw.Stop();
+            //runTime = sw.ElapsedMilliseconds;
             //Console.WriteLine("CRL映射用时:" + runTime);
             return list;
         }
@@ -245,9 +248,8 @@ namespace CRL
             }
             var actions = new List<ActionItem<T>>();
             object[] values = new object[reader.FieldCount];
-            for (int i = 0; i < mapping.Count();i++ )
+            foreach (var mp in mapping)
             {
-                var mp = mapping[i];
                 var fieldName = mp.QueryName.ToLower();
                 var accessor = queryInfo.Reflection.GetAccessor(mp.MappingName);
                 if (accessor == null)
@@ -256,26 +258,26 @@ namespace CRL
                 columns.Remove(fieldName);
                 actions.Add(action);
             }
-            var _actions = actions.ToArray();
-            var sw = new Stopwatch();
-            sw.Start();
+            var _actions = actions.ToArray();//遍历,数组比较快
             int actionsCount = actions.Count;
+            var type = typeof(T);
             while (reader.Read())
             {
                 reader.GetValues(values);
                 T detailItem ;
+                //var dataContainer = new DataContainer(values, type);
+                //detailItem = objCreater(dataContainer);
                 if (queryInfo.AnonymousClass)
                 {
-                    var dataContainer = new DataContainer(values);
+                    var dataContainer = new DataContainer(values, type);
                     detailItem = objCreater(dataContainer);
                 }
                 else
                 {
                     detailItem = queryInfo.Reflection.CreateObjectInstance();
                 }
-                for (int i = 0; i < actionsCount; i++)
+                foreach (var ac in _actions)
                 {
-                    var ac = _actions[i];
                     ac.Set(detailItem, values[ac.ValueIndex]);
                 }
                 #region 剩下的放索引
@@ -298,8 +300,6 @@ namespace CRL
                 #endregion
                 list.Add(detailItem);
             }
-            sw.Stop();
-            //Console.WriteLine("映射用时:" + sw.ElapsedMilliseconds);
             reader.Close();
             reader.Dispose();
             return list;

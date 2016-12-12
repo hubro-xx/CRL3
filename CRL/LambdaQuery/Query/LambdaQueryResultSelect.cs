@@ -54,7 +54,7 @@ namespace CRL.LambdaQuery
         public LambdaQueryResultSelect<TResult> OrderBy<TResult2>(Expression<Func<TResult, TResult2>> expression, bool desc = true)
         {
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
-            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters);
+            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).fields;
             var orderBy = string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
             if (!string.IsNullOrEmpty(__QueryOrderBy))
             {
@@ -83,6 +83,10 @@ namespace CRL.LambdaQuery
         {
             //todo MongoDB未实现
             var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
+            if (db is DBExtend.MongoDB.MongoDB)
+            {
+                throw new NotSupportedException("MongoDB暂未实现");
+            }
             if (resultSelectorBody is NewExpression)
             {
                 var newExpression = resultSelectorBody as NewExpression;
@@ -98,6 +102,10 @@ namespace CRL.LambdaQuery
         { 
             //todo MongoDB未实现
             var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
+            if (db is DBExtend.MongoDB.MongoDB)
+            {
+                throw new NotSupportedException("MongoDB暂未实现");
+            }
             return db.QueryDynamic(BaseQuery);
         }
     }

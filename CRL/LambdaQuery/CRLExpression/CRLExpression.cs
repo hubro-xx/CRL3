@@ -54,6 +54,9 @@ namespace CRL.LambdaQuery.CRLExpression
             get;
             set;
         }
+        [System.Xml.Serialization.XmlIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        public string DataParamed;
         /// <summary>
         /// 左右操作类型
         /// </summary>
@@ -67,5 +70,8 @@ namespace CRL.LambdaQuery.CRLExpression
             get;
             set;
         }
+        [System.Xml.Serialization.XmlIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        public bool IsConstantValue;
     }
 }
