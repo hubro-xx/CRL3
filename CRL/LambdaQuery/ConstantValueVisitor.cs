@@ -46,10 +46,10 @@ namespace CRL.LambdaQuery
                     }
                     else
                     {
-                        var v = GetMemberExpressionValue(m, out isConstant);
-                        return v;
+                        return GetMemberExpressionValue(m, out isConstant);
                     }
                 }
+                return GetMemberExpressionValue(m, out isConstant);
             }
             //按编译
             return Expression.Lambda(expression).Compile().DynamicInvoke();

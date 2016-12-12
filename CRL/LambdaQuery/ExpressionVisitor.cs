@@ -222,15 +222,16 @@ namespace CRL.LambdaQuery
                 //区分 属性表达带替换符{0} 变量值不带
                 #region Member
                 MemberExpression mExp = (MemberExpression)exp;
+                string key = string.Join("-", Prefixs) + mExp.Member.Name + firstLevel;
+                CRLExpression.CRLExpression val;
+                var a1 = MemberExpressionCache.TryGetValue(key, out val);
+                if (a1)
+                {
+                    return val;
+                }
+
                 if (mExp.Expression != null && mExp.Expression.NodeType == ExpressionType.Parameter) //like b.Name==b.Name1 或b.Name
                 {
-                    string key = string.Join("-", Prefixs) + mExp.Member.Name + firstLevel;
-                    CRLExpression.CRLExpression val;
-                    var a1 = MemberExpressionCache.TryGetValue(key, out val);
-                    if (a1)
-                    {
-                        return val;
-                    }
                     var fieldName = mExp.Member.Name;
                     var type = mExp.Expression.Type;
                     if (mExp.Member.ReflectedType.Name.StartsWith("<>f__AnonymousType"))//按匿名类
@@ -262,7 +263,7 @@ namespace CRL.LambdaQuery
                         //修正bool值一元运算 t1.isTop=1
                         fieldStr += "=1";
                     }
-                    var exp3= new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr };
+                    var exp3 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr };
                     MemberExpressionCache[key] = exp3;
                     return exp3;
                 }
@@ -277,8 +278,12 @@ namespace CRL.LambdaQuery
                 {
                     obj = Convert.ToInt32(obj);
                 }
-                //return obj + "";
-                return new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj, IsConstantValue = isConstant };
+                var exp4= new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj, IsConstantValue = isConstant };
+                if (isConstant)
+                {
+                    MemberExpressionCache[key] = exp4;
+                }
+                return exp4;
             }
             else if (exp is NewArrayExpression)
             {
@@ -599,10 +604,10 @@ namespace CRL.LambdaQuery
                     }
                     else
                     {
-                        var v = ConstantValueVisitor.GetMemberExpressionValue(m, out isConstant);
-                        return v;
+                        return ConstantValueVisitor.GetMemberExpressionValue(m, out isConstant);
                     }
                 }
+                return ConstantValueVisitor.GetMemberExpressionValue(m, out isConstant);
             }
             //按编译
             return Expression.Lambda(expression).Compile().DynamicInvoke();
