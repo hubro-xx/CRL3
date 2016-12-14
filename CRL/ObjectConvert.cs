@@ -251,12 +251,15 @@ namespace CRL
             foreach (var mp in mapping)
             {
                 var fieldName = mp.QueryName.ToLower();
-                var accessor = queryInfo.Reflection.GetAccessor(mp.MappingName);
-                if (accessor == null)
-                    continue;
-                var action = new ActionItem<T>() { Set = accessor.Set, Name = mp.MappingName, ValueIndex = columns[fieldName] };
+                if (!Base.UseEmitCreater)
+                {
+                    var accessor = queryInfo.Reflection.GetAccessor(mp.MappingName);
+                    if (accessor == null)
+                        continue;
+                    var action = new ActionItem<T>() { Set = accessor.Set, Name = mp.MappingName, ValueIndex = columns[fieldName] };
+                    actions.Add(action);
+                }
                 columns.Remove(fieldName);
-                actions.Add(action);
             }
             var _actions = actions.ToArray();//遍历,数组比较快
             int actionsCount = actions.Count;
@@ -265,20 +268,28 @@ namespace CRL
             {
                 reader.GetValues(values);
                 T detailItem ;
-                //var dataContainer = new DataContainer(values, type);
-                //detailItem = objCreater(dataContainer);
-                if (queryInfo.AnonymousClass)
+                if (Base.UseEmitCreater)
                 {
                     var dataContainer = new DataContainer(values, type);
                     detailItem = objCreater(dataContainer);
                 }
                 else
                 {
-                    detailItem = queryInfo.Reflection.CreateObjectInstance();
-                }
-                foreach (var ac in _actions)
-                {
-                    ac.Set(detailItem, values[ac.ValueIndex]);
+                    #region 按委托
+                    if (queryInfo.AnonymousClass)
+                    {
+                        var dataContainer = new DataContainer(values, type);
+                        detailItem = objCreater(dataContainer);
+                    }
+                    else
+                    {
+                        detailItem = queryInfo.Reflection.CreateObjectInstance();
+                    }
+                    foreach (var ac in _actions)
+                    {
+                        ac.Set(detailItem, values[ac.ValueIndex]);
+                    }
+                    #endregion
                 }
                 #region 剩下的放索引
                 //按IModel算

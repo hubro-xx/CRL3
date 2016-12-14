@@ -27,13 +27,20 @@ namespace CRL
 
         internal override DbContext GetDbContext()
         {
-            if (SettingConfig.GetDbAccess == null)
+            string contextName = "DbContext." + GetType().Name;//同一线程调用只创建一次
+            var dbContextObj = CallContext.GetData<DbContext>(contextName);
+            if (dbContextObj == null)
             {
-                throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
+                if (SettingConfig.GetDbAccess == null)
+                {
+                    throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
+                }
+                var helper = SettingConfig.GetDbAccess(dbLocation);
+                var dbContext = new DbContext(helper, dbLocation);
+                CallContext.SetData(contextName, dbContext);
+                return dbContext;
             }
-            var helper = SettingConfig.GetDbAccess(dbLocation);
-            var dbContext = new DbContext(helper, dbLocation);
-            return dbContext;
+            return dbContextObj;
         }
         #region 属性
         /// <summary>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CRL.LambdaQuery.Mapping
 {
-    internal class DataExtensions
+    public class DataExtensions
     {
         static Dictionary<Type, MethodInfo> methods = new Dictionary<Type, MethodInfo>();
         public static MethodInfo GetMethod(Type propType)
@@ -47,122 +47,122 @@ namespace CRL.LambdaQuery.Mapping
         #region method
         public static short GetInt16(DataContainer data)
         {
-            var obj = data.GetValue<short>();
+            var obj = data._GetValue<short>();
             return obj;
         }
         public static short? GetInt16Nullable(DataContainer data)
         {
-            var obj = data.GetValue<short>();
+            var obj = data._GetValue<short>();
             return obj;
         }
         public static int GetInt32(DataContainer data)
         {
-            var obj = data.GetValue<int>();
+            var obj = data._GetValue<int>();
             return obj;
         }
         public static int? GetInt32Nullable(DataContainer data)
         {
-            var obj = data.GetValue<int>();
+            var obj = data._GetValue<int>();
             return obj;
         }
         public static long GetInt64(DataContainer data)
         {
-            var obj = data.GetValue<long>();
+            var obj = data._GetValue<long>();
             return obj;
         }
         public static long? GetInt64Nullable(DataContainer data)
         {
-            var obj = data.GetValue<long>();
+            var obj = data._GetValue<long>();
             return obj;
         }
         public static decimal GetDecimal(DataContainer data)
         {
-            var obj = data.GetValue<decimal>();
+            var obj = data._GetValue<decimal>();
             return obj;
         }
         public static decimal? GetDecimalNullable(DataContainer data)
         {
-            var obj = data.GetValue<decimal>();
+            var obj = data._GetValue<decimal>();
             return obj;
         }
         public static double GetDouble(DataContainer data)
         {
-            var obj = data.GetValue<double>();
+            var obj = data._GetValue<double>();
             return obj;
         }
         public static double? GetDoubleNullable(DataContainer data)
         {
-            var obj = data.GetValue<double>();
+            var obj = data._GetValue<double>();
             return obj;
         }
         public static float GetFloat(DataContainer data)
         {
-            var obj = data.GetValue<float>();
+            var obj = data._GetValue<float>();
             return obj;
         }
         public static float? GetFloatNullable(DataContainer data)
         {
-            var obj = data.GetValue<float>();
+            var obj = data._GetValue<float>();
             return obj;
         }
         public static bool GetBoolean(DataContainer data)
         {
-            var obj = data.GetValue<bool>();
+            var obj = data._GetValue<bool>();
             return obj;
         }
         public static bool? GetBooleanNullable(DataContainer data)
         {
-            var obj = data.GetValue<bool>();
+            var obj = data._GetValue<bool>();
             return obj;
         }
         public static DateTime GetDateTime(DataContainer data)
         {
-            var obj = data.GetValue<DateTime>();
+            var obj = data._GetValue<DateTime>();
             return obj;
         }
         public static DateTime? GetDateTimeNullable(DataContainer data)
         {
-            var obj = data.GetValue<DateTime>();
+            var obj = data._GetValue<DateTime>();
             return obj;
         }
         public static Guid GetGuid(DataContainer data)
         {
-            var obj = data.GetValue<Guid>();
+            var obj = data._GetValue<Guid>();
             return obj;
         }
         public static Guid? GetGuidNullable(DataContainer data)
         {
-            var obj = data.GetValue<Guid>();
+            var obj = data._GetValue<Guid>();
             return obj;
         }
         public static byte GetByte(DataContainer data)
         {
-            var obj = data.GetValue<byte>();
+            var obj = data._GetValue<byte>();
             return obj;
         }
         public static byte? GetByteNullable(DataContainer data)
         {
-            var obj = data.GetValue<byte>();
+            var obj = data._GetValue<byte>();
             return obj;
         }
         public static char GetChar(DataContainer data)
         {
-            var obj = data.GetValue<char>();
+            var obj = data._GetValue<char>();
             return obj;
         }
         public static char? GetCharNullable(DataContainer data)
         {
-            var obj = data.GetValue<char>();
+            var obj = data._GetValue<char>();
             return obj;
         }
         public static string GetString(DataContainer data)
         {
-            var obj = data.GetValue<string>();
+            var obj = data._GetValue<string>();
             return obj;
         }
         public static object GetValue(DataContainer data)
         {
-            var obj = data.GetValue<object>();
+            var obj = data._GetValue<object>();
             return obj;
         }
         #endregion

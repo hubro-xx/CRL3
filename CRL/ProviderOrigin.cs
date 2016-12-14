@@ -29,6 +29,22 @@ namespace CRL
             }
         }
         /// <summary>
+        /// 创建当前调用上下文唯一实例
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T CreateInstance<T>() where T : class,new()
+        {
+            string contextName = "Instance." + typeof(T);
+            var instance = CallContext.GetData<T>(contextName);
+            if (instance == null)
+            {
+                instance = new T();
+                CallContext.SetData(contextName, instance);
+            }
+            return instance;
+        }
+        /// <summary>
         /// 基本业务方法封装
         /// </summary>
         public ProviderOrigin()

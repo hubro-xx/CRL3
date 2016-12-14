@@ -222,7 +222,7 @@ namespace CRL.LambdaQuery
                 //区分 属性表达带替换符{0} 变量值不带
                 #region Member
                 MemberExpression mExp = (MemberExpression)exp;
-                string key = string.Join("-", Prefixs) + mExp.Member.Name + firstLevel;
+                string key = string.Join("-", Prefixs) + exp + firstLevel;
                 CRLExpression.CRLExpression val;
                 var a1 = MemberExpressionCache.TryGetValue(key, out val);
                 if (a1)
