@@ -30,6 +30,11 @@ namespace CRL.LambdaQuery.CRLExpression
             get;
             set;
         }
+        public Type MemberType
+        {
+            get;
+            set;
+        }
         /// <summary>
         /// 右节点
         /// </summary>

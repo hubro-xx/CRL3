@@ -243,10 +243,10 @@ end", spName, script);
                         if (info.IsPrimaryKey)
                             continue;
                     }
-                    if (!string.IsNullOrEmpty(info.VirtualField))
-                    {
-                        continue;
-                    }
+                    //if (!string.IsNullOrEmpty(info.VirtualField))
+                    //{
+                    //    continue;
+                    //}
                     var value2 = ObjectConvert.CheckNullValue(value,info.PropertyType);
                     if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
                     {
@@ -291,10 +291,10 @@ end", spName, script);
                 {
                     continue;
                 }
-                if (!string.IsNullOrEmpty(info.VirtualField))
-                {
-                    continue;
-                }
+                //if (!string.IsNullOrEmpty(info.VirtualField))
+                //{
+                //    continue;
+                //}
                 object value = info.GetValue(obj);
                 if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
                 {

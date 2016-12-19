@@ -211,10 +211,10 @@ namespace CRL
                         }
                         remark += p.MemberName + "[" + enumStr + "]";
                     }
-                    if (p.FieldType == Attribute.FieldType.虚拟字段)
-                    {
-                        remark += string.Format("[as {0}]", System.Text.RegularExpressions.Regex.Replace(p.VirtualField, @"\{.+?\}", ""));
-                    }
+                    //if (p.FieldType == Attribute.FieldType.虚拟字段)
+                    //{
+                    //    remark += string.Format("[as {0}]", System.Text.RegularExpressions.Regex.Replace(p.VirtualField, @"\{.+?\}", ""));
+                    //}
                     sb.Append(@"<tr><td width='150'>" + p.MemberName + "</td><td  width='220'>" + p.PropertyType + "</td><td  width='40'>" + lengthStr + "</td><td  width='40'>" + p.FieldIndexType + "</td><td>" + remark + "</td></tr>");
                 }
                 sb.Append("</table>");

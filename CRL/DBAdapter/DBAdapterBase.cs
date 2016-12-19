@@ -317,7 +317,7 @@ namespace CRL.DBAdapter
         public abstract string CastField(string field,Type fieldType);
         public virtual string IsNotFormat(bool isNot)
         {
-            return isNot ? "is not" : "is";
+            return isNot ? " is not " : " is ";
         }
         public virtual string ToUpperFormat(string field)
         {

@@ -263,10 +263,10 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
                 {
                     //continue;//手动插入ID
                 }
-                if (!string.IsNullOrEmpty(info.VirtualField))
-                {
-                    continue;
-                }
+                //if (!string.IsNullOrEmpty(info.VirtualField))
+                //{
+                //    continue;
+                //}
                 object value = info.GetValue(obj);
                 if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
                 {

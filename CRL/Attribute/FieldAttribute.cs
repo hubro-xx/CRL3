@@ -56,11 +56,12 @@ namespace CRL.Attribute
                 if (fieldType == Attribute.FieldType.NONE)
                 {
                     //var isSystemType = PropertyType.Namespace == "System" || PropertyType.BaseType.Name == "Enum";
-                    if (!string.IsNullOrEmpty(VirtualField))
-                    {
-                        fieldType= Attribute.FieldType.虚拟字段;
-                    }
-                    else if (!string.IsNullOrEmpty(ConstraintField))
+                    //if (!string.IsNullOrEmpty(VirtualField))
+                    //{
+                    //    fieldType= Attribute.FieldType.虚拟字段;
+                    //}
+                    //else
+                        if (!string.IsNullOrEmpty(ConstraintField))
                     {
                         //fieldType = isSystemType ? FieldType.关联字段 : Attribute.FieldType.关联对象;
                         fieldType = Attribute.FieldType.关联字段;
@@ -171,15 +172,16 @@ namespace CRL.Attribute
                 fieldName = withTablePrefix ? MapingName : _DBAdapter.KeyWordFormat(MapingName);
             }
             //判断虚拟字段
-            if (FieldType == Attribute.FieldType.虚拟字段)
-            {
-                query = VirtualField.Replace("{" + ModelType.FullName + "}", usePrefix);//替换前辍
-                mapingName = MemberName;
-            }
-            else
-            {
-                query += fieldName;
-            }
+            //if (FieldType == Attribute.FieldType.虚拟字段)
+            //{
+            //    query = VirtualField.Replace("{" + ModelType.FullName + "}", usePrefix);//替换前辍
+            //    mapingName = MemberName;
+            //}
+            //else
+            //{
+            //    query += fieldName;
+            //}
+            query += fieldName;
             QueryField = query;
             var mappNameFull = fieldName;
          
@@ -271,7 +273,7 @@ namespace CRL.Attribute
         /// 如year($addtime)
         /// 字段前需加前辍$,以在关联查询时区分
         /// </summary>
-        public string VirtualField { get; set; }
+        ///public string VirtualField { get; set; }
         /// <summary>
         /// 约束字段
         /// 格式:$CategoryCode[当前类型字段]=SequenceCode[关联表字段]

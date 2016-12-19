@@ -170,14 +170,14 @@ namespace CRL
                 f.MemberName = info.Name;
                 f.TableName = table.TableName;
                 f.ModelType = table.Type;
-                if (!string.IsNullOrEmpty(f.VirtualField))
-                {
-                    if (SettingConfig.StringFormat != null)
-                    {
-                        f.VirtualField = SettingConfig.StringFormat(f.VirtualField);
-                    }
-                    f.VirtualField = f.VirtualField.Replace("$", "{" + type.FullName + "}");//虚拟字段使用Type名
-                }
+                //if (!string.IsNullOrEmpty(f.VirtualField))
+                //{
+                //    if (SettingConfig.StringFormat != null)
+                //    {
+                //        f.VirtualField = SettingConfig.StringFormat(f.VirtualField);
+                //    }
+                //    f.VirtualField = f.VirtualField.Replace("$", "{" + type.FullName + "}");//虚拟字段使用Type名
+                //}
                 //排除不映射字段
                 if (!f.MapingField)
                 {

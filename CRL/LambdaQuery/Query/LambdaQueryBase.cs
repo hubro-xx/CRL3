@@ -546,8 +546,8 @@ namespace CRL.LambdaQuery
             var result = __Visitor.RouteExpressionHandler(expressionBody,firstLevel:true);
             if (string.IsNullOrEmpty(result.SqlOut))//没有构成树
             {
-                string typeStr2 = "";
-                result.SqlOut = __Visitor.DealParame(result, "", out typeStr2).DataParamed + "";
+                //string typeStr2 = "";
+                result.SqlOut = __Visitor.DealCRLExpression(expressionBody, result, "");
             }
             return result;
         }

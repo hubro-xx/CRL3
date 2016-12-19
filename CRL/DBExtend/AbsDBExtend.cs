@@ -872,10 +872,10 @@ namespace CRL
             {
                 if (f.IsPrimaryKey)
                     continue;
-                if (!string.IsNullOrEmpty(f.VirtualField))
-                {
-                    continue;
-                }
+                //if (!string.IsNullOrEmpty(f.VirtualField))
+                //{
+                //    continue;
+                //}
                 var originValue = f.GetValue(origin);
                 var currentValue = f.GetValue(obj);
                 if (!Object.Equals(originValue, currentValue))

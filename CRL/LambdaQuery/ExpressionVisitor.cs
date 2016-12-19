@@ -56,11 +56,11 @@ namespace CRL.LambdaQuery
                 dbContext.parIndex = value;
             }
         }
-        public CRLExpression.CRLExpression DealParame(CRLExpression.CRLExpression par1, string typeStr, out string typeStr2)
+        CRLExpression.CRLExpression DealParame(CRLExpression.CRLExpression par1, string typeStr)
         {
 
             var par = par1.Data + "";
-            typeStr2 = typeStr;
+            //typeStr2 = typeStr;
             //todo 非关系型数据库不参数化
             if (dbContext.DataBaseArchitecture == DataBaseArchitecture.NotRelation)
             {
@@ -91,11 +91,11 @@ namespace CRL.LambdaQuery
             {
                 if (par.ToUpper() == "NULL")
                 {
-                    typeStr2 = "";
-                    if (typeStr == "=")
-                        par = " IS NULL ";
-                    else if (typeStr == "<>")
-                        par = " IS NOT NULL ";
+                    par = __DBAdapter.IsNotFormat(typeStr != "=") + "null";
+                    //if (typeStr == "=")
+                    //    par = " IS NULL ";
+                    //else if (typeStr == "<>")
+                    //    par = " IS NOT NULL ";
                 }
                 else
                 {
@@ -108,45 +108,48 @@ namespace CRL.LambdaQuery
             return par1;
         }
         static Dictionary<string, CRLExpression.CRLExpression> BinaryExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
-        bool IsMemberParameter(Expression exp)
-        {
-            if (exp is MemberExpression)
-            {
-                var mExp = exp as MemberExpression;
-                if (mExp.Expression == null)
-                    return false;
-                return mExp.Expression.NodeType == ExpressionType.Parameter;
-            }
-            return false;
-        }
+
         static ExpressionType[] binaryTypes= new ExpressionType[] { ExpressionType.Equal, ExpressionType.GreaterThan, ExpressionType.GreaterThanOrEqual, ExpressionType.LessThan, ExpressionType.LessThanOrEqual, ExpressionType.NotEqual };
-        CRLExpression.CRLExpression BinaryExpressionHandler(Expression left, Expression right, ExpressionType type)
+        public string DealCRLExpression(Expression exp, CRLExpression.CRLExpression b,string typeStr)
         {
-            var isBinary = binaryTypes.Contains(type);
+            //__typeStr2 = typeStr;
+            if (b.Type == CRLExpression.CRLExpressionType.Binary)
+            {
+                return b.Data.ToString();
+            }
+            if (b.Type == CRLExpression.CRLExpressionType.Name)
+            {
+                return FormatFieldPrefix(b.MemberType, b.Data.ToString()); ;
+            }
+            else
+            {
+                var valExp = b.IsConstantValue ? b : RouteExpressionHandler(exp);
+                var par2 = DealParame(valExp, typeStr);
+                return par2.DataParamed;
+            }
+        }
+        CRLExpression.CRLExpression BinaryExpressionHandler(Expression left, Expression right, ExpressionType expType)
+        {
+            var isBinary = binaryTypes.Contains(expType);
             string key = "";
-            string typeStr = ExpressionTypeCast(type);
+            string typeStr = ExpressionTypeCast(expType);
+            string __typeStr2 = typeStr;
+            string outLeft, outRight;
             if (isBinary)
             {
                 #region 二元运算缓存
                 CRLExpression.CRLExpression cacheItem;
-                key = string.Join("-", Prefixs) + left + type.ToString() + right;
+                key = string.Join("-", Prefixs) + left + expType.ToString() + right;
                 var a = BinaryExpressionCache.TryGetValue(key, out cacheItem);
                 if (a)
                 {
-                    CRLExpression.CRLExpression p2;
-                    string __typeStr2;
-                    if (IsMemberParameter(left))
+                    if (right.ToString().Equals("null"))//left为null则语法错误
                     {
-                        p2 = RouteExpressionHandler(right);
-                        var par2 = DealParame(p2, typeStr, out __typeStr2);
-                        cacheItem.SqlOut = string.Format("({0}{1}{2})", cacheItem.Left.Data, __typeStr2, par2.DataParamed);
+                        __typeStr2 = "";
                     }
-                    else
-                    {
-                        p2 = RouteExpressionHandler(left);
-                        var par2 = DealParame(p2, typeStr, out __typeStr2);
-                        cacheItem.SqlOut = string.Format("({0}{1}{2})", par2.DataParamed, __typeStr2, cacheItem.Right.Data);
-                    }
+                    outLeft = DealCRLExpression(left, cacheItem.Left, typeStr);
+                    outRight = DealCRLExpression(right, cacheItem.Right, typeStr);
+                    cacheItem.SqlOut = string.Format("({0}{1}{2})", outLeft, __typeStr2, outRight);
                     cacheItem.Data = cacheItem.SqlOut;
                     return cacheItem;
                 }
@@ -163,7 +166,9 @@ namespace CRL.LambdaQuery
                 var proType = ((MemberExpression)right).Type;
                 if (proType == typeof(bool))
                 {
-                    rightPar.Data = rightPar.Data.ToString().Split('=')[0] + "=1";
+                    right = right.Equal(Expression.Constant(true));
+                    rightPar = RouteExpressionHandler(right);
+                    //rightPar.Data = rightPar.Data.ToString().Split('=')[0] + "=1";
                 }
             }
             else if (rightPar.Type == CRLExpression.CRLExpressionType.Binary && leftPar.Type == CRLExpression.CRLExpressionType.Name)
@@ -171,20 +176,32 @@ namespace CRL.LambdaQuery
                 var proType = ((MemberExpression)left).Type;
                 if (proType == typeof(bool))
                 {
-                    leftPar.Data = leftPar.Data.ToString().Split('=')[0] + "=1";
+                    left = left.Equal(Expression.Constant(true));
+                    leftPar = RouteExpressionHandler(left);
+
+                    //leftPar.Data = leftPar.Data.ToString().Split('=')[0] + "=1";
                 }
             }
             #endregion
-            string typeStr2;
-            leftPar = DealParame(leftPar, typeStr, out typeStr2);
-            sb.Append(leftPar.DataParamed);
-            rightPar = DealParame(rightPar, typeStr, out typeStr2);
-            sb.Append(typeStr2);
-            sb.Append(rightPar.DataParamed);
+            if (isBinary)
+            {
+                if (right.ToString().Equals("null"))//left为null则语法错误
+                {
+                    __typeStr2 = "";
+                }
+            }
+            //leftPar = DealParame(leftPar, typeStr, out __typeStr2);
+            outLeft = DealCRLExpression(left, leftPar, typeStr);
+            sb.Append(outLeft);
+            //rightPar = DealParame(rightPar, typeStr, out __typeStr2);
+            outRight = DealCRLExpression(right, rightPar, typeStr);
+
+            sb.Append(__typeStr2);
+            sb.Append(outRight);
             sb.Append(")");
             //return sb.ToString();
 
-            var e = new CRLExpression.CRLExpression() { ExpressionType = type.ToString(), Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpression.CRLExpressionType.Binary : CRLExpression.CRLExpressionType.Tree };
+            var e = new CRLExpression.CRLExpression() { ExpressionType = expType.ToString(), Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpression.CRLExpressionType.Binary : CRLExpression.CRLExpressionType.Tree };
             e.SqlOut = sb.ToString();
             e.Data = e.SqlOut;
             if (isBinary)
@@ -220,70 +237,75 @@ namespace CRL.LambdaQuery
             else if (exp is MemberExpression)
             {
                 //区分 属性表达带替换符{0} 变量值不带
-                #region Member
                 MemberExpression mExp = (MemberExpression)exp;
-                string key = string.Join("-", Prefixs) + exp + firstLevel;
-                CRLExpression.CRLExpression val;
-                var a1 = MemberExpressionCache.TryGetValue(key, out val);
-                if (a1)
-                {
-                    return val;
-                }
-
                 if (mExp.Expression != null && mExp.Expression.NodeType == ExpressionType.Parameter) //like b.Name==b.Name1 或b.Name
                 {
+                    #region MemberParameter
                     var fieldName = mExp.Member.Name;
                     var type = mExp.Expression.Type;
                     if (mExp.Member.ReflectedType.Name.StartsWith("<>f__AnonymousType"))//按匿名类
                     {
-                        var queryField = FormatFieldPrefix(type, fieldName);
-                        var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
-                        MemberExpressionCache[key] = exp2;
+                        //var queryField = FormatFieldPrefix(type, fieldName);
+                        var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldName, MemberType = type };
+                        //MemberExpressionCache[key] = exp2;
                         return exp2;
                     }
- 
-                    CRL.Attribute.FieldAttribute field ;
+
+                    CRL.Attribute.FieldAttribute field;
                     var a = TypeCache.GetProperties(type, true).TryGetValue(fieldName, out field);
                     if (!a)
                     {
                         throw new CRLException("类型 " + type.Name + "." + fieldName + " 不是数据库字段,请检查查询条件");
                     }
-                    if (!string.IsNullOrEmpty(field.VirtualField))//按虚拟字段
-                    {
-                        //return filed.VirtualField;
-                        var queryField = field.VirtualField.Replace("{" + type.FullName + "}", Prefixs[type]);//替换前辍
-                        var exp2= new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField };
-                        MemberExpressionCache[key] = exp2;
-                        return exp2;
-                    }
-                    var fieldStr = FormatFieldPrefix(type, field.MapingName);//格式化为别名
+                    //if (!string.IsNullOrEmpty(field.VirtualField))//按虚拟字段
+                    //{
+                    //    //return filed.VirtualField;
+                    //    var queryField = field.VirtualField.Replace("{" + type.FullName + "}", Prefixs[type]);//替换前辍
+                    //    var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField, MemberType = type };
+                    //    //MemberExpressionCache[key] = exp2;
+                    //    return exp2;
+                    //}
+                    //var fieldStr = FormatFieldPrefix(type, field.MapingName);//格式化为别名
+                    var fieldStr = field.MapingName;
                     //return field;
                     if (firstLevel)
                     {
-                        //修正bool值一元运算 t1.isTop=1
-                        fieldStr += "=1";
+                        var exp2 = exp.Equal(Expression.Constant(true));
+                        return RouteExpressionHandler(exp2);
                     }
-                    var exp3 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr };
-                    MemberExpressionCache[key] = exp3;
+                    var exp3 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr, MemberType = type };
+                    //MemberExpressionCache[key] = exp3;
                     return exp3;
+                    #endregion
                 }
-                #endregion
-                bool isConstant;
-                var obj = GetParameExpressionValue(mExp, out isConstant);
-                if (obj is Enum)
+                else
                 {
-                    obj = (int)obj;
+                    string key = exp.ToString() + firstLevel;
+                    CRLExpression.CRLExpression val;
+                    var a1 = MemberExpressionCache.TryGetValue(key, out val);
+                    if (a1)
+                    {
+                        return val;
+                    }
+                    #region 按值
+                    bool isConstant;
+                    var obj = GetParameExpressionValue(mExp, out isConstant);
+                    if (obj is Enum)
+                    {
+                        obj = (int)obj;
+                    }
+                    else if (obj is Boolean)//sql2000需要转换
+                    {
+                        obj = Convert.ToInt32(obj);
+                    }
+                    var exp4 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj, IsConstantValue = isConstant };
+                    if (isConstant)
+                    {
+                        MemberExpressionCache[key] = exp4;
+                    }
+                    return exp4;
+                    #endregion
                 }
-                else if (obj is Boolean)//sql2000需要转换
-                {
-                    obj = Convert.ToInt32(obj);
-                }
-                var exp4= new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj, IsConstantValue = isConstant };
-                if (isConstant)
-                {
-                    MemberExpressionCache[key] = exp4;
-                }
-                return exp4;
             }
             else if (exp is NewArrayExpression)
             {
@@ -317,7 +339,7 @@ namespace CRL.LambdaQuery
 
                 MethodCallExpressionCacheItem methodCache;
                 #region 缓存处理
-                string key = string.Join("-", Prefixs) + exp + nodeType;
+                string key = string.Join("-", Prefixs) + mcExp + nodeType;
                 var exists = MethodCallExpressionCache.TryGetValue(key, out methodCache);
                 if (exists)
                 {
