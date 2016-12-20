@@ -28,6 +28,13 @@ namespace CRL
         internal override DbContext GetDbContext()
         {
             string contextName = "DbContext." + GetType().Name;//同一线程调用只创建一次
+            var _BeginTransContext = CallContext.GetData<bool>("_BeginTransContext");
+            if (_BeginTransContext)//对于数据库事务,只创建一个上下文
+            {
+                contextName = "TransDbContext";
+            }
+            var allKey = "AllDbContext";
+            var allList = Base.GetCallDBContext();
             var dbContextObj = CallContext.GetData<DbContext>(contextName);
             if (dbContextObj == null)
             {
@@ -37,7 +44,10 @@ namespace CRL
                 }
                 var helper = SettingConfig.GetDbAccess(dbLocation);
                 var dbContext = new DbContext(helper, dbLocation);
+                dbContext.Name = contextName;
                 CallContext.SetData(contextName, dbContext);
+                allList.Add(contextName);
+                CallContext.SetData(allKey, allList);
                 return dbContext;
             }
             return dbContextObj;

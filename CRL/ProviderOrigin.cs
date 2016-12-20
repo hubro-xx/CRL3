@@ -604,15 +604,18 @@ namespace CRL
 
         #region 包装为事务执行
         /// <summary>
-        /// 使用DbTransaction封装事务(不推荐)
+        /// 使用DbTransaction封装事务,不能跨库
+        /// 请将数据访问对象写在方法体内
         /// </summary>
-        /// <param name="db"></param>
         /// <param name="method"></param>
         /// <param name="error"></param>
         /// <returns></returns>
-        public bool PackageTrans2(AbsDBExtend db, TransMethod method, out string error)
+        public bool PackageTrans2(TransMethod method, out string error)
         {
             error = "";
+            CallContext.SetData("_BeginTransContext", true);
+            var context = GetDbContext();
+            var db = context.DBHelper;
             db.BeginTran();
             try
             {
@@ -620,6 +623,7 @@ namespace CRL
                 if (!a)
                 {
                     db.RollbackTran();
+                    CallContext.SetData("_BeginTransContext", false);
                     return false;
                 }
                 db.CommitTran();
@@ -628,8 +632,10 @@ namespace CRL
             {
                 error = "提交事务时发生错误:" + ero.Message;
                 db.RollbackTran();
+                CallContext.SetData("_BeginTransContext", false);
                 return false;
             }
+            CallContext.SetData("_BeginTransContext", false);
             return true;
         }
         /// <summary>

@@ -130,7 +130,6 @@
     <Content Include="Page\Query2.aspx" />
     <Content Include="Page\Query3.aspx" />
     <Content Include="Page\Sharding.aspx" />
-    <Content Include="Page\SpeedTest.aspx" />
     <Content Include="Page\TableExistsCache.aspx" />
     <Content Include="Page\TestAll.aspx" />
     <Content Include="Page\QueryView.aspx" />
@@ -159,14 +158,6 @@
     <Compile Include="Code\Sharding\MemberManage.cs" />
     <Compile Include="Code\Sharding\OrderManage.cs" />
     <Compile Include="Code\TestAll.cs" />
-    <Compile Include="Code\Test\CRLManage.cs" />
-    <Compile Include="Code\Test\EFContext.cs" />
-    <Compile Include="Code\Test\FS\FSContext.cs" />
-    <Compile Include="Code\Test\FS\TestEntity.cs" />
-    <Compile Include="Code\Test\MappingSpeedTest.cs" />
-    <Compile Include="Code\Test\SugarDao.cs" />
-    <Compile Include="Code\Test\SW.cs" />
-    <Compile Include="Code\Test\TestEntity.cs" />
     <Compile Include="CRLExpressionTest.aspx.cs">
       <DependentUpon>CRLExpressionTest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -313,13 +304,6 @@
     </Compile>
     <Compile Include="Page\Sharding.aspx.designer.cs">
       <DependentUpon>Sharding.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Page\SpeedTest.aspx.cs">
-      <DependentUpon>SpeedTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Page\SpeedTest.aspx.designer.cs">
-      <DependentUpon>SpeedTest.aspx</DependentUpon>
     </Compile>
     <Compile Include="Page\TableExistsCache.aspx.cs">
       <DependentUpon>TableExistsCache.aspx</DependentUpon>

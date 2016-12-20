@@ -297,3 +297,6 @@
 	二元运算和常量参数也缓存了
 2016-12-12
 	数据访问上下文在同一线程访问下是一个了
+2016-12-19
+	优化数据库事务调用,只生成一个数据访问上下文PackageTrans2(TransMethod method, out string error)
+	增加当前调用数据访问上下文统计Base.GetCallDBContext

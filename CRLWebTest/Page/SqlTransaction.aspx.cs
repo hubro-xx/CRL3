@@ -49,14 +49,16 @@ namespace WebTest
 
         protected void Button4_Click(object sender, EventArgs e)
         {
+            var item = Code.ProductDataManage.Instance.QueryItem(b=>b.Id>0);
             string error;
             var watch = new Stopwatch();
             watch.Start();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 2; i++)
             {
                 var a = Code.OrderManage.Instance.TransactionTest2(out error);
             }
             watch.Stop();
+            var allDBContext = CRL.Base.GetCallDBContext();
             Response.Write("操作" + watch.ElapsedMilliseconds);
         }
     }

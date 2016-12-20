@@ -154,5 +154,20 @@ namespace CRL
             MemoryDataCache.CacheService.StopWatch();
             ExistsTableCache.ColumnBackgroundCheck.Stop();
         }
+        /// <summary>
+        /// 获取当前调用所有的数据访问会话
+        /// 可用此检查代码调用深度
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetCallDBContext()
+        {
+            var allKey = "AllDbContext";
+            var allList = CallContext.GetData<List<string>>(allKey);
+            if (allList == null)
+            {
+                allList = new List<string>();
+            }
+            return allList;
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace WebTest.Code
     {
         protected override CRL.LambdaQuery.LambdaQuery<ProductData> CacheQuery()
         {
-            return GetLambdaQuery().Where(b => b.Id < 1000).Expire(10); ;
+            return GetLambdaQuery().Where(b => b.Id < 1000).Expire(1);
         }
         /// <summary>
         /// 对象被更新时,是否通知缓存服务器
@@ -49,7 +49,7 @@ namespace WebTest.Code
         /// </summary>
         public static ProductDataManage Instance
         {
-            get { return new ProductDataManage(); }
+            get { return CreateInstance<ProductDataManage>(); }
         }
 
         public List<ProductData> QueryDayProduct(DateTime date)

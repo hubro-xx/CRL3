@@ -189,15 +189,15 @@ namespace WebTest.Code
         //    get;
         //    set;
         //}
-        /// <summary>
-        /// 虚拟字段,等同于 year($addtime) as Year
-        /// 字段前需加前辍,以在关联查询时区分
-        /// </summary>
-        [CRL.Attribute.Field(VirtualField = "year($addtime)")]
-        public int Year
-        {
-            get;
-            set;
-        }
+        ///// <summary>
+        ///// 虚拟字段,等同于 year($addtime) as Year
+        ///// 字段前需加前辍,以在关联查询时区分
+        ///// </summary>
+        //[CRL.Attribute.Field(VirtualField = "year($addtime)")]
+        //public int Year
+        //{
+        //    get;
+        //    set;
+        //}
     }
 }

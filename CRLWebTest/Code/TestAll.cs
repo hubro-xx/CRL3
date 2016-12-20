@@ -16,11 +16,16 @@ namespace WebTest.Code
     {
         public static void TestSelect()
         {
+            var time = DateTime.Now;
             //select 测试
             var query = ProductDataManage.Instance.GetLambdaQuery();
-            query.Where(b => DateTime.Parse("2016-02-11 12:56") == b.AddTime);
+            query.Take(3);
+            //query.Where(b => DateTime.Parse("2016-02-11 12:56") == b.AddTime);
+            //query.Where(b => b.CategoryName != null);
+            query.Where(b => b.AddTime == time);
+            var times = "2016-02-11 12:56";
             //query.Where(b => int.Parse(b.InterFaceUser) == 123);//支持Cast转换
-            var result = query.Where(b => b.Id < 10).SelectV(b => new
+            var result = query.SelectV(b => new
             {
                 b.InterFaceUser,
                 bb = b.Id * b.Number,
@@ -28,7 +33,9 @@ namespace WebTest.Code
                 id1 = Convert.ToString(b.Id),
                 id2 = b.Id.ToString(),
                 name2 = b.CategoryName.Substring(0, 2),
-                time2 = DateTime.Parse("2016-02-11")
+                time = time,
+                aa = DateTime.Parse("2016-02-11 12:56"),
+                aa2 = Convert.ToDateTime(times)
             }).ToList();
             var sql = query.ToString();
         }
@@ -41,10 +48,10 @@ namespace WebTest.Code
             query.Where(b => b.TransType == TransType.In);
            
             var year = DateTime.Now.Year;
-            query.Where(b => b.Year == year);//虚拟字段
+            query.Where(b => b.InterFaceUser == "222" && b.Id < 20);
             #region 扩展方法
             query.Where(b => b.IsTop);//没有运算符的bool一元运算
-            query.Where(b => 0 < b.Id);//不再区分左边右边了
+            query.Where(b => 0 < b.Id && b.IsTop);//不再区分左边右边了
             query.Where(b => b.Id < b.Number);//直接比较可以解析通过
             query.Where(b => b.ProductName.Contains("122"));//包含字符串
             query.Where(b => !b.ProductName.Contains("122"));//不包含字符串
@@ -64,6 +71,7 @@ namespace WebTest.Code
             query.Where(b => b.Id.ToString() == "123");//支持Cast转换
             query.Where(b => Convert.ToString(b.Id) == "123");//支持Cast转换
             query.Where(b => int.Parse(b.InterFaceUser) == 123);//支持Cast转换
+            query.Where(b => b.CategoryName != null);
             query.Page(2, 1);
             query.OrderBy(b => b.Id * 1);
             var result = query.ToList();

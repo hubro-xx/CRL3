@@ -18,9 +18,20 @@ namespace WebTest
 {
     public partial class Default : System.Web.UI.Page
     {
+        int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-            Code.TestAll.TestSelect();
+            var query = ProductDataManage.Instance.GetLambdaQuery();
+            int n = 20;
+            string name = "sss";
+            //var join = query.Join<Code.Member>((a, b) => a.UserId == b.Id)
+            //    .SelectAppendValue(b => b.Mobile).OrderBy(b => b.Id, true);
+            query.Where(b => b.Id > n && b.CategoryName.Contains(name));
+            //query.Where(b => b.IsTop);
+            //join.Where(b => b.AccountNo == "123");//按join追加条件
+            string sql = query.PrintQuery();
+            Response.Write(sql);
+            Response.End();
         }
     }
 }

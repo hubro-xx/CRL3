@@ -62,15 +62,15 @@ namespace WebTest.Code
         }
         public bool TransactionTest2(out string error)
         {
-            var db = DBExtend;
+            
             //简化了事务写法,自动提交回滚
-            return PackageTrans2(db,(out string ex) =>
+            return PackageTrans2((out string ex) =>
             {
                 ex = "";
                 var product = new ProductData();
                 product.BarCode = "code" + DateTime.Now.Millisecond;
                 product.Number = 10;
-                db.InsertFromObj(product);
+                ProductDataManage.Instance.Add(product);
                 return false; //会回滚
             }, out error);
         }
