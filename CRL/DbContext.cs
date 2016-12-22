@@ -55,6 +55,11 @@ namespace CRL
         /// 当前查询参数索引
         /// </summary>
         internal int parIndex = 0;
+        public string Name;
+        public override string ToString()
+        {
+            return Name;
+        }
     }
     /// <summary>
     /// 数据库连接定位

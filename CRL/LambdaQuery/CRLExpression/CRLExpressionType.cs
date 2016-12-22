@@ -18,11 +18,11 @@ namespace CRL.LambdaQuery.CRLExpression
     /// </summary>
     public enum CRLExpressionType
     {
-        Tree,
-        Binary,
-        Name,
-        Value,
-        MethodCall,
-        MethodCallArgs
+        Tree = 1,
+        Binary = 2,
+        Name = 4,
+        Value = 8,
+        MethodCall = 16,
+        MethodCallArgs = 32
     }
 }

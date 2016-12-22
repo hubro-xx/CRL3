@@ -56,7 +56,7 @@ namespace CRL.DBExtend.RelationDB
                     reader = dbHelper.RunDataReader(sp);
                 }
                 query.ExecuteTime += dbHelper.ExecuteTime;
-                var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetFieldMapping());
+                var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetQueryFieldString(), query.GetFieldMapping());
                 list = ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
                 query.MapingTime += runTime;
             }

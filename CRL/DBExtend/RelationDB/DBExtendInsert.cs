@@ -58,7 +58,7 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="obj"></param>
         public override void InsertFromObj<TModel>(TModel obj)
         {
-            var Reflection = ReflectionHelper.GetInfo<TModel>();
+            //var Reflection = ReflectionHelper.GetInfo<TModel>();
             CheckTableCreated<TModel>();
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
             CheckData(obj);

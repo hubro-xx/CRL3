@@ -22,14 +22,16 @@ namespace WebTest
         protected void Page_Load(object sender, EventArgs e)
         {
             var query = ProductDataManage.Instance.GetLambdaQuery();
+            query.Take(10);
             int n = 20;
             string name = "sss";
             //var join = query.Join<Code.Member>((a, b) => a.UserId == b.Id)
             //    .SelectAppendValue(b => b.Mobile).OrderBy(b => b.Id, true);
-            query.Where(b => b.Id > n && b.CategoryName.Contains(name));
-            //query.Where(b => b.IsTop);
+            //query.Where(b => b.Id > n && b.CategoryName.Contains(name));
+            query.Where(b => b.IsTop || b.CategoryName==null);
             //join.Where(b => b.AccountNo == "123");//按join追加条件
             string sql = query.PrintQuery();
+            var resut = query.SelectV(b => new {b.CategoryName,b.Id }).ToList();
             Response.Write(sql);
             Response.End();
         }

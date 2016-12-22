@@ -166,50 +166,57 @@ namespace CRL.LambdaQuery
             public List<Attribute.FieldAttribute> fields;
             public IEnumerable<Attribute.FieldMapping> mapping;
             public ParameCollection parame;
+            //public Expression expression;
         }
         static Dictionary<string, SelectFieldInfo> _GetSelectFieldCache = new Dictionary<string, SelectFieldInfo>();
         internal SelectFieldInfo _CurrentSelectFieldCache;
         internal List<Attribute.FieldAttribute> _CurrentAppendSelectField = new List<Attribute.FieldAttribute>();
         internal SelectFieldInfo GetSelectField(bool isSelect, Expression expressionBody, bool withTablePrefix, params Type[] types)
         {
-            var cacheKey = GetSelectFieldCacheKey(isSelect, expressionBody, withTablePrefix, types);
-            var cache = !string.IsNullOrEmpty(cacheKey);
-            //cache = false;
             SelectFieldInfo item;
-            if (cache)
+            if (isSelect)
             {
-                var a = _GetSelectFieldCache.TryGetValue(cacheKey, out item);
-                if (a)
+                var cacheKey = GetSelectFieldCacheKey(isSelect, expressionBody, withTablePrefix, types);
+                var cache = !string.IsNullOrEmpty(cacheKey);
+                //cache = false;
+                if (cache)
                 {
-                    if (expressionBody is NewExpression)
+                    #region cache
+                    var a = _GetSelectFieldCache.TryGetValue(cacheKey, out item);
+                    if (a)
                     {
-                        var newExp = expressionBody as NewExpression;
-                        foreach (var kv in item.parame)
+                        if (expressionBody is NewExpression)
                         {
-                            var exp = newExp.Arguments[Convert.ToInt32(kv.Value)];
-                            if (exp is MethodCallExpression)
+                            var newExp = expressionBody as NewExpression;
+                            foreach (var kv in item.parame)
                             {
-                                var mExp = exp as MethodCallExpression;
-                                if (mExp.Arguments.Count > 0)
+                                var exp = newExp.Arguments[Convert.ToInt32(kv.Value)];
+                                if (exp is MethodCallExpression)
                                 {
-                                    string mName;
-                                    getSelectMethodCall(exp, out mName, 0, false);//转换为参数
+                                    var mExp = exp as MethodCallExpression;
+                                    if (mExp.Arguments.Count > 0)
+                                    {
+                                        string mName;
+                                        getSelectMethodCall(exp, out mName, 0, false);//转换为参数
+                                    }
+                                }
+                                else
+                                {
+                                    var obj = ConstantValueVisitor.GetParameExpressionValue(exp);
+                                    __Visitor.AddParame(kv.Key, obj);
                                 }
                             }
-                            else
-                            {
-                                var obj = ConstantValueVisitor.GetParameExpressionValue(exp);
-                                __Visitor.AddParame(kv.Key, obj);
-                            }
                         }
+                        return item;
                     }
-                    return item;
-                }
-                else
-                {
-                    item = _GetSelectField(isSelect, expressionBody, withTablePrefix, types);
-                    _GetSelectFieldCache[cacheKey] = item;
-                    return item;
+                    else
+                    {
+                        item = _GetSelectField(isSelect, expressionBody, withTablePrefix, types);
+                        //item.expression = expressionBody;
+                        _GetSelectFieldCache[cacheKey] = item;
+                        return item;
+                    }
+                    #endregion
                 }
             }
             item = _GetSelectField(isSelect, expressionBody, withTablePrefix, types);
@@ -543,7 +550,7 @@ namespace CRL.LambdaQuery
             //string condition;
             if (expressionBody == null)
                 return null;
-            var result = __Visitor.RouteExpressionHandler(expressionBody,firstLevel:true);
+            var result = __Visitor.RouteExpressionHandler(expressionBody, firstLevel: true);
             if (string.IsNullOrEmpty(result.SqlOut))//没有构成树
             {
                 //string typeStr2 = "";
@@ -646,13 +653,18 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <returns></returns>
         internal abstract string GetQuery();
-        internal IEnumerable<Attribute.FieldMapping> GetFieldMapping()
+        SelectFieldInfo GetSelectFieldInfo()
         {
             if (_CurrentSelectFieldCache == null)
             {
                 SelectAll();
             }
-            return _CurrentSelectFieldCache.mapping;
+            return _CurrentSelectFieldCache;
+        }
+        internal IEnumerable<Attribute.FieldMapping> GetFieldMapping()
+        {
+            var cache = GetSelectFieldInfo();
+            return cache.mapping;
         }
     }
 }

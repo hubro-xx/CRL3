@@ -32,7 +32,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\CRL.xml</DocumentationFile>
@@ -114,7 +114,6 @@
     <Compile Include="CRLException.cs" />
     <Compile Include="ExtensionMethod\IsNull.cs" />
     <Compile Include="LambdaQuery\Mapping\DataContainer.cs" />
-    <Compile Include="LambdaQuery\Mapping\DataExtensions.cs" />
     <Compile Include="LambdaQuery\Mapping\QueryInfo.cs" />
     <Compile Include="LambdaQuery\Query\In.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryViewJoin.cs" />

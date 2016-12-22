@@ -77,7 +77,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override List<TResult> QueryResult<TResult>(LambdaQueryBase query)
         {
-            var queryInfo = new LambdaQuery.Mapping.QueryInfo<TResult>(false, query.GetFieldMapping());
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<TResult>(false, query.GetQueryFieldString(), query.GetFieldMapping());
             if (query.SkipPage > 0)
             {
                 var reader = GetPageReader(query);
@@ -105,7 +105,7 @@ namespace CRL.DBExtend.RelationDB
         public override List<TResult> QueryResult<TResult>(LambdaQueryBase query, NewExpression newExpression)
         {
             List<TResult> list;
-            var queryInfo = new LambdaQuery.Mapping.QueryInfo<TResult>(true, null, newExpression.Constructor);
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<TResult>(true, query.GetQueryFieldString(), null, newExpression.Constructor);
             if (query.SkipPage > 0)
             {
                 var reader = GetPageReader(query);

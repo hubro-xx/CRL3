@@ -24,7 +24,7 @@ namespace CRL
     /// </summary>
     public class Base
     {
-        static internal bool UseEmitCreater = false;
+        //static internal bool UseEmitCreater = true;
         internal static Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(object id)
         {
             var type = typeof(TModel);

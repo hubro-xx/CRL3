@@ -173,7 +173,7 @@ namespace CRL.DBExtend.RelationDB
             //return ObjectConvert.DataReaderToList<T>(reader, out runTime);
             var pro = TypeCache.GetTable(typeof(T)).Fields;
             var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
-            var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, mapping);
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sql, mapping);
             var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
             return list;
         }
@@ -260,11 +260,11 @@ namespace CRL.DBExtend.RelationDB
         {
             var reader = dbHelper.RunDataReader(sp);
             ClearParame();
-            double runTime;
+            //double runTime;
             //return ObjectConvert.DataReaderToList<T>(reader, out runTime);
             var pro = TypeCache.GetTable(typeof(T)).Fields;
             var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
-            var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, mapping);
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sp, mapping);
             var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
             return list;
         }
