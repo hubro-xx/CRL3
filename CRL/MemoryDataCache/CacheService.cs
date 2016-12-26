@@ -119,7 +119,7 @@ namespace CRL.MemoryDataCache
                 }
             }
             //CacheUpdated(data.Type.Name);
-            string log = string.Format("更新缓存中的一项[{0}]", obj.GetModelKey());
+            string log = string.Format("更新缓存中的一项 [{0}]", obj.GetModelKey());
             CoreHelper.EventLog.Log(log, "DataCache", false);
         }
 
@@ -170,7 +170,7 @@ namespace CRL.MemoryDataCache
 
             if (timer == null)
             {
-                StarWatch();
+                //StarWatch();
             }
             //更新缓存数据
             if (dataItem.UpdatedData != null)

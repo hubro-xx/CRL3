@@ -34,7 +34,7 @@ namespace CRL.Sharding
             dbLocation.ShardingDataBase = dataBase;
             return this;
         }
-        internal override DbContext GetDbContext()
+        internal override DbContext GetDbContext(bool cache)
         {
             if (SettingConfig.GetDbAccess == null)
             {

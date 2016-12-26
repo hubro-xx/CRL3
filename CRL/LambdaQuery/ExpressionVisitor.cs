@@ -57,6 +57,7 @@ namespace CRL.LambdaQuery
                 dbContext.parIndex = value;
             }
         }
+
         CRLExpression.CRLExpression DealParame(CRLExpression.CRLExpression par1, string typeStr)
         {
             var par = par1.Data + "";
@@ -66,59 +67,56 @@ namespace CRL.LambdaQuery
             {
                 return par1;
             }
-            if (par1.Type == CRLExpression.CRLExpressionType.MethodCall)
+            switch (par1.Type)
             {
-                var method = par1.Data as CRLExpression.MethodCallObj;
-                var dic = MethodAnalyze.GetMethos(__DBAdapter);
-                if (!dic.ContainsKey(method.MethodName))
-                {
-                    throw new CRLException("LambdaQuery不支持扩展方法" + method.MemberQueryName + "." + method.MethodName);
-                }
-                int newParIndex = parIndex;
-                par = dic[method.MethodName](method, ref newParIndex, AddParame);
-                parIndex = newParIndex;
-            }
-
-            //字段会返回替换符
-            bool needPar = par1.Type == CRLExpression.CRLExpressionType.Value;//是否需要参数化处理
-            if (!needPar)
-            {
-                par1.DataParamed = par;
-                return par1;
-            }
-
-            if (par1.Data == null)
-            {
-                par = __DBAdapter.IsNotFormat(typeStr != "=") + "null";
-            }
-            else
-            {
-                QueryParames.Add("par" + parIndex, par);
-                par = "@par" + parIndex;
-                parIndex += 1;
+                case CRLExpression.CRLExpressionType.Value:
+                    #region value
+                    if (par1.Data == null)
+                    {
+                        par = __DBAdapter.IsNotFormat(typeStr != "=") + "null";
+                    }
+                    else
+                    {
+                        QueryParames.Add("par" + parIndex, par);
+                        par = "@par" + parIndex;
+                        parIndex += 1;
+                    }
+                    #endregion
+                    break;
+                case CRLExpression.CRLExpressionType.MethodCall:
+                    #region method
+                    var method = par1.Data as CRLExpression.MethodCallObj;
+                    var dic = MethodAnalyze.GetMethos(__DBAdapter);
+                    if (!dic.ContainsKey(method.MethodName))
+                    {
+                        throw new CRLException("LambdaQuery不支持扩展方法" + method.MemberQueryName + "." + method.MethodName);
+                    }
+                    int newParIndex = parIndex;
+                    par = dic[method.MethodName](method, ref newParIndex, AddParame);
+                    parIndex = newParIndex;
+                    #endregion
+                    break;
             }
             par1.DataParamed = par;
             return par1;
         }
         static Dictionary<string, CRLExpression.CRLExpression> BinaryExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
 
-        static ExpressionType[] binaryTypes= new ExpressionType[] { ExpressionType.Equal, ExpressionType.GreaterThan, ExpressionType.GreaterThanOrEqual, ExpressionType.LessThan, ExpressionType.LessThanOrEqual, ExpressionType.NotEqual };
-        public string DealCRLExpression(Expression exp, CRLExpression.CRLExpression b, string typeStr)
+        static ExpressionType[] binaryTypes = new ExpressionType[] { ExpressionType.Equal, ExpressionType.GreaterThan, ExpressionType.GreaterThanOrEqual, ExpressionType.LessThan, ExpressionType.LessThanOrEqual, ExpressionType.NotEqual };
+        public string DealCRLExpression(Expression exp, CRLExpression.CRLExpression b, string typeStr, out bool isNullValue)
         {
-            //__typeStr2 = typeStr;
-            if (b.Type == CRLExpression.CRLExpressionType.Binary)
+            isNullValue = false;
+            switch (b.Type)
             {
-                return b.Data.ToString();
-            }
-            if (b.Type == CRLExpression.CRLExpressionType.Name)
-            {
-                return FormatFieldPrefix(b.MemberType, b.Data.ToString());
-            }
-            else
-            {
-                var valExp = b.IsConstantValue ? b : RouteExpressionHandler(exp);
-                var par2 = DealParame(valExp, typeStr);
-                return par2.DataParamed;
+                case CRLExpression.CRLExpressionType.Name:
+                    return FormatFieldPrefix(b.MemberType, b.Data.ToString());
+                case CRLExpression.CRLExpressionType.Binary:
+                    return b.Data.ToString();
+                default:
+                    var valExp = b.IsConstantValue ? b : RouteExpressionHandler(exp);
+                    isNullValue = valExp.Data == null;
+                    var par2 = DealParame(valExp, typeStr);
+                    return par2.DataParamed;
             }
         }
         CRLExpression.CRLExpression BinaryExpressionHandler(Expression left, Expression right, ExpressionType expType)
@@ -128,20 +126,23 @@ namespace CRL.LambdaQuery
             string typeStr = ExpressionTypeCast(expType);
             string __typeStr2 = typeStr;
             string outLeft, outRight;
+            bool isNullValue = false;
+            //isBinary = false;
             if (isBinary)
             {
+                //QueryItem(item.Id)被缓存了 todo
                 #region 二元运算缓存
                 CRLExpression.CRLExpression cacheItem;
-                key = string.Join("-", Prefixs) + left + expType.ToString() + right;
+                key = string.Format("{0}{1}{2}{3}", string.Join("-", Prefixs), left, expType, right);
                 var a = BinaryExpressionCache.TryGetValue(key, out cacheItem);
                 if (a)
                 {
-                    if (right.ToString().Equals("null"))//left为null则语法错误
+                    outLeft = DealCRLExpression(left, cacheItem.Left, typeStr, out isNullValue);
+                    outRight = DealCRLExpression(right, cacheItem.Right, typeStr, out isNullValue);
+                    if (isNullValue)//left为null则语法错误
                     {
                         __typeStr2 = "";
                     }
-                    outLeft = DealCRLExpression(left, cacheItem.Left, typeStr);
-                    outRight = DealCRLExpression(right, cacheItem.Right, typeStr);
                     cacheItem.SqlOut = string.Format("({0}{1}{2})", outLeft, __typeStr2, outRight);
                     cacheItem.Data = cacheItem.SqlOut;
                     return cacheItem;
@@ -168,19 +169,15 @@ namespace CRL.LambdaQuery
                 }
             }
             #endregion
-            if (isBinary)
-            {
-                if (right.ToString().Equals("null"))//left为null则语法错误
-                {
-                    __typeStr2 = "";
-                }
-            }
             //leftPar = DealParame(leftPar, typeStr, out __typeStr2);
-            outLeft = DealCRLExpression(left, leftPar, typeStr);
+            outLeft = DealCRLExpression(left, leftPar, typeStr, out isNullValue);
             sb.Append(outLeft);
             //rightPar = DealParame(rightPar, typeStr, out __typeStr2);
-            outRight = DealCRLExpression(right, rightPar, typeStr);
-
+            outRight = DealCRLExpression(right, rightPar, typeStr, out isNullValue);
+            if (isNullValue)//left为null则语法错误
+            {
+                __typeStr2 = "";
+            }
             sb.Append(__typeStr2);
             sb.Append(outRight);
             sb.Append(")");
@@ -197,7 +194,7 @@ namespace CRL.LambdaQuery
         }
         static Dictionary<string, CRLExpression.CRLExpression> MemberExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
         static Dictionary<string, MethodCallExpressionCacheItem> MethodCallExpressionCache = new Dictionary<string, MethodCallExpressionCacheItem>();
-        class MethodCallExpressionCacheItem
+        struct MethodCallExpressionCacheItem
         {
             public CRLExpression.CRLExpression CRLExpression;
             public int argsIndex;
@@ -228,7 +225,7 @@ namespace CRL.LambdaQuery
             }
             else if (exp is MethodCallExpression)
             {
-                return MethodCallExpressionHandler(exp, nodeType, firstLevel);  
+                return MethodCallExpressionHandler(exp, nodeType, firstLevel);
             }
             else if (exp is UnaryExpression)
             {
@@ -279,46 +276,7 @@ namespace CRL.LambdaQuery
                 return type;
             }
             throw new InvalidCastException("不支持的运算符" + expType);
-            #region old
-            switch (expType)
-            {
-                case ExpressionType.And:
-                    return "&";
-                case ExpressionType.AndAlso:
-                    return " AND ";
-                case ExpressionType.Equal:
-                    return "=";
-                case ExpressionType.GreaterThan:
-                    return ">";
-                case ExpressionType.GreaterThanOrEqual:
-                    return ">=";
-                case ExpressionType.LessThan:
-                    return "<";
-                case ExpressionType.LessThanOrEqual:
-                    return "<=";
-                case ExpressionType.NotEqual:
-                    return "<>";
-                case ExpressionType.Or:
-                    return "|";
-                case ExpressionType.OrElse:
-                    return " OR ";
-                case ExpressionType.Add:
-                case ExpressionType.AddChecked:
-                    return "+";
-                case ExpressionType.Subtract:
-                case ExpressionType.SubtractChecked:
-                    return "-";
-                case ExpressionType.Divide:
-                    return "/";
-                case ExpressionType.Multiply:
-                case ExpressionType.MultiplyChecked:
-                    return "*";
-                case ExpressionType.Not:
-                    return "!=";
-                default:
-                    throw new InvalidCastException("不支持的运算符" + expType);
-            }
-            #endregion
+
         }
         object GetParameExpressionValue(Expression expression, out bool isConstant)
         {

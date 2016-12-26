@@ -35,6 +35,7 @@ namespace CRL
         /// <returns></returns>
         public static T CreateInstance<T>() where T : class,new()
         {
+            //return new T();
             string contextName = "Instance." + typeof(T);
             var instance = CallContext.GetData<T>(contextName);
             if (instance == null)
@@ -55,7 +56,7 @@ namespace CRL
         /// 数据访问上下文
         /// </summary>
         /// <returns></returns>
-        internal abstract DbContext GetDbContext();
+        internal abstract DbContext GetDbContext(bool cache);
 
         /// <summary>
         /// 当前数据访定位
@@ -83,8 +84,8 @@ namespace CRL
         /// <returns></returns>
         public LambdaQuery<TModel> GetLambdaQuery()
         {
-            var dbContext2 = GetDbContext();//避开事务控制,使用新的连接
-            var query = LambdaQueryFactory.CreateLambdaQuery<TModel>(dbContext2);
+            //var dbContext2 = GetDbContext(true);//避开事务控制,使用新的连接
+            var query = LambdaQueryFactory.CreateLambdaQuery<TModel>(DBExtend.dbContext);
             return query;
         }
 
@@ -100,7 +101,7 @@ namespace CRL
             {
                 if (_dBExtend == null)
                 {
-                    _dBExtend = GetDbHelper();
+                    _dBExtend = GetDBExtend();
                 }
                 return _dBExtend;
             }
@@ -114,17 +115,36 @@ namespace CRL
         /// 按指定的类型
         /// </summary>
         /// <returns></returns>
-        protected AbsDBExtend GetDbHelper(Type type = null)
+        protected AbsDBExtend GetDBExtend(bool cache = true)
         {
-            var dbContext2 = GetDbContext();
-            if (type != null)
+            AbsDBExtend db = null;
+            string contextName = "DBExtend." + GetType().Name;//同一线程调用只创建一次
+            if (cache)
             {
-                dbLocation.ManageType = type;
+                var _BeginTransContext = CallContext.GetData<bool>("_BeginTransContext");
+                if (_BeginTransContext)//对于数据库事务,只创建一个上下文
+                {
+                    contextName = "TransDbContext";
+                }
+                db = CallContext.GetData<AbsDBExtend>(contextName);
+                if (db != null)
+                {
+                    return db;
+                }
             }
-            var db = DBExtendFactory.CreateDBExtend(dbContext2);
+            var dbContext2 = GetDbContext(cache);
+            db = DBExtendFactory.CreateDBExtend(dbContext2);
             if (dbLocation.ShardingDataBase == null)
             {
                 db.OnUpdateNotifyCacheServer = OnUpdateNotifyCacheServer;
+            }
+            if (cache)
+            {
+                var allKey = "AllDBExtend";
+                var allList = Base.GetCallDBContext();
+                CallContext.SetData(contextName, db);
+                allList.Add(contextName);
+                CallContext.SetData(allKey, allList);
             }
             return db;
         }
@@ -218,9 +238,8 @@ namespace CRL
         /// <returns></returns>
         public TModel QueryItem(object id)
         {
-            AbsDBExtend db = DBExtend;
-            var lambda = Base.GetQueryIdExpression<TModel>(id);
-            return QueryItem(lambda);
+            var db = DBExtend;
+            return db.QueryItem<TModel>(id);
         }
         /// <summary>
         /// 按条件取单个记录[基本方法]
@@ -243,7 +262,7 @@ namespace CRL
         /// <returns></returns>
         public List<TModel> QueryList()
         {
-            AbsDBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            AbsDBExtend db = GetDBExtend();
             return db.QueryList<TModel>();
         }
         /// <summary>
@@ -254,7 +273,7 @@ namespace CRL
         /// <returns></returns>
         public List<TModel> QueryList(Expression<Func<TModel, bool>> expression, bool compileSp = false)
         {
-            AbsDBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            AbsDBExtend db = GetDBExtend();
             return db.QueryList<TModel>(expression, compileSp);
         }
         /**
@@ -558,7 +577,7 @@ namespace CRL
         /// <returns></returns>
         public int Count(Expression<Func<TModel, bool>> expression, bool compileSp = false)
         {
-            AbsDBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            AbsDBExtend db = GetDBExtend();
             return db.Count<TModel>(expression, compileSp);
         }
         /// <summary>
@@ -571,7 +590,7 @@ namespace CRL
         /// <returns></returns>
         public TType Sum<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
-            AbsDBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            AbsDBExtend db = GetDBExtend();
             return db.Sum<TType, TModel>(expression, field, compileSp);
         }
         /// <summary>
@@ -584,7 +603,7 @@ namespace CRL
         /// <returns></returns>
         public TType Max<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
-            AbsDBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            AbsDBExtend db = GetDBExtend();
             return db.Max<TType, TModel>(expression, field, compileSp);
         }
         /// <summary>
@@ -597,7 +616,7 @@ namespace CRL
         /// <returns></returns>
         public TType Min<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
-            AbsDBExtend db = GetDbHelper();//避开事务控制,使用新的连接
+            AbsDBExtend db = GetDBExtend();
             return db.Min<TType, TModel>(expression, field, compileSp);
         }
         #endregion
@@ -614,8 +633,7 @@ namespace CRL
         {
             error = "";
             CallContext.SetData("_BeginTransContext", true);
-            var context = GetDbContext();
-            var db = context.DBHelper;
+            var db = GetDBExtend(true);
             db.BeginTran();
             try
             {

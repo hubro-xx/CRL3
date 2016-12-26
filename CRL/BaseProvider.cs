@@ -25,32 +25,42 @@ namespace CRL
         where TModel : IModel, new()
     {
 
-        internal override DbContext GetDbContext()
+        internal override DbContext GetDbContext(bool cache)
         {
-            string contextName = "DbContext." + GetType().Name;//同一线程调用只创建一次
-            var _BeginTransContext = CallContext.GetData<bool>("_BeginTransContext");
-            if (_BeginTransContext)//对于数据库事务,只创建一个上下文
+            DbContext dbContext = null;
+            ////cache = false;
+            //string contextName = "DbContext." + GetType().Name;//同一线程调用只创建一次
+            //var _BeginTransContext = CallContext.GetData<bool>("_BeginTransContext");
+            //if (_BeginTransContext)//对于数据库事务,只创建一个上下文
+            //{
+            //    contextName = "TransDbContext";
+            //}
+
+            //if (cache)
+            //{
+            //    dbContext = CallContext.GetData<DbContext>(contextName);
+            //}
+            //if (dbContext != null)
+            //{
+            //    return dbContext;
+            //}
+            if (SettingConfig.GetDbAccess == null)
             {
-                contextName = "TransDbContext";
+                throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
             }
-            var allKey = "AllDbContext";
-            var allList = Base.GetCallDBContext();
-            var dbContextObj = CallContext.GetData<DbContext>(contextName);
-            if (dbContextObj == null)
-            {
-                if (SettingConfig.GetDbAccess == null)
-                {
-                    throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
-                }
-                var helper = SettingConfig.GetDbAccess(dbLocation);
-                var dbContext = new DbContext(helper, dbLocation);
-                dbContext.Name = contextName;
-                CallContext.SetData(contextName, dbContext);
-                allList.Add(contextName);
-                CallContext.SetData(allKey, allList);
-                return dbContext;
-            }
-            return dbContextObj;
+            var helper = SettingConfig.GetDbAccess(dbLocation);
+            //helper.Name = Guid.NewGuid().ToString();
+            dbContext = new DbContext(helper, dbLocation);
+            //if (cache)
+            //{
+            //    dbContext.Name = contextName;
+            //    var allKey = "AllDbContext";
+            //    var allList = Base.GetCallDBContext();
+            //    CallContext.SetData(contextName, dbContext);
+            //    allList.Add(contextName);
+            //    CallContext.SetData(allKey, allList);
+            //}
+            return dbContext;
         }
         #region 属性
         /// <summary>
@@ -198,7 +208,7 @@ namespace CRL
             string id = key.ToString();
             if (QueryCacheFromRemote)
             {
-                var expression = Base.GetQueryIdExpression<TModel>(key);
+                var expression = Base.GetQueryIdExpression2<TModel>(key);
                 return QueryItemFromCache(expression);
             }
             else
@@ -321,7 +331,7 @@ namespace CRL
             var list = new Dictionary<string, TModel>();
             if (!TypeCache.ModelKeyCache.ContainsKey(type))
             {
-                var db = GetDbHelper();//避开事务控制,使用新的连接
+                var db = DBExtend;
                 var list2 = db.QueryOrFromCache<TModel>(query, out dataCacheKey);
                 list = ObjectConvert.ConvertToDictionary<TModel>(list2);
                 lock (lockObj)

@@ -6,6 +6,7 @@
 * 在线文档 http://crl.changqidongli.com/
 */
 using CRL.LambdaQuery;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,8 +42,15 @@ namespace CRL.DBExtend.MongoDB
 
         public override int Delete<TModel>(object id)
         {
-            var expression = Base.GetQueryIdExpression<TModel>(id);
-            return Delete<TModel>(expression);
+            var table = TypeCache.GetTable(typeof(TModel));
+            var collection = _MongoDB.GetCollection<TModel>(table.TableName);
+            var builder = Builders<TModel>.Filter;
+            var filter = builder.Eq(table.PrimaryKey.MemberName, id);
+            var result = collection.DeleteMany(filter);
+            return (int)result.DeletedCount;
+
+            //var expression = Base.GetQueryIdExpression<TModel>(id);
+            //return Delete<TModel>(expression);
         }
 
     }

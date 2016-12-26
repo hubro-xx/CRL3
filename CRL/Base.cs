@@ -25,7 +25,7 @@ namespace CRL
     public class Base
     {
         //static internal bool UseEmitCreater = true;
-        internal static Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(object id)
+        internal static Expression<Func<TModel, bool>> GetQueryIdExpression2<TModel>(object id)
         {
             var type = typeof(TModel);
             var table = TypeCache.GetTable(type);
@@ -161,7 +161,7 @@ namespace CRL
         /// <returns></returns>
         public static List<string> GetCallDBContext()
         {
-            var allKey = "AllDbContext";
+            var allKey = "AllDBExtend";
             var allList = CallContext.GetData<List<string>>(allKey);
             if (allList == null)
             {

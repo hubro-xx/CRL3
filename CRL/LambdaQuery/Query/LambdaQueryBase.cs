@@ -553,8 +553,8 @@ namespace CRL.LambdaQuery
             var result = __Visitor.RouteExpressionHandler(expressionBody, firstLevel: true);
             if (string.IsNullOrEmpty(result.SqlOut))//没有构成树
             {
-                //string typeStr2 = "";
-                result.SqlOut = __Visitor.DealCRLExpression(expressionBody, result, "");
+                bool isNullValue;
+                result.SqlOut = __Visitor.DealCRLExpression(expressionBody, result, "", out isNullValue);
             }
             return result;
         }

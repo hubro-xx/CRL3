@@ -21,7 +21,26 @@ namespace CRL.DBExtend.MongoDB
         {
             throw new NotSupportedException();
         }
+        int Update<TModel>(FilterDefinition<TModel> filter, ParameCollection setValue)
+        {
+            var table = TypeCache.GetTable(typeof(TModel));
+            var collection = _MongoDB.GetCollection<TModel>(table.TableName);
+            var update = Builders<TModel>.Update;
+            var first = setValue.First();
+            var updateSet = update.Set(first.Key, first.Value);
+            setValue.Remove(first.Key);
+            foreach (var item in setValue)
+            {
+                if (item.Key.StartsWith("$"))
+                {
+                    throw new CRLException("MongoDB不支持累加" + item.Key);
+                }
+                update.Set(item.Key, item.Value);
+            }
+            var result = collection.UpdateMany(filter, updateSet);
+            return (int)result.ModifiedCount;
 
+        }
         public override int Update<TModel>(LambdaQuery.LambdaQuery<TModel> query1, ParameCollection setValue)
         {
             if (query1.__GroupFields.Count > 0)
@@ -37,21 +56,7 @@ namespace CRL.DBExtend.MongoDB
                 throw new ArgumentNullException("更新时发生错误,参数值为空 ParameCollection setValue");
             }
             var query = query1 as LambdaQuery.MongoDBLambdaQuery<TModel>;
-            var collection = _MongoDB.GetCollection<TModel>(query.QueryTableName);
-            var update = Builders<TModel>.Update;
-            var first = setValue.First();
-            var updateSet = update.Set(first.Key, first.Value);
-            setValue.Remove(first.Key);
-            foreach (var item in setValue)
-            {
-                if (item.Key.StartsWith("$"))
-                {
-                    throw new CRLException("MongoDB不支持累加" + item.Key);
-                }
-                update.Set(item.Key, item.Value);
-            }
-            var result = collection.UpdateMany(query.__MongoDBFilter, updateSet);
-            return (int)result.ModifiedCount;
+            return Update(query.__MongoDBFilter, setValue);
         }
         public override int Update<TModel>(TModel obj)
         {
@@ -62,12 +67,18 @@ namespace CRL.DBExtend.MongoDB
                 //throw new CRLException("更新集合为空");
             }
             var keyValue = obj.GetpPrimaryKeyValue();
-            var expression = Base.GetQueryIdExpression<TModel>(keyValue);
-            var n = Update(expression,c);
-            if (n == 0)
-            {
-                throw new CRLException("更新失败,找不到主键为 " + keyValue + " 的记录");
-            }
+            var table = TypeCache.GetTable(typeof(TModel));
+            var collection = _MongoDB.GetCollection<TModel>(table.TableName);
+            var builder = Builders<TModel>.Filter;
+            var filter = builder.Eq(table.PrimaryKey.MemberName, keyValue);
+            var n = Update(filter, c);
+
+            //var expression = Base.GetQueryIdExpression<TModel>(keyValue);
+            //var n = Update(expression,c);
+            //if (n == 0)
+            //{
+            //    throw new CRLException("更新失败,找不到主键为 " + keyValue + " 的记录");
+            //}
             obj.CleanChanges();
             return n;
         }

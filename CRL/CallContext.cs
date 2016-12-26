@@ -13,6 +13,7 @@ namespace CRL
     {
         public static T GetData<T>(string contextName)
         {
+            //return default(T);
             var dbContextObj = System.Runtime.Remoting.Messaging.CallContext.GetData(contextName);
             if (dbContextObj == null)
                 return default(T);
@@ -20,6 +21,7 @@ namespace CRL
         }
         public static void SetData(string contextName, object data)
         {
+            //return;
             System.Runtime.Remoting.Messaging.CallContext.SetData(contextName, data);
         }
     }

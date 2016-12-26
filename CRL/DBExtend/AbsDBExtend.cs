@@ -179,9 +179,10 @@ namespace CRL
             }
             Type type = typeof(TModel);
             var updateModel = MemoryDataCache.CacheService.GetCacheTypeKey(typeof(TModel));
+            var db = copyDBExtend();//使用新的访问对象
             foreach (var key in updateModel)
             {
-                var list = QueryList<TModel>(expression);
+                var list = db.QueryList<TModel>(expression);
                 foreach (var item in list)
                 {
                     MemoryDataCache.CacheService.UpdateCacheItem(key, item, c);
@@ -627,10 +628,17 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public TModel QueryItem<TModel>(object id)where TModel : CRL.IModel, new()
+        public TModel QueryItem<TModel>(object id) where TModel : CRL.IModel, new()
         {
-            var expression = Base.GetQueryIdExpression<TModel>(id);
-            return QueryItem<TModel>(expression);
+            var type = typeof(TModel);
+            var table = TypeCache.GetTable(type);
+            string where = _DBAdapter.KeyWordFormat(table.PrimaryKey.MapingName) + "=@par1";
+            AddParam("par1", id);
+            var query = CreateLambdaQuery<TModel>();
+            query.Where(where);
+            return QueryList(query).FirstOrDefault();
+            //var expression = Base.GetQueryIdExpression<TModel>(id);
+            //return QueryItem<TModel>(expression);
         }
         /// <summary>
         /// 查询返回单个结果

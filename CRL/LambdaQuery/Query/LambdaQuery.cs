@@ -251,6 +251,15 @@ namespace CRL.LambdaQuery
         /// <param name="expression">最好用变量代替属性或方法</param>
         /// <returns></returns>
         public abstract LambdaQuery<T> Where(Expression<Func<T, bool>> expression);
+        internal LambdaQuery<T> Where(string expression)
+        {
+            if (Condition.Length > 0)
+            {
+                expression = " and " + expression;
+            }
+            Condition.Append(expression);
+            return this;
+        }
         #endregion
 
         #region order

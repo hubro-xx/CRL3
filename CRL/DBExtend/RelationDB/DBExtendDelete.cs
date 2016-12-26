@@ -40,8 +40,14 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override int Delete<TModel>(object id)
         {
-            var expression = Base.GetQueryIdExpression<TModel>(id);
-            return Delete<TModel>(expression);
+            var type = typeof(TModel);
+            var table = TypeCache.GetTable(type);
+            string where = _DBAdapter.KeyWordFormat(table.PrimaryKey.MapingName) + "=@par1";
+            AddParam("par1", id);
+            return Delete<TModel>(where);
+
+            //var expression = Base.GetQueryIdExpression<TModel>(id);
+            //return Delete<TModel>(expression);
         }
         /// <summary>
         /// 指定条件删除

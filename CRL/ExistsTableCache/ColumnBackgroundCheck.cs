@@ -81,7 +81,7 @@ namespace CRL.ExistsTableCache
                     {
                         continue;
                     }
-                    if (!allFileds2.ContainsKey(field.MemberName.ToLower()))
+                    if (!allFileds2.ContainsKey(field.MapingName.ToLower()))
                     {
                         needCreates.Add(field);
                     }
