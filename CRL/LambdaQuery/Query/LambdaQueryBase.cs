@@ -168,7 +168,7 @@ namespace CRL.LambdaQuery
             public ParameCollection parame;
             //public Expression expression;
         }
-        static Dictionary<string, SelectFieldInfo> _GetSelectFieldCache = new Dictionary<string, SelectFieldInfo>();
+        internal static Dictionary<string, SelectFieldInfo> _GetSelectFieldCache = new Dictionary<string, SelectFieldInfo>();
         internal SelectFieldInfo _CurrentSelectFieldCache;
         internal List<Attribute.FieldAttribute> _CurrentAppendSelectField = new List<Attribute.FieldAttribute>();
         internal SelectFieldInfo GetSelectField(bool isSelect, Expression expressionBody, bool withTablePrefix, params Type[] types)

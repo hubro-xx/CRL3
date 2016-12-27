@@ -25,7 +25,7 @@ namespace CRL
     public class Base
     {
         //static internal bool UseEmitCreater = true;
-        internal static Expression<Func<TModel, bool>> GetQueryIdExpression2<TModel>(object id)
+        internal static Expression<Func<TModel, bool>> GetQueryIdExpression<TModel>(object id)
         {
             var type = typeof(TModel);
             var table = TypeCache.GetTable(type);
@@ -168,6 +168,16 @@ namespace CRL
                 allList = new List<string>();
             }
             return allList;
+        }
+        public static Dictionary<string, int> GetTempCacheCount()
+        {
+            var dic = new Dictionary<string, int>();
+            dic.Add("表达式二元运算缓存", LambdaQuery.ExpressionVisitor.BinaryExpressionCache.Count);
+            dic.Add("表达式方法解析缓存", LambdaQuery.ExpressionVisitor.MethodCallExpressionCache.Count);
+            dic.Add("表达式属性解析缓存", LambdaQuery.ExpressionVisitor.MemberExpressionCache.Count);
+            dic.Add("表达式字段筛选缓存", LambdaQuery.LambdaQueryBase._GetSelectFieldCache.Count);
+            dic.Add("对象映射列缓存", ObjectConvert.columnCache.Count);
+            return dic;
         }
     }
 }

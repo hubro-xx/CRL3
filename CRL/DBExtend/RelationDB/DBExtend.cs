@@ -365,14 +365,13 @@ namespace CRL.DBExtend.RelationDB
             {
                 return;
             }
-            if (!tableCheckedCache.ContainsKey(type))
-            {
-                tableCheckedCache.TryAdd(type, false);
-            }
-            if (tableCheckedCache[type] == true)
+            bool a1;
+            var a = tableCheckedCache.TryGetValue(type, out a1);
+            if (a && a1)
             {
                 return;
             }
+            tableCheckedCache.TryAdd(type, false);
             //TypeCache.SetDBAdapterCache(type, _DBAdapter);
             var dbName = DatabaseName;
             var cacheInstance =CRL.ExistsTableCache.ExistsTableCache.Instance;

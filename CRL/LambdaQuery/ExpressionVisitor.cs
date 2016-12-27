@@ -100,7 +100,7 @@ namespace CRL.LambdaQuery
             par1.DataParamed = par;
             return par1;
         }
-        static Dictionary<string, CRLExpression.CRLExpression> BinaryExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
+        internal static Dictionary<string, CRLExpression.CRLExpression> BinaryExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
 
         static ExpressionType[] binaryTypes = new ExpressionType[] { ExpressionType.Equal, ExpressionType.GreaterThan, ExpressionType.GreaterThanOrEqual, ExpressionType.LessThan, ExpressionType.LessThanOrEqual, ExpressionType.NotEqual };
         public string DealCRLExpression(Expression exp, CRLExpression.CRLExpression b, string typeStr, out bool isNullValue)
@@ -192,9 +192,9 @@ namespace CRL.LambdaQuery
             }
             return e;
         }
-        static Dictionary<string, CRLExpression.CRLExpression> MemberExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
-        static Dictionary<string, MethodCallExpressionCacheItem> MethodCallExpressionCache = new Dictionary<string, MethodCallExpressionCacheItem>();
-        struct MethodCallExpressionCacheItem
+        internal static Dictionary<string, CRLExpression.CRLExpression> MemberExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
+        internal static Dictionary<string, MethodCallExpressionCacheItem> MethodCallExpressionCache = new Dictionary<string, MethodCallExpressionCacheItem>();
+        internal struct MethodCallExpressionCacheItem
         {
             public CRLExpression.CRLExpression CRLExpression;
             public int argsIndex;
@@ -522,7 +522,17 @@ namespace CRL.LambdaQuery
                 //当是常量转换方法
                 //like DateTime.Parse("2016-02-11")
                 var method = mcExp.Method;
-                var obj = method.Invoke(null, arguments.ToArray());
+                object obj;
+                if (mcExp.Method.IsStatic)
+                {
+                    obj = method.Invoke(null, arguments.ToArray());
+                }
+                else
+                {
+                    var args1 = arguments.First();
+                    arguments.RemoveAt(0);
+                    obj = method.Invoke(args1, arguments.ToArray());
+                }
                 var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
                 var cache = new MethodCallExpressionCacheItem() { CRLExpression = exp2, argsIndex = argsIndex, isConstantMethod = isConstantMethod, isStatic = mcExp.Method.IsStatic };
                 MethodCallExpressionCache[key] = cache;

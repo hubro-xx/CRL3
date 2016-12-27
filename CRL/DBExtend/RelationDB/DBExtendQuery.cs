@@ -32,9 +32,15 @@ namespace CRL.DBExtend.RelationDB
         {
             cacheKey = "";
             CheckTableCreated<TModel>();
+            List<TModel> list = new List<TModel>();
             if (query.SkipPage > 0)//按分页
             {
-                return QueryResult<TModel>(query);
+                list = QueryResult<TModel>(query);
+                if (SettingConfig.AutoTrackingModel && query.__TrackingModel)
+                {
+                    SetOriginClone(list);
+                }
+                return list;
             }
             cacheKey = "";
             System.Data.Common.DbDataReader reader;
@@ -42,7 +48,6 @@ namespace CRL.DBExtend.RelationDB
             var sql = query.GetQuery();
             var cacheTime = query.__ExpireMinute;
             var compileSp = query.__CompileSp;
-            List<TModel> list = new List<TModel>();
             double runTime = 0;
             if (cacheTime <= 0)
             {

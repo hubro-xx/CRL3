@@ -230,7 +230,7 @@ namespace CRL
         #endregion
         #region 返回指定类型
 
-        static Dictionary<string, Dictionary<string, int>> columnCache = new Dictionary<string, Dictionary<string, int>>();
+        internal static Dictionary<string, Dictionary<string, int>> columnCache = new Dictionary<string, Dictionary<string, int>>();
         /// <summary>
         /// 返回指定类型,支持强类型和匿名类型
         /// </summary>

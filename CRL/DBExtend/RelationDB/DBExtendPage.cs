@@ -94,6 +94,7 @@ namespace CRL.DBExtend.RelationDB
             dic.Add("fields", fields);
             dic.Add("sort", orderBy);
             dic.Add("rowOver", rowOver);
+            //dic.Add("pageSize", pageSize.ToString());
             //string sql = string.Format("{0} with(nolock) where {1}", tableName, where);
             string sp = CompileSqlToSp(_DBAdapter.TemplatePage, condition, dic);
             CallBackDataReader reader;
@@ -202,6 +203,7 @@ namespace CRL.DBExtend.RelationDB
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic.Add("fields", fields);
             dic.Add("rowOver", rowOver);
+            //dic.Add("pageSize", pageSize.ToString());
             //dic.Add("sort", sort1);
             string sp = CompileSqlToSp(_DBAdapter.TemplateGroupPage, conditions, dic);
             CallBackDataReader reader;

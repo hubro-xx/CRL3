@@ -208,7 +208,7 @@ namespace CRL
             string id = key.ToString();
             if (QueryCacheFromRemote)
             {
-                var expression = Base.GetQueryIdExpression2<TModel>(key);
+                var expression = Base.GetQueryIdExpression<TModel>(key);
                 return QueryItemFromCache(expression);
             }
             else
