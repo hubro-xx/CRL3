@@ -46,8 +46,9 @@ namespace WebTest.Code
             instance.QueryItem(1);
             var query = ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.TransType == TransType.In);
-           
+            var item = new ProductData();
             var year = DateTime.Now.Year;
+            query.Where(b => b.Id == item.Id);
             query.Where(b => b.InterFaceUser == "222" && b.Id < 20);
             #region 扩展方法
             query.Where(b => b.IsTop);//没有运算符的bool一元运算
@@ -308,7 +309,7 @@ namespace WebTest.Code
             c["UserId"] = "$UserId";//order.userid=product.userid
             c["Remark"] = "2222";//order.remark=2222
             Code.OrderManage.Instance.Update(query, c);
-            
+
             #endregion
 
             #region 删除
@@ -324,7 +325,7 @@ namespace WebTest.Code
             //按编号为1的数据
             var item = Code.ProductDataManage.Instance.QueryItemFromCache(b => b.Id > 0);
             item.CheckNull("item");
-            var guid = Guid.NewGuid().ToString().Substring(0,8);
+            var guid = Guid.NewGuid().ToString().Substring(0, 8);
             item.Change(b => b.SupplierName, guid);
             Code.ProductDataManage.Instance.Update(item);
             item = Code.ProductDataManage.Instance.QueryItemFromCache(item.Id);

@@ -2,16 +2,19 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style type="text/css">
         .auto-style2 {
-            width: 70px
+            width: 70px;
         }
+
         .auto-style3 {
-            width: 56px
+            width: 56px;
         }
+
         .auto-style4 {
-            width: 93px
+            width: 93px;
         }
+
         .auto-style5 {
-            width: 133px
+            width: 133px;
         }
     </style>
 </asp:Content>
@@ -32,7 +35,7 @@
         <td width="40">操作</td>
     </tr>
     <%
-        foreach(var item in caches)
+        foreach (var item in caches)
         {
     %>
     <tr>
@@ -56,4 +59,18 @@
         string key = Request["key"];
         var a = CRL.MemoryDataCache.CacheService.UpdateCache(key);
     </pre>
+    <h3>缓存变量信息</h3>
+    <table border="1">
+        <tr>
+            <td>名称</td>
+            <td>数量</td>
+        </tr>
+        <% foreach (var item in tempCache)
+           {%>
+        <tr>
+            <td><%=item.Key %></td>
+            <td><%=item.Value %></td>
+        </tr>
+        <% }%>
+    </table>
 </asp:Content>

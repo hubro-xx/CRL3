@@ -197,3 +197,4 @@ FakesAssemblies/
 /log/
 /RoleControl/Config/LocalConnection.config
 /NoteForCode.exe
+/CRLWebTest/config/*.ser

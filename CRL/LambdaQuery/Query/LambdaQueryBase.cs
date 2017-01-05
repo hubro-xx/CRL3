@@ -28,7 +28,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 处理后的查询参数
         /// </summary>
-        internal ParameCollection QueryParames
+        internal Dictionary<string, object> QueryParames
         {
             get
             {
@@ -496,6 +496,7 @@ namespace CRL.LambdaQuery
         /// 别名
         /// </summary>
         internal Dictionary<Type, string> __Prefixs = new Dictionary<Type, string>();
+        internal string __PrefixsAllKey;
         internal int prefixIndex = 0;
         /// <summary>
         /// 获取别名,如t1.
@@ -519,6 +520,7 @@ namespace CRL.LambdaQuery
                     prefix2 = "";
                 }
                 __Prefixs[type] = prefix2;
+                __PrefixsAllKey = string.Join("-", __Prefixs);
                 return prefix2;
             }
             return prefix;

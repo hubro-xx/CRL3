@@ -20,7 +20,7 @@ namespace WebTest.Code
     {
         protected override CRL.LambdaQuery.LambdaQuery<ProductData> CacheQuery()
         {
-            return GetLambdaQuery().Where(b => b.Id < 1000).Expire(1);
+            return GetLambdaQuery().Where(b => b.Id < 1000).Expire(5);
         }
         /// <summary>
         /// 对象被更新时,是否通知缓存服务器

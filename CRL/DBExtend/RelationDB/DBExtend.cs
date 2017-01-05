@@ -361,10 +361,10 @@ namespace CRL.DBExtend.RelationDB
             {
                 return;
             }
-            if (!type.IsSubclassOf(typeof(IModel)))
-            {
-                return;
-            }
+            //if (!type.IsSubclassOf(typeof(IModel)))
+            //{
+            //    return;
+            //}
             bool a1;
             var a = tableCheckedCache.TryGetValue(type, out a1);
             if (a && a1)
@@ -424,7 +424,7 @@ namespace CRL.DBExtend.RelationDB
                 tableCheckedCache[type] = true;
                 return;
             }
-            //判断字段是否一致
+            //从本地缓存判断字段是否一致
             var needCreates = CRL.ExistsTableCache.ExistsTableCache.Instance.CheckFieldExists(dbName, table, tableName);
             if (needCreates.Count > 0)
             {
@@ -443,7 +443,7 @@ namespace CRL.DBExtend.RelationDB
                 //RecoveryParams();
                 #endregion
             }
-           //二次检查,对照表结构
+           //二次检查从数据库,对照表结构
             if (!tb.ColumnChecked2)
             {
                 var db2 = copyDBExtend();

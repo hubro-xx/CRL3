@@ -214,9 +214,11 @@ namespace CRL
             else
             {
                 var all = GetCache(CacheQuery());
-                if (all.ContainsKey(id))
+                TModel item;
+                var a = all.TryGetValue(id, out item);
+                if (a)
                 {
-                    return all[id];
+                    return item;
                 }
                 return null;
             }
@@ -261,10 +263,37 @@ namespace CRL
             }
             return QueryFromCacheBase(expression, out total, pageIndex, pageSize);
         }
+        static Dictionary<string, bool> idExpressionCache = new Dictionary<string, bool>();
+        List<TModel> QueryFormCacheById(object id)
+        {
+            var key = id.ToString();
+            var all = GetCache(CacheQuery());
+            if (all == null)
+            {
+                return new List<TModel>();
+            }
+            TModel item;
+            var a = all.TryGetValue(key, out item);
+            if (a)
+            {
+                return new List<TModel>() { item };
+            }
+            return new List<TModel>();
+        }
         List<TModel> QueryFromCacheBase(Expression<Func<TModel, bool>> expression, out int total, int pageIndex = 0, int pageSize = 0)
         {
             total = 0;
             #region 按KEY查找
+            bool b;
+            var a = idExpressionCache.TryGetValue(expression.Body.ToString(), out b);
+            if (a)
+            {
+                var binary = expression.Body as BinaryExpression;
+                var value = LambdaQuery.ConstantValueVisitor.GetParameExpressionValue(binary.Right);
+                var list = QueryFormCacheById(value);
+                total = list.Count();
+                return list;
+            }
             if (expression.Body is BinaryExpression)
             {
                 var binary = expression.Body as BinaryExpression;
@@ -276,19 +305,11 @@ namespace CRL
                         var primaryKey = TypeCache.GetTable(typeof(TModel)).PrimaryKey.MemberName;
                         if (member.Member.Name.ToUpper() == primaryKey.ToUpper())
                         {
-                            var value = ConstantValueVisitor.GetParameExpressionValue(binary.Right).ToString();
-                            //var value = (int)Expression.Lambda(binary.Right).Compile().DynamicInvoke();
-                            var all = GetCache(CacheQuery());
-                            if(all==null)
-                            {
-                                return new List<TModel>();
-                            }
-                            if (all.ContainsKey(value))
-                            {
-                                total = 1;
-                                return new List<TModel>() { all[value] };
-                            }
-                            return new List<TModel>();
+                            idExpressionCache[expression.Body.ToString()] = true;
+                            var value = ConstantValueVisitor.GetParameExpressionValue(binary.Right);
+                            var list = QueryFormCacheById(value);
+                            total = list.Count();
+                            return list; 
                         }
                     }
                 }

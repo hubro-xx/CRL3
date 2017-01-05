@@ -17,6 +17,7 @@ namespace WebTest.Page
     public partial class CacheManage : System.Web.UI.Page
     {
         public List<CRL.MemoryDataCache.QueryItem> caches=new List<CRL.MemoryDataCache.QueryItem>();
+        public Dictionary<string, int> tempCache = new Dictionary<string, int>();
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request["type"] == "update")
@@ -26,6 +27,7 @@ namespace WebTest.Page
             }
             var all = Code.ProductDataManage.Instance.AllCache;//调用缓存,让它生成
             caches = CRL.MemoryDataCache.CacheService.GetCacheList();
+            tempCache = CRL.Base.GetTempCacheCount();
         }
         void Update()
         {

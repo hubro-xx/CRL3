@@ -29,6 +29,13 @@ namespace CRL.LambdaQuery
                 return lambdaQueryBase.__Prefixs;
             }
         }
+        string __PrefixsAllKey
+        {
+            get
+            {
+                return lambdaQueryBase.__PrefixsAllKey;
+            }
+        }
         LambdaQueryBase lambdaQueryBase;
         public ExpressionVisitor(LambdaQueryBase _lambdaQueryBase)
         {
@@ -45,7 +52,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 处理后的查询参数
         /// </summary>
-        internal ParameCollection QueryParames = new ParameCollection();
+        internal Dictionary<string, object> QueryParames = new Dictionary<string, object>();
         int parIndex
         {
             get
@@ -133,7 +140,7 @@ namespace CRL.LambdaQuery
                 //QueryItem(item.Id)被缓存了 todo
                 #region 二元运算缓存
                 CRLExpression.CRLExpression cacheItem;
-                key = string.Format("{0}{1}{2}{3}", string.Join("-", Prefixs), left, expType, right);
+                key = string.Format("{0}{1}{2}{3}", __PrefixsAllKey, left, expType, right);
                 var a = BinaryExpressionCache.TryGetValue(key, out cacheItem);
                 if (a)
                 {
@@ -150,7 +157,6 @@ namespace CRL.LambdaQuery
                 #endregion
             }
             StringBuilder sb = new StringBuilder();
-            sb.Append("(");
             var leftPar = RouteExpressionHandler(left);
             var rightPar = RouteExpressionHandler(right);
             #region 修正bool值一元运算
@@ -169,20 +175,13 @@ namespace CRL.LambdaQuery
                 }
             }
             #endregion
-            //leftPar = DealParame(leftPar, typeStr, out __typeStr2);
             outLeft = DealCRLExpression(left, leftPar, typeStr, out isNullValue);
-            sb.Append(outLeft);
-            //rightPar = DealParame(rightPar, typeStr, out __typeStr2);
             outRight = DealCRLExpression(right, rightPar, typeStr, out isNullValue);
             if (isNullValue)//left为null则语法错误
             {
                 __typeStr2 = "";
             }
-            sb.Append(__typeStr2);
-            sb.Append(outRight);
-            sb.Append(")");
-            //return sb.ToString();
-
+            sb.AppendFormat("({0}{1}{2})", outLeft, __typeStr2, outRight);
             var e = new CRLExpression.CRLExpression() { ExpressionType = expType.ToString(), Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpression.CRLExpressionType.Binary : CRLExpression.CRLExpressionType.Tree };
             e.SqlOut = sb.ToString();
             e.Data = e.SqlOut;
@@ -418,7 +417,7 @@ namespace CRL.LambdaQuery
 
             MethodCallExpressionCacheItem methodCache;
             #region 缓存处理
-            string key = string.Join("-", Prefixs) + mcExp + nodeType;
+            string key = __PrefixsAllKey + mcExp + nodeType;
             var exists = MethodCallExpressionCache.TryGetValue(key, out methodCache);
             if (exists)
             {
