@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using CRL;
+using WebTest.Code;
 namespace WebTest
 {
     public partial class Update : System.Web.UI.Page
@@ -55,6 +56,18 @@ namespace WebTest
             c["Remark"] = "2222";//order.remark=2222
             Code.OrderManage.Instance.Update(query, c);
             //等效语句为 update order set userid=ProductData.userid,remark='2222' from ProductData where order.id=ProductData.id and ProductData.number<10
+        }
+        public static void TestModified()
+        {
+            var item2 = ProductDataManage.Instance.QueryItemFromCache(b => b.Id > 0);
+            item2.BarCode = "23424234";
+            var c1 = item2.IsModified();
+            ProductDataManage.Instance.Update(item2);
+            var c2 = item2.IsModified();
+            item2.Change(b => b.BarCode, "2222");
+            var c3 = item2.IsModified();
+            ProductDataManage.Instance.Update(item2);
+            var c4 = item2.IsModified();
         }
     }
 }

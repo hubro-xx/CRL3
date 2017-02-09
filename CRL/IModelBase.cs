@@ -194,7 +194,7 @@ namespace CRL
             Changes = Changes ?? new ParameCollection();
             Changes[name] = value;
         }
-        internal ParameCollection GetChanges()
+        ParameCollection GetChanges()
         {
             Changes = Changes ?? new ParameCollection();
             return Changes;
@@ -210,6 +210,68 @@ namespace CRL
                 return;
             }
             OriginClone = Clone();
+        }
+        /// <summary>
+        /// 获取被修改的字段
+        /// </summary>
+        /// <returns></returns>
+        public ParameCollection GetUpdateField(bool check = true)
+        {
+            var c = new ParameCollection();
+            var fields = TypeCache.GetProperties(GetType(), true);
+            if (this.GetChanges().Count > 0)//按手动指定更改
+            {
+                foreach (var item in this.GetChanges())
+                {
+                    var key = item.Key.Replace("$", "");
+                    var f = fields[key];
+                    if (f == null)
+                        continue;
+                    if (f.IsPrimaryKey || f.FieldType != Attribute.FieldType.数据库字段)
+                        continue;
+                    var value = item.Value;
+                    //如果表示值为被追加 名称为$name
+                    //使用Cumulation扩展方法后按此处理
+                    if (key != item.Key)//按$name=name+'123123'
+                    {
+                        if (f.PropertyType == typeof(string))
+                        {
+                            value = string.Format("{0}+'{1}'", key, value);
+                        }
+                        else
+                        {
+                            value = string.Format("{0}+{1}", key, value);
+                        }
+                    }
+                    c[item.Key] = value;
+                }
+                return c;
+            }
+            //按对象对比
+            var origin = this.OriginClone;
+            if (origin == null && check)
+            {
+                throw new CRLException("_originClone为空,请确认此对象是由查询创建");
+            }
+            foreach (var f in fields.Values)
+            {
+                if (f.IsPrimaryKey)
+                    continue;
+                var originValue = f.GetValue(origin);
+                var currentValue = f.GetValue(this);
+                if (!Object.Equals(originValue, currentValue))
+                {
+                    c.Add(f.MemberName, currentValue);
+                }
+            }
+            return c;
+        }
+        /// <summary>
+        /// 对象是否被修改
+        /// </summary>
+        public bool IsModified()
+        {
+            return GetUpdateField(false).Count > 0;
         }
         #endregion
 

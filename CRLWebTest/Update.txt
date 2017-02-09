@@ -300,3 +300,5 @@
 2016-12-19
 	优化数据库事务调用,只生成一个数据访问上下文PackageTrans2(TransMethod method, out string error)
 	增加当前调用数据访问上下文统计Base.GetCallDBContext
+2017-01-20
+	增加了IMode GetUpdateField,IsModified 用来判断属性是否被修改过

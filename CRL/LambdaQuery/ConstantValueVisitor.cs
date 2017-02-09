@@ -69,6 +69,8 @@ namespace CRL.LambdaQuery
                 if (mExp.Expression != null)
                 {
                     instance = GetMemberExpressionValue(mExp.Expression, out isConstant);
+                    //字段属属性都按变量
+                    isConstant = false;
                 }
                 if (mExp.Member.MemberType == MemberTypes.Field)
                 {

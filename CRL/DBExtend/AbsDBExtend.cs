@@ -840,7 +840,9 @@ namespace CRL
         }
         internal ParameCollection GetUpdateField<TModel>(TModel obj) where TModel : IModel, new()
         {
-            var c = new ParameCollection();
+            var c = obj.GetUpdateField();
+            #region old
+            /**
             var fields = TypeCache.GetProperties(typeof(TModel), true);
             if (obj.GetChanges().Count > 0)//按手动指定更改
             {
@@ -891,6 +893,8 @@ namespace CRL
                     c.Add(f.MemberName, currentValue);
                 }
             }
+             * */
+            #endregion
             if (c.Count() > 0)
             {
                 CheckData(obj);

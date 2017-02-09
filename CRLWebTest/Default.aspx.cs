@@ -23,22 +23,7 @@ namespace WebTest
         {
             //Code.TestAll.TestUpdate();
             //return;
-            var item2 = ProductDataManage.Instance.QueryItemFromCache(b=>b.Id==0);
-            var n2 = item2.Id + 10;
-            var query = ProductDataManage.Instance.GetLambdaQuery();
-            query.Take(10);
-            int n = 20;
-            string name = "sss";
-            var join = query.Join<Code.Member>((a, b) => a.UserId == b.Id)
-                .SelectAppendValue(b => b.Mobile).OrderBy(b => b.Id, true);
-            //query.Where(b => b.Id > n && b.CategoryName.Contains(name));
-            query.Where(b => b.CategoryName == "null");
-            query.Where(b => b.Id == item2.Id);
-            //join.Where(b => b.AccountNo == "123");//按join追加条件
-            string sql = query.PrintQuery();
-            var resut = query.SelectV(b => new { b.CategoryName, b.Id }).ToList();
-            Response.Write(sql);
-            Response.End();
+            Update.TestModified();
         }
     }
 }
