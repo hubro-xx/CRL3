@@ -15,7 +15,7 @@ namespace CRL.Package.RoleAuthorize
     /// <summary>
     /// 
     /// </summary>
-    public class EmployeeBusiness : Person.PersonBusiness<EmployeeBusiness, Employee>
+    public class EmployeeBusiness : Person.PersonBusiness<Employee>
     {
         public static EmployeeBusiness Instance
         {

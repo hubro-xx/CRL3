@@ -110,7 +110,7 @@ namespace CRL.LambdaQuery
         internal static Dictionary<string, CRLExpression.CRLExpression> BinaryExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
 
         static ExpressionType[] binaryTypes = new ExpressionType[] { ExpressionType.Equal, ExpressionType.GreaterThan, ExpressionType.GreaterThanOrEqual, ExpressionType.LessThan, ExpressionType.LessThanOrEqual, ExpressionType.NotEqual };
-        public string DealCRLExpression(Expression exp, CRLExpression.CRLExpression b, string typeStr, out bool isNullValue)
+        public string DealCRLExpression(Expression exp, CRLExpression.CRLExpression b, string typeStr, out bool isNullValue, bool first = false)
         {
             isNullValue = false;
             switch (b.Type)
@@ -120,7 +120,7 @@ namespace CRL.LambdaQuery
                 case CRLExpression.CRLExpressionType.Binary:
                     return b.Data.ToString();
                 default:
-                    var valExp = b.IsConstantValue ? b : RouteExpressionHandler(exp);
+                    var valExp = (b.IsConstantValue || first) ? b : RouteExpressionHandler(exp);
                     isNullValue = valExp.Data == null;
                     var par2 = DealParame(valExp, typeStr);
                     return par2.DataParamed;
@@ -175,8 +175,8 @@ namespace CRL.LambdaQuery
                 }
             }
             #endregion
-            outLeft = DealCRLExpression(left, leftPar, typeStr, out isNullValue);
-            outRight = DealCRLExpression(right, rightPar, typeStr, out isNullValue);
+            outLeft = DealCRLExpression(left, leftPar, typeStr, out isNullValue, true);
+            outRight = DealCRLExpression(right, rightPar, typeStr, out isNullValue, true);
             if (isNullValue)//left为null则语法错误
             {
                 __typeStr2 = "";

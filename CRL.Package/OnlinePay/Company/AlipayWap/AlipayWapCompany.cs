@@ -70,6 +70,13 @@ namespace CRL.Package.OnlinePay.Company.AlipayWap
             {
                 var out_trade_no = context.Request["out_trade_no"];
                 var order = OnlinePayBusiness.Instance.GetOrder(out_trade_no, ThisCompanyType);
+                if (order == null)
+                {
+                    error = "交易成功，确认订单时，找不到订单" + out_trade_no + "";
+                    CoreHelper.EventLog.Log(string.Format("在线支付支付成功，确认时找不到订单{0} 订单号{1}", ThisCompanyType, out_trade_no), true);
+                    //context.Response.Write("fail");
+                    return false;
+                }
                 Confirm(order, GetType(), order.Amount);
                 return true;
             }
@@ -110,7 +117,16 @@ namespace CRL.Package.OnlinePay.Company.AlipayWap
                 //交易成功并在页面返回success
                 string out_trade_no = Function.GetStrForXmlDoc(notify_data, "notify/out_trade_no");
                 var order = OnlinePayBusiness.Instance.GetOrder(out_trade_no, ThisCompanyType);
-                Confirm(order, GetType(), order.Amount);
+                if (order == null)
+                {
+                    CoreHelper.EventLog.Log(string.Format("在线支付支付成功，确认时找不到订单{0} 订单号{1}", ThisCompanyType, out_trade_no), true);
+                    //context.Response.Write("fail");
+                    //return "fail";
+                }
+                else
+                {
+                    Confirm(order, GetType(), order.Amount);
+                }
                 return "success";
                 
             }
@@ -118,6 +134,7 @@ namespace CRL.Package.OnlinePay.Company.AlipayWap
 
         public override void Submit(PayHistory order)
         {
+            BaseSubmit(order);
             //初始化Service
             Service ali = new Service();
             var context = HttpContext.Current;

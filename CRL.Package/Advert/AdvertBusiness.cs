@@ -13,15 +13,18 @@ using System.Text;
 
 namespace CRL.Package.Advert
 {
-    /// <summary>
-    /// 广告管理
-    /// </summary>
-    public class AdvertBusiness<TType> : BaseProvider<Advert> where TType : class
+    public class AdvertBusiness<TType> : AdvertBusiness
     {
         public static AdvertBusiness<TType> Instance
         {
             get { return new AdvertBusiness<TType>(); }
         }
+    }
+    /// <summary>
+    /// 广告管理
+    /// </summary>
+    public class AdvertBusiness : BaseProvider<Advert>
+    {
 
         protected override LambdaQuery<Advert> CacheQuery()
         {

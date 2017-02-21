@@ -13,18 +13,16 @@ using System.Collections;
 
 namespace CRL.Package.Person
 {
+    public class PersonBusiness<TType, TModel> : PersonBusiness<TModel>
+        where TModel : Person, new()
+    {
+    }
     /// <summary>
     /// 会员/人维护
     /// </summary>
-    public class PersonBusiness<TType, TModel> : BaseProvider<TModel>
-        where TType : class
+    public class PersonBusiness<TModel> : BaseProvider<TModel>
         where TModel : Person, new()
     {
-        public static PersonBusiness<TType, TModel> Instance
-        {
-            get { return new PersonBusiness<TType, TModel>(); }
-        }
-
         /// <summary>
         /// 加密方法,默认MD5,如不同请重写
         /// </summary>

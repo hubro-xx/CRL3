@@ -13,17 +13,21 @@ using System.Collections;
 
 namespace CRL.Package.ReceiveAddress
 {
-    /// <summary>
-    /// 收货地址维护
-    /// </summary>
-    public class AddressBusiness<TType, TModel> : BaseProvider<TModel>
+    public class AddressBusiness<TType, TModel> : AddressBusiness<TModel>
         where TType : class
-        where TModel : Address,new()
+        where TModel : Address, new()
     {
         public static AddressBusiness<TType, TModel> Instance
         {
             get { return new AddressBusiness<TType, TModel>(); }
         }
+    }
+    /// <summary>
+    /// 收货地址维护
+    /// </summary>
+    public class AddressBusiness<TModel> : BaseProvider<TModel>
+        where TModel : Address,new()
+    {
 
         /// <summary>
         /// 获取用户收货地址

@@ -21,9 +21,12 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
+            int a = 10;
+            int c = Convert.ToInt32("0" + Request["a"]);
+            var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id == a);
             //Code.TestAll.TestUpdate();
             //return;
-            Update.TestModified();
+            //Update.TestModified();
         }
     }
 }

@@ -15,16 +15,19 @@ using System.Collections;
 namespace CRL.Package.Account
 {
 
-    /// <summary>
-    /// 帐号维护,区分不同的帐号类型和流水类型
-    /// </summary>
-    public class AccountBusiness<TType> : BaseProvider<AccountDetail> where TType : class
+    public class AccountBusiness<TType> : AccountBusiness where TType : class
     {
 
         public static AccountBusiness<TType> Instance
         {
             get { return new AccountBusiness<TType>(); }
         }
+    }
+    /// <summary>
+    /// 帐号维护,区分不同的帐号类型和流水类型
+    /// </summary>
+    public class AccountBusiness : BaseProvider<AccountDetail>
+    {
         /// <summary>
         /// 创建帐户
         /// </summary>

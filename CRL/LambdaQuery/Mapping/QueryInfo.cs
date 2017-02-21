@@ -120,7 +120,7 @@ namespace CRL.LambdaQuery.Mapping
         {
             var type = typeof(T);
             var fields = TypeCache.GetProperties(type, true);
-            DynamicMethod method = new DynamicMethod("DynamicCreateEntity", type,
+            DynamicMethod method = new DynamicMethod("CreateObjectGeneratorEmit", type,
                              new Type[] { typeof(CRL.LambdaQuery.Mapping.DataContainer) }, type, true);
             ILGenerator generator = method.GetILGenerator();
             LocalBuilder result = generator.DeclareLocal(type);

@@ -12,7 +12,7 @@ using System.Text;
 
 namespace CRL.Package.Article
 {
-    public class ArticleBusiness<TType, TModel> : BaseProvider<TModel>
+    public class ArticleBusiness<TType, TModel> : ArticleBusiness<TModel>
         where TType : class
         where TModel : Article, new()
     {
@@ -23,5 +23,9 @@ namespace CRL.Package.Article
         //}
 
         
+    }
+    public class ArticleBusiness<TModel> : BaseProvider<TModel>
+        where TModel : Article, new()
+    {
     }
 }

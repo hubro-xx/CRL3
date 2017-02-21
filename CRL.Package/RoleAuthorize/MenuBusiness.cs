@@ -12,7 +12,7 @@ using System.Text;
 
 namespace CRL.Package.RoleAuthorize
 {
-    public class MenuBusiness : Category.CategoryBusiness<MenuBusiness, Menu>
+    public class MenuBusiness : Category.CategoryBusiness<Menu>
     {
         public static MenuBusiness Instance
         {

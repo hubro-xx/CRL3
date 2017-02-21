@@ -14,16 +14,19 @@ using System.Reflection;
 
 namespace CRL.Package.DicConfig
 {
-    /// <summary>
-    /// 字典设置维护
-    /// 通过TYPE区分不同的用途
-    /// </summary>
-    public class DicConfigBusiness<TType> : BaseProvider<DicConfig> where TType : class
+    public class DicConfigBusiness<TType> : DicConfigBusiness
     {
         public static DicConfigBusiness<TType> Instance
         {
             get { return new DicConfigBusiness<TType>(); }
         }
+    }
+    /// <summary>
+    /// 字典设置维护
+    /// 通过TYPE区分不同的用途
+    /// </summary>
+    public class DicConfigBusiness : BaseProvider<DicConfig>
+    {
 
         /// <summary>
         /// 添加一项

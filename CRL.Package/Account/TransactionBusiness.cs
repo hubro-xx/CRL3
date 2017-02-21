@@ -12,17 +12,20 @@ using System.Text;
 
 namespace CRL.Package.Account
 {
-    /// <summary>
-    /// 帐户交易
-    /// 锁定=>提交流水=>解锁=>确认流水
-    /// 此逻辑会生成详细的帐户变动情况
-    /// </summary>
-    public class TransactionBusiness<TType> : BaseProvider<Transaction> where TType : class
+    public class TransactionBusiness<TType> : TransactionBusiness where TType : class
     {
         public static TransactionBusiness<TType> Instance
         {
             get { return new TransactionBusiness<TType>(); }
         }
+    }
+    /// <summary>
+    /// 帐户交易
+    /// 锁定=>提交流水=>解锁=>确认流水
+    /// 此逻辑会生成详细的帐户变动情况
+    /// </summary>
+    public class TransactionBusiness: BaseProvider<Transaction>
+    {
 
         #region 内部属性
         long serialNumber = 0;
@@ -132,7 +135,7 @@ namespace CRL.Package.Account
         {
             error = "";
             var helper = DBExtend;
-            var account = AccountBusiness<TType>.Instance.QueryItem(item.AccountId);
+            var account = AccountBusiness<TransactionBusiness>.Instance.QueryItem(item.AccountId);
             item.TransactionType = account.TransactionType;
             item.Amount = Math.Abs(item.Amount);
             if (item.OperateType == OperateType.支出)
@@ -250,7 +253,7 @@ namespace CRL.Package.Account
                 return false;
                 //throw new Exception("同时提交了多次相同的参数" + key);
             }
-            var account = AccountBusiness<TType>.Instance.QueryItem(record.AccountId);
+            var account = AccountBusiness<TransactionBusiness>.Instance.QueryItem(record.AccountId);
             if (account.AvailableBalance < record.Amount)
             {
                 CoreHelper.ConcurrentControl.Remove(key);

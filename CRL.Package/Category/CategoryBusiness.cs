@@ -13,16 +13,20 @@ using System.Reflection;
 using System.Data;
 namespace CRL.Package.Category
 {
-    /// <summary>
-    /// 分类维护
-    /// </summary>
-    public class CategoryBusiness<TType,TModel> : BaseProvider<TModel> where TType : class
-        where TModel : Category,new()
+    public class CategoryBusiness<TType, TModel> : CategoryBusiness<TModel>
+        where TModel : Category, new()
     {
         public static CategoryBusiness<TType, TModel> Instance
         {
             get { return new CategoryBusiness<TType, TModel>(); }
         }
+    }
+    /// <summary>
+    /// 分类维护
+    /// </summary>
+    public class CategoryBusiness<TModel> : BaseProvider<TModel>
+        where TModel : Category,new()
+    {
 
         public IEnumerable<TModel> GetAllCache(int dataType)
         {

@@ -127,11 +127,7 @@ namespace CRL.MemoryDataCache
         {
             Type type = typeof(TItem);
             query = query.ToLower();
-            string Params = "";
-            foreach (KeyValuePair<string, object> item in helper.Params)
-            {
-                Params += item.Key + ":" + item.Value;
-            }
+            string Params = string.Join(":", helper.Params);
             //按参数进行缓存
             key = StringHelper.EncryptMD5(query + Params);
             //初始缓存

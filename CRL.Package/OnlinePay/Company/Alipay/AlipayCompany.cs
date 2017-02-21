@@ -147,8 +147,17 @@ namespace CRL.Package.OnlinePay.Company.Alipay
                         {
                             #region 支付处理
                             PayHistory order = OnlinePayBusiness.Instance.GetOrder(strOrderNO, ThisCompanyType);
-                            order.SpBillno = trade_no;
-                            Confirm(order, GetType(), Convert.ToDecimal(strPrice));
+                            if (order == null)
+                            {
+                                CoreHelper.EventLog.Log(string.Format("在线支付支付成功，确认时找不到订单{0} 订单号{1}", ThisCompanyType, strOrderNO), true);
+                                //context.Response.Write("fail");
+                                //return "fail";
+                            }
+                            else
+                            {
+                                order.SpBillno = trade_no;
+                                Confirm(order, GetType(), Convert.ToDecimal(strPrice));
+                            }
                             #endregion
                             //context.Response.Write("success");     //返回给支付宝消息，成功，请不要改写这个success
                             return "success";
@@ -158,7 +167,16 @@ namespace CRL.Package.OnlinePay.Company.Alipay
                             #region 退款处理
                             Log("收到退款通知:" + strOrderNO);
                             PayHistory order = OnlinePayBusiness.Instance.GetOrder(strOrderNO, ThisCompanyType);
-                            BaseRefundOrder(order);
+                            if (order == null)
+                            {
+                                CoreHelper.EventLog.Log(string.Format("在线支付支付成功，确认时找不到订单{0} 订单号{1}", ThisCompanyType, strOrderNO), true);
+                                //context.Response.Write("fail");
+                                //return "fail";
+                            }
+                            else
+                            {
+                               BaseRefundOrder(order); 
+                            }                            
                             #endregion
                             //context.Response.Write("success");
                             return "success";
