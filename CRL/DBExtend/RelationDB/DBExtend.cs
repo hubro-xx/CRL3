@@ -351,7 +351,7 @@ namespace CRL.DBExtend.RelationDB
         {
             CheckTableCreated(typeof(T));
         }
-        static ConcurrentDictionary<Type, bool> tableCheckedCache = new ConcurrentDictionary<Type, bool>();
+        static ConcurrentDictionary<string, bool> tableCheckedCache = new ConcurrentDictionary<string, bool>();
         /// <summary>
         /// 检查表是否被创建
         /// </summary>
@@ -366,12 +366,13 @@ namespace CRL.DBExtend.RelationDB
             //    return;
             //}
             bool a1;
-            var a = tableCheckedCache.TryGetValue(type, out a1);
+            var typeKey = type + "|" + DatabaseName;
+            var a = tableCheckedCache.TryGetValue(typeKey, out a1);
             if (a && a1)
             {
                 return;
             }
-            tableCheckedCache.TryAdd(type, false);
+            tableCheckedCache.TryAdd(typeKey, false);
             //TypeCache.SetDBAdapterCache(type, _DBAdapter);
             var dbName = DatabaseName;
             var cacheInstance =CRL.ExistsTableCache.ExistsTableCache.Instance;
@@ -415,13 +416,13 @@ namespace CRL.DBExtend.RelationDB
                 {
                     _DBAdapter.BatchInsert(initDatas, false);
                 }
-                tableCheckedCache[type] = true;
+                tableCheckedCache[typeKey] = true;
                 return;
                 #endregion
             }
             if (tb.ColumnChecked)
             {
-                tableCheckedCache[type] = true;
+                tableCheckedCache[typeKey] = true;
                 return;
             }
             //从本地缓存判断字段是否一致
@@ -450,7 +451,7 @@ namespace CRL.DBExtend.RelationDB
                 ExistsTableCache.ColumnBackgroundCheck.Add(db2, type);
                 tb.ColumnChecked2 = true;
             }
-            tableCheckedCache[type] = true;
+            tableCheckedCache[typeKey] = true;
         }
         #endregion
 

@@ -73,6 +73,10 @@ namespace CRL
         /// </summary>
         public Type ManageType;
         /// <summary>
+        /// 附加的定位数据
+        /// </summary>
+        public object TagData;
+        /// <summary>
         /// 分库指定的数据库
         /// </summary>
         public Sharding.DB.DataBase ShardingDataBase;

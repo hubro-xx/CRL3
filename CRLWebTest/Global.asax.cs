@@ -28,7 +28,7 @@ namespace WebTest
             //配置数据连接
             CRL.SettingConfig.GetDbAccess = (dbLocation) =>
             {
-                
+                var obj = dbLocation.TagData;
                 if (dbLocation.ShardingDataBase != null)//按分库判断
                 {
                     if (dbLocation.ShardingDataBase.Name == "db1")

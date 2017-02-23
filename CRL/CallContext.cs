@@ -9,7 +9,7 @@ namespace CRL
     /// <summary>
     /// 当前调用上下文
     /// </summary>
-    class CallContext
+    public class CallContext
     {
         public static T GetData<T>(string contextName)
         {

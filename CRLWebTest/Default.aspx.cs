@@ -23,7 +23,9 @@ namespace WebTest
         {
             int a = 10;
             int c = Convert.ToInt32("0" + Request["a"]);
-            var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id == a);
+            var manage = Code.ProductDataManage.Instance;
+            manage.SetDbLocationTag(1);
+            var item = manage.QueryItem(b => b.Id == a);
             //Code.TestAll.TestUpdate();
             //return;
             //Update.TestModified();

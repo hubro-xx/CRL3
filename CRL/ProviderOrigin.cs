@@ -111,6 +111,16 @@ namespace CRL
             }
         }
         /// <summary>
+        /// 手动设置数据库定位数据
+        /// 用以在GetDbAccess手动判断
+        /// </summary>
+        /// <param name="obj"></param>
+        public void SetDbLocationTag(object obj)
+        {
+            CallContext.SetData("SetDbLocationTag", obj);
+            dbLocation.TagData = obj;
+        }
+        /// <summary>
         /// 数据访问对象[基本方法]
         /// 按指定的类型
         /// </summary>
