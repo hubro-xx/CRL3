@@ -20,10 +20,28 @@ namespace CRL
         internal static ConcurrentDictionary<Type, Attribute.TableAttribute> typeCache = new ConcurrentDictionary<Type, Attribute.TableAttribute>();
         /// <summary>
         /// 对象类型缓存
+        /// 类型+key
         /// </summary>
-        internal static ConcurrentDictionary<Type, string> ModelKeyCache = new ConcurrentDictionary<Type, string>();
+        static ConcurrentDictionary<string, string> ModelKeyCache = new ConcurrentDictionary<string, string>();
 
-
+        #region modelKey
+        public static bool GetModelKeyCache(Type type, string dataBase, out string key)
+        {
+            var typeKey = string.Format("{0}|{1}", type, dataBase);
+            return ModelKeyCache.TryGetValue(typeKey, out key);
+        }
+        public static void SetModelKeyCache(Type type, string dataBase,  string key)
+        {
+            var typeKey = string.Format("{0}|{1}", type, dataBase);
+            ModelKeyCache[typeKey] = key;
+        }
+        public static void RemoveModelKeyCache(Type type, string dataBase)
+        {
+            var typeKey = string.Format("{0}|{1}", type, dataBase);
+            string val;
+            ModelKeyCache.TryRemove(typeKey, out val);
+        }
+        #endregion
         /// <summary>
         /// 根据类型返回表名
         /// 如果设置了分表,返回分表名

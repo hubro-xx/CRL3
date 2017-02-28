@@ -344,8 +344,12 @@ setTimeout('goUrl()', 3300)</script>";
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public ActionResult _CacheManage(string key = "")
+        public virtual ActionResult _CacheManage(string key = "")
         {
+            if (!Request.Path.ToLower().StartsWith("/sys/"))
+            {
+                return Content("access /sys/_CacheManage");
+            }
             string html = "<h2>缓存管理</h2>";
             html += "<a href='_ModelManage'>对象管理</a>";
             if (!string.IsNullOrEmpty(key))
@@ -372,7 +376,7 @@ setTimeout('goUrl()', 3300)</script>";
                 string part = @"<tr>
                 <td><a href='?key={0}'>更新</a></td>
         <td>{0}</td>
-        <td>{1}</td>
+        <td>{1}[{7}]</td>
         <td>{2}</td>
         <td>{3}</td>
         <td>{4}</td>
@@ -380,7 +384,7 @@ setTimeout('goUrl()', 3300)</script>";
         <td>{6}</td>
 
     </tr>";
-                part = string.Format(part, item.Key, item.DataType,item.RowCount, item.TimeOut, item.UpdateTime, item.TableName, item.Params);
+                part = string.Format(part, item.Key, item.DataType,item.RowCount, item.TimeOut, item.UpdateTime, item.TableName, item.Params,item.DatabaseName);
                 html += part;
             }
 
@@ -395,18 +399,22 @@ setTimeout('goUrl()', 3300)</script>";
         /// 重写以获取结构检查对象程序集
         /// </summary>
         /// <returns></returns>
-        protected virtual Type BusinessTypeForCheck()
+        protected virtual Type CRLModelTypeForCheck()
         {
             return null;
         }
-        public ActionResult _ModelManage(string chkType="")
+        public virtual ActionResult _ModelManage(string chkType="")
         {
-            var currentType = BusinessTypeForCheck();
+            if (!Request.Path.ToLower().StartsWith("/sys/"))
+            {
+                return Content("access /sys/_ModelManage");
+            }
+            var currentType = CRLModelTypeForCheck();
             string html = @"<h2>对象管理</h2>";
             html += "<a href='_CacheManage'>缓存管理</a>";
             if (currentType == null)
             {
-                return Content("请重写BusinessTypeForCheck以获取反射的MODEL");
+                return Content("请重写CRLModelTypeForCheck以获取反射的MODEL");
             }
             var findTypes = CRL.Base.GetAllModel(currentType);
             if (!string.IsNullOrEmpty(chkType))

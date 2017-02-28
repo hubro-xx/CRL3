@@ -19,17 +19,18 @@ namespace TestConsole
         public MainForm()
         {
             InitializeComponent();
-            methods.Add("DapperQueryTest", MappingSpeedTest.DapperQueryTest);
+            methods.Add("DapperQueryTest(SQL)", MappingSpeedTest.DapperQueryTest);
             methods.Add("SugarQueryTest", MappingSpeedTest.SugarQueryTest);
-            methods.Add("LoognQueryTest", MappingSpeedTest.LoognQueryTest);
+            methods.Add("LoognQueryTest(SQL)", MappingSpeedTest.LoognQueryTest);
 
             methods.Add("ChloeQueryTest", MappingSpeedTest.ChloeQueryTest);
             methods.Add("EFLinqQueryTest", MappingSpeedTest.EFLinqQueryTest);
-            methods.Add("EFSqlQueryTest", MappingSpeedTest.EFSqlQueryTest);
+            methods.Add("EFSqlQueryTest(SQL)", MappingSpeedTest.EFSqlQueryTest);
             methods.Add("LinqToDBQueryTest", MappingSpeedTest.LinqToDBQueryTest);
 
            
             methods.Add("CRLQueryTest", MappingSpeedTest.CRLQueryTest);
+            methods.Add("CRLSQLQueryTest(SQL)", MappingSpeedTest.CRLSQLQueryTest);
         }
         private async void MainForm_Load(object sender, EventArgs e)
         {
@@ -131,7 +132,7 @@ namespace TestConsole
         {
             var n = Convert.ToInt32(textBox2.Text);
             //n = 3;
-            MappingSpeedTest.CRLQueryTest(1);
+            //MappingSpeedTest.CRLQueryTest(1);
             var sw = new Stopwatch();
             //int a = 20;
             sw.Start();
@@ -144,6 +145,7 @@ namespace TestConsole
                 query.Where(b => b.Id < id2 && b.Id > id);
 
                 var result = query.Top(1).ToString();
+
             }
             //Code.TestAll.TestMethod();
             sw.Stop();
@@ -166,10 +168,25 @@ namespace TestConsole
                 {
                     var first = db.Queryable<TestEntity>().Where(b => b.Id < id2 && b.Id > id).OrderBy(b => b.Id).Take(1).ToString2();
                 }
+
             }
             //Code.TestAll.TestMethod();
             sw.Stop();
             txtResult.Text = sw.ElapsedMilliseconds.ToString();
+
+        }
+
+        int[] arry = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        int index = 0;
+        private void button4_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    Task.Delay(10);
+                });
+            }
         }
     }
 }

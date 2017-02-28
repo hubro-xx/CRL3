@@ -40,11 +40,11 @@
     %>
     <tr>
         <td class="auto-style5"><%=item.Key %></td>
-        <td class="auto-style2"><%=item.DataType %></td>
+        <td class="auto-style2"><%=item.DataType %> [<%=item.DatabaseName %>]</td>
         <td class="auto-style3"><%=item.TimeOut %></td>
         <td class="auto-style4"><%=item.UpdateTime %></td>
         <td><%=item.RowCount %></td>
-        <td><%=item.TableName %></td>
+        <td><%=item.TableName %> </td>
         <td><%=item.Params %></td>
         <td><a href="?type=update&key=<%=item.Key %>" target="_blank">更新</a></td>
     </tr>

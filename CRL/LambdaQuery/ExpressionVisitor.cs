@@ -137,7 +137,6 @@ namespace CRL.LambdaQuery
             //isBinary = false;
             if (isBinary)
             {
-                //QueryItem(item.Id)被缓存了 todo
                 #region 二元运算缓存
                 CRLExpression.CRLExpression cacheItem;
                 key = string.Format("{0}{1}{2}{3}", __PrefixsAllKey, left, expType, right);

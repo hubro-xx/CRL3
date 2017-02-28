@@ -52,14 +52,14 @@ namespace CRL.MemoryDataCache
             return new List<string>();
         }
 
-        internal static void DeleteCacheItem<TItem>(string typeKey, string[] ids) where TItem : IModel
+        internal static void DeleteCacheItem<TItem>(string typeKey, string[] keys) where TItem : IModel
         {
             if (!cacheDatas.ContainsKey(typeKey))
                 return;
             var data = cacheDatas[typeKey].Data as Dictionary<string, TItem>;
-            foreach (var id in ids)
+            foreach (var key in keys)
             {
-                data.Remove(id);
+                data.Remove(key);
             }
         }
         /// <summary>
@@ -129,7 +129,7 @@ namespace CRL.MemoryDataCache
             query = query.ToLower();
             string Params = string.Join(":", helper.Params);
             //按参数进行缓存
-            key = StringHelper.EncryptMD5(query + Params);
+            key = StringHelper.EncryptMD5(query + Params + "|" + helper.DatabaseName);//按库名
             //初始缓存
             //lock (lockObj)
             //{
@@ -314,7 +314,7 @@ namespace CRL.MemoryDataCache
                 {
                     par += item1.Key + ":" + item1.Value;
                 }
-                result.Add(new QueryItem() { TableName = item.Value.Query, Key = item.Key, Params = par, TimeOut = item.Value.TimeOut, UpdateTime = item.Value.UpdateTime, RowCount = item.Value.Count, DataType = item.Value.Type });
+                result.Add(new QueryItem() { TableName = item.Value.Query, Key = item.Key, Params = par, TimeOut = item.Value.TimeOut, UpdateTime = item.Value.UpdateTime, RowCount = item.Value.Count, DataType = item.Value.Type, DatabaseName = item.Value.DatabaseName });
             }
             return result;
         }

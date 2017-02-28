@@ -93,11 +93,11 @@ namespace CRL
         public void ClearCache()
         {
             Type type = typeof(TModel);
-            if (TypeCache.ModelKeyCache.ContainsKey(type))
+            var key = "";
+            if (TypeCache.GetModelKeyCache(type, DBExtend.dbHelper.DatabaseName, out key))
             {
-                CRL.MemoryDataCache.CacheService.RemoveCache(TypeCache.ModelKeyCache[type]);
-                string val;
-                TypeCache.ModelKeyCache.TryRemove(type,out val);
+                CRL.MemoryDataCache.CacheService.RemoveCache(key);
+                TypeCache.RemoveModelKeyCache(type, DBExtend.dbHelper.DatabaseName);
             }
         }
         /// <summary>
@@ -107,6 +107,18 @@ namespace CRL
         protected virtual LambdaQuery<TModel> CacheQuery()
         {
             return GetLambdaQuery();
+        }
+        int allCacheCount = -1;
+        int AllCacheCount
+        {
+            get
+            {
+                if (allCacheCount == -1)
+                {
+                    allCacheCount = AllCache.Count();
+                }
+                return allCacheCount;
+            }
         }
         /// <summary>
         /// 获取当前对象缓存,不指定条件
@@ -317,8 +329,7 @@ namespace CRL
             #endregion
             var predicate = expression.Compile();
             IEnumerable<TModel> data;
-            int cacheTotal = AllCache.Count();
-            if (CacheQueryAsParallel && cacheTotal > 100000)
+            if (CacheQueryAsParallel && AllCacheCount > 100000)
             {
                 data = AllCache.AsParallel().Where(predicate);
             }
@@ -350,22 +361,24 @@ namespace CRL
             query.__ExpireMinute = expMinute;
             string dataCacheKey;
             var list = new Dictionary<string, TModel>();
-            if (!TypeCache.ModelKeyCache.ContainsKey(type))
+            var a = TypeCache.GetModelKeyCache(type, DBExtend.dbHelper.DatabaseName, out dataCacheKey);
+            if (!a)
             {
                 var db = DBExtend;
                 var list2 = db.QueryOrFromCache<TModel>(query, out dataCacheKey);
                 list = ObjectConvert.ConvertToDictionary<TModel>(list2);
                 lock (lockObj)
                 {
-                    if (!TypeCache.ModelKeyCache.ContainsKey(type))
+                    string key2;
+                    a = TypeCache.GetModelKeyCache(type, DBExtend.dbHelper.DatabaseName, out key2);
+                    if (!a)
                     {
-                        TypeCache.ModelKeyCache.TryAdd(type, dataCacheKey);
+                        TypeCache.SetModelKeyCache(type, DBExtend.dbHelper.DatabaseName, dataCacheKey);
                     }
                 }
             }
             else
             {
-                dataCacheKey = TypeCache.ModelKeyCache[type];
                 list = MemoryDataCache.CacheService.GetCacheItem<TModel>(dataCacheKey);
             }
             return list;

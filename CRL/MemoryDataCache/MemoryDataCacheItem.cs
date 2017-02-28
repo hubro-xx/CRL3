@@ -50,6 +50,16 @@ namespace CRL.MemoryDataCache
         /// </summary>
         public DateTime UseTime = DateTime.Now;
         public DBHelper DBHelper;
+        /// <summary>
+        /// 库名
+        /// </summary>
+        public string DatabaseName
+        {
+            get
+            {
+                return DBHelper.DatabaseName;
+            }
+        }
         public Dictionary<string, object> Params;
         /// <summary>
         /// 查询次数

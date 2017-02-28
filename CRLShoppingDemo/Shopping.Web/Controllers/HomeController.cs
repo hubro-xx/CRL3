@@ -18,7 +18,7 @@ namespace Shopping.Web.Controllers
     [Core.Mvc.MenuAuthor]
     public class HomeController : Core.Mvc.BaseController
     {
-        protected override Type BusinessTypeForCheck()
+        protected override Type CRLModelTypeForCheck()
         {
             return typeof(BLL.CartManage);
         }
