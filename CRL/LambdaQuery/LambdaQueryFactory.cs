@@ -17,11 +17,11 @@ namespace CRL.LambdaQuery
     {
         public static LambdaQuery<T> CreateLambdaQuery<T>(DbContext _dbContext) where T : IModel, new()
         {
-            if (_dbContext.DBHelper.CurrentDBType == CoreHelper.DBType.MongoDB)
+            if (_dbContext.DBHelper.CurrentDBType != CoreHelper.DBType.MongoDB)
             {
-                return new MongoDBLambdaQuery<T>(_dbContext);
+                return new RelationLambdaQuery<T>(_dbContext);
             }
-            return new RelationLambdaQuery<T>(_dbContext);
+            return new MongoDBLambdaQuery<T>(_dbContext);
         }
     }
 }

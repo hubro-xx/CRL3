@@ -425,7 +425,7 @@ namespace CRL.LambdaQuery
                     var methodCall = methodCache.CRLExpression.Data as CRLExpression.MethodCallObj;
                     if (methodCall.Args.Count > 0)
                     {
-                        for (int i = 0; i < allArguments.Count; i++)
+                        for (int i = argsIndex; i < allArguments.Count; i++)
                         {
                             bool isConstant1;
                             var obj = GetParameExpressionValue(allArguments[i], out isConstant1);
@@ -482,7 +482,7 @@ namespace CRL.LambdaQuery
                         var obj = GetParameExpressionValue(allArguments[i], out isConstant2);
                         if (!isConstant2)
                         {
-                            allConstant = true;
+                            allConstant = false;
                         }
                         arguments.Add(obj);
                     }

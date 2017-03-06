@@ -21,11 +21,11 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-            int a = 10;
-            int c = Convert.ToInt32("0" + Request["a"]);
+            var name = Request["name"];
             var manage = Code.ProductDataManage.Instance;
-            manage.SetDbLocationTag(1);
-            var item = manage.QueryItem(b => b.Id == a);
+            var query = manage.GetLambdaQuery();
+            query.Where(b => b.CategoryName.Like(name));
+            Response.Write(query.PrintQuery());
             //Code.TestAll.TestUpdate();
             //return;
             //Update.TestModified();

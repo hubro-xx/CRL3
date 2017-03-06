@@ -143,11 +143,11 @@ namespace CRL
                 }
                 return obj;
             }
-            //set
-            //{
-            //    Datas = Datas ?? new Dictionary<string, object>();
-            //    Datas[key.ToLower()] = value;
-            //}
+            set
+            {
+                Datas = Datas ?? new Dictionary<string, object>();
+                Datas[key.ToLower()] = value;
+            }
         }
         /// <summary>
         /// 设置索引值
