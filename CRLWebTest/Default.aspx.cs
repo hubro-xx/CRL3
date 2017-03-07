@@ -23,8 +23,9 @@ namespace WebTest
         {
             var name = Request["name"];
             var manage = Code.ProductDataManage.Instance;
+            Code.ProductData data = null;
             var query = manage.GetLambdaQuery();
-            query.Where(b => b.CategoryName.Like(name));
+            //query.Where(b => b.Number>data.Id);
             Response.Write(query.PrintQuery());
             //Code.TestAll.TestUpdate();
             //return;

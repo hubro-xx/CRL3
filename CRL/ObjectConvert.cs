@@ -231,6 +231,7 @@ namespace CRL
         #region 返回指定类型
 
         internal static Dictionary<string, Dictionary<string, int>> columnCache = new Dictionary<string, Dictionary<string, int>>();
+        internal static Dictionary<string, Dictionary<string, int>> queryColumnCache = new Dictionary<string, Dictionary<string, int>>();
         /// <summary>
         /// 返回指定类型,支持强类型和匿名类型
         /// </summary>
@@ -240,15 +241,17 @@ namespace CRL
         /// <returns></returns>
         internal static List<T> DataReaderToSpecifiedList<T>(DbDataReader reader, QueryInfo<T> queryInfo)
         {
-            var objCreater = queryInfo.ObjCreater;
+      
             var mapping = queryInfo.Mapping;
             var list = new List<T>();
             string columnCacheKey = queryInfo.selectKey;
             var leftColumns = new Dictionary<string, int>();
+            var dicColumns = new Dictionary<string, int>();
             var a = columnCache.TryGetValue(columnCacheKey, out leftColumns);
             if (!a)
             {
                 leftColumns = new Dictionary<string, int>();
+                dicColumns= new Dictionary<string, int>();
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     var name = reader.GetName(i).ToLower();
@@ -257,9 +260,14 @@ namespace CRL
                     {
                         leftColumns.Add(name, i);
                     }
+                    dicColumns.Add(name, i);
                 }
                 columnCache[columnCacheKey] = leftColumns;
+                queryColumnCache[columnCacheKey] = dicColumns;
             }
+            dicColumns = queryColumnCache[columnCacheKey];
+            queryInfo.CreateObjCreater(dicColumns);
+            var objCreater = queryInfo.GetObjCreater();
             int leftColumnCount = leftColumns.Count;
             var type = typeof(T);
             while (reader.Read())

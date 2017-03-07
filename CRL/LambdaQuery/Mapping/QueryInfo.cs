@@ -13,12 +13,18 @@ namespace CRL.LambdaQuery.Mapping
     {
         static System.Collections.Concurrent.ConcurrentDictionary<string, Delegate> DelegateCache = new System.Collections.Concurrent.ConcurrentDictionary<string, Delegate>();
         public string selectKey;
+        ConstructorInfo Constructor;
         public QueryInfo(bool anonymousClass, string _selectKey, IEnumerable<Attribute.FieldMapping> mapping = null, ConstructorInfo constructor = null)
         {
+            Constructor = constructor;
             selectKey = typeof(TSource) + _selectKey;
             mapping = mapping ?? new List<Attribute.FieldMapping>();
             Mapping = mapping;
             AnonymousClass = anonymousClass;
+            
+        }
+        public void CreateObjCreater(Dictionary<string, int> queryFields)
+        {
             #region 按EMIT创建
             //var key = typeof(TSource).ToString() + string.Join("-", mapping.Select(b => b.MappingName));
             Delegate dg;
@@ -31,13 +37,13 @@ namespace CRL.LambdaQuery.Mapping
             }
             else
             {
-                if (anonymousClass)
+                if (AnonymousClass)
                 {
-                    ObjCreater = CreateObjectGenerator<TSource>(constructor);
+                    ObjCreater = CreateObjectGenerator<TSource>(Constructor);
                 }
                 else
                 {
-                    ObjCreater = CreateObjectGeneratorEmit<TSource>(mapping);
+                    ObjCreater = CreateObjectGeneratorEmit<TSource>(Mapping, queryFields);
                 }
                 DelegateCache.TryAdd(selectKey, ObjCreater);
             }
@@ -45,8 +51,12 @@ namespace CRL.LambdaQuery.Mapping
         }
         public bool AnonymousClass;
         public IEnumerable<Attribute.FieldMapping> Mapping;
-        public Func<DataContainer, TSource> ObjCreater;
+        Func<DataContainer, TSource> ObjCreater;
 
+        public Func<DataContainer, TSource> GetObjCreater()
+        {
+            return ObjCreater;
+        }
       
         /// <summary>
         /// 使用lambda匿名对象创建
@@ -116,7 +126,7 @@ namespace CRL.LambdaQuery.Mapping
         /// <typeparam name="T"></typeparam>
         /// <param name="mapping"></param>
         /// <returns></returns>
-        public static Func<DataContainer, T> CreateObjectGeneratorEmit<T>(IEnumerable<Attribute.FieldMapping> mapping)
+        public static Func<DataContainer, T> CreateObjectGeneratorEmit<T>(IEnumerable<Attribute.FieldMapping> mapping, Dictionary<string, int> queryFields)
         {
             var type = typeof(T);
             var fields = TypeCache.GetProperties(type, true);
@@ -126,13 +136,15 @@ namespace CRL.LambdaQuery.Mapping
             LocalBuilder result = generator.DeclareLocal(type);
             generator.Emit(OpCodes.Newobj, type.GetConstructor(Type.EmptyTypes));
             generator.Emit(OpCodes.Stloc, result);
-            int i = 0;
+            //int i = 0;
+            //mapping顺序和语句查询不一致
             foreach (var mp in mapping)
             {
                 if (!fields.ContainsKey(mp.MappingName))
                 {
                     continue;
                 }
+                var i = queryFields[mp.QueryName.ToLower()];
                 var pro = fields[mp.MappingName].GetPropertyInfo();
                 var endIfLabel = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldloc, result);
@@ -142,7 +154,7 @@ namespace CRL.LambdaQuery.Mapping
                 generator.Emit(OpCodes.Call, method2);
                 generator.Emit(OpCodes.Callvirt, pro.GetSetMethod());
                 generator.MarkLabel(endIfLabel);
-                i += 1;
+                //i += 1;
             }
             generator.Emit(OpCodes.Ldloc, result);
             generator.Emit(OpCodes.Ret);
