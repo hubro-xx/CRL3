@@ -72,9 +72,10 @@ namespace CRL.LambdaQuery.Mapping
             int i = 0;
             foreach (var parameter in parameters)
             {
-                var method = DataContainer.GetMethod(parameter.ParameterType);
-                var getValue = parame.Call(method.Name, Expression.Constant(i));
-                //var getValue = Expression.Call(method, parame, Expression.Constant(i));
+                var method = DataContainer.GetMethod(parameter.ParameterType,true);
+                //var getValue = parame.Call(method.Name, Expression.Constant(i));
+                var getValue = Expression.Call(parame, method, Expression.Constant(i));
+                //var getValue = Expression.Call(method, parame, Expression.Constant(i));//静态方法
                 arguments.Add(getValue);
                 i += 1;
             }
@@ -104,7 +105,7 @@ namespace CRL.LambdaQuery.Mapping
                     continue;
                 }
                 var m = fields[mp.MappingName].GetPropertyInfo();
-                var method = DataContainer.GetMethod(m.PropertyType);
+                var method = DataContainer.GetMethod(m.PropertyType, true);
                 //Expression getValue = Expression.Call(method, parame);
                 var getValue = parame.Call(method.Name, Expression.Constant(i));
                 if (m.PropertyType.IsEnum)
@@ -141,6 +142,10 @@ namespace CRL.LambdaQuery.Mapping
             foreach (var mp in mapping)
             {
                 if (!fields.ContainsKey(mp.MappingName))
+                {
+                    continue;
+                }
+                if (!queryFields.ContainsKey(mp.QueryName.ToLower()))
                 {
                     continue;
                 }

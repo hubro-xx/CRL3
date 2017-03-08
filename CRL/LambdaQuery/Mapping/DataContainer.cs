@@ -237,6 +237,24 @@ namespace CRL.LambdaQuery.Mapping
             }
         }
         #region method
+        public TEnum GetEnum<TEnum>(int index) where TEnum : struct
+        {
+            if (reader.IsDBNull(index))
+            {
+                return default(TEnum);
+            }
+            return (TEnum)Enum.ToObject(typeof(TEnum), index);
+        }
+        public TEnum? GetEnumNullable<TEnum>(int index) where TEnum : struct
+        {
+            if (reader.IsDBNull(index))
+            {
+                return default(TEnum);
+            }
+            int value = reader.GetInt32(index);
+            return (TEnum)Enum.ToObject(typeof(TEnum), value);
+        }
+
         public short GetInt16(int index)
         {
             if (reader.IsDBNull(index))
@@ -431,13 +449,15 @@ namespace CRL.LambdaQuery.Mapping
         }
         #endregion
         static Dictionary<Type, MethodInfo> methods = new Dictionary<Type, MethodInfo>();
-        public static MethodInfo GetMethod(Type propType)
+        public static MethodInfo GetMethod(Type propType, bool anonymousClass = false)
         {
-            if (propType.IsEnum)
+            var  unType = Nullable.GetUnderlyingType(propType);
+            var isNullable = unType != null;
+            MethodInfo result;
+            if (propType.IsEnum && !anonymousClass)//按是按lanbda表达式便建对象赋值时,需返回强类型方法
             {
                 propType = propType.GetEnumUnderlyingType();
             }
-            MethodInfo result;
             var Type2 = typeof(DataContainer);
             if (methods.Count == 0)
             {
@@ -455,6 +475,18 @@ namespace CRL.LambdaQuery.Mapping
                     methods.Add(item.ReturnType, item);
                 }
             }
+            if (propType.IsEnum && anonymousClass)
+            {
+                //按是按lanbda表达式便建对象赋值时,需返回强类型方法
+                var m1 = Type2.GetMethod("GetEnum");
+                var m2 = Type2.GetMethod("GetEnumNullable");
+                if (isNullable)
+                {
+                    return m2.MakeGenericMethod(unType);
+                }
+                return m1.MakeGenericMethod(propType);
+            }
+
             var a = methods.TryGetValue(propType, out result);
             if (a)
             {

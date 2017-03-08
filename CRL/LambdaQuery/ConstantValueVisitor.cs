@@ -71,11 +71,12 @@ namespace CRL.LambdaQuery
                     instance = GetMemberExpressionValue(mExp.Expression, out isConstant);
                     //字段属属性都按变量
                     isConstant = false;
+                    if (instance == null)
+                    {
+                        throw new ArgumentNullException(exp.ToString());
+                    }
                 }
-                if (instance == null)
-                {
-                    throw new ArgumentNullException(exp.ToString());
-                }
+
                 if (mExp.Member.MemberType == MemberTypes.Field)
                 {
                     return ((FieldInfo)mExp.Member).GetValue(instance);
