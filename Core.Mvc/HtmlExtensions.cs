@@ -58,7 +58,7 @@ namespace Core.Mvc
         /// <param name="nullOption"></param>
         /// <param name="htmlAttributes"></param>
         /// <returns></returns>
-        public static MvcHtmlString DropDownListEx(this HtmlHelper html, string name, List<SelectListItem> items, bool nullOption = true, object htmlAttributes = null)
+        public static MvcHtmlString DropDownListEx(this HtmlHelper html, string name, IEnumerable<SelectListItem> items, bool nullOption = true, object htmlAttributes = null)
         {
             return Core.Mvc.ControllHelper.DropDownList(name, items, nullOption, htmlAttributes);
         }

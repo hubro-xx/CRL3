@@ -26,7 +26,7 @@ namespace WebTest
             Code.ProductData data = null;
             var time = DateTime.Now;
             var query = manage.GetLambdaQuery();
-            query.Where(b => b.Number>time.Second);
+            query.Where(b => b.Number > time.Second);
             //var result = query.SelectV(b => new { b.TransType, b.UserId }).ToList();
             var result = query.ToList();
             Response.Write(query.PrintQuery());

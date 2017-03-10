@@ -895,7 +895,7 @@ namespace CRL
             }
              * */
             #endregion
-            if (c.Count() > 0)
+            if (c.Count() > 0 && obj.OriginClone != null)//只有克隆过的才进行检查
             {
                 CheckData(obj);
             }

@@ -105,7 +105,7 @@ namespace Core.Mvc
         /// <param name="nullOption"></param>
         /// <param name="htmlAttributes"></param>
         /// <returns></returns>
-        public static MvcHtmlString DropDownList(string name, List<SelectListItem> items, bool nullOption = true, object htmlAttributes = null)
+        public static MvcHtmlString DropDownList(string name, IEnumerable<SelectListItem> items, bool nullOption = true, object htmlAttributes = null)
         {
             var html = string.Format("<select id='{0}' name='{0}' ", name);
             if (htmlAttributes != null)

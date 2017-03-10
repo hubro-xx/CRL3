@@ -90,7 +90,7 @@ namespace CRL.LambdaQuery.Mapping
         /// <typeparam name="T"></typeparam>
         /// <param name="mapping"></param>
         /// <returns></returns>
-        public static Func<DataContainer, T> CreateObjectGeneratorLambda<T>(IEnumerable<Attribute.FieldMapping> mapping)
+        static Func<DataContainer, T> CreateObjectGeneratorLambda<T>(IEnumerable<Attribute.FieldMapping> mapping)
         {
             var objectType = typeof(T);
             var fields = TypeCache.GetProperties(objectType, true);

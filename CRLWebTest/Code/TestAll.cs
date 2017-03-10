@@ -22,7 +22,7 @@ namespace WebTest.Code
             query.Take(3);
             //query.Where(b => DateTime.Parse("2016-02-11 12:56") == b.AddTime);
             //query.Where(b => b.CategoryName != null);
-            query.Where(b => b.AddTime == time);
+            //query.Where(b => b.AddTime == time);
             var times = "2016-02-11 12:56";
             //query.Where(b => int.Parse(b.InterFaceUser) == 123);//支持Cast转换
             var result = query.SelectV(b => new
@@ -32,7 +32,7 @@ namespace WebTest.Code
                 b.ProductName,
                 id1 = Convert.ToString(b.Id),
                 id2 = b.Id.ToString(),
-                name2 = b.CategoryName.Substring(0, 2),
+                name2 = b.ProductName.Substring(0, 2),
                 time = time,
                 aa = DateTime.Parse("2016-02-11 12:56"),
                 aa2 = Convert.ToDateTime(times)
