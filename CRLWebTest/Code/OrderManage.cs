@@ -70,7 +70,9 @@ namespace WebTest.Code
                 var product = new ProductData();
                 product.BarCode = "code" + DateTime.Now.Millisecond;
                 product.Number = 10;
-                ProductDataManage.Instance.Add(product);
+                var list = new List<ProductData>();
+                list.Add(product);
+                ProductDataManage.Instance.Add(list);
                 return false; //会回滚
             }, out error);
         }

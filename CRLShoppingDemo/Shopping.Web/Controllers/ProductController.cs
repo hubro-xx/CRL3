@@ -21,7 +21,8 @@ namespace Shopping.Web.Controllers
             int count;
 
             count = 0;
-            var query = new CRL.ExpressionJoin<Product>(b => b.ProductStatus == CRL.Package.Product.ProductStatus.已上架);
+            //使用缓存搜索
+            var query = new CRL.ExpressionJoin<Product>(BLL.ProductManage.Instance.AllCache, b => b.ProductStatus == CRL.Package.Product.ProductStatus.已上架);
             if (!string.IsNullOrEmpty(k))
             {
                 query.And(b => b.ProductName.Contains(k));
@@ -30,9 +31,8 @@ namespace Shopping.Web.Controllers
             {
                 query.And(b => b.CategoryCode.StartsWith(c));
             }
-            //使用缓存搜索
-            IEnumerable<Product> products = BLL.ProductManage.Instance.QueryFromCache(query.GetExpression());
-            products = products.OrderByDescending(b => b.Id);
+
+            var products = query.ToList().OrderByDescending(b => b.Id);
             count = products.Count();
             var result = products.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             var pageObj = new PageObj<Product>(result, page, count, pageSize);

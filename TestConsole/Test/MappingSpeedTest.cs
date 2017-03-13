@@ -53,6 +53,14 @@ namespace TestConsole
                 query.Where(b => b.Id < id2 && b.Id > id);
             }
             var result = query.Top(takeCount).ToList();
+
+        }
+        public static void CRLSQLQueryTest(int takeCount)
+        {
+            var instance = CRLManage.Instance;
+
+            string sql = string.Format("select top {0} * from TestEntity" + (takeCount == 1 ? " where id<" + id2 + " and id>" + id : ""), takeCount.ToString());
+            instance.Test(sql);
         }
 
         public static void SugarQueryTest(int takeCount)

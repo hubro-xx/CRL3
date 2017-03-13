@@ -168,11 +168,12 @@ namespace CRL
         /// 创建表
         /// 会检查表是否存在,如果存在则检查字段
         /// 创建失败则抛出异常
+        /// 表存在返回失败
         /// </summary>
         /// <param name="db"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal static void CreateTable(Type type, AbsDBExtend db, out string message)
+        internal static bool CreateTable(Type type, AbsDBExtend db, out string message)
         {
             var dbAdapter = db._DBAdapter;
             message = "";
@@ -184,6 +185,7 @@ namespace CRL
             {
                 //检查表是否存在
                 db.Execute(sql);
+                return false;
             }
             catch
             {
@@ -213,7 +215,7 @@ namespace CRL
             {
                 message = CheckColumnExists(type, db);
             }
-            //return false;
+            return true;
         }
 
         #endregion

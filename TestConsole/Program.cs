@@ -1,63 +1,46 @@
-﻿using System;
+﻿using CRL.LambdaQuery.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace TestConsole
 {
     class Program
     {
-        static void Main(string[] args)
+         [STAThread]
+        static void Main()
         {
-            var list = new List<Test2>();
-            for (int i = 0; i < 100; i++)
-            {
-                list.Add(new Test2() { Name = "234234" });
-            }
-            var sw = new Stopwatch();
-            sw.Start();
-            foreach (var item in list)
-            {
-                var name = item.Name;
-            }
-            sw.Stop();
-            Console.WriteLine(sw.ElapsedMilliseconds);
+            //var fuc = CRL.Base.CreateObjectTest<Test2>();
+            //var data = new object[] { "333",1};
+            //var dataContainer = new DataContainer(data);
+            //var obj2 = fuc(dataContainer);
 
-            sw.Start();
-            int count = list.Count;
-            for (int i = 0; i < count; i++)
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            CRL.SettingConfig.GetDbAccess = (dbLocation) =>
             {
-                //var item = list[i];
-                //var name = item.Name;
-            }
-            sw.Stop();
-            Console.WriteLine(sw.ElapsedMilliseconds);
-            var propType=typeof(type2);
-            var aa= propType.GetEnumUnderlyingType();
-            Console.ReadLine();
+                return new CoreHelper.SqlHelper(TestConsole.DbHelper.ConnectionString);
+            };
+            Application.Run(new MainForm());
         }
-        public enum type2
+ 
+    }
+    public class Test2 : CRL.IModel
+    {
+        public string Name
         {
-            wss,
-            sss,
+            get;
+            set;
         }
-        public class Test2
+        public string Id
         {
-            public string Name;
-            public string Name2
-            {
-                get;
-                set;
-            }
-            public string Name3
-            {
-                get
-                {
-                    return "Name3";
-                }
-            } 
+            get;
+            set;
         }
+        public int? F_Int32 { get; set; }
     }
 }

@@ -409,10 +409,10 @@ namespace CRL.DBExtend.RelationDB
                     }
                 }
                 string msg;
-                ModelCheck.CreateTable(type, db, out msg);
+                var created = ModelCheck.CreateTable(type, db, out msg);
        
                 cacheInstance.SaveTable(dbName, table, tableName);
-                if (initDatas != null)
+                if (created && initDatas != null)
                 {
                     _DBAdapter.BatchInsert(initDatas, false);
                 }

@@ -99,6 +99,11 @@ namespace CRL
         {
             get
             {
+                 var _BeginTransContext = CallContext.GetData<bool>("_BeginTransContext");
+                 if (_BeginTransContext)//对于数据库事务,只创建一个上下文
+                 {
+                     return GetDBExtend(true);
+                 }
                 if (_dBExtend == null)
                 {
                     _dBExtend = GetDBExtend();
