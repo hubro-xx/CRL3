@@ -10,6 +10,7 @@
      
     <asp:Button ID="Button3" runat="server" Text="使用封装事务(TransactionScope)" OnClick="Button3_Click" />
     <asp:Button ID="Button4" runat="server" OnClick="Button4_Click" Text="使用封装事务(DbTransaction)" />
+    <asp:Button ID="Button5" runat="server" OnClick="Button5_Click" Text="使用嵌套封装事务(DbTransaction)" />
     <pre>
     var helper = dbHelper;
     //简化了事务写法,自动提交回滚

@@ -640,6 +640,7 @@ namespace CRL
         /// <summary>
         /// 使用DbTransaction封装事务,不能跨库
         /// 请将数据访问对象写在方法体内
+        /// 可嵌套调用
         /// </summary>
         /// <param name="method"></param>
         /// <param name="error"></param>
@@ -647,29 +648,46 @@ namespace CRL
         public bool PackageTrans2(TransMethod method, out string error)
         {
             error = "";
-            CallContext.SetData("_BeginTransContext", true);
+            var transBegined = CallContext.GetData<bool>("_BeginTransContext");//事务已开启,内部事务不用处理
+            if (!transBegined)
+            {
+                CallContext.SetData("_BeginTransContext", true);
+            }
             var db = GetDBExtend(true);
-            db.BeginTran();
+            if (!transBegined)
+            {
+                db.BeginTran();
+            }
+            bool result;
             try
             {
-                var a = method(out error);
-                if (!a)
+                result = method(out error);
+                if (!transBegined)
                 {
-                    db.RollbackTran();
-                    CallContext.SetData("_BeginTransContext", false);
-                    return false;
+                    if (!result)
+                    {
+                        db.RollbackTran();
+                        CallContext.SetData("_BeginTransContext", false);
+                        return false;
+                    }
+                    db.CommitTran();
                 }
-                db.CommitTran();
             }
             catch (Exception ero)
             {
                 error = "提交事务时发生错误:" + ero.Message;
-                db.RollbackTran();
-                CallContext.SetData("_BeginTransContext", false);
+                if (!transBegined)
+                {
+                    db.RollbackTran();
+                    CallContext.SetData("_BeginTransContext", false);
+                }
                 return false;
             }
-            CallContext.SetData("_BeginTransContext", false);
-            return true;
+            if (!transBegined)
+            {
+                CallContext.SetData("_BeginTransContext", false);
+            }
+            return result;
         }
         /// <summary>
         /// 使用TransactionScope封装事务[基本方法]

@@ -76,6 +76,21 @@ namespace WebTest.Code
                 return false; //会回滚
             }, out error);
         }
+        public bool TransactionTest3(out string error)
+        {
+
+            //简化了事务写法,自动提交回滚
+            return PackageTrans2((out string ex) =>
+            {
+                ex = "";
+                var product = new ProductData();
+                product.BarCode = "code" + DateTime.Now.Millisecond;
+                product.Number = 10;
+                ProductDataManage.Instance.Add(product);
+                var a = TransactionTest2(out ex);//嵌套事务
+                return a; //会回滚
+            }, out error);
+        }
         public bool TransactionTest(out string error)
         {
             //简化了事务写法,自动提交回滚

@@ -310,3 +310,6 @@
 	修改一个解析缓存错误
 	修改语句查询,字段映射顺序问题
 	增加解析null判断
+2017-03-13
+	SqlBulkCopy支持事务了,修改数据库事务PackageTrans2没有正确回滚
+	DbTransaction事务可以嵌套调用了
