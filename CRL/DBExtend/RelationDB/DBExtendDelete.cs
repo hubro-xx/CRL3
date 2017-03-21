@@ -28,7 +28,7 @@ namespace CRL.DBExtend.RelationDB
             string table = TypeCache.GetTableName(typeof(TModel),dbContext);
             string sql = _DBAdapter.GetDeleteSql(table, where);
             sql = _DBAdapter.SqlFormat(sql);
-            int n = dbHelper.Execute(sql);
+            int n = __DbHelper.Execute(sql);
             ClearParame();
             return n;
         }

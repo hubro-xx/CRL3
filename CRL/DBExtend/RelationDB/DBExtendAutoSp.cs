@@ -62,7 +62,7 @@ namespace CRL.DBExtend.RelationDB
             sp = "ZautoSp_" + sp.Substring(8, 16);
             if (!spCahe.ContainsKey(sp))
             {
-                sql = dbHelper.FormatWithNolock(sql);
+                sql = __DbHelper.FormatWithNolock(sql);
                 var db = GetBackgroundDBExtend();
                 string spScript = Base.SqlToProcedure(template, dbContext, sql, sp, parames);
                 try

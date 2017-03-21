@@ -98,12 +98,12 @@ namespace CRL.DBExtend.RelationDB
             //string sql = string.Format("{0} with(nolock) where {1}", tableName, where);
             string sp = CompileSqlToSp(_DBAdapter.TemplatePage, condition, dic);
             CallBackDataReader reader;
-            reader = new CallBackDataReader(dbHelper.RunDataReader(sp), () =>
+            reader = new CallBackDataReader(__DbHelper.RunDataReader(sp), () =>
             {
                 return GetOutParam<int>("count");
             });
             ClearParame();
-            query1.ExecuteTime += dbHelper.ExecuteTime;
+            query1.ExecuteTime += __DbHelper.ExecuteTime;
             return reader;
         }
         /// <summary>
@@ -142,8 +142,8 @@ namespace CRL.DBExtend.RelationDB
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             string countSql = string.Format("select count(*) from {0}", condition);
-            int count = Convert.ToInt32(dbHelper.ExecScalar(countSql));
-            query1.ExecuteTime += dbHelper.ExecuteTime;
+            int count = Convert.ToInt32(__DbHelper.ExecScalar(countSql));
+            query1.ExecuteTime += __DbHelper.ExecuteTime;
             query1.RowCount = count;
             //if (count == 0)
             //{
@@ -156,11 +156,11 @@ namespace CRL.DBExtend.RelationDB
             var start = pageSize * (pageIndex - 1) + 1;
             var end = start + pageSize - 1;
             string sql = _DBAdapter.PageSqlFormat(fields, rowOver, condition, start, end, orderBy);
-            var reader = new CallBackDataReader(dbHelper.ExecDataReader(sql), () =>
+            var reader = new CallBackDataReader(__DbHelper.ExecDataReader(sql), () =>
             {
                 return count;
             });
-            query1.ExecuteTime += dbHelper.ExecuteTime;
+            query1.ExecuteTime += __DbHelper.ExecuteTime;
             ClearParame();
             return reader;
         }
@@ -199,7 +199,7 @@ namespace CRL.DBExtend.RelationDB
             pageSize = pageSize == 0 ? 15 : pageSize;
             AddParam("pageIndex", pageIndex);
             AddParam("pageSize", pageSize);
-            dbHelper.AddOutParam("count", -1);
+            __DbHelper.AddOutParam("count", -1);
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic.Add("fields", fields);
             dic.Add("rowOver", rowOver);
@@ -207,11 +207,11 @@ namespace CRL.DBExtend.RelationDB
             //dic.Add("sort", sort1);
             string sp = CompileSqlToSp(_DBAdapter.TemplateGroupPage, conditions, dic);
             CallBackDataReader reader;
-            reader = new CallBackDataReader(dbHelper.RunDataReader(sp), () =>
+            reader = new CallBackDataReader(__DbHelper.RunDataReader(sp), () =>
             {
                 return GetOutParam<int>("count");
             });
-            query1.ExecuteTime += dbHelper.ExecuteTime;
+            query1.ExecuteTime += __DbHelper.ExecuteTime;
             ClearParame();
             return reader;
         }
@@ -252,8 +252,8 @@ namespace CRL.DBExtend.RelationDB
             pageSize = pageSize == 0 ? 15 : pageSize;
 
             string countSql = string.Format("select count(*)  from (select count(*) as a from {0}) t", condition);
-            int count = Convert.ToInt32(dbHelper.ExecScalar(countSql));
-            query1.ExecuteTime += dbHelper.ExecuteTime;
+            int count = Convert.ToInt32(__DbHelper.ExecScalar(countSql));
+            query1.ExecuteTime += __DbHelper.ExecuteTime;
             query1.RowCount = count;
             //if (count == 0)
             //{
@@ -268,11 +268,11 @@ namespace CRL.DBExtend.RelationDB
             string sql = _DBAdapter.PageSqlFormat(fields, rowOver, condition, start, end, "");
             //System.Data.Common.DbDataReader reader;
             //reader = dbHelper.ExecDataReader(sql);
-            var reader = new CallBackDataReader(dbHelper.ExecDataReader(sql), () =>
+            var reader = new CallBackDataReader(__DbHelper.ExecDataReader(sql), () =>
             {
                 return count;
             });
-            query1.ExecuteTime += dbHelper.ExecuteTime;
+            query1.ExecuteTime += __DbHelper.ExecuteTime;
             ClearParame();
             return reader;
         }

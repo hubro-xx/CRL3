@@ -315,3 +315,4 @@
 	DbTransaction事务可以嵌套调用了
 2017-03-20
 	增加CRLDbConnectionScope,使多次访问只用打开一次数据连接
+	DbTransaction事务修改为基于此控制

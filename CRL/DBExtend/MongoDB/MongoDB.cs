@@ -33,9 +33,9 @@ namespace CRL.DBExtend.MongoDB
             get {
                 if (_mongoDatabase == null)
                 {
-                    var connectionString = dbHelper.ConnectionString;
+                    var connectionString = __DbHelper.ConnectionString;
                     var _client = new MongoClient(connectionString);
-                    _mongoDatabase = _client.GetDatabase(dbHelper.DatabaseName);
+                    _mongoDatabase = _client.GetDatabase(__DbHelper.DatabaseName);
                 }
                 return _mongoDatabase; }
             set { _mongoDatabase = value; }

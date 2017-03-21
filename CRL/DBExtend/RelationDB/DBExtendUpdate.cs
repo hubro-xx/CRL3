@@ -108,7 +108,7 @@ namespace CRL.DBExtend.RelationDB
             string setString = ForamtSetValue<TModel>(setValue);
             string sql = _DBAdapter.GetUpdateSql(table, setString, where);
             sql = _DBAdapter.SqlFormat(sql);
-            int n = dbHelper.Execute(sql);
+            int n = __DbHelper.Execute(sql);
             ClearParame();
             return n;
         }

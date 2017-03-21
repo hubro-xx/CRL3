@@ -53,21 +53,21 @@ namespace CRL.DBExtend.RelationDB
             {
                 if (!compileSp)
                 {
-                    reader = dbHelper.ExecDataReader(sql);
+                    reader = __DbHelper.ExecDataReader(sql);
                 }
                 else//生成储过程
                 {
                     string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-                    reader = dbHelper.RunDataReader(sp);
+                    reader = __DbHelper.RunDataReader(sp);
                 }
-                query.ExecuteTime += dbHelper.ExecuteTime;
+                query.ExecuteTime += __DbHelper.ExecuteTime;
                 var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetQueryFieldString(), query.GetFieldMapping());
                 list = ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
                 query.MapingTime += runTime;
             }
             else
             {
-                list = MemoryDataCache.CacheService.GetCacheList<TModel>(sql, query.GetFieldMapping(), cacheTime, dbHelper, out cacheKey).Values.ToList();
+                list = MemoryDataCache.CacheService.GetCacheList<TModel>(sql, query.GetFieldMapping(), cacheTime, __DbHelper, out cacheKey).Values.ToList();
             }
             ClearParame();
             query.RowCount = list.Count;

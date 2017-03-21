@@ -73,7 +73,7 @@ namespace CRL
             return DBExtendFactory.CreateDBExtend(dbContext2);
         }
 
-        internal CoreHelper.DBHelper dbHelper;
+        internal CoreHelper.DBHelper __DbHelper;
         /// <summary>
         /// 库名
         /// </summary>
@@ -81,7 +81,7 @@ namespace CRL
         {
             get
             {
-                return CoreHelper.StringHelper.EncryptMD5(dbHelper.ConnectionString);
+                return CoreHelper.StringHelper.EncryptMD5(__DbHelper.ConnectionString);
             }
         }
         DBAdapter.DBAdapterBase __DBAdapter;
@@ -263,7 +263,7 @@ namespace CRL
                 throw new CRLException("数据访问对象未实例化,请实现CRL.SettingConfig.GetDbAccess");
             }
             GUID = Guid.NewGuid();
-            dbHelper = _helper;
+            __DbHelper = _helper;
         }
         #region 参数
         /// <summary>

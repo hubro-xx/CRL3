@@ -38,7 +38,7 @@ namespace CRL.DBExtend.RelationDB
         /// </summary>
         public override void ClearParame()
         {
-            dbHelper.ClearParams();
+            __DbHelper.ClearParams();
         }
         /// <summary>
         /// 增加参数
@@ -48,7 +48,7 @@ namespace CRL.DBExtend.RelationDB
         public override void AddParam(string name, object value)
         {
             value = ObjectConvert.CheckNullValue(value);
-            dbHelper.AddParam(name,value);
+            __DbHelper.AddParam(name,value);
         }
         /// <summary>
         /// 设置参数
@@ -58,7 +58,7 @@ namespace CRL.DBExtend.RelationDB
         public override void SetParam(string name, object value)
         {
             value = ObjectConvert.CheckNullValue(value);
-            dbHelper.SetParam(name, value);
+            __DbHelper.SetParam(name, value);
         }
         /// <summary>
         /// 增加输出参数
@@ -67,7 +67,7 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="value">对应类型任意值</param>
         public override void AddOutParam(string name, object value = null)
         {
-            dbHelper.AddOutParam(name, value);
+            __DbHelper.AddOutParam(name, value);
         }
         /// <summary>
         /// 获取存储过程return的值
@@ -75,7 +75,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override int GetReturnValue()
         {
-            return dbHelper.GetReturnValue();
+            return __DbHelper.GetReturnValue();
         }
         /// <summary>
         /// 获取OUTPUT的值
@@ -84,7 +84,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override object GetOutParam(string name)
         {
-            return dbHelper.GetOutParam(name);
+            return __DbHelper.GetOutParam(name);
         }
         /// <summary>
         /// 获取OUT值
@@ -94,7 +94,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override T GetOutParam<T>(string name)
         {
-            var obj = dbHelper.GetOutParam(name);
+            var obj = __DbHelper.GetOutParam(name);
             return ObjectConvert.ConvertObject<T>(obj);
         }
         #endregion
@@ -182,7 +182,7 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            var  reader = dbHelper.ExecDataReader(sql);
+            var  reader = __DbHelper.ExecDataReader(sql);
             ClearParame();
             return reader;
         }
@@ -202,7 +202,7 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            int count = dbHelper.Execute(sql);
+            int count = __DbHelper.Execute(sql);
             ClearParame();
             return count;
         }
@@ -216,7 +216,7 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            object obj = dbHelper.ExecScalar(sql);
+            object obj = __DbHelper.ExecScalar(sql);
             ClearParame();
             return obj;
         }
@@ -258,7 +258,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override List<T> RunList<T>(string sp)
         {
-            var reader = dbHelper.RunDataReader(sp);
+            var reader = __DbHelper.RunDataReader(sp);
             ClearParame();
             //double runTime;
             //return ObjectConvert.DataReaderToList<T>(reader, out runTime);
@@ -275,7 +275,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override int Run(string sp)
         {
-            int count = dbHelper.Run(sp);
+            int count = __DbHelper.Run(sp);
             ClearParame();
             return count;
         }
@@ -299,7 +299,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override object RunScalar(string sp)
         {
-            object obj = dbHelper.RunScalar(sp);
+            object obj = __DbHelper.RunScalar(sp);
             ClearParame();
             return obj;
         }
@@ -317,7 +317,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new CRLException("事务开始失败,已有未完成的事务");
             }
-            dbHelper.BeginTran();
+            __DbHelper.BeginTran();
             currentTransStatus = TranStatus.已开始;
         }
         /// <summary>
@@ -329,7 +329,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new CRLException("事务回滚失败,没有需要回滚的事务");
             }
-            dbHelper.RollbackTran();
+            __DbHelper.RollbackTran();
             currentTransStatus = TranStatus.未开始;
         }
         /// <summary>
@@ -341,7 +341,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new CRLException("事务提交失败,没有需要提交的事务");
             }
-            dbHelper.CommitTran();
+            __DbHelper.CommitTran();
             currentTransStatus = TranStatus.未开始;
         }
         #endregion
