@@ -52,12 +52,9 @@ namespace WebTest
             string error;
             var watch = new Stopwatch();
             watch.Start();
-            for (int i = 0; i < 10; i++)
-            {
-                var a = Code.OrderManage.Instance.TransactionTest2(out error);
-            }
+            var a = Code.OrderManage.Instance.TransactionTest2(out error);
             watch.Stop();
-            Response.Write("操作" + watch.ElapsedMilliseconds);
+            Response.Write("提交" + a + error);
         }
 
         protected void Button5_Click(object sender, EventArgs e)
@@ -66,7 +63,7 @@ namespace WebTest
             string error;
             var a = Code.OrderManage.Instance.TransactionTest3(out error);
             var allDBContext = CRL.Base.GetCallDBContext();
-            Response.Write("操作" + a + error);
+            Response.Write("提交" + a + error);
         }
     }
 }

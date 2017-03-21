@@ -179,5 +179,7 @@ namespace CRL
             dic.Add("对象映射列缓存", ObjectConvert.columnCache.Count);
             return dic;
         }
+        internal const string UseCRLContextFlagName = "CRLContextFlagName";
+        internal const string CRLContextName = "TransDbContext";
     }
 }

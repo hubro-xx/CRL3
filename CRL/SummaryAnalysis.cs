@@ -17,11 +17,20 @@ namespace CRL
     /// </summary>
     public class SummaryAnalysis
     {
+        class ObjItem
+        {
+            public string Name;
+            public string Remark;
+            public List<FieldItem> Fields = new List<FieldItem>();
+            public void Add(FieldItem item)
+            {
+                Fields.Add(item);
+            }
+        }
         class FieldItem
         {
             public string Remark;
             public string Name;
-            public string ModelRemark;
             public Type Type;
             public override string ToString()
             {
@@ -58,16 +67,16 @@ namespace CRL
             }
             return findTypes.OrderBy(b => b.Name).ToList();
         }
-        static Dictionary<string, List<FieldItem>> GetInfoFromXml(List<string> xmlFiles)
+        static Dictionary<string, ObjItem> GetInfoFromXml(List<string> xmlFiles)
         {
-            Dictionary<string, List<FieldItem>> list = new Dictionary<string, List<FieldItem>>();
+            Dictionary<string, ObjItem> objItems = new Dictionary<string, ObjItem>();
             if (xmlFiles == null)
             {
-                return list;
+                return objItems;
             }
             if (xmlFiles.Count == 0)
             {
-                return list;
+                return objItems;
             }
             var CRLModelFile = CoreHelper.RequestHelper.GetFilePath("/bin/CRL.Package.xml");
             if (System.IO.File.Exists(CRLModelFile))
@@ -77,6 +86,26 @@ namespace CRL
             foreach (string xmlFile in xmlFiles)
             {
                 var rootE = XElement.Load(xmlFile);
+                //找对象注释
+                IEnumerable<XElement> query2 =
+                                            from ele in rootE.Element("members").Elements("member")
+                                            where ele.Attribute("name").Value.StartsWith("T:")
+                                            select ele;
+                foreach (XElement e in query2)
+                {
+                    string name = e.Attribute("name").Value.Substring(2);
+                    var summary = e.Element("summary");
+                    string remark = "";
+                    if (summary != null)
+                    {
+                        remark = summary.Value.Trim();
+                    }
+                    if (!objItems.ContainsKey(name))
+                    {
+                        objItems.Add(name, new ObjItem() { Name = name, Remark = remark });
+                    }
+                }
+                //属性
                 IEnumerable<XElement> query =
                                             from ele in rootE.Element("members").Elements("member")
                                             where ele.Attribute("name").Value.StartsWith("P:")
@@ -93,85 +122,58 @@ namespace CRL
                     {
                         remark = summary.Value.Trim();
                     }
-                    if (!list.ContainsKey(typeName))
+                    if (!objItems.ContainsKey(typeName))
                     {
-                        list.Add(typeName, new List<FieldItem>());
+                        objItems.Add(typeName, new ObjItem() { Name = typeName });
                     }
-                    list[typeName].Add(new FieldItem() { Name = propertyName, Remark = remark });
+                    objItems[typeName].Add(new FieldItem() { Name = propertyName, Remark = remark });
                 }
-                //找对象注释
-                IEnumerable<XElement> query2 =
-                                            from ele in rootE.Element("members").Elements("member")
-                                            where ele.Attribute("name").Value.StartsWith("T:")
-                                            select ele;
-                foreach (XElement e in query2)
-                {
-                    string name = e.Attribute("name").Value.Substring(2);
-                    var summary = e.Element("summary");
-                    string remark = "";
-                    if (summary != null)
-                    {
-                        remark = summary.Value.Trim();
-                    }
-                    if (list.ContainsKey(name))
-                    {
-                        list[name].ForEach(b =>
-                        {
-                            b.ModelRemark = remark;
-                        });
-                    }
-                }
+                
             }
             var list2 = new List<FieldItem>();
             list2.Add(new FieldItem() { Name = "Id", Type = typeof(Int32), Remark = "自增主键" });
             list2.Add(new FieldItem() { Name = "AddTime", Type = typeof(DateTime), Remark = "添加时间" });
-            list.Add("CRL.IModelBase", list2);
-            return list;
+            objItems.Add("CRL.IModelBase", new ObjItem() { Name = "CRL.IModelBase", Remark = "", Fields = list2 });
+            return objItems;
         }
 
-        static Dictionary<Type, List<CRL.Attribute.FieldAttribute>> Merge(List<Type> types,Dictionary<string, List<FieldItem>> fields)
+        static Dictionary<Type, CRL.Attribute.TableAttribute> Merge(List<Type> types,Dictionary<string, ObjItem> objItems)
         {
-            var result = new Dictionary<Type, List<CRL.Attribute.FieldAttribute>>();
+            var result = new Dictionary<Type, CRL.Attribute.TableAttribute>();
             foreach(var type in types)
             {
                 string typeName = type.FullName;
                 var list2 = CRL.TypeCache.GetProperties(type, true);
-                if (fields.ContainsKey(typeName))
+                var table = new CRL.Attribute.TableAttribute();
+                if (objItems.ContainsKey(typeName))
                 {
-                    var list = fields[typeName];
+                    var objItem = objItems[typeName];
+                    table.Remark = objItem.Remark;
                     Type parentType = type.BaseType;
                     while (parentType != typeof(Object))
                     {
-                        if (fields.ContainsKey(parentType.FullName))
+                        if (objItems.ContainsKey(parentType.FullName))
                         {
-                            list.AddRange(fields[parentType.FullName]);
+                            objItem.Fields.AddRange(objItems[parentType.FullName].Fields);
                         }
                         parentType = parentType.BaseType;
                     }
-                    //foreach (var item in list)
-                    //{
-                    //    var item2 = list2[item.Name];
-                    //    if (item2 != null)
-                    //    {
-                    //        item2.Remark = item.Remark;
-                    //        item2.ModelRemark = item.ModelRemark;
-                    //    }
-                    //}
+         
                     foreach (var item in list2.Values)
                     {
-                        var item2 = list.Find(b => b.Name == item.MemberName);
+                        var item2 = objItem.Fields.Find(b => b.Name == item.MemberName);
                         if (item2 != null)
                         {
                             item.Remark = item2.Remark;
-                            item.ModelRemark = item2.ModelRemark;
                         }
                     }
                 }
                 else
                 {
-                    fields.Remove(typeName);
+                    objItems.Remove(typeName);
                 }
-                result.Add(type, list2.Values.ToList());
+                table.Fields = list2.Values.ToList();
+                result.Add(type, table);
             }
             return result;
         }
@@ -182,13 +184,13 @@ namespace CRL
             var b = GetInfoFromXml(xmlFiles);
             var c = Merge(a, b);
             StringBuilder sb = new StringBuilder("<meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>");
-            foreach (var item in c)
+            foreach (var kv in c)
             {
-                var tableName = CRL.TypeCache.GetTableName(item.Key, null);
+                var tableName = CRL.TypeCache.GetTableName(kv.Key, null);
                 sb.Append(@"<table border='1' cellpadding='4' cellspacing='1' style='width:100%'>
   <tr>
-    <td colspan='5'><b>" + tableName + "[" + item.Key.FullName + "]</b>(" + item.Value[0].ModelRemark + ")</td></tr><tr><th>名称</th><th>类型</th><th>长度</th><th>索引</th><th>备注</th></tr>");
-                var list = item.Value;
+    <td colspan='5'><b>" + kv.Key.FullName + "[" + tableName + "]</b>(" + kv.Value.Remark+ ")</td></tr><tr><th>名称</th><th>类型</th><th>长度</th><th>索引</th><th>备注</th></tr>");
+                var list = kv.Value.Fields;
                 foreach (var p in list)
                 {
                     var lengthStr = "";
@@ -215,13 +217,13 @@ namespace CRL
                     //{
                     //    remark += string.Format("[as {0}]", System.Text.RegularExpressions.Regex.Replace(p.VirtualField, @"\{.+?\}", ""));
                     //}
-                    sb.Append(@"<tr><td width='150'>" + p.MemberName + "</td><td  width='220'>" + p.PropertyType + "</td><td  width='40'>" + lengthStr + "</td><td  width='40'>" + p.FieldIndexType + "</td><td>" + remark + "</td></tr>");
+                    sb.Append(@"<tr><td width='250'>" + p.MemberName + "</td><td  width='280'>" + p.PropertyType + "</td><td  width='40'>" + lengthStr + "</td><td  width='80'>" + p.FieldIndexType + "</td><td>" + remark + "</td></tr>");
                 }
                 sb.Append("</table>");
             }
-            string saveFile = System.Web.Hosting.HostingEnvironment.MapPath(string.Format("/model_{0}.html", currentTypes[0].Assembly.ManifestModule.Name));
-            System.IO.File.WriteAllText(saveFile, sb.ToString());
-            System.Diagnostics.Process.Start(saveFile);
+            //string saveFile = System.Web.Hosting.HostingEnvironment.MapPath(string.Format("/model_{0}.html", currentTypes[0].Assembly.ManifestModule.Name));
+            //System.IO.File.WriteAllText(saveFile, sb.ToString());
+            //System.Diagnostics.Process.Start(saveFile);
             return sb.ToString(); 
         }
     }

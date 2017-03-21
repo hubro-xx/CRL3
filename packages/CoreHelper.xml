@@ -755,11 +755,6 @@
             开启事务的CONN
             </summary>
         </member>
-        <member name="F:CoreHelper.DBHelper.LogQueryCount">
-            <summary>
-            是否记录查询统计
-            </summary>
-        </member>
         <member name="F:CoreHelper.DBHelper.LogError">
             <summary>
             是否记录错误日志
@@ -802,13 +797,6 @@
             新的输出参数集合
             </summary>
         </member>
-        <member name="M:CoreHelper.DBHelper.GetReturnValue">
-            <summary>
-            获取存储过程的return值,如果没有则为0
-            sql没有
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:CoreHelper.DBHelper.AddOutParam(System.String,System.Object)">
             <summary>
             添加一个输出参数
@@ -817,6 +805,13 @@
             <param name="name"></param>
             <param name="value"></param>
         </member>
+        <member name="M:CoreHelper.DBHelper.GetReturnValue">
+            <summary>
+            获取存储过程的return值,如果没有则为0
+            sql没有
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CoreHelper.DBHelper.GetOutParam(System.String)">
             <summary>
             获取OUTPUT的值
@@ -824,42 +819,10 @@
             <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="F:CoreHelper.DBHelper.CountStartTime">
-            <summary>
-            统计开始时间
-            </summary>
-        </member>
-        <member name="F:CoreHelper.DBHelper.ExecuteCmdCount">
-            <summary>
-            缓存的查询语句执行次数
-            </summary>
-        </member>
-        <member name="M:CoreHelper.DBHelper.AddQueryCmdCache(System.Data.Common.DbCommand)">
-            <summary>
-            增加到缓存
-            </summary>
-            <param name="cmd"></param>
-        </member>
-        <member name="M:CoreHelper.DBHelper.GetExecuteCmdsCount(System.Int32)">
-            <summary>
-            获取以排过序的统计结果
-            </summary>
-            <param name="min">过滤最小次数</param>
-            <returns></returns>
-        </member>
-        <member name="M:CoreHelper.DBHelper.ClearExecuteCmdsCount">
-            <summary>
-            清空统计缓存
-            </summary>
-        </member>
-        <member name="M:CoreHelper.DBHelper.SaveExecuteCmdsCount">
-            <summary>
-            保存统计结果
-            </summary>
-        </member>
         <member name="F:CoreHelper.DBHelper.CurrentDataReadCommand">
             <summary>
             使用DataReader时,上次Command
+            DbDataReader在关闭前,取不到存储过程out值
             </summary>
         </member>
         <member name="M:CoreHelper.DBHelper.Execute(System.String)">
@@ -949,7 +912,7 @@
         </member>
         <member name="P:CoreHelper.DBHelper.DatabaseName">
             <summary>
-            数据库名
+            数据库名,连接成功后才知道
             </summary>
         </member>
         <member name="P:CoreHelper.DBHelper.Params">
@@ -1473,6 +1436,28 @@
             <param name="strTemp"></param>
             <returns></returns>
         </member>
+        <member name="T:CoreHelper.ICoreConfig`1">
+            <summary>
+            可序列化的配置
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:CoreHelper.ICoreConfig`1.FromFile">
+            <summary>
+            反序列化
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.ICoreConfig`1.Save">
+            <summary>
+            保存
+            </summary>
+        </member>
+        <member name="P:CoreHelper.ICoreConfig`1.Instance">
+            <summary>
+            实例
+            </summary>
+        </member>
         <member name="M:CoreHelper.ImageHelper.CutImg(System.Drawing.Image,System.Int32,System.Int32,CoreHelper.ImageHelper.CutMode,System.Boolean,System.Boolean)">
             <summary>
             裁剪图片
@@ -1607,6 +1592,11 @@
             上传文件类型
             </summary>
         </member>
+        <member name="F:CoreHelper.ImageUpload.Upload.UseConvertFolder">
+            <summary>
+            是否映射目录
+            </summary>
+        </member>
         <member name="M:CoreHelper.ImageUpload.Upload.CheckFile(System.IO.Stream,System.String,System.String@)">
             <summary>
             验证上传数据
@@ -1616,7 +1606,7 @@
             <param name="message"></param>
             <returns></returns>
         </member>
-        <member name="M:CoreHelper.ImageUpload.Upload.SaveFile(System.Byte[],System.String,System.Int32,System.String@,System.String@)">
+        <member name="M:CoreHelper.ImageUpload.Upload.SaveFile(System.Byte[],System.String,System.Int32,System.String@,System.String@,System.String)">
             <summary>
             通过BYTE数据保存
             </summary>
@@ -1644,7 +1634,7 @@
         <member name="T:CoreHelper.ImageUpload.UploadService">
             <summary>
             上传服务封装
-            请配置app.config服务地址
+            请配置config服务地址UploadServiceUrl
             </summary>
         </member>
         <member name="F:CoreHelper.ImageUpload.UploadService.UploadFolder">
@@ -2616,11 +2606,19 @@
         </member>
         <member name="M:CoreHelper.HttpRequest.HttpGet(System.String,System.String,System.Text.Encoding)">
             <summary>
-            
+            返回字符串
+            </summary>
+            <param name="url"></param>
+            <param name="proxyHost"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CoreHelper.HttpRequest.HttpGet(System.String,System.String)">
+            <summary>
+            返回流
             </summary>
             <param name="url"></param>
             <param name="proxyHost">代理地址</param>
-            <param name="enc"></param>
             <returns></returns>
         </member>
         <member name="T:CoreHelper.XmlType">
@@ -2824,6 +2822,11 @@
         <member name="F:CoreHelper.DBType.ORACLE">
             <summary>
             oracle
+            </summary>
+        </member>
+        <member name="F:CoreHelper.DBType.MongoDB">
+            <summary>
+            MongoDB
             </summary>
         </member>
         <member name="T:CoreHelper.EmailHelper">
@@ -3402,11 +3405,6 @@
         <member name="P:CoreHelper.CoreConfig.LogMsgId">
             <summary>
             日志消息ID
-            </summary>
-        </member>
-        <member name="P:CoreHelper.CoreConfig.Instance">
-            <summary>
-            实例
             </summary>
         </member>
         <member name="T:CoreHelper.logService.LogItem">

@@ -56,7 +56,7 @@ namespace CRL
         /// 数据访问上下文
         /// </summary>
         /// <returns></returns>
-        internal abstract DbContext GetDbContext(bool cache);
+        internal abstract DbContext GetDbContext();
 
         /// <summary>
         /// 当前数据访定位
@@ -99,8 +99,8 @@ namespace CRL
         {
             get
             {
-                 var _BeginTransContext = CallContext.GetData<bool>("_BeginTransContext");
-                 if (_BeginTransContext)//对于数据库事务,只创建一个上下文
+                 var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);
+                 if (_useCRLContext)//对于数据库事务,只创建一个上下文
                  {
                      return GetDBExtend(true);
                  }
@@ -134,20 +134,22 @@ namespace CRL
         {
             AbsDBExtend db = null;
             string contextName = "DBExtend." + GetType().Name;//同一线程调用只创建一次
-            if (cache)
+
+            var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);
+            if (_useCRLContext)//对于数据库事务,只创建一个上下文
             {
-                var _BeginTransContext = CallContext.GetData<bool>("_BeginTransContext");
-                if (_BeginTransContext)//对于数据库事务,只创建一个上下文
-                {
-                    contextName = "TransDbContext";
-                }
-                db = CallContext.GetData<AbsDBExtend>(contextName);
-                if (db != null)
-                {
-                    return db;
-                }
+                contextName = Base.CRLContextName;
             }
-            var dbContext2 = GetDbContext(cache);
+            db = CallContext.GetData<AbsDBExtend>(contextName);
+            if (db != null)
+            {
+                return db;
+            }
+            var dbContext2 = GetDbContext();
+            if (_useCRLContext)//使用CRLContext,需由CRLContext来关闭数据连接
+            {
+                dbContext2.DBHelper.AutoCloseConn = false;
+            }
             db = DBExtendFactory.CreateDBExtend(dbContext2);
             if (dbLocation.ShardingDataBase == null)
             {
@@ -648,46 +650,45 @@ namespace CRL
         public bool PackageTrans2(TransMethod method, out string error)
         {
             error = "";
-            var transBegined = CallContext.GetData<bool>("_BeginTransContext");//事务已开启,内部事务不用处理
-            if (!transBegined)
+            var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);//事务已开启,内部事务不用处理
+            using (var context = new CRLDbConnectionScope())
             {
-                CallContext.SetData("_BeginTransContext", true);
-            }
-            var db = GetDBExtend(true);
-            if (!transBegined)
-            {
-                db.BeginTran();
-            }
-            bool result;
-            try
-            {
-                result = method(out error);
-                if (!transBegined)
+                var db = GetDBExtend(true);
+                if (!_useCRLContext)
                 {
-                    if (!result)
+                    db.BeginTran();
+                }
+                bool result;
+                try
+                {
+                    result = method(out error);
+                    if (!_useCRLContext)
+                    {
+                        if (!result)
+                        {
+                            db.RollbackTran();
+                            CallContext.SetData(Base.UseCRLContextFlagName, false);
+                            return false;
+                        }
+                        db.CommitTran();
+                    }
+                }
+                catch (Exception ero)
+                {
+                    error = "提交事务时发生错误:" + ero.Message;
+                    if (!_useCRLContext)
                     {
                         db.RollbackTran();
-                        CallContext.SetData("_BeginTransContext", false);
-                        return false;
+                        CallContext.SetData(Base.UseCRLContextFlagName, false);
                     }
-                    db.CommitTran();
+                    return false;
                 }
-            }
-            catch (Exception ero)
-            {
-                error = "提交事务时发生错误:" + ero.Message;
-                if (!transBegined)
+                if (!_useCRLContext)
                 {
-                    db.RollbackTran();
-                    CallContext.SetData("_BeginTransContext", false);
+                    CallContext.SetData(Base.UseCRLContextFlagName, false);
                 }
-                return false;
+                return result;
             }
-            if (!transBegined)
-            {
-                CallContext.SetData("_BeginTransContext", false);
-            }
-            return result;
         }
         /// <summary>
         /// 使用TransactionScope封装事务[基本方法]

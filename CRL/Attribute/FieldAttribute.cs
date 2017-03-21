@@ -219,7 +219,7 @@ namespace CRL.Attribute
         {
             return string.Format("{0}__{1}", table, fileld);
         }
-        internal string ModelRemark;
+        //internal string ModelRemark;
         /// <summary>
         /// 备注
         /// </summary>

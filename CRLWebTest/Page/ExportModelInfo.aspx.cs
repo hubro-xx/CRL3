@@ -25,7 +25,9 @@ namespace WebTest
         {
             Type[] types = new Type[] { typeof(Code.ProductData) };
             var xmlFiles = new List<string> { Server.MapPath(TextBox1.Text) };
-            CRL.SummaryAnalysis.ExportToFile(types, xmlFiles);
+            var str = CRL.SummaryAnalysis.ExportToFile(types, xmlFiles);
+            Response.Write(str);
+            Response.End();
         }
     }
 }

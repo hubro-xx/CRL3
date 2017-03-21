@@ -25,12 +25,12 @@ namespace CRL
         where TModel : IModel, new()
     {
 
-        internal override DbContext GetDbContext(bool cache)
+        internal override DbContext GetDbContext()
         {
             DbContext dbContext = null;
             ////cache = false;
             //string contextName = "DbContext." + GetType().Name;//同一线程调用只创建一次
-            //var _BeginTransContext = CallContext.GetData<bool>("_BeginTransContext");
+            //var _BeginTransContext = CallContext.GetData<bool>(Base.CRLContextName);
             //if (_BeginTransContext)//对于数据库事务,只创建一个上下文
             //{
             //    contextName = "TransDbContext";
@@ -94,10 +94,10 @@ namespace CRL
         {
             Type type = typeof(TModel);
             var key = "";
-            if (TypeCache.GetModelKeyCache(type, DBExtend.dbHelper.DatabaseName, out key))
+            if (TypeCache.GetModelKeyCache(type, DBExtend.__DbHelper.DatabaseName, out key))
             {
                 CRL.MemoryDataCache.CacheService.RemoveCache(key);
-                TypeCache.RemoveModelKeyCache(type, DBExtend.dbHelper.DatabaseName);
+                TypeCache.RemoveModelKeyCache(type, DBExtend.__DbHelper.DatabaseName);
             }
         }
         /// <summary>
@@ -361,7 +361,7 @@ namespace CRL
             query.__ExpireMinute = expMinute;
             string dataCacheKey;
             var list = new Dictionary<string, TModel>();
-            var a = TypeCache.GetModelKeyCache(type, DBExtend.dbHelper.DatabaseName, out dataCacheKey);
+            var a = TypeCache.GetModelKeyCache(type, DBExtend.__DbHelper.DatabaseName, out dataCacheKey);
             if (!a)
             {
                 var db = DBExtend;
@@ -370,10 +370,10 @@ namespace CRL
                 lock (lockObj)
                 {
                     string key2;
-                    a = TypeCache.GetModelKeyCache(type, DBExtend.dbHelper.DatabaseName, out key2);
+                    a = TypeCache.GetModelKeyCache(type, DBExtend.__DbHelper.DatabaseName, out key2);
                     if (!a)
                     {
-                        TypeCache.SetModelKeyCache(type, DBExtend.dbHelper.DatabaseName, dataCacheKey);
+                        TypeCache.SetModelKeyCache(type, DBExtend.__DbHelper.DatabaseName, dataCacheKey);
                     }
                 }
             }

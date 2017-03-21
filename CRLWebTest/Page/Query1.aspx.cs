@@ -23,13 +23,17 @@ namespace WebTest
         protected void Button1_Click(object sender, EventArgs e)
         {
             var a = true;
+            var list = new List<object>();
+
             //查询一项
-            var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0 || b.IsTop == a);
-            var list = new List<object>(); 
-            
-            if(item!=null)
+            using (var context = new CRL.CRLDbConnectionScope())//使用同一个数据连接
             {
-                list.Add(item);
+                var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0 || b.IsTop == a);
+                var item2 = Code.ProductDataManage.Instance.QueryItem(2);
+                if (item != null)
+                {
+                    list.Add(item);
+                }
             }
             GridView1.DataSource = list;
             GridView1.DataBind();

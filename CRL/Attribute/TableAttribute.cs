@@ -32,6 +32,14 @@ namespace CRL.Attribute
             set;
         }
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark
+        {
+            get;
+            set;
+        }
+        /// <summary>
         /// 默认排序 如Id Desc
         /// </summary>
         public string DefaultSort

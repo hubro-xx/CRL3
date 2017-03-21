@@ -69,6 +69,14 @@ namespace CRL
 
         #region 方法重写
         /// <summary>
+        /// ToJson
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "[" + GetType().FullName + "] " + ToJson();
+        }
+        /// <summary>
         /// 数据校验方法,可重写
         /// </summary>
         /// <returns></returns>
