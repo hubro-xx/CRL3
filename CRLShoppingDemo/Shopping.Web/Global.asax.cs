@@ -29,6 +29,12 @@ namespace Shopping.Web
             {
                 return new CoreHelper.SqlHelper(System.Configuration.ConfigurationManager.ConnectionStrings["default"].ConnectionString);
             };
+
+            var QuartzWorker = new CoreHelper.QuartzScheduler.QuartzWorker();
+            var task = new BLL.ProxyPool.GetProxyJob();
+            QuartzWorker.AddWork(task);
+            QuartzWorker.Start();
+
         }
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
         {
