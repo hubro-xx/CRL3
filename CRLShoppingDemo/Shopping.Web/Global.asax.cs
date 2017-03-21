@@ -33,7 +33,7 @@ namespace Shopping.Web
             var QuartzWorker = new CoreHelper.QuartzScheduler.QuartzWorker();
             var task = new BLL.ProxyPool.GetProxyJob();
             QuartzWorker.AddWork(task);
-            QuartzWorker.Start();
+            //QuartzWorker.Start();
 
         }
         protected void Application_AuthenticateRequest(object sender, EventArgs e)

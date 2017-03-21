@@ -1,0 +1,30 @@
+﻿@model Core.Mvc.PageObj<Shopping.BLL.ProxyPool.IpProxy>
+@{
+    ViewBag.Title = "";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table">
+    <tr>
+        <th>编号</th>
+        <th>地址</th>
+        <th>检测结果</th>
+        <th>检测时间</th>
+        <th></th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        var color = item.CheckResult ? "GREEN" : "RED";
+        var ts = DateTime.Now - item.CheckTime;
+        <tr style="color:@color">
+            <td>@item.Id</td>
+            <td>@item.FullAddress</td>
+            <td>@item.CheckResult</td>
+            <td>[@((int)ts.TotalMinutes)m] @item.CheckTime </td>
+            <td>
+                <a href="/Proxy/Check?id=@item.Id" target="_blank">测试</a>
+            </td>
+        </tr>
+    }
+</table>
+@Core.Mvc.ControllHelper.CreatePageNavigation(Model)
