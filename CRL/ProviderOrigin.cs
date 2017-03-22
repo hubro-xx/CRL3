@@ -638,6 +638,26 @@ namespace CRL
         }
         #endregion
 
+        /// <summary>
+        /// 将方法调用打包,使只用一个数据连接
+        /// 同CRLDbConnectionScope
+        /// </summary>
+        /// <param name="action"></param>
+        public void Package(Action action)
+        {
+            using (var context = new CRLDbConnectionScope())
+            {
+                try
+                {
+                    action();
+                }
+                catch(Exception ero)
+                {
+                    context.Dispose();
+                    throw ero;
+                }
+            }
+        }
         #region 包装为事务执行
         /// <summary>
         /// 使用DbTransaction封装事务,不能跨库

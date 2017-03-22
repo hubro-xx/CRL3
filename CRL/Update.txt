@@ -316,3 +316,4 @@
 2017-03-20
 	增加CRLDbConnectionScope,使多次访问只用打开一次数据连接
 	DbTransaction事务修改为基于此控制
+	增加Package方法封装
