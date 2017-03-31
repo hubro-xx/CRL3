@@ -88,9 +88,20 @@ namespace CRL
             var query = LambdaQueryFactory.CreateLambdaQuery<TModel>(DBExtend.dbContext);
             return query;
         }
+        /// <summary>
+        /// 指定查询条件创建表达式实例
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQuery<TModel> GetLambdaQuery(Expression<Func<TModel, bool>> expression)
+        {
+            var query = GetLambdaQuery();
+            query.Where(expression);
+            return query;
+        }
 
-        #region 数据访问对象
-        AbsDBExtend _dBExtend;
+            #region 数据访问对象
+            AbsDBExtend _dBExtend;
         /// <summary>
         /// 数据访部对象
         /// 当前实例内只会创建一个,查询除外
@@ -643,7 +654,7 @@ namespace CRL
         /// 同CRLDbConnectionScope
         /// </summary>
         /// <param name="action"></param>
-        public void Package(Action action)
+        public void PackageMethod(Action action)
         {
             using (var context = new CRLDbConnectionScope())
             {

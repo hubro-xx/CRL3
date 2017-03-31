@@ -134,7 +134,7 @@ namespace CRL
                     }
                     if (value.Length > p.Length && p.Length < 3000)
                     {
-                        msg = string.Format("对象{0}属性{1}长度超过了设定值{2}", obj.GetType(), p.MemberName, p.Length);
+                        msg = string.Format("对象{0}属性{1}长度超过了设定值{2}[{3}]", obj.GetType(), p.MemberName, p.Length, value);
                         throw new CRLException(msg);
                     }
                 }

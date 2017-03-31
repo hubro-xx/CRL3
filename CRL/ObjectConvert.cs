@@ -313,6 +313,10 @@ namespace CRL
             while (reader.Read())
             {
                 object data1 = reader[0];
+                if(data1 is DBNull)
+                {
+                    continue;
+                }
                 object data2 = reader[1];
                 Tkey key = (Tkey)data1;
                 TValue value = (TValue)data2;

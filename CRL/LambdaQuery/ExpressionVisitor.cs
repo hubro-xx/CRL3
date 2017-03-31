@@ -496,7 +496,22 @@ namespace CRL.LambdaQuery
                     //like Convert.ToDateTime(times)
                     var obj = ConstantValueVisitor.GetParameExpressionValue(firstArgs);
                     arguments.Add(obj);
-                    isConstantMethod = true;
+                    var allConstant = true;
+                    for (int i = argsIndex; i < allArguments.Count; i++)
+                    {
+                        bool isConstant2;
+                        var obj2 = GetParameExpressionValue(allArguments[i], out isConstant2);
+                        if (!isConstant2)
+                        {
+                            allConstant = false;
+                        }
+                        arguments.Add(obj2);
+                    }
+                    //if (allConstant)
+                    //{
+                    //    isConstantMethod = true;
+                    //}
+                    //isConstantMethod = true;
                 }
             }
             else if (firstArgs is ConstantExpression)//按常量
@@ -518,14 +533,14 @@ namespace CRL.LambdaQuery
             if (string.IsNullOrEmpty(methodField))
             {
                 //当是常量转换方法
-                //like DateTime.Parse("2016-02-11")
+                
                 var method = mcExp.Method;
                 object obj;
-                if (mcExp.Method.IsStatic)
+                if (mcExp.Method.IsStatic)//like DateTime.Parse("2016-02-11")
                 {
                     obj = method.Invoke(null, arguments.ToArray());
                 }
-                else
+                else//like time.AddDays(1)
                 {
                     var args1 = arguments.First();
                     arguments.RemoveAt(0);
@@ -533,7 +548,7 @@ namespace CRL.LambdaQuery
                 }
                 var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Value, Data = obj };
                 var cache = new MethodCallExpressionCacheItem() { CRLExpression = exp2, argsIndex = argsIndex, isConstantMethod = isConstantMethod, isStatic = mcExp.Method.IsStatic };
-                MethodCallExpressionCache[key] = cache;
+                //MethodCallExpressionCache[key] = cache;
                 return exp2;
             }
             var methodInfo = new CRLExpression.MethodCallObj() { Args = arguments, ExpressionType = nodeType.Value, MemberName = memberName, MethodName = methodName, MemberQueryName = methodField };

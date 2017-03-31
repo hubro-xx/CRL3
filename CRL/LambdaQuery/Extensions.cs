@@ -16,7 +16,7 @@ namespace CRL.LambdaQuery
     /// <summary>
     /// 表达式扩展
     /// </summary>
-    internal static partial class Extensions
+    public static partial class Extensions
     {
 
         /// <summary>
@@ -417,7 +417,7 @@ namespace CRL.LambdaQuery
     /// <summary>
     /// 操作符
     /// </summary>
-    internal enum Operator
+    public enum Operator
     {
         None,
         /// <summary>
