@@ -114,6 +114,7 @@
     <Compile Include="CRLDbConnectionScope.cs" />
     <Compile Include="DBExtend\CallBackDataReader.cs" />
     <Compile Include="CRLException.cs" />
+    <Compile Include="ExtensionMethod\DateTime.cs" />
     <Compile Include="ExtensionMethod\IsNull.cs" />
     <Compile Include="LambdaQuery\Mapping\DataContainer.cs" />
     <Compile Include="LambdaQuery\Mapping\QueryInfo.cs" />
@@ -160,7 +161,7 @@
     <Compile Include="ExistsTableCache\Table.cs" />
     <Compile Include="ExpressionJoin.cs" />
     <Compile Include="ExtensionMethod\Avg.cs" />
-    <Compile Include="ExtensionMethod\Between.cs" />
+    <Compile Include="ExtensionMethod\Convert.cs" />
     <Compile Include="ExtensionMethod\FieldChange.cs" />
     <Compile Include="ExtensionMethod\In.cs" />
     <Compile Include="ExtensionMethod\Max.cs" />
@@ -199,11 +200,6 @@
     <Compile Include="MemoryDataCache\QueryItem.cs" />
     <Compile Include="MemoryDataCache\UpdateItem.cs" />
     <Compile Include="ObjectConvert.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProviderOrigin.cs" />
     <Compile Include="SettingConfig.cs" />
@@ -223,13 +219,6 @@
     <Compile Include="SummaryAnalysis.cs" />
     <Compile Include="ExistsTableCache\ExistsTableCache.cs" />
     <Compile Include="TypeCache.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />

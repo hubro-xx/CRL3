@@ -283,8 +283,11 @@ namespace CRL.LambdaQuery
                         sql.Append("\r\n " + unionType + " \r\n");
                         sql.Append(sqlUnoin);
                     }
-                    orderBy = System.Text.RegularExpressions.Regex.Replace(orderBy, @"t\d+\.", " ");
-                    sql.Append("\r\n " + orderBy);
+                    if (!string.IsNullOrEmpty(orderBy))
+                    {
+                        orderBy = System.Text.RegularExpressions.Regex.Replace(orderBy, @"t\d+\.", " ");
+                        sql.Append("\r\n " + orderBy);
+                    }
                     #endregion
                 }
             }

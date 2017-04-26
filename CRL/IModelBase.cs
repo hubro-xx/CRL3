@@ -305,6 +305,11 @@ namespace CRL
             var keyValue = primaryKey.GetValue(this);
             return keyValue;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="db"></param>
+        /// <returns></returns>
         public string CreateTable(AbsDBExtend db)
         {
             return ModelCheck.CreateTable(GetType(), db);

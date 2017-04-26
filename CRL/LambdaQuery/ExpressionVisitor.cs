@@ -13,6 +13,8 @@ using System.Text;
 using CoreHelper;
 using System.Reflection;
 using CRL;
+using System.Collections.Concurrent;
+
 namespace CRL.LambdaQuery
 {
     internal class ExpressionVisitor
@@ -73,6 +75,10 @@ namespace CRL.LambdaQuery
             if (dbContext.DataBaseArchitecture == DataBaseArchitecture.NotRelation)
             {
                 return par1;
+            }
+            if (parIndex > 1000)
+            {
+                throw new CRLException("参数计数超过了1000,请确认数据访问对象没有被静态化");
             }
             switch (par1.Type)
             {
@@ -181,7 +187,7 @@ namespace CRL.LambdaQuery
                 __typeStr2 = "";
             }
             sb.AppendFormat("({0}{1}{2})", outLeft, __typeStr2, outRight);
-            var e = new CRLExpression.CRLExpression() { ExpressionType = expType.ToString(), Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpression.CRLExpressionType.Binary : CRLExpression.CRLExpressionType.Tree };
+            var e = new CRLExpression.CRLExpression() { ExpType = expType.ToString(), Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpression.CRLExpressionType.Binary : CRLExpression.CRLExpressionType.Tree };
             e.SqlOut = sb.ToString();
             e.Data = e.SqlOut;
             if (isBinary)
@@ -243,29 +249,29 @@ namespace CRL.LambdaQuery
             QueryParames.Add(name, value);
             //parIndex += 1;
         }
-        static Dictionary<ExpressionType, string> expressionTypeCache = new Dictionary<ExpressionType, string>();
+        static ConcurrentDictionary<ExpressionType, string> expressionTypeCache = new ConcurrentDictionary<ExpressionType, string>();
         public static string ExpressionTypeCast(ExpressionType expType)
         {
             if (expressionTypeCache.Count == 0)
             {
-                expressionTypeCache.Add(ExpressionType.And, "&");
-                expressionTypeCache.Add(ExpressionType.AndAlso, " AND ");
-                expressionTypeCache.Add(ExpressionType.Equal, "=");
-                expressionTypeCache.Add(ExpressionType.GreaterThan, ">");
-                expressionTypeCache.Add(ExpressionType.GreaterThanOrEqual, ">=");
-                expressionTypeCache.Add(ExpressionType.LessThan, "<");
-                expressionTypeCache.Add(ExpressionType.LessThanOrEqual, "<=");
-                expressionTypeCache.Add(ExpressionType.NotEqual, "<>");
-                expressionTypeCache.Add(ExpressionType.Or, "|");
-                expressionTypeCache.Add(ExpressionType.OrElse, " OR ");
-                expressionTypeCache.Add(ExpressionType.Add, "+");
-                expressionTypeCache.Add(ExpressionType.AddChecked, "+");
-                expressionTypeCache.Add(ExpressionType.Subtract, "-");
-                expressionTypeCache.Add(ExpressionType.SubtractChecked, "-");
-                expressionTypeCache.Add(ExpressionType.Multiply, "*");
-                expressionTypeCache.Add(ExpressionType.MultiplyChecked, "*");
-                expressionTypeCache.Add(ExpressionType.Divide, "/");
-                expressionTypeCache.Add(ExpressionType.Not, "!=");
+                expressionTypeCache.TryAdd(ExpressionType.And, "&");
+                expressionTypeCache.TryAdd(ExpressionType.AndAlso, " AND ");
+                expressionTypeCache.TryAdd(ExpressionType.Equal, "=");
+                expressionTypeCache.TryAdd(ExpressionType.GreaterThan, ">");
+                expressionTypeCache.TryAdd(ExpressionType.GreaterThanOrEqual, ">=");
+                expressionTypeCache.TryAdd(ExpressionType.LessThan, "<");
+                expressionTypeCache.TryAdd(ExpressionType.LessThanOrEqual, "<=");
+                expressionTypeCache.TryAdd(ExpressionType.NotEqual, "<>");
+                expressionTypeCache.TryAdd(ExpressionType.Or, "|");
+                expressionTypeCache.TryAdd(ExpressionType.OrElse, " OR ");
+                expressionTypeCache.TryAdd(ExpressionType.Add, "+");
+                expressionTypeCache.TryAdd(ExpressionType.AddChecked, "+");
+                expressionTypeCache.TryAdd(ExpressionType.Subtract, "-");
+                expressionTypeCache.TryAdd(ExpressionType.SubtractChecked, "-");
+                expressionTypeCache.TryAdd(ExpressionType.Multiply, "*");
+                expressionTypeCache.TryAdd(ExpressionType.MultiplyChecked, "*");
+                expressionTypeCache.TryAdd(ExpressionType.Divide, "/");
+                expressionTypeCache.TryAdd(ExpressionType.Not, "!=");
             }
             string type;
             var a = expressionTypeCache.TryGetValue(expType, out type);
@@ -496,22 +502,12 @@ namespace CRL.LambdaQuery
                     //like Convert.ToDateTime(times)
                     var obj = ConstantValueVisitor.GetParameExpressionValue(firstArgs);
                     arguments.Add(obj);
-                    var allConstant = true;
                     for (int i = argsIndex; i < allArguments.Count; i++)
                     {
                         bool isConstant2;
                         var obj2 = GetParameExpressionValue(allArguments[i], out isConstant2);
-                        if (!isConstant2)
-                        {
-                            allConstant = false;
-                        }
                         arguments.Add(obj2);
                     }
-                    //if (allConstant)
-                    //{
-                    //    isConstantMethod = true;
-                    //}
-                    //isConstantMethod = true;
                 }
             }
             else if (firstArgs is ConstantExpression)//按常量

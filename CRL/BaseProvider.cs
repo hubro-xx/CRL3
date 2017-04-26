@@ -192,9 +192,9 @@ namespace CRL
         /// <returns></returns>
         CacheServer.ResultData QueryFromCache(LambdaQuery.CRLExpression.CRLQueryExpression expression)
         {
-            var _CRLExpression = new CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor<TModel>().CreateLambda(expression.Expression);
+            var _CRLExpression = new CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor<TModel>().CreateLambda(expression.Exp);
             int total;
-            var data = QueryFromCacheBase(_CRLExpression, out total, expression.PageIndex, expression.PageSize);
+            var data = QueryFromCacheBase(_CRLExpression, out total, expression.Page, expression.Size);
             return new CacheServer.ResultData() { Total = total, JsonData = CoreHelper.StringHelper.SerializerToJson(data) };
         }
         #endregion

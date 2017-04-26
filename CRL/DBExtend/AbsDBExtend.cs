@@ -841,60 +841,7 @@ namespace CRL
         internal ParameCollection GetUpdateField<TModel>(TModel obj) where TModel : IModel, new()
         {
             var c = obj.GetUpdateField();
-            #region old
-            /**
-            var fields = TypeCache.GetProperties(typeof(TModel), true);
-            if (obj.GetChanges().Count > 0)//按手动指定更改
-            {
-                foreach (var item in obj.GetChanges())
-                {
-                    var key = item.Key.Replace("$", "");
-                    var f = fields[key];
-                    if (f == null)
-                        continue;
-                    if (f.IsPrimaryKey || f.FieldType != Attribute.FieldType.数据库字段)
-                        continue;
-                    var value = item.Value;
-                    //如果表示值为被追加 名称为$name
-                    //使用Cumulation扩展方法后按此处理
-                    if (key != item.Key)//按$name=name+'123123'
-                    {
-                        if (f.PropertyType == typeof(string))
-                        {
-                            value = string.Format("{0}+'{1}'", key, value);
-                        }
-                        else
-                        {
-                            value = string.Format("{0}+{1}", key, value);
-                        }
-                    }
-                    c[item.Key] = value;
-                }
-                return c;
-            }
-            //按对象对比
-            var origin = obj.OriginClone;
-            if (origin == null)
-            {
-                throw new CRLException("_originClone为空,请确认此对象是由查询创建");
-            }
-            foreach (var f in fields.Values)
-            {
-                if (f.IsPrimaryKey)
-                    continue;
-                //if (!string.IsNullOrEmpty(f.VirtualField))
-                //{
-                //    continue;
-                //}
-                var originValue = f.GetValue(origin);
-                var currentValue = f.GetValue(obj);
-                if (!Object.Equals(originValue, currentValue))
-                {
-                    c.Add(f.MemberName, currentValue);
-                }
-            }
-             * */
-            #endregion
+            
             if (c.Count() > 0 && obj.OriginClone != null)//只有克隆过的才进行检查
             {
                 CheckData(obj);

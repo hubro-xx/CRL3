@@ -23,7 +23,10 @@ namespace CRL.LambdaQuery.CRLExpression
             get;
             set;
         }
-        public CRLExpression Expression
+        /// <summary>
+        /// 
+        /// </summary>
+        public CRLExpression Exp
         {
             get;
             set;
@@ -31,7 +34,7 @@ namespace CRL.LambdaQuery.CRLExpression
         /// <summary>
         /// 分页用,每页大小
         /// </summary>
-        public int PageSize
+        public int Size
         {
             get;
             set;
@@ -39,7 +42,7 @@ namespace CRL.LambdaQuery.CRLExpression
         /// <summary>
         /// 分页用,页索引
         /// </summary>
-        public int PageIndex
+        public int Page
         {
             get;
             set;

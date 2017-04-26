@@ -54,6 +54,10 @@ namespace CRL.CacheServer
                 Log("处理数据出错：" + ex.Message);
                 result = "error,服务器内部错误:" + ex.Message;
             }
+            if (result.Length > 1024 * 50)
+            {
+                result = "error,返回数据长度超过了50K,数据可能无法返回,请缩小查询范围";
+            }
             //发送数据
             var data2 = encode.GetBytes(result);
             sender.Send(data2);

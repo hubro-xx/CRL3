@@ -90,6 +90,14 @@ namespace CRL
         /// <returns></returns>
         internal static object ConvertObject(Type type, object value)
         {
+            if (value == null)
+            {
+                return value;
+            }
+            if (type == value.GetType())
+            {
+                return value;
+            }
             if (convertMethod.Count == 0)
             {
                 convertMethod.Add(typeof(byte[]), (a) =>
@@ -191,34 +199,45 @@ namespace CRL
             }
             var _actions = actions.ToArray();
             int actionsCount = actions.Count;
-            while (reader.Read())
+            try
             {
-                reader.GetValues(values);
-                var detailItem = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
-                foreach (var ac in _actions)
+                #region while
+                while (reader.Read())
                 {
-                    ac.SetValue2(detailItem, values);
-                }
-                #region 剩下的放索引
-                //按IModel算
-                if (columns.Count > 0)
-                {
-                    var model = detailItem as IModel;
-                    foreach (var item in columns)
+                    reader.GetValues(values);
+                    var detailItem = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
+                    foreach (var ac in _actions)
                     {
-                        var col = item.Key;
-                        var n = col.LastIndexOf("__");
-                        if (n == -1)
-                        {
-                            continue;
-                        }
-                        var mapingName = col.Substring(n + 2);
-                        model.SetIndexData(mapingName, values[item.Value]);
+                        ac.SetValue2(detailItem, values);
                     }
+                    #region 剩下的放索引
+                    //按IModel算
+                    if (columns.Count > 0)
+                    {
+                        var model = detailItem as IModel;
+                        foreach (var item in columns)
+                        {
+                            var col = item.Key;
+                            var n = col.LastIndexOf("__");
+                            if (n == -1)
+                            {
+                                continue;
+                            }
+                            var mapingName = col.Substring(n + 2);
+                            model.SetIndexData(mapingName, values[item.Value]);
+                        }
+                    }
+                    #endregion
+                    list.Add(detailItem);
+
                 }
                 #endregion
-                list.Add(detailItem);
-
+            }
+            catch( Exception ero)
+            {
+                reader.Close();
+                reader.Dispose();
+                throw new CRLException("转换数据时发生错误:" + ero.Message);
             }
             reader.Close();
             reader.Dispose();
@@ -272,8 +291,19 @@ namespace CRL
             var type = typeof(T);
             while (reader.Read())
             {
-                var dataContainer = new DataContainer(reader, type);
-                var detailItem = objCreater(dataContainer);
+                var dataContainer = new DataContainer(reader, type, dicColumns);
+                T detailItem;
+                try
+                {
+                    detailItem = objCreater(dataContainer);
+                }
+                catch
+                {
+                    reader.Close();
+                    reader.Dispose();
+                    var columnName = dataContainer._GetCurrentColumnName();
+                    throw new CRLException("反射赋值时发生错误,在:" + type + " 字段:" + columnName+ ",请检查数据库字段类型与对象是否一致");
+                }
                 #region 剩下的放索引
                 //按IModel算
                 if (leftColumnCount > 0)
@@ -310,17 +340,25 @@ namespace CRL
         internal static Dictionary<Tkey, TValue> DataReadToDictionary<Tkey, TValue>(DbDataReader reader)
         {
             var dic = new Dictionary<Tkey, TValue>();
-            while (reader.Read())
+            try
             {
-                object data1 = reader[0];
-                if(data1 is DBNull)
+                while (reader.Read())
                 {
-                    continue;
+                    object data1 = reader[0];
+                    if (data1 is DBNull)
+                    {
+                        continue;
+                    }
+                    object data2 = reader[1];
+                    Tkey key = (Tkey)data1;
+                    TValue value = (TValue)data2;
+                    dic.Add(key, value);
                 }
-                object data2 = reader[1];
-                Tkey key = (Tkey)data1;
-                TValue value = (TValue)data2;
-                dic.Add(key, value);
+            }
+            catch (Exception ero)
+            {
+                reader.Close();
+                throw new CRLException("转换为字典时发生错误" + ero.Message);
             }
             reader.Close();
             return dic;

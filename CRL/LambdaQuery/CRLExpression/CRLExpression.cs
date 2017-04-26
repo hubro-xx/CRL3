@@ -62,10 +62,15 @@ namespace CRL.LambdaQuery.CRLExpression
         [System.Xml.Serialization.XmlIgnore]
         [Newtonsoft.Json.JsonIgnore]
         public string DataParamed;
+
         /// <summary>
         /// 左右操作类型
         /// </summary>
-        public string ExpressionType;
+        public string ExpType
+        {
+            get;
+            set;
+        }
 
 
         [System.Xml.Serialization.XmlIgnore]

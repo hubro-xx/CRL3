@@ -211,14 +211,28 @@ namespace CRL.LambdaQuery.Mapping
         }
     }
 
-    public class DataContainer
+    class DataContainer
     {
         DbDataReader reader;
         Type dataType;
-        public DataContainer(DbDataReader _reader, Type _dataType)
+        Dictionary<string, int> columnMapping;
+        internal int currentDataIndex = 0;
+        public DataContainer(DbDataReader _reader, Type _dataType, Dictionary<string, int> _columnMapping)
         {
             dataType = _dataType;
             reader = _reader;
+            columnMapping = _columnMapping;
+        }
+        internal string _GetCurrentColumnName()
+        {
+            foreach (var kv in columnMapping)
+            {
+                if (kv.Value == currentDataIndex)
+                {
+                    return kv.Key;
+                }
+            }
+            return "";
         }
         T _GetValue<T>(int _index)
         {
@@ -239,14 +253,17 @@ namespace CRL.LambdaQuery.Mapping
         #region method
         public TEnum GetEnum<TEnum>(int index) where TEnum : struct
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(TEnum);
             }
-            return (TEnum)Enum.ToObject(typeof(TEnum), index);
+            var value = reader.GetInt32(index);
+            return (TEnum)Enum.ToObject(typeof(TEnum), value);
         }
         public TEnum? GetEnumNullable<TEnum>(int index) where TEnum : struct
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(TEnum);
@@ -257,6 +274,7 @@ namespace CRL.LambdaQuery.Mapping
 
         public short GetInt16(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(short);
@@ -265,6 +283,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public short? GetInt16Nullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -273,6 +292,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public int GetInt32(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(int);
@@ -281,6 +301,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public int? GetInt32Nullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -289,6 +310,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public long GetInt64(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(long);
@@ -297,6 +319,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public long? GetInt64Nullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -305,6 +328,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public decimal GetDecimal(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(decimal);
@@ -313,6 +337,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public decimal? GetDecimalNullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -321,6 +346,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public double GetDouble(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(double);
@@ -329,6 +355,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public double? GetDoubleNullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -337,6 +364,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public float GetFloat(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(float);
@@ -345,6 +373,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public float? GetFloatNullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -353,6 +382,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public bool GetBoolean(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(bool);
@@ -361,6 +391,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public bool? GetBooleanNullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -369,6 +400,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public DateTime GetDateTime(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(DateTime);
@@ -377,6 +409,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public DateTime? GetDateTimeNullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -385,6 +418,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public Guid GetGuid(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(Guid);
@@ -393,6 +427,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public Guid? GetGuidNullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -401,6 +436,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public byte GetByte(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(byte);
@@ -409,6 +445,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public byte? GetByteNullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -417,6 +454,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public char GetChar(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return default(char);
@@ -425,6 +463,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public char? GetCharNullable(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -433,6 +472,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public string GetString(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;
@@ -441,6 +481,7 @@ namespace CRL.LambdaQuery.Mapping
         }
         public object GetIndexValue(int index)
         {
+            currentDataIndex = index;
             if (reader.IsDBNull(index))
             {
                 return null;

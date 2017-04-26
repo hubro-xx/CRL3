@@ -70,9 +70,9 @@ namespace CRL.CacheServer
         public override string SendQuery(string query)
         {
             var data = encode.GetBytes(query);
-            if (Connections.Count > 300)
+            if (Connections.Count > 500)
             {
-                throw new CRLException("TcpClientPool连接已超过300");
+                throw new CRLException("TcpClientPool连接已超过500");
             }
             Connection connection;
             lock (lockObj)

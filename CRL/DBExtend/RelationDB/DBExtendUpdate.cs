@@ -20,10 +20,11 @@ namespace CRL.DBExtend.RelationDB
         /// 格式化为更新值查询
         /// </summary>
         /// <param name="setValue"></param>
+        /// <param name="joinType"></param>
         /// <returns></returns>
         string ForamtSetValue<T>(ParameCollection setValue, Type joinType = null) where T : IModel
         {
-            string tableName = TypeCache.GetTableName(typeof(T), dbContext);
+            //string tableName = TypeCache.GetTableName(typeof(T), dbContext);
             string setString = "";
             var fields = TypeCache.GetProperties(typeof(T), true);
             foreach (var pair in setValue)
@@ -50,7 +51,7 @@ namespace CRL.DBExtend.RelationDB
                 }
                 else
                 {
-                    if (value.ToString().Contains("$"))//当是关联更新
+                    if (joinType != null && value.ToString().Contains("$"))//当是关联更新
                     {
 
                         if (!fields.ContainsKey(name))

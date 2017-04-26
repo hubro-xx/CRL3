@@ -35,7 +35,7 @@ namespace CRL
         public string TableName { get; set; }
 
         public Func<TObject> CreateObjectInstance;
-        private Dictionary<string, Accessor> accessorDict;
+        internal Dictionary<string, Accessor> accessorDict;
 
         public ReflectionInfo(Type modelType)
         {
@@ -191,7 +191,7 @@ namespace CRL
 
         public abstract class Accessor
         {
-            PropertyInfo _prop;
+            internal PropertyInfo _prop;
             public Accessor(PropertyInfo prop)
             {
                 _prop = prop;

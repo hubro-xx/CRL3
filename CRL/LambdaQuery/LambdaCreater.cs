@@ -155,7 +155,20 @@ namespace CRL.LambdaQuery
                     .ToLambda<Func<T, bool>>(parameter);
         }
         #endregion
-
+        public Expression And(Expression left, object value)
+        {
+            var parameter = CreateParameter();
+            var exp = left
+                    .And(left.GetConstant(value));
+            return exp;
+        }
+        public Expression Or(Expression left, object value)
+        {
+            var parameter = CreateParameter();
+            var exp = left
+                    .Or(left.GetConstant(value));
+            return exp;
+        }
         #region LessEqual(小于等于表达式)
 
         /// <summary>
@@ -243,6 +256,23 @@ namespace CRL.LambdaQuery
         }
 
         #endregion
+        public Expression<Func<T, bool>> IsNullOrEmpty(string propertyName, params object[] value)
+        {
+            var parameter = CreateParameter();
+            var property = parameter.Property(propertyName);
+            var call = Expression.Call(property.Type.GetMethod("IsNullOrEmpty", new Type[] { typeof(string) }), property);
+            return call.ToLambda<Func<T, bool>>(parameter);
+        }
+
+        public Expression<Func<T, bool>> Equals(string propertyName, params object[] value)
+        {
+            var parameter = CreateParameter();
+            var property = parameter.Property(propertyName);
+            var type2 = value[0].GetType();
+            var call = Expression.Call(property, property.Type.GetMethod("Equals", new Type[] { type2 }),
+                Expression.Constant(value[0], type2));
+            return call.ToLambda<Func<T, bool>>(parameter);
+        }
         public MethodCallExpression Substring(string propertyName, params object[] value)
         {
             var parameter = CreateParameter();
@@ -276,5 +306,99 @@ namespace CRL.LambdaQuery
                  args.ToArray());
             return call;
         }
+        #region 转换方法
+        public MethodCallExpression ToString(string propertyName, params object[] value)
+        {
+            var parameter = CreateParameter();
+            var property = parameter.Property(propertyName);
+            var args = new List<Expression>();
+            var argsTypes = new List<Type>();
+            foreach (var v in value)
+            {
+                args.Add(Expression.Constant(v));
+                argsTypes.Add(v.GetType());
+            }
+            var method = property.Type.GetMethod("ToString", argsTypes.ToArray());
+            var call = Expression.Call(property, method,
+                 args.ToArray());
+            return call;
+        }
+        public MethodCallExpression ToUpper(string propertyName, params object[] value)
+        {
+            var parameter = CreateParameter();
+            var property = parameter.Property(propertyName);
+            var args = new List<Expression>();
+            var argsTypes = new List<Type>();
+            foreach (var v in value)
+            {
+                args.Add(Expression.Constant(v));
+                argsTypes.Add(v.GetType());
+            }
+            var method = property.Type.GetMethod("ToUpper", argsTypes.ToArray());
+            var call = Expression.Call(property, method,
+                 args.ToArray());
+            return call;
+        }
+        public MethodCallExpression ToLower(string propertyName, params object[] value)
+        {
+            var parameter = CreateParameter();
+            var property = parameter.Property(propertyName);
+            var args = new List<Expression>();
+            var argsTypes = new List<Type>();
+            foreach (var v in value)
+            {
+                args.Add(Expression.Constant(v));
+                argsTypes.Add(v.GetType());
+            }
+            var method = property.Type.GetMethod("ToLower", argsTypes.ToArray());
+            var call = Expression.Call(property, method,
+                 args.ToArray());
+            return call;
+        }
+        public MethodCallExpression ToInt32(string propertyName, params object[] value)
+        {
+            var call = CreateConvert("ToInt32", propertyName, value);
+            return call;
+        }
+        public MethodCallExpression ToDecimal(string propertyName, params object[] value)
+        {
+            var call = CreateConvert("ToDecimal", propertyName, value);
+            return call;
+        }
+        public MethodCallExpression ToDouble(string propertyName, params object[] value)
+        {
+            var call = CreateConvert("ToDouble", propertyName, value);
+            return call;
+        }
+        public MethodCallExpression ToBoolean(string propertyName, params object[] value)
+        {
+            var call = CreateConvert("ToBoolean", propertyName, value);
+            return call;
+        }
+        public MethodCallExpression ToDateTime(string propertyName, params object[] value)
+        {
+            var call = CreateConvert("ToDateTime", propertyName, value);
+            return call;
+        }
+        public MethodCallExpression ToInt16(string propertyName, params object[] value)
+        {
+            var call = CreateConvert("ToInt16", propertyName, value);
+            return call;
+        }
+        public MethodCallExpression ToSingle(string propertyName, params object[] value)
+        {
+            var call = CreateConvert("ToSingle", propertyName, value);
+            return call;
+        }
+        MethodCallExpression CreateConvert(string methodName,string propertyName, params object[] value)
+        {
+            var parameter = CreateParameter();
+            var property = parameter.Property(propertyName);
+            var method = typeof(Convert).GetMethod(methodName, new Type[] { property.Type });
+            var call = Expression.Call(method,
+                 property);
+            return call;
+        }
+        #endregion
     }
 }

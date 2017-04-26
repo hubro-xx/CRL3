@@ -168,13 +168,13 @@ namespace CRL.LambdaQuery
         {
             if (exp.Type == CRLExpression.CRLExpressionType.Binary || exp.Type == CRLExpression.CRLExpressionType.Tree)//表示二元运算
             {
-                return BinaryCRLExpression(exp.Left, exp.Right, exp.ExpressionType);
+                return BinaryCRLExpression(exp.Left, exp.Right, exp.ExpType);
             }
             else if(exp.Type== CRLExpression.CRLExpressionType.MethodCall)
             {
                 var methodInfo = exp.Data as CRLExpression.MethodCallObj;
-                var left = new CRLExpression.CRLExpression() { ExpressionType = methodInfo.ExpressionType.ToString(), Type = CRLExpression.CRLExpressionType.MethodCallArgs, Data = methodInfo };
-                var right = new CRLExpression.CRLExpression() { ExpressionType = methodInfo.ExpressionType.ToString(), Type = CRLExpression.CRLExpressionType.MethodCallArgs, Data = methodInfo.Args };
+                var left = new CRLExpression.CRLExpression() { ExpType = methodInfo.ExpressionType.ToString(), Type = CRLExpression.CRLExpressionType.MethodCallArgs, Data = methodInfo };
+                var right = new CRLExpression.CRLExpression() { ExpType = methodInfo.ExpressionType.ToString(), Type = CRLExpression.CRLExpressionType.MethodCallArgs, Data = methodInfo.Args };
                 return BinaryCRLExpression(left, right, methodInfo.ExpressionType.ToString());
             }
             //按值
