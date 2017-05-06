@@ -42,8 +42,8 @@ namespace WebTest.Code
         public static void TestMethod()
         {
             //扩展方法测试
-            var instance = Code.ProductDataManage.Instance;
-            instance.QueryItem(1);
+            //var instance = Code.ProductDataManage.Instance;
+            //instance.QueryItem(1);
             var query = ProductDataManage.Instance.GetLambdaQuery();
             query.Where(b => b.TransType == TransType.In);
             var item = new ProductData();

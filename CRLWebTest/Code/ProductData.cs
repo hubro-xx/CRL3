@@ -156,6 +156,12 @@ namespace WebTest.Code
             get;
             set;
         }
+        [CRL.Attribute.Field(Length =4000)]
+        public string Remark
+        {
+            get;
+            set;
+        }
         public bool IsTop
         {
             get;

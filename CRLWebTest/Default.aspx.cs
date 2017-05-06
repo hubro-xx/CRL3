@@ -21,15 +21,9 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-            var name = Request["name"];
-            var manage = Code.ProductDataManage.Instance;
-            Code.ProductData data = null;
-            var time = DateTime.Now;
-            var query = manage.GetLambdaQuery();
-            query.Where(b => b.Number > time.Second);
-            //var result = query.SelectV(b => new { b.TransType, b.UserId }).ToList();
-            var result = query.ToList();
-            Response.Write(query.PrintQuery());
+            var query = Code.OrderManage.Instance.GetLambdaQuery();
+            query.SelectV(b => new { aa = b.Id * 10 });
+            //Response.End();
             //Code.TestAll.TestUpdate();
             //return;
             //Update.TestModified();

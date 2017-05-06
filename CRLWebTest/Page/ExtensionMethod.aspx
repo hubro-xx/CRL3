@@ -31,4 +31,36 @@
         query.Where(b => !string.IsNullOrEmpty(b.BarCode));
         query.PrintQuery();
     </pre>
+    支持的扩展方法
+    <pre>
+        methodDic.Add("Like", StringLike);
+        methodDic.Add("LikeLeft", StringLikeLeft);
+        methodDic.Add("LikeRight", StringLikeRight);
+        methodDic.Add("Contains", StringContains);
+        methodDic.Add("Between", Between);
+        methodDic.Add("DateDiff", DateTimeDateDiff);
+        methodDic.Add("In", In);
+        methodDic.Add("Substring", Substring);
+        methodDic.Add("COUNT", Count);
+        methodDic.Add("Count", Count);
+        methodDic.Add("SUM", Sum);
+        methodDic.Add("MAX", Max);
+        methodDic.Add("MIN", Min);
+        methodDic.Add("AVG", AVG);
+        methodDic.Add("Equals", Equals);
+        methodDic.Add("StartsWith", StartsWith);
+        methodDic.Add("IsNullOrEmpty", IsNullOrEmpty);
+        methodDic.Add("ToString", CaseToType);
+        methodDic.Add("ToInt32", CaseToType);
+        methodDic.Add("ToDecimal", CaseToType);
+        methodDic.Add("ToDouble", CaseToType);
+        methodDic.Add("ToBoolean", CaseToType);
+        methodDic.Add("ToDateTime", CaseToType);
+        methodDic.Add("ToInt16", CaseToType);
+        methodDic.Add("Parse", CaseToType);
+        methodDic.Add("ToSingle", CaseToType);
+        methodDic.Add("ToUpper", ToUpper);
+        methodDic.Add("ToLower", ToLower);
+        methodDic.Add("IsNull", IsNull);
+    </pre>
 </asp:Content>

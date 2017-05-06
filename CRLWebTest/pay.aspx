@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="pay.aspx.cs" Inherits="WebTest.pay" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="pay.aspx.cs" validateRequest="false" Inherits="WebTest.pay" %>
 
 <!DOCTYPE html>
 
@@ -11,7 +11,7 @@
     <form id="form1" runat="server">
     <div>
     
-        <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" style="height: 21px" Text="鉴权" />
+        <asp:TextBox ID="TextBox1" runat="server" Height="271px" TextMode="MultiLine"></asp:TextBox>
         <asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="支付" />
     
     </div>

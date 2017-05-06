@@ -32,7 +32,7 @@
     在Global中配置数据源和服务监听
     <pre>
     //增加处理规则
-    CRL.CacheServerSetting.AddCacheServerDealDataRule(typeof(Code.ProductData), Code.ProductDataManage.Instance.DeaCacheCommand);
+    CRL.CacheServerSetting.AddCacheServerDealDataRule(typeof(Code.CacheDataTest), Code.CacheDataTestManage.Instance.DeaCacheCommand);
     //启动服务端
     var cacheServer = new CRL.CacheServer.TcpServer(1129);
     cacheServer.Start();
@@ -44,7 +44,7 @@
     CRL.CacheServerSetting.AddTcpServerListen("127.0.0.1", 1129);
     CRL.CacheServerSetting.Init();
     </pre>
-    启用远端缓存查询,重写ProductDataManage属性
+    启用远端缓存查询,重写CacheDataTestManage属性
     <pre>
     //是否从远程查询缓存
     protected override bool QueryCacheFromRemote
@@ -57,9 +57,10 @@
     </pre>
     <strong>调用</strong><asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="测试" />
 &nbsp;<strong><asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="更新测试" />
+    <asp:Button ID="Button3" runat="server" OnClick="Button3_Click" Text="Button" />
     </strong>
     <pre>
-    var list = Code.ProductDataManage.Instance.QueryItemFromCache(b => b.Id > 0 && b.ProductName.Contains("product"));
+    var list = Code.CacheDataTestManage.Instance.QueryItemFromCache(b => b.Id > 0 && b.Name.Contains("name"));
     Response.Write(list.ToString());
     </pre>
 </asp:Content>

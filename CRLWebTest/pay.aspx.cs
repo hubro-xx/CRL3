@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using CRL.Package;
+using CRL;
 namespace WebTest
 {
     public partial class pay : System.Web.UI.Page
@@ -43,29 +44,11 @@ namespace WebTest
         static string token;
         protected void Button2_Click(object sender, EventArgs e)
         {
-            var request = new CRL.Package.OnlinePay.Company.Bill99.TxnMsgContent.Request();
-            request.amount = "100.00"; //与鉴权订单金额一致
-            request.customerId = "201105";//必须要
-
-            var ex = new CRL.Package.OnlinePay.Company.Bill99.TxnMsgContent.Request._extData();
-            //扩展字段信息        
-            ex.validCode = "949378";//手机验证码
-            ex.savePciFlag = "1";//是否保存鉴权信息 1保存 0不保存
-            ex.token = token;//手机验证令牌
-            ex.payBatch = "2";//快捷支付批次 1首次支付 2再次支付
-            ex.phone = "15861806195";
-            request.extData = ex;
-
-            //以下第二次支付可以不用填写
-            request.cardNo = "4380880000000007";
-            request.expiredDate = "0911";
-            request.cvv2 = "111";
-            request.cardHolderName = "测试";
-            request.cardHolderId = "340827198512011810";
-            request.idType = "0";
-            string error;
-            var result = CRL.Package.OnlinePay.Company.Bill99.Bill99Util.Purchase(request, true, out error);
-            Response.Write(string.Format("{0},{1}", result, error));
+            var data = new Code.ProductData();
+            data.Id = 1;
+            string remark = System.IO.File.ReadAllText(Server.MapPath("code.txt"));
+            data.Change(b => b.Remark, remark);
+            Code.ProductDataManage.Instance.Update(data);
         }
     }
 }

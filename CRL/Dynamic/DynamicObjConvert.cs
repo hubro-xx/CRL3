@@ -38,13 +38,22 @@ namespace CRL.Dynamic
             {
                 columns.Add(reader.GetName(i));
             }
-
-            while (reader.Read())
+            try
             {
-                object[] values = new object[columns.Count];
-                reader.GetValues(values);
-                var d = getRow(columns, values);
-                list.Add(d);
+                #region while
+                while (reader.Read())
+                {
+                    object[] values = new object[columns.Count];
+                    reader.GetValues(values);
+                    var d = getRow(columns, values);
+                    list.Add(d);
+                }
+                #endregion
+            }
+            catch(Exception ero)
+            {
+                reader.Close();
+                throw new CRLException("读取数据时发生错误:" + ero.Message);
             }
             reader.Close();
             runTime = (DateTime.Now - time).TotalMilliseconds;

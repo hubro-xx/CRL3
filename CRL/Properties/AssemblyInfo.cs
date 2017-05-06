@@ -19,7 +19,7 @@ using System.Security;
 [assembly: AssemblyCompany("hubro")]
 [assembly: AssemblyProduct("CRL")]
 [assembly: AssemblyCopyright("Copyright © hubro 2013-2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("http://www.cnblogs.com/hubro/")]
 [assembly: AssemblyCulture("")]
 //[assembly: System.Security.Permissions.SecurityPermissionAttribute(System.Security.Permissions.SecurityAction.RequestRefuse,SkipVerification=true)]
 //[assembly: SecurityRules(SecurityRuleSet.Level1, SkipVerificationInFullTrust = true)]

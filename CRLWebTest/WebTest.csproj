@@ -24,6 +24,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <TargetFrameworkProfile />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -114,6 +115,7 @@
     <Content Include="Page\Cache.aspx" />
     <Content Include="Page\Cache2.aspx" />
     <Content Include="Page\CacheManage.aspx" />
+    <Content Include="Page\CallContext.aspx" />
     <Content Include="Page\DataVerification.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Page\Delete.aspx" />
@@ -149,6 +151,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\CacheDataTest.cs" />
     <Compile Include="Code\ClassGuid.cs" />
     <Compile Include="Code\Dapper.cs" />
     <Compile Include="Code\Member.cs" />
@@ -210,6 +213,13 @@
     </Compile>
     <Compile Include="Page\CacheServer.ashx.cs">
       <DependentUpon>CacheServer.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\CallContext.aspx.cs">
+      <DependentUpon>CallContext.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\CallContext.aspx.designer.cs">
+      <DependentUpon>CallContext.aspx</DependentUpon>
     </Compile>
     <Compile Include="Page\DataVerification.aspx.cs">
       <DependentUpon>DataVerification.aspx</DependentUpon>
@@ -460,6 +470,8 @@
           <DevelopmentServerPort>56640</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:56641/</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>http://localhost:56641/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -75,6 +75,7 @@ left:500px;
                             menus.Add("大数据分库分表", "/page/Sharding.aspx");
                             menus.Add("MongoDB测试", "/page/MongoDB.aspx");
                             menus.Add("导出对象文档", "/page/ExportModelInfo.aspx");
+                            menus.Add("CallContext", "/page/CallContext.aspx");
                             menus.Add("版本/讨论", "/page/About.aspx");
                         %>
                         <%foreach (var item in menus)

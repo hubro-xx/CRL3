@@ -22,13 +22,19 @@ namespace WebTest
 
             int m = 10;
             var query = new CRL.LambdaQuery.CRLExpression.CRLExpressionVisitor<Code.ProductData>();
-            var re = query.Where(b =>b.Id == 10);
+            var re = query.Where(b => b.Id.Equals(2));
+            //var re = query.Where(b => b.Id==2);
+            //var re = query.Where(b => (b.Id | 1) == 1);
+            //var re = query.Where(b => int.Parse(b.CategoryName) == 11);
+            //var re = query.Where(b => b.CategoryName.ToUpper()=="22");
+            //var re = query.Where(b => b.Id.ToString()=="22");
+            //var re = query.Where(b => Convert.ToInt32(b.Style) == m);
             //var re = query.Where(b => b.ProductName.Substring(2)=="22");
             //var re = query.Where(b => b.ProductName.IndexOf("22")==1);
-
+            //var re = query.Where(b => b.ProductName.IndexOf("22") == 1&&b.Id==m);
             //还原
             var obj = CRL.LambdaQuery.CRLExpression.CRLQueryExpression.FromJson(re);
-            var expression = query.CreateLambda(obj.Expression);
+            var expression = query.CreateLambda(obj.Exp);
             var pc = expression.Compile();
             //re = CRL.CacheServer.CacheServer.Query(obj);
             TextBox1.Text = re.ToString();
