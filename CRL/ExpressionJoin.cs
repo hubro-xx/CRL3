@@ -49,7 +49,7 @@ namespace CRL
         {
             if (currentExpression != null)
             {
-                var exp = currentExpression.And(expr2);
+                var exp = currentExpression.AndAlso(expr2);
                 currentExpression = exp;
             }
             else

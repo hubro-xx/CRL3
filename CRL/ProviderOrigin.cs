@@ -113,7 +113,7 @@ namespace CRL
                  var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);
                  if (_useCRLContext)//对于数据库事务,只创建一个上下文
                  {
-                     return GetDBExtend(true);
+                     return GetDBExtend();
                  }
                 if (_dBExtend == null)
                 {
@@ -141,11 +141,10 @@ namespace CRL
         /// 按指定的类型
         /// </summary>
         /// <returns></returns>
-        protected AbsDBExtend GetDBExtend(bool cache = true)
+        protected AbsDBExtend GetDBExtend()
         {
             AbsDBExtend db = null;
-            string contextName = "DBExtend." + GetType().Name;//同一线程调用只创建一次
-
+            string contextName = GetType().Name;//同一线程调用只创建一次
             var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);
             if (_useCRLContext)//对于数据库事务,只创建一个上下文
             {
@@ -166,14 +165,11 @@ namespace CRL
             {
                 db.OnUpdateNotifyCacheServer = OnUpdateNotifyCacheServer;
             }
-            if (cache)
-            {
-                var allKey = "AllDBExtend";
-                var allList = Base.GetCallDBContext();
-                CallContext.SetData(contextName, db);
-                allList.Add(contextName);
-                CallContext.SetData(allKey, allList);
-            }
+            CallContext.SetData(contextName, db);
+            var allKey = "__AllDBExtend";
+            var allList = Base.GetCallDBContext();
+            allList.Add(contextName);
+            CallContext.SetData(allKey, allList);
             return db;
         }
         #endregion
@@ -684,7 +680,7 @@ namespace CRL
             var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);//事务已开启,内部事务不用处理
             using (var context = new CRLDbConnectionScope())
             {
-                var db = GetDBExtend(true);
+                var db = GetDBExtend();
                 if (!_useCRLContext)
                 {
                     db.BeginTran();

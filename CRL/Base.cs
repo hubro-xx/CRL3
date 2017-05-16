@@ -60,11 +60,26 @@ namespace CRL
             {
                 if (typeCRL.IsAssignableFrom(type))
                 {
-                    var obj = System.Activator.CreateInstance(type) as IProvider;
+                    if (type.ContainsGenericParameters)
+                    {
+                        continue;
+                    }
+                        IProvider obj;
+                    try
+                    {
+                        obj = System.Activator.CreateInstance(type) as IProvider;
+                    }
+                    catch (Exception ero)
+                    {
+                        throw new Exception(ero.Message+ type);
+                    }
                     var table = TypeCache.GetTable(obj.ModelType);
                     var pro = type.GetProperty("DBExtend", BindingFlags.Instance | BindingFlags.NonPublic);
                     var db = pro.GetValue(obj) as AbsDBExtend;
-                    findTypes.Add(table, db);
+                    if (!findTypes.ContainsKey(table))
+                    {
+                        findTypes.Add(table, db);
+                    }
                 }
             }
             return findTypes;
@@ -161,7 +176,7 @@ namespace CRL
         /// <returns></returns>
         public static List<string> GetCallDBContext()
         {
-            var allKey = "AllDBExtend";
+            var allKey = "__AllDBExtend";
             var allList = CallContext.GetData<List<string>>(allKey);
             if (allList == null)
             {

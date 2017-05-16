@@ -341,7 +341,7 @@ namespace CRL.LambdaQuery
         #region And(与表达式)
 
         /// <summary>
-        /// 与操作表达式
+        /// 与操作表达式 
         /// </summary>
         /// <param name="left">左操作数</param>
         /// <param name="right">右操作数</param>
@@ -360,7 +360,7 @@ namespace CRL.LambdaQuery
         /// <typeparam name="T">对象类型</typeparam>
         /// <param name="left">左操作数</param>
         /// <param name="right">右操作数</param>
-        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
+        internal static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
         {
             if (left == null)
                 return right;
@@ -370,6 +370,21 @@ namespace CRL.LambdaQuery
         }
 
         #endregion
+
+        /// <summary>
+        /// 并且条件表达式 
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static Expression<Func<T, bool>> AndAlso<T>(this Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
+        {
+            if (left == null)
+                return right;
+            if (right == null)
+                return left;
+            return left.Compose(right, Expression.AndAlso);
+        }
 
         #region Or(或表达式)
 
