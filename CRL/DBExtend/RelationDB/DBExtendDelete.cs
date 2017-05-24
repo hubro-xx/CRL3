@@ -22,13 +22,13 @@ namespace CRL.DBExtend.RelationDB
         /// <typeparam name="TModel"></typeparam>
         /// <param name="where"></param>
         /// <returns></returns>
-        internal int Delete<TModel>(string where)where TModel:IModel,new()
+        internal int Delete<TModel>(string where) where TModel : IModel, new()
         {
             CheckTableCreated<TModel>();
-            string table = TypeCache.GetTableName(typeof(TModel),dbContext);
+            string table = TypeCache.GetTableName(typeof(TModel), dbContext);
             string sql = _DBAdapter.GetDeleteSql(table, where);
             sql = _DBAdapter.SqlFormat(sql);
-            int n = __DbHelper.Execute(sql);
+            var n = SqlStopWatch.Execute(__DbHelper, sql);
             ClearParame();
             return n;
         }

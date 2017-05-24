@@ -260,7 +260,7 @@ EXECUTE  ' {1} ';
             else
             {
                 sql += "SELECT LAST_INSERT_ID();";
-                return helper.ExecScalar(sql);
+                return SqlStopWatch.ExecScalar(helper, sql);
             }
         }
         /// <summary>

@@ -251,7 +251,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
 
             string sequenceName = string.Format("{0}_sequence", table);
             var sqlGetIndex = string.Format("select {0}.nextval from dual", sequenceName);//oracle不能同时执行多条语句
-            int id = Convert.ToInt32(helper.ExecScalar(sqlGetIndex));
+            int id = Convert.ToInt32(SqlStopWatch.ExecScalar(helper, sqlGetIndex));
             foreach (Attribute.FieldAttribute info in typeArry)
             {
                 if (info.FieldType != Attribute.FieldType.数据库字段)

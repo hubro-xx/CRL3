@@ -169,6 +169,11 @@ namespace CRL
             MemoryDataCache.CacheService.StopWatch();
             ExistsTableCache.ColumnBackgroundCheck.Stop();
         }
+        #region callContext
+        internal const string UseCRLContextFlagName = "__CRLContextFlagName";
+        internal const string CRLContextName = "__TransDbContext";
+        internal const string AllDBExtendName = "__AllDBExtend";
+        internal const string SQLRunningtimeName = "__SQLRunningtime";
         /// <summary>
         /// 获取当前调用所有的数据访问会话
         /// 可用此检查代码调用深度
@@ -176,14 +181,47 @@ namespace CRL
         /// <returns></returns>
         public static List<string> GetCallDBContext()
         {
-            var allKey = "__AllDBExtend";
-            var allList = CallContext.GetData<List<string>>(allKey);
+            var allList = CallContext.GetData<List<string>>(AllDBExtendName);
             if (allList == null)
             {
                 allList = new List<string>();
+                CallContext.SetData(AllDBExtendName, allList);
             }
             return allList;
         }
+        public struct SqlInfo
+        {
+            /// <summary>
+            /// sql
+            /// </summary>
+            public string SQL
+            {
+                get;set;
+            }
+            /// <summary>
+            /// ms
+            /// </summary>
+            public long Time
+            {
+                get; set;
+            }
+        }
+        public static List<SqlInfo> GetSQLRunningtime()
+        {
+            var allList = CallContext.GetData<List<SqlInfo>>(SQLRunningtimeName);
+            if (allList == null)
+            {
+                allList = new List<SqlInfo>();
+                CallContext.SetData(SQLRunningtimeName,allList);
+            }
+            return allList;
+        }
+        internal static void SaveSQLRunningtme(string sql,long n)
+        {
+            var list = GetSQLRunningtime();
+            list.Add(new SqlInfo { SQL = sql, Time = n });
+        }
+        #endregion
         public static Dictionary<string, int> GetTempCacheCount()
         {
             var dic = new Dictionary<string, int>();
@@ -194,7 +232,6 @@ namespace CRL
             dic.Add("对象映射列缓存", ObjectConvert.columnCache.Count);
             return dic;
         }
-        internal const string UseCRLContextFlagName = "CRLContextFlagName";
-        internal const string CRLContextName = "TransDbContext";
+
     }
 }

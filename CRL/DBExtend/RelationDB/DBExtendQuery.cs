@@ -53,12 +53,12 @@ namespace CRL.DBExtend.RelationDB
             {
                 if (!compileSp)
                 {
-                    reader = __DbHelper.ExecDataReader(sql);
+                    reader = SqlStopWatch.ExecuteDataReader(__DbHelper,sql);
                 }
                 else//生成储过程
                 {
                     string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-                    reader = __DbHelper.RunDataReader(sp);
+                    reader = SqlStopWatch.RunDataReader(__DbHelper,sp);
                 }
                 query.ExecuteTime += __DbHelper.ExecuteTime;
                 var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetQueryFieldString(), query.GetFieldMapping());

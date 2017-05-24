@@ -38,7 +38,7 @@ namespace CRL.DBExtend.RelationDB
         public override List<dynamic> RunDynamicList(string sp)
         {
             double runTime;
-            var reader = __DbHelper.RunDataReader(sp);
+            var reader = SqlStopWatch.RunDataReader(__DbHelper,sp);
             ClearParame();
             return Dynamic.DynamicObjConvert.DataReaderToDynamic(reader,out runTime);
         }
@@ -161,12 +161,12 @@ namespace CRL.DBExtend.RelationDB
                 {
                     __DbHelper.AutoFormatWithNolock = false;
                 }
-                reader = __DbHelper.ExecDataReader(sql);
+                reader = SqlStopWatch.ExecuteDataReader(__DbHelper,sql);
             }
             else//生成储过程
             {
                 string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-                reader = __DbHelper.RunDataReader(sp);
+                reader = SqlStopWatch.RunDataReader(__DbHelper,sp);
             }
             query.ExecuteTime = __DbHelper.ExecuteTime;
             ClearParame();

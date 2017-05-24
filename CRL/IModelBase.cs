@@ -281,6 +281,13 @@ namespace CRL
         {
             return GetUpdateField(false).Count > 0;
         }
+        /// <summary>
+        /// 清除通过Change方法设置的变更字典
+        /// </summary>
+        public void ClearChangedFiled()
+        {
+            Changes.Clear();
+        }
         #endregion
 
         /// <summary>

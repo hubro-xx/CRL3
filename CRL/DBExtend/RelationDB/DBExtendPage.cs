@@ -14,53 +14,7 @@ namespace CRL.DBExtend.RelationDB
 {
     public sealed partial class DBExtend
     {
-        #region 分页
-        ///// <summary>
-        ///// 动态对象分页
-        ///// </summary>
-        ///// <typeparam name="TModel"></typeparam>
-        ///// <param name="query"></param>
-        ///// <returns></returns>
-        //public override List<dynamic> PageDynamic<TModel>(LambdaQuery<TModel> query)
-        //{
-        //    int count;
-        //    var reader = GetPageReader(query);
-        //    var list = reader.GetDataDynamic(out count);
-        //    query.MapingTime += reader.runTime;
-        //    query.RowCount = count;
-        //    return list;
-        //}
-        ///// <summary>
-        ///// 分页
-        ///// </summary>
-        ///// <typeparam name="TModel"></typeparam>
-        ///// <param name="query"></param>
-        ///// <returns></returns>
-        //public override List<TModel> Page<TModel>(LambdaQuery<TModel> query)
-        //{
-        //    int count;
-        //    var reader = GetPageReader(query);
-        //    var list = reader.GetDataTResult<TModel>(false, out count, query.GetFieldMapping());
-        //    query.MapingTime += reader.runTime;
-        //    query.RowCount = count;
-        //    return list;
-        //}
-        ///// <summary>
-        ///// 指定对象分页
-        ///// </summary>
-        ///// <typeparam name="TResult"></typeparam>
-        ///// <param name="query"></param>
-        ///// <returns></returns>
-        //public override List<TResult> Page<TResult>(LambdaQueryBase query)
-        //{
-        //    int count;
-        //    var reader = GetPageReader(query);
-        //    var list = reader.GetDataTResult<TResult>(false, out count, query.GetFieldMapping());
-        //    query.MapingTime += reader.runTime;
-        //    query.RowCount = count;
-        //    return list;
-        //}
-        #endregion
+        
         #region 按存储过程
         /// <summary>
         /// 按编译
@@ -98,7 +52,7 @@ namespace CRL.DBExtend.RelationDB
             //string sql = string.Format("{0} with(nolock) where {1}", tableName, where);
             string sp = CompileSqlToSp(_DBAdapter.TemplatePage, condition, dic);
             CallBackDataReader reader;
-            reader = new CallBackDataReader(__DbHelper.RunDataReader(sp), () =>
+            reader = new CallBackDataReader(SqlStopWatch.RunDataReader(__DbHelper,sp), () =>
             {
                 return GetOutParam<int>("count");
             });
@@ -142,7 +96,7 @@ namespace CRL.DBExtend.RelationDB
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
             string countSql = string.Format("select count(*) from {0}", condition);
-            int count = Convert.ToInt32(__DbHelper.ExecScalar(countSql));
+            int count = Convert.ToInt32(SqlStopWatch.ExecScalar(__DbHelper, countSql));
             query1.ExecuteTime += __DbHelper.ExecuteTime;
             query1.RowCount = count;
             //if (count == 0)
@@ -156,7 +110,7 @@ namespace CRL.DBExtend.RelationDB
             var start = pageSize * (pageIndex - 1) + 1;
             var end = start + pageSize - 1;
             string sql = _DBAdapter.PageSqlFormat(fields, rowOver, condition, start, end, orderBy);
-            var reader = new CallBackDataReader(__DbHelper.ExecDataReader(sql), () =>
+            var reader = new CallBackDataReader(SqlStopWatch.ExecuteDataReader(__DbHelper,sql), () =>
             {
                 return count;
             });
@@ -207,7 +161,7 @@ namespace CRL.DBExtend.RelationDB
             //dic.Add("sort", sort1);
             string sp = CompileSqlToSp(_DBAdapter.TemplateGroupPage, conditions, dic);
             CallBackDataReader reader;
-            reader = new CallBackDataReader(__DbHelper.RunDataReader(sp), () =>
+            reader = new CallBackDataReader(SqlStopWatch.RunDataReader(__DbHelper,sp), () =>
             {
                 return GetOutParam<int>("count");
             });
@@ -252,7 +206,7 @@ namespace CRL.DBExtend.RelationDB
             pageSize = pageSize == 0 ? 15 : pageSize;
 
             string countSql = string.Format("select count(*)  from (select count(*) as a from {0}) t", condition);
-            int count = Convert.ToInt32(__DbHelper.ExecScalar(countSql));
+            int count = Convert.ToInt32(SqlStopWatch.ExecScalar(__DbHelper, countSql));
             query1.ExecuteTime += __DbHelper.ExecuteTime;
             query1.RowCount = count;
             //if (count == 0)
@@ -268,7 +222,7 @@ namespace CRL.DBExtend.RelationDB
             string sql = _DBAdapter.PageSqlFormat(fields, rowOver, condition, start, end, "");
             //System.Data.Common.DbDataReader reader;
             //reader = dbHelper.ExecDataReader(sql);
-            var reader = new CallBackDataReader(__DbHelper.ExecDataReader(sql), () =>
+            var reader = new CallBackDataReader(SqlStopWatch.ExecuteDataReader(__DbHelper,sql), () =>
             {
                 return count;
             });

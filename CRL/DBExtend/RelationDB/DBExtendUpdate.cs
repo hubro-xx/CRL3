@@ -101,7 +101,7 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="setValue"></param>
         /// <param name="where"></param>
         /// <returns></returns>
-        internal int Update<TModel>(ParameCollection setValue, string where) where TModel : IModel,new()
+        internal int Update<TModel>(ParameCollection setValue, string where) where TModel : IModel, new()
         {
             CheckTableCreated<TModel>();
             Type type = typeof(TModel);
@@ -109,7 +109,7 @@ namespace CRL.DBExtend.RelationDB
             string setString = ForamtSetValue<TModel>(setValue);
             string sql = _DBAdapter.GetUpdateSql(table, setString, where);
             sql = _DBAdapter.SqlFormat(sql);
-            int n = __DbHelper.Execute(sql);
+            var n = SqlStopWatch.Execute(__DbHelper, sql);
             ClearParame();
             return n;
         }

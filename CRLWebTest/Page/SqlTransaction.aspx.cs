@@ -52,9 +52,12 @@ namespace WebTest
             string error;
             var watch = new Stopwatch();
             watch.Start();
-            var a = Code.OrderManage.Instance.TransactionTest2(out error);
+            for (int i = 0; i < 10; i++)
+            {
+                var a = Code.OrderManage.Instance.TransactionTest2(out error);
+            }
             watch.Stop();
-            Response.Write("提交" + a + error);
+            Response.Write("操作" + watch.ElapsedMilliseconds);
         }
 
         protected void Button5_Click(object sender, EventArgs e)
@@ -62,7 +65,7 @@ namespace WebTest
             var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id > 0);
             string error;
             var a = Code.OrderManage.Instance.TransactionTest3(out error);
-            var allDBContext = CRL.Base.GetCallDBContext();
+            //var allDBContext = CRL.Base.GetCallDBContext();
             Response.Write("提交" + a + error);
         }
     }

@@ -80,6 +80,10 @@ namespace CRL.LambdaQuery
                 __QueryOrderBy += ",";
             }
             var key = TypeCache.GetTable(typeof(T)).PrimaryKey;
+            if (key == null)
+            {
+                return this;
+            }
             __QueryOrderBy += string.Format(" {2}{0} {1}", key.MapingName, desc ? "desc" : "asc", GetPrefix());
             //QueryOrderBy = ReplacePrefix(QueryOrderBy);
             return this;

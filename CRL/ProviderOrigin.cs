@@ -166,10 +166,9 @@ namespace CRL
                 db.OnUpdateNotifyCacheServer = OnUpdateNotifyCacheServer;
             }
             CallContext.SetData(contextName, db);
-            var allKey = "__AllDBExtend";
             var allList = Base.GetCallDBContext();
             allList.Add(contextName);
-            CallContext.SetData(allKey, allList);
+            //CallContext.SetData(Base.AllDBExtendName, allList);
             return db;
         }
         #endregion

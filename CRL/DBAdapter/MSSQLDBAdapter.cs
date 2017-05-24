@@ -320,7 +320,7 @@ end", spName, script);
             else
             {
                 sql += "SELECT scope_identity() ;";
-                return helper.ExecScalar(sql);
+                return SqlStopWatch.ExecScalar(helper,sql);
             }
         }
         /// <summary>

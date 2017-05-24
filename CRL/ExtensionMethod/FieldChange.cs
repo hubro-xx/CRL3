@@ -89,7 +89,7 @@ namespace CRL
             var field = pro[name];
             var Reflection = ReflectionHelper.GetInfo<T>();
             //field.TupleSetValue<T>(obj, value);
-            Reflection.GetAccessor(field.MemberName).Set((T)obj, value);
+            Reflection.GetAccessor(field.MemberName).Set(obj, value);
             obj.SetChanges(name, value);
         }
         #region 表示按值累加

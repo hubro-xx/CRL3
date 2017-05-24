@@ -216,6 +216,7 @@
     <Compile Include="Sharding\DB\TablePartManage.cs" />
     <Compile Include="Sharding\Location.cs" />
     <Compile Include="Sharding\UnionType.cs" />
+    <Compile Include="SqlStopWatch.cs" />
     <Compile Include="SummaryAnalysis.cs" />
     <Compile Include="ExistsTableCache\ExistsTableCache.cs" />
     <Compile Include="TypeCache.cs" />

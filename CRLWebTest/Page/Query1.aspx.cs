@@ -27,8 +27,8 @@ namespace WebTest
             //使用同一个数据连接
             Code.ProductDataManage.Instance.PackageMethod(() =>
             {
-                var item = Code.ProductDataManage.Instance.QueryItem(2);
-                var item2 = Code.ProductDataManage.Instance.QueryItem(2);
+                var item = Code.ProductDataManage.Instance.QueryItem(b=>b.Id==2);
+                var item2 = Code.ProductDataManage.Instance.QueryItem(b=>b.Id==3);
             });
             //查询一项
             using (var context = new CRL.CRLDbConnectionScope())//使用同一个数据连接

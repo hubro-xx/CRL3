@@ -182,7 +182,7 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            var  reader = __DbHelper.ExecDataReader(sql);
+            var  reader = SqlStopWatch.ExecuteDataReader(__DbHelper,sql);
             ClearParame();
             return reader;
         }
@@ -202,7 +202,7 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            int count = __DbHelper.Execute(sql);
+            int count = SqlStopWatch.Execute(__DbHelper, sql);
             ClearParame();
             return count;
         }
@@ -216,7 +216,7 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            object obj = __DbHelper.ExecScalar(sql);
+            object obj = SqlStopWatch.ExecScalar(__DbHelper, sql);
             ClearParame();
             return obj;
         }
@@ -258,7 +258,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override List<T> RunList<T>(string sp)
         {
-            var reader = __DbHelper.RunDataReader(sp);
+            var reader = SqlStopWatch.RunDataReader(__DbHelper,sp);
             ClearParame();
             //double runTime;
             //return ObjectConvert.DataReaderToList<T>(reader, out runTime);

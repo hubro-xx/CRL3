@@ -21,12 +21,8 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-            var query = Code.OrderManage.Instance.GetLambdaQuery();
-            query.SelectV(b => new { aa = b.Id * 10 });
-            //Response.End();
-            //Code.TestAll.TestUpdate();
-            //return;
-            //Update.TestModified();
+
         }
+        
     }
 }
