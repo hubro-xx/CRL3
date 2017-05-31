@@ -265,7 +265,7 @@ namespace CRL.DBAdapter
             var reader = new CallBackDataReader(helper.RunDataReader("sp_page"), () =>
             {
                 return Convert.ToInt32(helper.GetOutParam("count_"));
-            });
+            }, query);
             return reader;
         }
         #region 函数语法

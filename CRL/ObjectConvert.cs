@@ -289,9 +289,10 @@ namespace CRL
             var objCreater = queryInfo.GetObjCreater();
             int leftColumnCount = leftColumns.Count;
             var type = typeof(T);
+            DataContainer dataContainer;
             while (reader.Read())
             {
-                var dataContainer = new DataContainer(reader, type, dicColumns);
+                dataContainer = new DataContainer(reader, type, dicColumns);
                 T detailItem;
                 try
                 {

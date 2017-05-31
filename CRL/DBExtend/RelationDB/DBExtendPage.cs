@@ -52,10 +52,10 @@ namespace CRL.DBExtend.RelationDB
             //string sql = string.Format("{0} with(nolock) where {1}", tableName, where);
             string sp = CompileSqlToSp(_DBAdapter.TemplatePage, condition, dic);
             CallBackDataReader reader;
-            reader = new CallBackDataReader(SqlStopWatch.RunDataReader(__DbHelper,sp), () =>
+            reader = new CallBackDataReader(__DbHelper.RunDataReader(sp), () =>
             {
                 return GetOutParam<int>("count");
-            });
+            },sp);
             ClearParame();
             query1.ExecuteTime += __DbHelper.ExecuteTime;
             return reader;
@@ -110,10 +110,10 @@ namespace CRL.DBExtend.RelationDB
             var start = pageSize * (pageIndex - 1) + 1;
             var end = start + pageSize - 1;
             string sql = _DBAdapter.PageSqlFormat(fields, rowOver, condition, start, end, orderBy);
-            var reader = new CallBackDataReader(SqlStopWatch.ExecuteDataReader(__DbHelper,sql), () =>
+            var reader = new CallBackDataReader(__DbHelper.ExecDataReader(sql), () =>
             {
                 return count;
-            });
+            },sql);
             query1.ExecuteTime += __DbHelper.ExecuteTime;
             ClearParame();
             return reader;
@@ -161,10 +161,10 @@ namespace CRL.DBExtend.RelationDB
             //dic.Add("sort", sort1);
             string sp = CompileSqlToSp(_DBAdapter.TemplateGroupPage, conditions, dic);
             CallBackDataReader reader;
-            reader = new CallBackDataReader(SqlStopWatch.RunDataReader(__DbHelper,sp), () =>
+            reader = new CallBackDataReader(__DbHelper.RunDataReader(sp), () =>
             {
                 return GetOutParam<int>("count");
-            });
+            },sp);
             query1.ExecuteTime += __DbHelper.ExecuteTime;
             ClearParame();
             return reader;
@@ -222,10 +222,10 @@ namespace CRL.DBExtend.RelationDB
             string sql = _DBAdapter.PageSqlFormat(fields, rowOver, condition, start, end, "");
             //System.Data.Common.DbDataReader reader;
             //reader = dbHelper.ExecDataReader(sql);
-            var reader = new CallBackDataReader(SqlStopWatch.ExecuteDataReader(__DbHelper,sql), () =>
+            var reader = new CallBackDataReader(__DbHelper.ExecDataReader(sql), () =>
             {
                 return count;
-            });
+            },sql);
             query1.ExecuteTime += __DbHelper.ExecuteTime;
             ClearParame();
             return reader;

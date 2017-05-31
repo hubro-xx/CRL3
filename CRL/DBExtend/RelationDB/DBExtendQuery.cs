@@ -51,18 +51,21 @@ namespace CRL.DBExtend.RelationDB
             double runTime = 0;
             if (cacheTime <= 0)
             {
-                if (!compileSp)
+                list = SqlStopWatch.ReturnList(() =>
                 {
-                    reader = SqlStopWatch.ExecuteDataReader(__DbHelper,sql);
-                }
-                else//生成储过程
-                {
-                    string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-                    reader = SqlStopWatch.RunDataReader(__DbHelper,sp);
-                }
-                query.ExecuteTime += __DbHelper.ExecuteTime;
-                var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetQueryFieldString(), query.GetFieldMapping());
-                list = ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
+                    if (!compileSp)
+                    {
+                        reader = __DbHelper.ExecDataReader(sql);
+                    }
+                    else//生成储过程
+                    {
+                        string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
+                        reader = __DbHelper.RunDataReader(sp);
+                    }
+                    query.ExecuteTime += __DbHelper.ExecuteTime;
+                    var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetQueryFieldString(), query.GetFieldMapping());
+                    return ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
+                }, sql);
                 query.MapingTime += runTime;
             }
             else
@@ -97,10 +100,17 @@ namespace CRL.DBExtend.RelationDB
             return (TType)result;
         }
 
-        public override Dictionary<TKey, TValue> ToDictionary<TModel,TKey, TValue>(LambdaQuery<TModel> query)
+        public override Dictionary<TKey, TValue> ToDictionary<TModel, TKey, TValue>(LambdaQuery<TModel> query)
         {
-            var reader = GetQueryDynamicReader(query);
-            return ObjectConvert.DataReadToDictionary<TKey, TValue>(reader);
+            var dic = SqlStopWatch.ReturnData(() =>
+              {
+                  return GetQueryDynamicReader(query);
+
+              }, (r) =>
+              {
+                  return ObjectConvert.DataReadToDictionary<TKey, TValue>(r.reader);
+              });
+            return dic;
         }
         
     }

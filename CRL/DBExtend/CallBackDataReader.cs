@@ -19,13 +19,15 @@ namespace CRL
     /// </summary>
     internal class CallBackDataReader
     {
-        System.Data.Common.DbDataReader reader;
+        public System.Data.Common.DbDataReader reader;
+        public string Sql;
         Func<int> handler;
-        public double runTime;
-        public CallBackDataReader(System.Data.Common.DbDataReader _reader, Func<int> _handler)
+        public double runTime = 0;
+        public CallBackDataReader(System.Data.Common.DbDataReader _reader, Func<int> _handler,string sql)
         {
             reader = _reader;
             handler = _handler;
+            Sql = sql;
         }
         public List<T> GetDataTResult<T>(LambdaQuery.Mapping.QueryInfo<T> queryInfo,out int outParame)
         {

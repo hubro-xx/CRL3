@@ -168,28 +168,50 @@ namespace CRL.DBExtend.RelationDB
         public override List<T> ExecList<T>(string sql, params Type[] types)
         {
             sql = _DBAdapter.SqlFormat(sql);
-            var reader = GetDataReader(sql, types);
-            //double runTime;
-            //return ObjectConvert.DataReaderToList<T>(reader, out runTime);
-            var pro = TypeCache.GetTable(typeof(T)).Fields;
-            var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
-            var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sql, mapping);
-            var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
+            var list = SqlStopWatch.ReturnData(() =>
+            {
+                return GetDataReader(sql, types);
+
+            }, (r) =>
+            {
+                var pro = TypeCache.GetTable(typeof(T)).Fields;
+                var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName });
+                var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sql, mapping);
+                return ObjectConvert.DataReaderToSpecifiedList<T>(r.reader, queryInfo);
+            });
             return list;
+            ////var reader = GetDataReader(sql, types);
+            ////double runTime;
+            ////return ObjectConvert.DataReaderToList<T>(reader, out runTime);
+            //var pro = TypeCache.GetTable(typeof(T)).Fields;
+            //var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
+            //var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sql, mapping);
+            //var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
         }
         
-        DbDataReader GetDataReader(string sql, params Type[] types)
+        CallBackDataReader GetDataReader(string sql, params Type[] types)
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            var  reader = SqlStopWatch.ExecuteDataReader(__DbHelper,sql);
+            var  reader = __DbHelper.ExecDataReader(sql);
             ClearParame();
-            return reader;
+            return new CallBackDataReader(reader, null, sql);
         }
         public override Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql, params Type[] types)
         {
-            var reader = GetDataReader(sql, types);
-            return ObjectConvert.DataReadToDictionary<TKey, TValue>(reader);
+            //var reader = GetDataReader(sql, types);
+            //return ObjectConvert.DataReadToDictionary<TKey, TValue>(reader);
+
+            var dic = SqlStopWatch.ReturnData(() =>
+            {
+                return GetDataReader(sql, types);
+
+            }, (r) =>
+            {
+                return ObjectConvert.DataReadToDictionary<TKey, TValue>(r.reader);
+            });
+            return dic;
+
         }
 
         /// <summary>
@@ -258,14 +280,15 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override List<T> RunList<T>(string sp)
         {
-            var reader = SqlStopWatch.RunDataReader(__DbHelper,sp);
-            ClearParame();
-            //double runTime;
-            //return ObjectConvert.DataReaderToList<T>(reader, out runTime);
-            var pro = TypeCache.GetTable(typeof(T)).Fields;
-            var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
-            var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sp, mapping);
-            var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
+            var list = SqlStopWatch.ReturnList(() =>
+            {
+                var reader = __DbHelper.RunDataReader(sp);
+                ClearParame();
+                var pro = TypeCache.GetTable(typeof(T)).Fields;
+                var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
+                var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sp, mapping);
+                return ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
+            }, sp);
             return list;
         }
         /// <summary>
