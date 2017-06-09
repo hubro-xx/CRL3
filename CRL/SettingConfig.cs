@@ -76,6 +76,13 @@ namespace CRL
         /// </summary>
         public static bool AutoTrackingModel = true;
 
+        /// <summary>
+        /// 是否使用主从读写分离
+        /// 启用后,不会自动检查表结构
+        /// 在事务范围内,查询按主库
+        /// </summary>
+        public static bool UseReadSeparation = false;
+
     }
 
 

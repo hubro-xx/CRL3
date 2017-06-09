@@ -45,7 +45,8 @@ namespace CRL
         /// 分库表定位索引
         /// 大于0则按需要查找分表判断
         /// </summary>
-        internal int ShardingMainDataIndex = 0;
+        internal long ShardingMainDataIndex = 0;
+        internal long ShardingPartDataIndex = 0;
         /// <summary>
         /// 是否使用分表定位
         /// </summary>
@@ -60,6 +61,20 @@ namespace CRL
         {
             return Name;
         }
+        internal CoreHelper.DBHelper GetDBHelper(AccessType accessType = AccessType.Default)
+        {
+            DBLocation.AccessType = accessType;
+            var helper = SettingConfig.GetDbAccess(DBLocation);
+            return helper;
+        }
+    }
+    /// <summary>
+    /// 数据访问类型
+    /// </summary>
+    public enum AccessType
+    {
+        Default,
+        Read
     }
     /// <summary>
     /// 数据库连接定位
@@ -80,5 +95,9 @@ namespace CRL
         /// 分库指定的数据库
         /// </summary>
         public Sharding.DB.DataBase ShardingDataBase;
+        /// <summary>
+        /// 访问类型,当不是在事务内查询时,返回Read
+        /// </summary>
+        public AccessType AccessType;
     }
 }

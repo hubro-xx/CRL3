@@ -55,7 +55,7 @@ namespace CRL.Sharding.DB
         /// <summary>
         /// 主数据开始索引值
         /// </summary>
-        public int MainDataStartIndex
+        public long MainDataStartIndex
         {
             get;
             set;
@@ -63,7 +63,7 @@ namespace CRL.Sharding.DB
         /// <summary>
         /// 主数据结束索引值
         /// </summary>
-        public int MainDataEndIndex
+        public long MainDataEndIndex
         {
             get;
             set;

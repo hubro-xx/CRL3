@@ -12,18 +12,8 @@ using System.Web;
 
 namespace WebTest.Code
 {
-    public class MongoDBModel:CRL.IModel
+    public class MongoDBModel2:CRL.IModelBase
     {
-        public MongoDBModel()
-        {
-            //保持唯一
-            Id = new Guid();
-        }
-        public Guid Id
-        {
-            get;
-            set;
-        }
         public string OrderId
         {
             get;
@@ -35,7 +25,7 @@ namespace WebTest.Code
             set;
         }
     }
-    public class MongoDBTestManage : CRL.BaseProvider<MongoDBModel>
+    public class MongoDBTestManage : CRL.BaseProvider<MongoDBModel2>
     {
         public static MongoDBTestManage Instance
         {
@@ -97,6 +87,7 @@ namespace WebTest.Code
             return PackageTrans((out string ex) =>
             {
                 ex = "";
+                var item = QueryItem(1);
                 var product = new ProductData();
                 product.BarCode = "code" + DateTime.Now.Millisecond;
                 product.Number = 10;

@@ -11,9 +11,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CRL.DBExtend.MongoDB
+namespace CRL.DBExtend.MongoDBEx
 {
-    public sealed partial class MongoDB
+    public sealed partial class MongoDBExt
     {
 
 
@@ -75,22 +75,6 @@ namespace CRL.DBExtend.MongoDB
         {
             throw new NotSupportedException();//不支持
         }
-
-        public override object GetOutParam(string name)
-        {
-            throw new NotSupportedException();//不支持
-        }
-
-        public override T GetOutParam<T>(string name)
-        {
-            throw new NotSupportedException();//不支持
-        }
-
-        public override int GetReturnValue()
-        {
-            throw new NotSupportedException();//不支持
-        }
-
 
         public override int Run(string sp)
         {

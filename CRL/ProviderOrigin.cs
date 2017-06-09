@@ -727,21 +727,25 @@ namespace CRL
             error = "";
             using (var trans = new TransactionScope())
             {
+                CallContext.SetData(Base.UseTransactionScopeName, true);
                 try
                 {
                     var a = method(out error);
                     if (!a)
                     {
+                        CallContext.SetData(Base.UseTransactionScopeName, false);
                         return false;
                     }
                     trans.Complete();
                 }
                 catch (Exception ero)
                 {
+                    CallContext.SetData(Base.UseTransactionScopeName, false);
                     error = "提交事务时发生错误:" + ero.Message;
                     return false;
                 }
             }
+            CallContext.SetData(Base.UseTransactionScopeName, false);
             return true;
         }
         #endregion

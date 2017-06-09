@@ -29,7 +29,7 @@ namespace CRL.Sharding.DB
         /// <summary>
         /// 主数据开始INDEX
         /// </summary>
-        public int MainDataStartIndex
+        public long MainDataStartIndex
         {
             get;
             set;
@@ -37,7 +37,7 @@ namespace CRL.Sharding.DB
         /// <summary>
         /// 主数据结束INDEX
         /// </summary>
-        public int MainDataEndIndex
+        public long MainDataEndIndex
         {
             get;
             set;
@@ -45,7 +45,7 @@ namespace CRL.Sharding.DB
         /// <summary>
         /// 主数据表最大数据量
         /// </summary>
-        public int MaxMainDataTotal
+        public long MaxMainDataTotal
         {
             get;
             set;

@@ -13,9 +13,9 @@ using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-namespace CRL.DBExtend.MongoDB
+namespace CRL.DBExtend.MongoDBEx
 {
-    public sealed partial class MongoDB
+    public sealed partial class MongoDBExt
     {
         //public override List<TResult> Page<TResult>(LambdaQuery.LambdaQueryBase query1)
         //{

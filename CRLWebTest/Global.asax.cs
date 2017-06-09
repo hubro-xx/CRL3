@@ -22,6 +22,7 @@ namespace WebTest
     {
         protected void Application_Start(object sender, EventArgs e)
         {
+            //CRL.SettingConfig.UseReadSeparation = true;
             CRL.Package.SettingConfig.OnlinePayOrderRefund = (order) =>
                 {
                 };
@@ -47,6 +48,10 @@ namespace WebTest
                     if (type2 == typeof(Code.MongoDBTestManage))
                     {
                         return Code.LocalSqlHelper.MongoDB;
+                    }
+                    if(dbLocation.AccessType== CRL.AccessType.Read)
+                    {
+                        return Code.LocalSqlHelper.TestConnection2;
                     }
                     return WebTest.Code.LocalSqlHelper.TestConnection;
                 }

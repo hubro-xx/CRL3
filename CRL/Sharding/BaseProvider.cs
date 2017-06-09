@@ -22,12 +22,12 @@ namespace CRL.Sharding
         /// <summary>
         /// 主数据索引
         /// </summary>
-        int mainDataIndex;
+        long mainDataIndex;
         /// <summary>
         /// 使用主数据索引定位库
         /// </summary>
         /// <param name="_mainDataIndex"></param>
-        public BaseProvider<TModel> SetLocation(int _mainDataIndex)
+        public BaseProvider<TModel> SetLocation(long _mainDataIndex)
         {
             mainDataIndex = _mainDataIndex;
             var dataBase = DBService.GetDataBase(mainDataIndex);

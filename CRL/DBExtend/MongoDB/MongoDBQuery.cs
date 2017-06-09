@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Linq.Expressions;
-namespace CRL.DBExtend.MongoDB
+namespace CRL.DBExtend.MongoDBEx
 {
     /// <summary>
     /// MongoDB不支持关联和直接语句查询
     /// 部份扩展方法支持
     /// </summary>
-    public sealed partial class MongoDB
+    public sealed partial class MongoDBExt
     {
         List<dynamic> GetDynamicResult<TModel>(LambdaQuery.LambdaQuery<TModel> query1) where TModel : IModel, new()
         {

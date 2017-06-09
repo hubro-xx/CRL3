@@ -131,6 +131,7 @@
     <Content Include="Page\Query1.aspx" />
     <Content Include="Page\Query2.aspx" />
     <Content Include="Page\Query3.aspx" />
+    <Content Include="Page\ReadSeparation.aspx" />
     <Content Include="Page\Sharding.aspx" />
     <Content Include="Page\TableExistsCache.aspx" />
     <Content Include="Page\TestAll.aspx" />
@@ -307,6 +308,13 @@
     </Compile>
     <Compile Include="Page\Query3.aspx.designer.cs">
       <DependentUpon>Query3.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\ReadSeparation.aspx.cs">
+      <DependentUpon>ReadSeparation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\ReadSeparation.aspx.designer.cs">
+      <DependentUpon>ReadSeparation.aspx</DependentUpon>
     </Compile>
     <Compile Include="Page\Sharding.aspx.cs">
       <DependentUpon>Sharding.aspx</DependentUpon>

@@ -45,7 +45,7 @@ namespace CRL
                 var db = CallContext.GetData<AbsDBExtend>(Base.CRLContextName);
                 if (db != null)
                 {
-                    db.__DbHelper.CloseConn(true);
+                    db.CloseConn(true);
                 }
             }
         }

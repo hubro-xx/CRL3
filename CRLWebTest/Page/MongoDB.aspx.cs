@@ -20,7 +20,7 @@ namespace WebTest.Page
             //return;
             var instance = Code.MongoDBTestManage.Instance;
             //插入
-            instance.Add(new Code.MongoDBModel() { OrderId = "1212", Status = DateTime.Now.Second });
+            instance.Add(new Code.MongoDBModel2() { OrderId = "1212", Status = DateTime.Now.Second });
             //函数Count
             int count = instance.Count(b => b.Status >= 0);
             var query = instance.GetLambdaQuery();
@@ -38,7 +38,7 @@ namespace WebTest.Page
             var query2 = instance.GetLambdaQuery();
             query2.Select(b => new { aa = b.Id, bb = b.Status });
             //query2.Where(b=>b.Status.In(1,2,3,4));
-            var result = query2.ToDictionary<Guid, int>();//返回字典
+            var result = query2.ToDictionary<int, int>();//返回字典
             var result2 = query2.ToDynamic();//返回动态对象
 
             //删除

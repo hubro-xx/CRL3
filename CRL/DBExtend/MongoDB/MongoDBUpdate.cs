@@ -12,9 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CRL.DBExtend.MongoDB
+namespace CRL.DBExtend.MongoDBEx
 {
-    public sealed partial class MongoDB
+    public sealed partial class MongoDBExt
     {
 
         public override int Update<TModel, TJoin>(System.Linq.Expressions.Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)

@@ -11,22 +11,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CRL.DBExtend.MongoDB
+namespace CRL.DBExtend.MongoDBEx
 {
-    public sealed partial class MongoDB
+    public sealed partial class MongoDBExt
     {
         public override void BatchInsert<TModel>(List<TModel> details, bool keepIdentity = false)
         {
             if (details.Count == 0)
                 return;
-            string table = TypeCache.GetTableName(typeof(TModel), dbContext);
-            var collection = _MongoDB.GetCollection<TModel>(table);
+            var table = TypeCache.GetTable(typeof(TModel));
+            var collection = _MongoDB.GetCollection<TModel>(table.TableName);
+            foreach(var item in details)
+            {
+                var index = getIndex(table.TableName);
+                table.PrimaryKey.SetValue(item, index);
+            }
             collection.InsertMany(details);
+        }
+        int getIndex(string tableName)
+        {
+            var newIndex = _MongoDB.RunCommand<MongoDB.Bson.BsonDocument>(@"{findAndModify:'ids',query:{_id:'" + tableName + @"'}, update:{
+$inc:{ 'currentIdValue':1}
+        }, new:true,upsert:true}");
+            var index = newIndex["value"]["currentIdValue"].AsInt32;
+            return index;
         }
         public override void InsertFromObj<TModel>(TModel obj)
         {
-            string table = TypeCache.GetTableName(typeof(TModel), dbContext);
-            var collection = _MongoDB.GetCollection<TModel>(table);
+            var table = TypeCache.GetTable(typeof(TModel));
+            var index = getIndex(table.TableName);
+            table.PrimaryKey.SetValue(obj, index);
+            var collection = _MongoDB.GetCollection<TModel>(table.TableName);
             collection.InsertOne(obj);
         }
     }

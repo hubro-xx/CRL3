@@ -13,9 +13,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CRL.DBExtend.MongoDB
+namespace CRL.DBExtend.MongoDBEx
 {
-    public sealed partial class MongoDB
+    public sealed partial class MongoDBExt
     {
 
         public override int Delete<T>(LambdaQuery.LambdaQuery<T> query1)

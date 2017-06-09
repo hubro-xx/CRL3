@@ -36,7 +36,7 @@ namespace CRL.Sharding
         /// </summary>
         /// <param name="mainDataIndex"></param>
         /// <returns></returns>
-        public static DataBase GetDataBase(int mainDataIndex)
+        public static DataBase GetDataBase(long mainDataIndex)
         {
             if (_DataBase.Count() == 0)
             {
@@ -56,7 +56,7 @@ namespace CRL.Sharding
         /// <param name="mainDataIndex"></param>
         /// <param name="db"></param>
         /// <returns></returns>
-        public static Location GetLocation(string tableName, int mainDataIndex, DataBase db)
+        public static Location GetLocation(string tableName, long mainDataIndex, DataBase db)
         {
             var table = _Table.Find(b => b.TableName == tableName && b.DataBaseName == db.Name);
             if (table == null)//找哪个表

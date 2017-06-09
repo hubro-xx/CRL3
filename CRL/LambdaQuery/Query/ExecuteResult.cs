@@ -53,9 +53,9 @@ namespace CRL.LambdaQuery
         public List<dynamic> ToDynamic()
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            if (db is DBExtend.MongoDB.MongoDB)
+            if (db is DBExtend.MongoDBEx.MongoDBExt)
             {
-                var db2 = db as DBExtend.MongoDB.MongoDB;
+                var db2 = db as DBExtend.MongoDBEx.MongoDBExt;
                 return db2.QueryDynamic<T>(this);
             }
             return db.QueryDynamic(this);
@@ -70,9 +70,9 @@ namespace CRL.LambdaQuery
             where TResult : class,new()
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            if (db is DBExtend.MongoDB.MongoDB)
+            if (db is DBExtend.MongoDBEx.MongoDBExt)
             {
-                var db2 = db as DBExtend.MongoDB.MongoDB;
+                var db2 = db as DBExtend.MongoDBEx.MongoDBExt;
                 return db2.QueryResult<T,TResult>(this);
             }
             return db.QueryResult<TResult>(this);

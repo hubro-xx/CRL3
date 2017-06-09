@@ -54,7 +54,8 @@ namespace CRL.DBExtend.RelationDB
             //return Dynamic.DynamicObjConvert.DataReaderToDynamic(reader,out runTime);
             var list = SqlStopWatch.ReturnList(() =>
             {
-                var reader = __DbHelper.RunDataReader(sp);
+                var db = GetDBHelper(AccessType.Read);
+                var reader = db.RunDataReader(sp);
                 return Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, out runTime);
             }, sp);
             return list;
@@ -261,20 +262,21 @@ namespace CRL.DBExtend.RelationDB
             sql = _DBAdapter.SqlFormat(sql);
             System.Data.Common.DbDataReader reader;
             var compileSp = query.__CompileSp;
+            var db = GetDBHelper(AccessType.Read);
             if (!compileSp)
             {
                 if (query.TakeNum > 0)
                 {
-                    __DbHelper.AutoFormatWithNolock = false;
+                    db.AutoFormatWithNolock = false;
                 }
-                reader = __DbHelper.ExecDataReader(sql);
+                reader = db.ExecDataReader(sql);
             }
             else//生成储过程
             {
                 string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-                reader = __DbHelper.RunDataReader(sp);
+                reader = db.RunDataReader(sp);
             }
-            query.ExecuteTime = __DbHelper.ExecuteTime;
+            query.ExecuteTime = db.ExecuteTime;
             ClearParame();
             return new CallBackDataReader(reader, null, sql);
         }

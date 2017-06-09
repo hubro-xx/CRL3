@@ -16,6 +16,45 @@ namespace CRL
     public abstract class AbsDBExtend
     {
         /// <summary>
+        /// 构造DBExtend
+        /// </summary>
+        /// <param name="_dbContext"></param>
+        public AbsDBExtend(DbContext _dbContext)
+        {
+            dbContext = _dbContext;
+            var _helper = _dbContext.DBHelper;
+            if (_helper == null)
+            {
+                throw new CRLException("数据访问对象未实例化,请实现CRL.SettingConfig.GetDbAccess");
+            }
+            GUID = Guid.NewGuid();
+            __DbHelper = _helper;
+        }
+        protected DBHelper GetDBHelper(AccessType accessType = AccessType.Default)
+        {
+            if (!SettingConfig.UseReadSeparation)//不使用主从时
+            {
+                FillParame(__DbHelper);
+                return __DbHelper;
+            }
+            var _useTransactionScope = CallContext.GetData<bool>(Base.UseTransactionScopeName);
+            if (_useTransactionScope)//使用TransactionScope
+            {
+                FillParame(__DbHelper);
+                return __DbHelper;
+            }
+            var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);
+            if (_useCRLContext)//对于数据库事务,只创建一个上下文
+            {
+                FillParame(__DbHelper);
+                return __DbHelper;
+            }
+            var db = dbContext.GetDBHelper(accessType);
+            FillParame(db);
+            __DbHelper = db;
+            return db;
+        }
+        /// <summary>
         /// 创建当前数据库类型查询
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
@@ -73,7 +112,18 @@ namespace CRL
             return DBExtendFactory.CreateDBExtend(dbContext2);
         }
 
-        internal CoreHelper.DBHelper __DbHelper;
+        CoreHelper.DBHelper __DbHelper;
+        internal void CloseConn(bool a)
+        {
+            __DbHelper.CloseConn(a);
+        }
+        //internal string DatabaseName
+        //{
+        //    get
+        //    {
+        //        return __DbHelper.DatabaseName;
+        //    }
+        //}
         /// <summary>
         /// 库名
         /// </summary>
@@ -250,99 +300,85 @@ namespace CRL
             return string.Format("{0} {1}", GUID, DatabaseName);
         }
 
-        /// <summary>
-        /// 构造DBExtend
-        /// </summary>
-        /// <param name="_dbContext"></param>
-        public AbsDBExtend(DbContext _dbContext)
+        #region 参数处理
+        Dictionary<string, object> _Parame = new Dictionary<string, object>();
+        Dictionary<string, object> _OutParame = new Dictionary<string, object>();
+        internal void FillParame(CoreHelper.DBHelper db)
         {
-            dbContext = _dbContext;
-            var _helper = _dbContext.DBHelper;
-            if (_helper == null)
+            foreach(var kv in _Parame)
             {
-                throw new CRLException("数据访问对象未实例化,请实现CRL.SettingConfig.GetDbAccess");
+                db.AddParam(kv.Key,kv.Value);
             }
-            GUID = Guid.NewGuid();
-            __DbHelper = _helper;
+            foreach (var kv in _OutParame)
+            {
+                db.AddOutParam(kv.Key, kv.Value);
+            }
+            _Parame.Clear();
+            _OutParame.Clear();
         }
-        #region 参数
         /// <summary>
-        /// 设置参数
+        /// 清除参数
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public abstract void SetParam(string name, object value);
-        /// <summary>
-        /// 增加存储过程out参数
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public abstract void AddOutParam(string name, object value = null);
+        public void ClearParame()
+        {
+            _Parame.Clear();
+            _OutParame.Clear();
+            __DbHelper.ClearParams();
+        }
         /// <summary>
         /// 增加参数
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public abstract void AddParam(string name, object value);
+        public void AddParam(string name, object value)
+        {
+            value = ObjectConvert.CheckNullValue(value);
+            //__DbHelper.AddParam(name, value);
+            _Parame.Add(name,value);
+        }
+        public void SetParam(string name,object value)
+        {
+            value = ObjectConvert.CheckNullValue(value);
+            _Parame[name] = value;
+        }
         /// <summary>
-        /// 清除参数
+        /// 增加输出参数
         /// </summary>
-        public abstract void ClearParame();
+        /// <param name="name"></param>
+        /// <param name="value">对应类型任意值</param>
+        public void AddOutParam(string name, object value = null)
+        {
+            //__DbHelper.AddOutParam(name, value);
+            _OutParame.Add(name, value);
+        }
         /// <summary>
-        /// 获取out参数
+        /// 获取存储过程return的值
+        /// </summary>
+        /// <returns></returns>
+        public int GetReturnValue()
+        {
+            return __DbHelper.GetReturnValue();
+        }
+        /// <summary>
+        /// 获取OUTPUT的值
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public abstract object GetOutParam(string name);
+        public object GetOutParam(string name)
+        {
+            return __DbHelper.GetOutParam(name);
+        }
         /// <summary>
-        /// 获存储过程取out参数
+        /// 获取OUT值
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
         /// <returns></returns>
-        public abstract T GetOutParam<T>(string name);
-        /// <summary>
-        /// 获取存储过程返回值
-        /// </summary>
-        /// <returns></returns>
-        public abstract int GetReturnValue();
-        #endregion
-
-        #region 自动编译
-        ///// <summary>
-        ///// 返回首行结果
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="sql"></param>
-        ///// <param name="types"></param>
-        ///// <returns></returns>
-        //public abstract T AutoExecuteScalar<T>(string sql, params Type[] types);
-
-        ///// <summary>
-        ///// 自动编译为存储过程查询
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="sql"></param>
-        ///// <param name="types"></param>
-        ///// <returns></returns>
-        //public abstract List<T> AutoSpQuery<T>(string sql, params Type[] types) where T : class, new();
-        ///// <summary>
-        ///// 自动编译为存储过程查询
-        ///// </summary>
-        ///// <typeparam name="TKey"></typeparam>
-        ///// <typeparam name="TValue"></typeparam>
-        ///// <param name="sql"></param>
-        ///// <param name="types"></param>
-        ///// <returns></returns>
-        //public abstract Dictionary<TKey, TValue> AutoSpQuery<TKey, TValue>(string sql, params Type[] types);
-        ///// <summary>
-        ///// 编译为存储过程更新
-        ///// </summary>
-        ///// <param name="sql"></param>
-        ///// <param name="types"></param>
-        ///// <returns></returns>
-        //public abstract int AutoSpUpdate(string sql, params Type[] types);
-
+        public T GetOutParam<T>(string name)
+        {
+            var obj = GetOutParam(name);
+            return ObjectConvert.ConvertObject<T>(obj);
+        }
         #endregion
 
         #region 事务

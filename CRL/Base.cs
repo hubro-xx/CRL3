@@ -174,6 +174,7 @@ namespace CRL
         internal const string CRLContextName = "__TransDbContext";
         internal const string AllDBExtendName = "__AllDBExtend";
         internal const string SQLRunningtimeName = "__SQLRunningtime";
+        internal const string UseTransactionScopeName = "__TransactionScopeName";
         /// <summary>
         /// 获取当前调用所有的数据访问会话
         /// 可用此检查代码调用深度

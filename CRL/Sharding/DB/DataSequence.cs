@@ -29,7 +29,7 @@ namespace CRL.Sharding.DB
         /// <summary>
         /// 自增编号
         /// </summary>
-        public int Sequence
+        public long Sequence
         {
             get;
             set;

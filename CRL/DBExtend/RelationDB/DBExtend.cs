@@ -32,72 +32,7 @@ namespace CRL.DBExtend.RelationDB
         {
             return new RelationLambdaQuery<TModel>(dbContext); 
         }
-        #region 参数处理
-        /// <summary>
-        /// 清除参数
-        /// </summary>
-        public override void ClearParame()
-        {
-            __DbHelper.ClearParams();
-        }
-        /// <summary>
-        /// 增加参数
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public override void AddParam(string name, object value)
-        {
-            value = ObjectConvert.CheckNullValue(value);
-            __DbHelper.AddParam(name,value);
-        }
-        /// <summary>
-        /// 设置参数
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public override void SetParam(string name, object value)
-        {
-            value = ObjectConvert.CheckNullValue(value);
-            __DbHelper.SetParam(name, value);
-        }
-        /// <summary>
-        /// 增加输出参数
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value">对应类型任意值</param>
-        public override void AddOutParam(string name, object value = null)
-        {
-            __DbHelper.AddOutParam(name, value);
-        }
-        /// <summary>
-        /// 获取存储过程return的值
-        /// </summary>
-        /// <returns></returns>
-        public override int GetReturnValue()
-        {
-            return __DbHelper.GetReturnValue();
-        }
-        /// <summary>
-        /// 获取OUTPUT的值
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public override object GetOutParam(string name)
-        {
-            return __DbHelper.GetOutParam(name);
-        }
-        /// <summary>
-        /// 获取OUT值
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public override T GetOutParam<T>(string name)
-        {
-            var obj = __DbHelper.GetOutParam(name);
-            return ObjectConvert.ConvertObject<T>(obj);
-        }
-        #endregion
+        
 
         /// <summary>
         /// 通过关键类型,格式化SQL语句
@@ -193,7 +128,8 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            var  reader = __DbHelper.ExecDataReader(sql);
+            var db = GetDBHelper(AccessType.Read);
+            var  reader = db.ExecDataReader(sql);
             ClearParame();
             return new CallBackDataReader(reader, null, sql);
         }
@@ -224,7 +160,8 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            int count = SqlStopWatch.Execute(__DbHelper, sql);
+            var db = GetDBHelper();
+            int count = SqlStopWatch.Execute(db, sql);
             ClearParame();
             return count;
         }
@@ -238,7 +175,8 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            object obj = SqlStopWatch.ExecScalar(__DbHelper, sql);
+            var db = GetDBHelper(AccessType.Read);
+            object obj = SqlStopWatch.ExecScalar(db, sql);
             ClearParame();
             return obj;
         }
@@ -282,7 +220,8 @@ namespace CRL.DBExtend.RelationDB
         {
             var list = SqlStopWatch.ReturnList(() =>
             {
-                var reader = __DbHelper.RunDataReader(sp);
+                var db = GetDBHelper(AccessType.Read);
+                var reader = db.RunDataReader(sp);
                 ClearParame();
                 var pro = TypeCache.GetTable(typeof(T)).Fields;
                 var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
@@ -298,7 +237,8 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override int Run(string sp)
         {
-            int count = __DbHelper.Run(sp);
+            var db = GetDBHelper();
+            int count = db.Run(sp);
             ClearParame();
             return count;
         }
@@ -322,7 +262,8 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override object RunScalar(string sp)
         {
-            object obj = __DbHelper.RunScalar(sp);
+            var db = GetDBHelper(AccessType.Read);
+            object obj = db.RunScalar(sp);
             ClearParame();
             return obj;
         }
@@ -330,7 +271,7 @@ namespace CRL.DBExtend.RelationDB
         #endregion
 
         #region 事务控制
-
+        CoreHelper.DBHelper transDb;
         /// <summary>
         /// 开始物务
         /// </summary>
@@ -340,7 +281,8 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new CRLException("事务开始失败,已有未完成的事务");
             }
-            __DbHelper.BeginTran();
+            transDb = GetDBHelper();
+            transDb.BeginTran();
             currentTransStatus = TranStatus.已开始;
         }
         /// <summary>
@@ -352,7 +294,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new CRLException("事务回滚失败,没有需要回滚的事务");
             }
-            __DbHelper.RollbackTran();
+            transDb.RollbackTran();
             currentTransStatus = TranStatus.未开始;
         }
         /// <summary>
@@ -364,7 +306,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new CRLException("事务提交失败,没有需要提交的事务");
             }
-            __DbHelper.CommitTran();
+            transDb.CommitTran();
             currentTransStatus = TranStatus.未开始;
         }
         #endregion
@@ -380,6 +322,11 @@ namespace CRL.DBExtend.RelationDB
         /// </summary>
         internal override void CheckTableCreated(Type type)
         {
+            if(SettingConfig.UseReadSeparation)
+            {
+                //使用主从分离,不检查表创建
+                return;
+            }
             if (!SettingConfig.CheckModelTableMaping)
             {
                 return;

@@ -19,7 +19,7 @@ namespace CRL
         {
             if (_dbContext.DBHelper.CurrentDBType == CoreHelper.DBType.MongoDB)
             {
-                return new DBExtend.MongoDB.MongoDB(_dbContext);
+                return new DBExtend.MongoDBEx.MongoDBExt(_dbContext);
             }
             return new DBExtend.RelationDB.DBExtend(_dbContext);
         }

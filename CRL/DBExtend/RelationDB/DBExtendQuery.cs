@@ -49,20 +49,21 @@ namespace CRL.DBExtend.RelationDB
             var cacheTime = query.__ExpireMinute;
             var compileSp = query.__CompileSp;
             double runTime = 0;
+            var db = GetDBHelper(AccessType.Read);
             if (cacheTime <= 0)
             {
                 list = SqlStopWatch.ReturnList(() =>
                 {
                     if (!compileSp)
                     {
-                        reader = __DbHelper.ExecDataReader(sql);
+                        reader = db.ExecDataReader(sql);
                     }
                     else//生成储过程
                     {
                         string sp = CompileSqlToSp(_DBAdapter.TemplateSp, sql);
-                        reader = __DbHelper.RunDataReader(sp);
+                        reader = db.RunDataReader(sp);
                     }
-                    query.ExecuteTime += __DbHelper.ExecuteTime;
+                    query.ExecuteTime += db.ExecuteTime;
                     var queryInfo = new LambdaQuery.Mapping.QueryInfo<TModel>(false, query.GetQueryFieldString(), query.GetFieldMapping());
                     return ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
                 }, sql);
@@ -70,7 +71,7 @@ namespace CRL.DBExtend.RelationDB
             }
             else
             {
-                list = MemoryDataCache.CacheService.GetCacheList<TModel>(sql, query.GetFieldMapping(), cacheTime, __DbHelper, out cacheKey).Values.ToList();
+                list = MemoryDataCache.CacheService.GetCacheList<TModel>(sql, query.GetFieldMapping(), cacheTime, db, out cacheKey).Values.ToList();
             }
             ClearParame();
             query.RowCount = list.Count;

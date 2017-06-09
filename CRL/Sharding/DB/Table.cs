@@ -47,7 +47,7 @@ namespace CRL.Sharding.DB
         /// <summary>
         /// 分表最大数据量
         /// </summary>
-        public int MaxPartDataTotal
+        public long MaxPartDataTotal
         {
             get;
             set;

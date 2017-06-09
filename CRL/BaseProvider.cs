@@ -94,10 +94,10 @@ namespace CRL
         {
             Type type = typeof(TModel);
             var key = "";
-            if (TypeCache.GetModelKeyCache(type, DBExtend.__DbHelper.DatabaseName, out key))
+            if (TypeCache.GetModelKeyCache(type, DBExtend.DatabaseName, out key))
             {
                 CRL.MemoryDataCache.CacheService.RemoveCache(key);
-                TypeCache.RemoveModelKeyCache(type, DBExtend.__DbHelper.DatabaseName);
+                TypeCache.RemoveModelKeyCache(type, DBExtend.DatabaseName);
             }
         }
         /// <summary>
@@ -361,7 +361,7 @@ namespace CRL
             query.__ExpireMinute = expMinute;
             string dataCacheKey;
             var list = new Dictionary<string, TModel>();
-            var a = TypeCache.GetModelKeyCache(type, DBExtend.__DbHelper.DatabaseName, out dataCacheKey);
+            var a = TypeCache.GetModelKeyCache(type, DBExtend.DatabaseName, out dataCacheKey);
             if (!a)
             {
                 var db = DBExtend;
@@ -370,10 +370,10 @@ namespace CRL
                 lock (lockObj)
                 {
                     string key2;
-                    a = TypeCache.GetModelKeyCache(type, DBExtend.__DbHelper.DatabaseName, out key2);
+                    a = TypeCache.GetModelKeyCache(type, DBExtend.DatabaseName, out key2);
                     if (!a)
                     {
-                        TypeCache.SetModelKeyCache(type, DBExtend.__DbHelper.DatabaseName, dataCacheKey);
+                        TypeCache.SetModelKeyCache(type, DBExtend.DatabaseName, dataCacheKey);
                     }
                 }
             }

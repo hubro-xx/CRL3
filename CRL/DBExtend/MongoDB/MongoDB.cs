@@ -14,11 +14,11 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 using CRL.LambdaQuery;
-namespace CRL.DBExtend.MongoDB
+namespace CRL.DBExtend.MongoDBEx
 {
-    public sealed partial class MongoDB : AbsDBExtend
+    public sealed partial class MongoDBExt : AbsDBExtend
     {
-        public MongoDB(DbContext _dbContext)
+        public MongoDBExt(DbContext _dbContext)
             : base(_dbContext)
         {
         }
@@ -33,35 +33,15 @@ namespace CRL.DBExtend.MongoDB
             get {
                 if (_mongoDatabase == null)
                 {
-                    var connectionString = __DbHelper.ConnectionString;
+                    var db = GetDBHelper();
+                    var connectionString = db.ConnectionString;
                     var _client = new MongoClient(connectionString);
-                    _mongoDatabase = _client.GetDatabase(__DbHelper.DatabaseName);
+                    _mongoDatabase = _client.GetDatabase(db.DatabaseName);
                 }
                 return _mongoDatabase; }
             set { _mongoDatabase = value; }
         }
-        #region 参数
-        public override void AddOutParam(string name, object value = null)
-        {
-            
-        }
-
-        public override void AddParam(string name, object value)
-        {
-           
-        }
-
-
-        public override void SetParam(string name, object value)
-        {
-           
-        }
-
-        public override void ClearParame()
-        {
-           
-        }
-        #endregion
+        
         internal override TType GetFunction<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> selectField, FunctionType functionType, bool compileSp = false)
         {
             var query = new MongoDBLambdaQuery<TModel>(dbContext);

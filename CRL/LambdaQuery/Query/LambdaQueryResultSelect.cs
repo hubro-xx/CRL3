@@ -83,7 +83,7 @@ namespace CRL.LambdaQuery
         {
             //todo MongoDB未实现
             var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
-            if (db is DBExtend.MongoDB.MongoDB)
+            if (db is DBExtend.MongoDBEx.MongoDBExt)
             {
                 throw new NotSupportedException("MongoDB暂未实现");
             }
@@ -102,7 +102,7 @@ namespace CRL.LambdaQuery
         { 
             //todo MongoDB未实现
             var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
-            if (db is DBExtend.MongoDB.MongoDB)
+            if (db is DBExtend.MongoDBEx.MongoDBExt)
             {
                 throw new NotSupportedException("MongoDB暂未实现");
             }
