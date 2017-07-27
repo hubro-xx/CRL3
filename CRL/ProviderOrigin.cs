@@ -100,7 +100,7 @@ namespace CRL
             return query;
         }
 
-            #region 数据访问对象
+        #region 数据访问对象
             AbsDBExtend _dBExtend;
         /// <summary>
         /// 数据访部对象

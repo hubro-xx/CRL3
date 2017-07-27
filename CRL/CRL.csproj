@@ -116,12 +116,14 @@
     <Compile Include="CRLException.cs" />
     <Compile Include="ExtensionMethod\DateTime.cs" />
     <Compile Include="ExtensionMethod\IsNull.cs" />
+    <Compile Include="ExtensionMethod\Length.cs" />
     <Compile Include="LambdaQuery\Mapping\DataContainer.cs" />
     <Compile Include="LambdaQuery\Mapping\QueryInfo.cs" />
     <Compile Include="LambdaQuery\Query\In.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryViewJoin.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryResultSelect.cs" />
     <Compile Include="LambdaQuery\Query\TypeQuery.cs" />
+    <Compile Include="ListenTest.cs" />
     <Compile Include="ModelCheck.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="DBAdapter\MongoDBAdapter.cs" />
@@ -202,6 +204,8 @@
     <Compile Include="ObjectConvert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProviderOrigin.cs" />
+    <Compile Include="Runtime\RunTimeCache.cs" />
+    <Compile Include="Runtime\RunTimeService.cs" />
     <Compile Include="SettingConfig.cs" />
     <Compile Include="Attribute\TableAttribute.cs" />
     <Compile Include="Sharding\BaseProvider.cs" />

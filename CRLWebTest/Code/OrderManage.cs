@@ -12,6 +12,7 @@ using System.Web;
 
 namespace WebTest.Code
 {
+    [CRL.Attribute.Table( TableName = "MongoDBModel3")]
     public class MongoDBModel2:CRL.IModelBase
     {
         public string OrderId

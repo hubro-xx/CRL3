@@ -23,12 +23,12 @@ namespace CRL.DBExtend.MongoDBEx
             var collection = _MongoDB.GetCollection<TModel>(table.TableName);
             foreach(var item in details)
             {
-                var index = getIndex(table.TableName);
+                var index = getId(table.TableName);
                 table.PrimaryKey.SetValue(item, index);
             }
             collection.InsertMany(details);
         }
-        int getIndex(string tableName)
+        int getId(string tableName)
         {
             var newIndex = _MongoDB.RunCommand<MongoDB.Bson.BsonDocument>(@"{findAndModify:'ids',query:{_id:'" + tableName + @"'}, update:{
 $inc:{ 'currentIdValue':1}
@@ -39,7 +39,7 @@ $inc:{ 'currentIdValue':1}
         public override void InsertFromObj<TModel>(TModel obj)
         {
             var table = TypeCache.GetTable(typeof(TModel));
-            var index = getIndex(table.TableName);
+            var index = getId(table.TableName);
             table.PrimaryKey.SetValue(obj, index);
             var collection = _MongoDB.GetCollection<TModel>(table.TableName);
             collection.InsertOne(obj);

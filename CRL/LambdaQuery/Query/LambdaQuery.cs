@@ -144,6 +144,18 @@ namespace CRL.LambdaQuery
             return this;
         }
         /// <summary>
+        /// 使用In语法时,是否转换成Join优化,并指定最小值
+        /// 大于20才生效
+        /// MSSQL内部已自动优化
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> UseInJoin(int count = 20)
+        {
+            __AutoInJoin = count;
+            return this;
+        }
+        /// <summary>
         /// 设置是否编译为存储过程
         /// </summary>
         /// <param name="compileSp"></param>

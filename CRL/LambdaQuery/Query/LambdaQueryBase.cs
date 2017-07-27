@@ -102,6 +102,7 @@ namespace CRL.LambdaQuery
             }
         }
         internal bool __WithNoLock = true;
+        internal int __AutoInJoin = 0;
         //internal bool __QueryAllField = false;
         #region 解析选择的字段
         internal string GetQueryFieldsString(List<Attribute.FieldAttribute> fields)
@@ -667,6 +668,54 @@ namespace CRL.LambdaQuery
         {
             var cache = GetSelectFieldInfo();
             return cache.mapping;
+        }
+        #region In关联优化
+        internal string __RemoveInJionBatchNo;
+        #endregion
+    }
+
+    [Attribute.Table(TableName = "__InJoin")]
+    class InJoin : CRL.IModelBase
+    {
+        public void SetValue(Type type,object v)
+        {
+            switch (type.Name)
+            {
+                case "Int32":
+                    this.V_Int32 = (int)v;
+                    break;
+                case "Decimal":
+                    this.V_Decimal = (decimal)v;
+                    break;
+                case "String":
+                    this.V_String = v.ToString();
+                    break;
+                case "Double":
+                    this.V_Double = (double)v;
+                    break;
+            }
+        }
+        [CRL.Attribute.Field(FieldIndexType = Attribute.FieldIndexType.非聚集,Length =50)]
+        public string BatchNo
+        {
+            get; set;
+        }
+        public int V_Int32
+        {
+            get; set;
+        }
+        public decimal V_Decimal
+        {
+            get; set;
+        }
+        [CRL.Attribute.Field(Length =50)]
+        public string V_String
+        {
+            get; set;
+        }
+        public double V_Double
+        {
+            get; set;
         }
     }
 }

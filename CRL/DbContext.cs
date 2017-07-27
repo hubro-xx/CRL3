@@ -56,11 +56,6 @@ namespace CRL
         /// 当前查询参数索引
         /// </summary>
         internal int parIndex = 0;
-        public string Name;
-        public override string ToString()
-        {
-            return Name;
-        }
         internal CoreHelper.DBHelper GetDBHelper(AccessType accessType = AccessType.Default)
         {
             DBLocation.AccessType = accessType;
@@ -73,7 +68,13 @@ namespace CRL
     /// </summary>
     public enum AccessType
     {
+        /// <summary>
+        /// 默认
+        /// </summary>
         Default,
+        /// <summary>
+        /// 读
+        /// </summary>
         Read
     }
     /// <summary>

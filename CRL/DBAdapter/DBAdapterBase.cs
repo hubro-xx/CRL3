@@ -331,6 +331,26 @@ namespace CRL.DBAdapter
         {
             return string.Format("isnull({0},{1})", field, value);
         }
+        public virtual string LengthFormat(string field)
+        {
+            return string.Format("len({0})", field);
+        }
+        public virtual string Trim(string field)
+        {
+            return string.Format("ltrim(rtrim({0})) ", field);
+        }
+        public virtual string TrimStart(string field)
+        {
+            return string.Format("ltrim({0}) ", field);
+        }
+        public virtual string TrimEnd(string field)
+        {
+            return string.Format("rtrim({0}) ", field);
+        }
+        public virtual string Replace(string field, string find, string rep)
+        {
+            return string.Format("replace({0},{1},{2}) ", field, find, rep);
+        }
         #endregion
 
         /// <summary>

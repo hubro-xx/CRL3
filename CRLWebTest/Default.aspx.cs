@@ -21,7 +21,14 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            //query.UseInJoin(6);
+            query.Where(b => b.ProductChannel.In(new ProductChannel[] { ProductChannel.其它, ProductChannel.自采 }));
+            //query.Where(b => b.CategoryName.In("12", "212", "122", "2424", "122", "2424", "122"));
+            //query.Where(b => b.CategoryName.Replace("22","") == "abc");
+            //var result = query.ToList();
+            Response.Write(query.PrintQuery());
+            //Response.End();
         }
         
     }

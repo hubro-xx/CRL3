@@ -50,6 +50,10 @@ namespace CRL.LambdaQuery
                 methodDic.Add("Contains", StringContains);
                 methodDic.Add("Between", Between);
                 methodDic.Add("DateDiff", DateTimeDateDiff);
+                methodDic.Add("Length", Length);
+                methodDic.Add("Trim", Trim);
+                methodDic.Add("TrimStart", TrimStart);
+                methodDic.Add("TrimEnd", TrimEnd);
                 methodDic.Add("In", In);
                 methodDic.Add("Substring", Substring);
                 methodDic.Add("COUNT", Count);
@@ -73,6 +77,7 @@ namespace CRL.LambdaQuery
                 methodDic.Add("ToUpper", ToUpper);
                 methodDic.Add("ToLower", ToLower);
                 methodDic.Add("IsNull", IsNull);
+                methodDic.Add("Replace", Replace);
             }
             return methodDic;
         }
@@ -94,6 +99,27 @@ namespace CRL.LambdaQuery
         {
             var field = methodInfo.MemberQueryName;
             return dBAdapter.ToLowerFormat(field);
+        }
+
+        public string Length(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            return dBAdapter.LengthFormat(field);
+        }
+        public string Trim(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            return dBAdapter.Trim(field);
+        }
+        public string TrimStart(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            return dBAdapter.TrimStart(field);
+        }
+        public string TrimEnd(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            return dBAdapter.TrimEnd(field);
         }
         public string IsNullOrEmpty(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
@@ -264,6 +290,28 @@ namespace CRL.LambdaQuery
             return dBAdapter.DateDiffFormat(field, args[0].ToString(), parName);
             //return string.Format("DateDiff({0},{1},{2}){3}", args[0], field, parName, args[2]);
         }
+        public string Replace(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            var args = methodInfo.Args;
+            string parName = string.Format("@repf{0}", parIndex);
+            var args1 = args[0];
+            if (args1 is ExpressionValueObj)
+            {
+                parName = args1.ToString();
+            }
+            else
+            {
+                addParame(parName, args1);
+            }
+            var args2= args[1];
+            parIndex += 1;
+            string parName2 = string.Format("@repd{0}", parIndex);
+            addParame(parName2, args2);
+            parIndex += 1;
+            //DateDiff(2015/2/5 17:59:44,t1.AddTime,@DateDiff1)>1 
+            return dBAdapter.Replace(field, parName, parName2);
+        }
         #region 函数
         public string Count(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
@@ -305,6 +353,7 @@ namespace CRL.LambdaQuery
             else if (par2 is string[])
             {
                 IEnumerable list = par2 as IEnumerable;
+                //return "'" + string.Join("','", list) + "'";
                 foreach (var s in list)
                 {
                     string parName = string.Format("@in{0}", parIndex);

@@ -1,4 +1,11 @@
-﻿using System;
+﻿/**
+* CRL 快速开发框架 V4.0
+* Copyright (c) 2016 Hubro All rights reserved.
+* GitHub https://github.com/hubro-xx/CRL3
+* 主页 http://www.cnblogs.com/hubro
+* 在线文档 http://crl.changqidongli.com/
+*/
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -56,27 +63,7 @@ namespace CRL
             Base.SaveSQLRunningtme(sql, el);
             return list;
         }
-        //internal static DbDataReader RunDataReader(CoreHelper.DBHelper __DbHelper, string sp)
-        //{
-        //    DbDataReader reader = null;
-        //    var el = Run(() =>
-        //    {
-        //        reader = __DbHelper.RunDataReader(sp);
-        //    });
-        //    Base.SaveSQLRunningtme(sp, el);
-        //    return reader;
-        //}
-        //internal static DbDataReader ExecuteDataReader(CoreHelper.DBHelper __DbHelper, string sql)
-        //{
-        //    DbDataReader reader = null;
-        //    var el = Run(() =>
-        //    {
-        //        reader = __DbHelper.ExecDataReader(sql);
-        //    });
-        //    Base.SaveSQLRunningtme(sql, el);
-        //    return reader;
-        //}
-        static long Run(Action act)
+        public static long Run(Action act)
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();

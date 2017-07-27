@@ -99,6 +99,46 @@ namespace CRL.LambdaQuery
                 case CRLExpression.CRLExpressionType.MethodCall:
                     #region method
                     var method = par1.Data as CRLExpression.MethodCallObj;
+
+                    #region in优化 MSSQL内部已自动优化
+                    var nodeType = method.ExpressionType;
+                    /**
+                    if (dbContext.DataBaseArchitecture == DataBaseArchitecture.Relation && method.MethodName == "In" && lambdaQueryBase.__AutoInJoin > 5 && nodeType == ExpressionType.Equal)
+                    {
+                        var inArgs = method.Args[0] as System.Collections.IEnumerable;
+                        int _i = 0;
+                        Type innerType = null;
+                        var pars = new List<InJoin>();
+                        var batchNo = System.Guid.NewGuid().ToString().Replace("-", "");
+                        foreach (var a in inArgs)
+                        {
+                            _i += 1;
+                            if (innerType == null)
+                            {
+                                innerType = a.GetType();
+                            }
+                            var obj2 = new InJoin() { BatchNo = batchNo, V_String = "" };
+                            obj2.SetValue(innerType, a);
+                            pars.Add(obj2);
+                        }
+                        if (_i > lambdaQueryBase.__AutoInJoin)
+                        {
+                            QueryParames.Add("__batchNO", batchNo);
+                            var typeJoin = typeof(InJoin);
+                            var inJoinName = lambdaQueryBase.GetPrefix(typeJoin);
+                            var joinFormat = string.Format("{1}BatchNo=@__batchNO and {0}={1}V_{2}", method.MemberQueryName, inJoinName, innerType.Name);
+                            lambdaQueryBase.AddInnerRelation(new TypeQuery(typeJoin), JoinType.Inner, joinFormat);
+                            par1.DataParamed = "";
+                            var dbEx = DBExtendFactory.CreateDBExtend(dbContext);
+                            dbEx.CheckTableCreated(typeJoin);
+                            __DBAdapter.BatchInsert(pars);
+                            lambdaQueryBase.__RemoveInJionBatchNo = batchNo;
+                            return par1;
+                        }
+                    }
+                    */
+                    #endregion
+
                     var dic = MethodAnalyze.GetMethos(__DBAdapter);
                     if (!dic.ContainsKey(method.MethodName))
                     {

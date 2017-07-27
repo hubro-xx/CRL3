@@ -84,6 +84,9 @@
     <Reference Include="MongoDB.Driver.Core">
       <HintPath>..\packages\MongoDB.Driver.Core.2.2.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\packages\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="SqlSugar">
       <HintPath>..\packages\ORMS\SqlSugar.dll</HintPath>
     </Reference>
@@ -146,6 +149,7 @@
     <Content Include="Page\test.aspx" />
     <Content Include="Page\Update.aspx" />
     <Content Include="Page\UserTransactionTest.aspx" />
+    <Content Include="TcpTest.aspx" />
     <Content Include="Update.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -412,6 +416,13 @@
     </Compile>
     <Compile Include="Page\UserTransactionTest.aspx.designer.cs">
       <DependentUpon>UserTransactionTest.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TcpTest.aspx.cs">
+      <DependentUpon>TcpTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TcpTest.aspx.designer.cs">
+      <DependentUpon>TcpTest.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

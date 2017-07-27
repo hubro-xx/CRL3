@@ -212,21 +212,40 @@ end", spName, script);
             string sql = "Select name,0 from syscolumns Where ID=OBJECT_ID('" + tableName + "')";
             return sql;
         }
+        static Dictionary<Type, DataTable> cacheTables = new Dictionary<Type, DataTable>();
         /// <summary>
         /// 批量插入
         /// </summary>
         /// <param name="details"></param>
         /// <param name="keepIdentity"></param>
-        public override void BatchInsert(System.Collections.IList details, bool keepIdentity = false) 
+        public override void BatchInsert(System.Collections.IList details, bool keepIdentity = false)
         {
             if (details.Count == 0)
                 return;
             var type = details[0].GetType();
-            string table = TypeCache.GetTableName(type, dbContext);
-            table = KeyWordFormat(table);
-            string sql = GetSelectTop("*", " from " + table + " where 1=0","", 1);
-            DataTable tempTable = helper.ExecDataTable(sql);
-            var typeArry = TypeCache.GetProperties(type, true).Values;
+            var table = TypeCache.GetTable(type);
+            var tableName = KeyWordFormat(table.TableName);
+
+            DataTable tempTable;
+            if (!cacheTables.ContainsKey(type))
+            {
+                string sql = GetSelectTop("*", " from " + tableName + " where 1=0", "", 1);
+                var tempTable2 = helper.ExecDataTable(sql);
+                cacheTables.Add(type, tempTable2);
+                tempTable = tempTable2.Clone();//创建一个副本
+            }
+            else
+            {
+                tempTable = cacheTables[type].Clone();
+            }
+            ////字段顺序得和表一至,不然插入出错
+            //DataTable tempTable = new DataTable() { TableName = tableName };
+            //foreach (var f in table.Fields)
+            //{
+            //    var column = new DataColumn() { ColumnName = f.MapingName, DataType = f.PropertyType, AllowDBNull = true };
+            //    tempTable.Columns.Add(column);
+            //}
+            var typeArry = table.Fields;
             foreach (var item in details)
             {
                 DataRow dr = tempTable.NewRow();
@@ -243,10 +262,6 @@ end", spName, script);
                         if (info.IsPrimaryKey)
                             continue;
                     }
-                    //if (!string.IsNullOrEmpty(info.VirtualField))
-                    //{
-                    //    continue;
-                    //}
                     var value2 = ObjectConvert.CheckNullValue(value,info.PropertyType);
                     if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
                     {
@@ -259,7 +274,7 @@ end", spName, script);
                 }
                 tempTable.Rows.Add(dr);
             }
-            helper.InsertFromDataTable(tempTable, table, keepIdentity);
+            helper.InsertFromDataTable(tempTable, tableName, keepIdentity);
         }
 
         /// <summary>

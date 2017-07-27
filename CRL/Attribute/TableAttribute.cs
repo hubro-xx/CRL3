@@ -24,7 +24,7 @@ namespace CRL.Attribute
         }
         /// <summary>
         /// 表名
-        /// MongoDB不支持表和字段别名
+        /// MongoDB不支持字段别名
         /// </summary>
         public string TableName
         {

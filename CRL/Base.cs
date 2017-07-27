@@ -190,6 +190,7 @@ namespace CRL
             }
             return allList;
         }
+        [Serializable]
         public struct SqlInfo
         {
             /// <summary>

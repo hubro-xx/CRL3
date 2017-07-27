@@ -36,7 +36,7 @@ namespace WebTest.Page
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            var item = Code.ProductDataManage.Instance.QueryItem(1);
+            var item = Code.ProductDataManage.Instance.QueryItem(2);
             item.ProductName = "更改主库数据为" + DateTime.Now.Second;
             Code.ProductDataManage.Instance.Update(item);
             Bind();
@@ -44,7 +44,7 @@ namespace WebTest.Page
 
         protected void Button2_Click(object sender, EventArgs e)
         {
-            var item = Code.ProductDataManage.Instance.QueryItem(1);
+            var item = Code.ProductDataManage.Instance.QueryItem(2);
             Response.Write("从库数据1为" + item.ProductName);
         }
     }

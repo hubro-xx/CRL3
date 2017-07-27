@@ -15,7 +15,7 @@ namespace CRL
         /// <param name="origin"></param>
         /// <param name="v"></param>
         /// <returns></returns>
-        public static T IsNull<T>(this T origin,T v) where T : struct
+        public static T IsNull<T>(this T origin, T v) where T : struct
         {
             return default(T);
         }

@@ -75,7 +75,7 @@ namespace CRL.Sharding
             }
             if (part == null)
             {
-                throw new CRLException(string.Format("找不到指定的表{1}在库{0}", db.Name, tableName));
+                throw new CRLException(string.Format("找不到指定的分表,在主表{1}在库{0} 索引{2}", db.Name, tableName, mainDataIndex));
             }
             return new Location() { DataBase = db, TablePart = part };
         }

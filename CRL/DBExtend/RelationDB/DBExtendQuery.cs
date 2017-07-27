@@ -68,6 +68,11 @@ namespace CRL.DBExtend.RelationDB
                     return ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
                 }, sql);
                 query.MapingTime += runTime;
+                if(!string.IsNullOrEmpty(query.__RemoveInJionBatchNo))
+                {
+                    Delete<InJoin>(b => b.BatchNo == query.__RemoveInJionBatchNo);
+                    query.__RemoveInJionBatchNo = "";
+                }
             }
             else
             {

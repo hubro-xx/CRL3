@@ -34,6 +34,18 @@ namespace CRL.Sharding
             dbLocation.ShardingDataBase = dataBase;
             return this;
         }
+        /// <summary>
+        /// 获取定位
+        /// </summary>
+        /// <param name="dataIndex"></param>
+        /// <returns></returns>
+        public Location GetLocation(long dataIndex)
+        {
+            var dataBase = DBService.GetDataBase(dataIndex);
+            var tableName = TypeCache.GetTable(typeof(TModel)).TableName;
+            var location2 = DBService.GetLocation(tableName, dataIndex, dataBase);
+            return location2;
+        }
         internal override DbContext GetDbContext()
         {
             if (SettingConfig.GetDbAccess == null)

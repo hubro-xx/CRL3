@@ -49,7 +49,7 @@ namespace WebTest
                     {
                         return Code.LocalSqlHelper.MongoDB;
                     }
-                    if(dbLocation.AccessType== CRL.AccessType.Read)
+                    if (dbLocation.AccessType == CRL.AccessType.Read)
                     {
                         return Code.LocalSqlHelper.TestConnection2;
                     }
@@ -70,6 +70,9 @@ namespace WebTest
             CRL.CacheServerSetting.AddTcpServerListen("127.0.0.1", 11236);
             //CRL.CacheServerSetting.AddTcpServerListen("122.114.91.203", 11236);
             CRL.CacheServerSetting.Init();
+
+            //var listenTestServer = new CRL.ListenTestServer(1438);
+            //listenTestServer.Start();
         }
 
     }
