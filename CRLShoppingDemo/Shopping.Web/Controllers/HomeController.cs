@@ -39,7 +39,7 @@ namespace Shopping.Web.Controllers
 
         public ActionResult Logoff()
         {
-            System.Web.Security.FormsAuthentication.SignOut();
+            CoreHelper.FormAuthentication.AuthenticationSecurity.LoginOut();
             return RedirectToAction("index");
         }
         #region 图片上传
@@ -85,5 +85,11 @@ namespace Shopping.Web.Controllers
             return Content(html);
         }
         #endregion
+        [AllowAnonymous]
+        public ActionResult RunTime()
+        {
+            var str = CRL.Runtime.RunTimeService.Display();
+            return Content(str);
+        }
     }
 }

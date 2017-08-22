@@ -155,8 +155,9 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
-        public override void CreateTable(List<Attribute.FieldAttribute> fields, string tableName)
+        public override void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName)
         {
+            var helper = dbContext.DBHelper;
             var lines = new List<string>();
             //tableName = tableName.ToUpper();
             string script = string.Format("create table {0}(\r\n", tableName);
@@ -225,12 +226,13 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         /// </summary>
         /// <param name="details"></param>
         /// <param name="keepIdentity"></param>
-        public override void BatchInsert(System.Collections.IList details, bool keepIdentity = false) 
+        public override void BatchInsert(DbContext dbContext, System.Collections.IList details, bool keepIdentity = false)
         {
+            var helper = dbContext.DBHelper;
             foreach (var item in details)
             {
                 helper.ClearParams();
-                InsertObject(item as IModel);
+                InsertObject(dbContext, item as IModel);
             }
 
         }
@@ -240,8 +242,9 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override object InsertObject(IModel obj)
+        public override object InsertObject(DbContext dbContext, IModel obj)
         {
+            var helper = dbContext.DBHelper;
             Type type = obj.GetType();
             string table = TypeCache.GetTableName(type, dbContext);
             var typeArry = TypeCache.GetProperties(type, true).Values;
@@ -254,10 +257,10 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             int id = Convert.ToInt32(SqlStopWatch.ExecScalar(helper, sqlGetIndex));
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                if (info.FieldType != Attribute.FieldType.数据库字段)
-                {
-                    continue;
-                }
+                //if (info.FieldType != Attribute.FieldType.数据库字段)
+                //{
+                //    continue;
+                //}
                 string name = info.MapingName;
                 if (info.IsPrimaryKey && !info.KeepIdentity)
                 {
@@ -306,23 +309,29 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         /// <param name="query">from table where 1=1</param>
         /// <param name="top"></param>
         /// <returns></returns>
-        public override string GetSelectTop(string fields, string query,string sort, int top)
+        public override void GetSelectTop(StringBuilder sb, string fields, Action<StringBuilder> query,string sort, int top)
         {
-            if (!query.ToLower().Contains("where"))
-            {
-                query += " where 1=1 ";
-            }
-            string sql = string.Format("select {0} {1} {2} {3}", fields, query, top == 0 ? "" : " and ROWNUM<=" + top,sort);
-            return sql;
+            //if (!query.ToLower().Contains("where"))
+            //{
+            //    query += " where 1=1 ";
+            //}
+            sb.Append("select ");
+            sb.Append(fields);
+            sb.Append(query);
+            sb.Append(top == 0 ? "" : " and ROWNUM<=" + top);
+            sb.Append(sort);
+
+            //string sql = string.Format("select {0} {1} {2} {3}", fields, query, top == 0 ? "" : " and ROWNUM<=" + top,sort);
+            //return sql;
         }
         #endregion
 
         #region 系统查询
-        public override string GetAllTablesSql()
+        public override string GetAllTablesSql(string db)
         {
             return "SELECT lower(table_name),1 FROM user_TABLES";
         }
-        public override string GetAllSPSql()
+        public override string GetAllSPSql(string db)
         {
             return "select object_name,1 from user_objects where object_type='PROCEDURE'";
         }
@@ -440,23 +449,6 @@ end
             return System.Text.RegularExpressions.Regex.Replace(sql, @"@(\w+)", ":$1");
         }
         #endregion
-
-        internal override CallBackDataReader GetPageData( string query, string fields, string sort, int pageSize, int pageIndex)
-        {
-            helper.AddParam("query_", query);
-            helper.AddParam("fields_", fields);
-            helper.AddParam("sort_", sort);
-            helper.AddParam("pageSize_", pageSize);
-            helper.AddParam("pageIndex_", pageIndex);
-            helper.AddOutParam("count_");
-            helper.AddOutParam("v_Cursor");
-            var reader = new CallBackDataReader(helper.RunDataReader("sp_page"), () =>
-            {
-                return Convert.ToInt32(helper.GetOutParam("count_"));
-            }, query);
-            return reader;
-        }
-
 
 
         public override string SubstringFormat(string field, int index, int length)

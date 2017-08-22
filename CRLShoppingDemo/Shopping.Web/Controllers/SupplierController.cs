@@ -67,13 +67,35 @@ namespace Shopping.Web.Controllers
             var query = ProductManage.Instance.GetLambdaQuery();
             query.Where(b => b.SupplierId == CurrentUser.Id);
             query.Page(pageSize, page);
+            
             query.OrderBy(b => b.Id, false);
             var result = query.ToList();
             int count = query.RowCount;
             var pageObj = new PageObj<Product>(result, page, count, pageSize);
             return View(pageObj);
         }
-
+        public ActionResult Product1()
+        {
+            var query = ProductManage.Instance.GetLambdaQuery();
+            query.Top(30);
+            query.Where(b => b.SupplierId == CurrentUser.Id);
+            query.OrderBy(b => b.Id, false);
+            var result = query.ToList();
+            return Content("ok");
+        }
+        public ActionResult Product2()
+        {
+            var list = ProductManage.Instance.getList();
+            return Content("ok");
+        }
+        public ActionResult Product3()
+        {
+            string sql = "select top 30 * from Product";
+            var db = new CoreHelper.SqlHelper(System.Configuration.ConfigurationManager.ConnectionStrings["default"].ConnectionString);
+            var dt = db.ExecDataTable(sql);
+            dt = null;
+            return Content("ok");
+        }
         public ActionResult ProductUpdate(int id)
         {
             var item = ProductManage.Instance.QueryItem(id);

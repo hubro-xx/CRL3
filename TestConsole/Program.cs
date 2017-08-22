@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using SqlSugar;
 namespace TestConsole
 {
     class Program
@@ -25,22 +25,13 @@ namespace TestConsole
             {
                 return new CoreHelper.SqlHelper(TestConsole.DbHelper.ConnectionString);
             };
+
+            //var s2 = new CRL.ListenTestServer(1437);
+            //s2.Start();
+
             Application.Run(new MainForm());
         }
  
     }
-    public class Test2 : CRL.IModel
-    {
-        public string Name
-        {
-            get;
-            set;
-        }
-        public string Id
-        {
-            get;
-            set;
-        }
-        public int? F_Int32 { get; set; }
-    }
+
 }

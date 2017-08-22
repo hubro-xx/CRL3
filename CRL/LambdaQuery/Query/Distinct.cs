@@ -31,7 +31,8 @@ namespace CRL.LambdaQuery
             Top(0);
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
             var fields = GetSelectField(true, resultSelector.Body, false, parameters);
-            _CurrentSelectFieldCache = fields;
+            //_CurrentSelectFieldCache = fields;
+            SetSelectFiled(fields,true);
             __DistinctFields = true;
             __FieldFunctionFormat = " DISTINCT {0}";
             //__QueryFields = fields;

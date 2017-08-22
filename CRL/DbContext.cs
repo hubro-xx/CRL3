@@ -54,6 +54,7 @@ namespace CRL
 
         /// <summary>
         /// 当前查询参数索引
+        /// 为了让多次操作能串行,参数索引放在这
         /// </summary>
         internal int parIndex = 0;
         internal CoreHelper.DBHelper GetDBHelper(AccessType accessType = AccessType.Default)

@@ -77,10 +77,10 @@ namespace CRL.ExistsTableCache
                 var needCreates = new List<Attribute.FieldAttribute>();
                 foreach (var field in fields)
                 {
-                    if (field.FieldType != Attribute.FieldType.数据库字段)
-                    {
-                        continue;
-                    }
+                    //if (field.FieldType != Attribute.FieldType.数据库字段)
+                    //{
+                    //    continue;
+                    //}
                     if (!allFileds2.ContainsKey(field.MapingName.ToLower()))
                     {
                         needCreates.Add(field);

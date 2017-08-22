@@ -243,9 +243,13 @@ namespace CRL.DBExtend.RelationDB
                 }
                 var result = reader[0];
                 reader.Close();
-                return result;
+                return new object[] { result };
             });
-            return list;
+            if (list == null)
+            {
+                return null;
+            }
+            return list.FirstOrDefault();
 
         }
         /// <summary>

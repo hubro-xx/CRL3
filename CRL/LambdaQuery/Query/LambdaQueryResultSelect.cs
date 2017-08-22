@@ -54,7 +54,7 @@ namespace CRL.LambdaQuery
         public LambdaQueryResultSelect<TResult> OrderBy<TResult2>(Expression<Func<TResult, TResult2>> expression, bool desc = true)
         {
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
-            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).fields;
+            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).mapping;
             var orderBy = string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
             if (!string.IsNullOrEmpty(__QueryOrderBy))
             {

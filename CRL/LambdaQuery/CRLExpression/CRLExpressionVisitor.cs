@@ -43,7 +43,7 @@ namespace CRL.LambdaQuery.CRLExpression
             var leftPar = RouteExpressionHandler(left);
             var isBinary = types.Contains(type);
             var rightPar = RouteExpressionHandler(right);
-            var e = new CRLExpression() { ExpType = type.ToString(), Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpressionType.Binary : CRLExpressionType.Tree };
+            var e = new CRLExpression() { ExpType = type, Left = leftPar, Right = rightPar, Type = isBinary ? CRLExpressionType.Binary : CRLExpressionType.Tree };
             return e;
         }
         
@@ -100,12 +100,12 @@ namespace CRL.LambdaQuery.CRLExpression
         {
             #region 数组
             NewArrayExpression naExp = (NewArrayExpression)exp;
-            StringBuilder sb = new StringBuilder();
+            var sb = "";
             foreach (Expression expression in naExp.Expressions)
             {
-                sb.AppendFormat(",{0}", RouteExpressionHandler(expression));
+                sb += string.Format(",{0}", RouteExpressionHandler(expression));
             }
-            var str = sb.Length == 0 ? "" : sb.Remove(0, 1).ToString();
+            var str = sb.Length == 0 ? "" : sb.Remove(0, 1);
             return new CRLExpression() { Type = CRLExpressionType.Value, Data = str };
             #endregion
         }
@@ -260,13 +260,13 @@ namespace CRL.LambdaQuery.CRLExpression
             var expression2 = CreateLambda(expression.Right);
             switch (expression.ExpType)
             {
-                case "AndAlso":
+                case  ExpressionType.AndAlso:
                     return expression1.Compose(expression2, Expression.AndAlso);
-                case "OrElse":
+                case ExpressionType.OrElse:
                     return expression1.Compose(expression2, Expression.OrElse);
-                case "And":
+                case ExpressionType.And:
                     return expression1.Compose(expression2, Expression.And);
-                case "Or":
+                case ExpressionType.Or:
                     return expression1.Compose(expression2, Expression.Or);
             }
             //if (expression.ExpressionType == "AndAlso")
@@ -306,21 +306,21 @@ namespace CRL.LambdaQuery.CRLExpression
 
             switch (type)
             {
-                case "Equal":
+                case ExpressionType.Equal:
                     return creater.Equal(exp, value);
-                case "NotEqual":
+                case ExpressionType.NotEqual:
                     return creater.NotEqual(exp, value);
-                case "Greater":
+                case ExpressionType.GreaterThan:
                     return creater.Greater(exp, value);
-                case "Less":
+                case ExpressionType.LessThan:
                     return creater.Less(exp, value);
-                case "GreaterThan":
+                case ExpressionType.GreaterThanOrEqual:
                     return creater.GreaterThan(exp, value);
-                case "LessThan":
+                case ExpressionType.LessThanOrEqual:
                     return creater.LessThan(exp, value);
-                case "And":
+                case ExpressionType.And:
                     return creater.And(exp, value);
-                case "Or":
+                case ExpressionType.Or:
                     return creater.Or(exp, value);
                 default:
                     throw new CRLException("没有对应的运算方法 " + type);

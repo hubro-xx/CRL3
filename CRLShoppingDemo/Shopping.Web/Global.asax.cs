@@ -20,8 +20,8 @@ namespace Shopping.Web
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
-
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
+            CoreHelper.FormAuthentication.AuthenticationSecurity.CrossDomain = true;
+            //WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             //初始数据访问

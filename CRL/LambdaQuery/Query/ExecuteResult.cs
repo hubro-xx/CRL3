@@ -109,7 +109,7 @@ namespace CRL.LambdaQuery
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
             var result = db.QueryScalar(this);
-            if (result == null)
+            if (result == null || result is DBNull)
             {
                 return default(TResult);
             }

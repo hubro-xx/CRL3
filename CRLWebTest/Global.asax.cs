@@ -16,6 +16,8 @@ using System.Web.SessionState;
 using System.Xml.Linq;
 using System.Linq.Expressions;
 using System.Collections.Generic;
+using System.Diagnostics;
+
 namespace WebTest
 {
     public class Global : System.Web.HttpApplication
@@ -74,6 +76,21 @@ namespace WebTest
             //var listenTestServer = new CRL.ListenTestServer(1438);
             //listenTestServer.Start();
         }
+        Stopwatch sw;
+        protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            sw = new Stopwatch();
+            sw.Start();
+            var name = Request.Path;
+            CRL.Runtime.RunTimeService.BeginLog(name);
+        }
+        protected void Application_EndRequest(object sender, EventArgs e)
+        {
+            sw.Stop();
+            var el = sw.ElapsedMilliseconds;
+            var name = Request.Path;
+            CRL.Runtime.RunTimeService.Log(name, el);
 
+        }
     }
 }

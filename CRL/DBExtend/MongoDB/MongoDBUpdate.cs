@@ -43,11 +43,11 @@ namespace CRL.DBExtend.MongoDBEx
         }
         public override int Update<TModel>(LambdaQuery.LambdaQuery<TModel> query1, ParameCollection setValue)
         {
-            if (query1.__GroupFields.Count > 0)
+            if (query1.__GroupFields != null)
             {
                 throw new CRLException("update不支持group查询");
             }
-            if (query1.__Relations.Count > 1)
+            if (query1.__Relations != null && query1.__Relations.Count > 1)
             {
                 throw new CRLException("update关联不支持多次");
             }

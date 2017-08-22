@@ -149,6 +149,7 @@
     <Content Include="Page\test.aspx" />
     <Content Include="Page\Update.aspx" />
     <Content Include="Page\UserTransactionTest.aspx" />
+    <Content Include="RunTime.aspx" />
     <Content Include="TcpTest.aspx" />
     <Content Include="Update.txt" />
     <Content Include="Web.config">
@@ -374,6 +375,13 @@
     </Compile>
     <Compile Include="Page\Query2.aspx.designer.cs">
       <DependentUpon>Query2.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RunTime.aspx.cs">
+      <DependentUpon>RunTime.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RunTime.aspx.designer.cs">
+      <DependentUpon>RunTime.aspx</DependentUpon>
     </Compile>
     <Compile Include="Site1.Master.cs">
       <DependentUpon>Site1.Master</DependentUpon>

@@ -73,12 +73,12 @@ namespace CRL.DBAdapter
             throw new NotImplementedException();
         }
 
-        public override void CreateTable(List<Attribute.FieldAttribute> fields, string tableName)
+        public override void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName)
         {
             throw new NotImplementedException();
         }
 
-        public override void BatchInsert(System.Collections.IList details, bool keepIdentity = false)
+        public override void BatchInsert(DbContext dbContext, System.Collections.IList details, bool keepIdentity = false)
         {
             throw new NotImplementedException();
         }
@@ -88,12 +88,12 @@ namespace CRL.DBAdapter
             throw new NotImplementedException();
         }
 
-        public override object InsertObject(IModel obj)
+        public override object InsertObject(DbContext dbContext, IModel obj)
         {
             throw new NotImplementedException();
         }
 
-        public override string GetSelectTop(string fields, string query, string sort, int top)
+        public override void GetSelectTop(StringBuilder sb, string fields, Action<StringBuilder> query, string sort, int top)
         {
             throw new NotImplementedException();
         }
@@ -103,12 +103,12 @@ namespace CRL.DBAdapter
             throw new NotImplementedException();
         }
 
-        public override string GetAllSPSql()
+        public override string GetAllSPSql(string db)
         {
             throw new NotImplementedException();
         }
 
-        public override string GetAllTablesSql()
+        public override string GetAllTablesSql(string db)
         {
             throw new NotImplementedException();
         }
@@ -118,10 +118,6 @@ namespace CRL.DBAdapter
             throw new NotImplementedException();
         }
 
-        public override string KeyWordFormat(string value)
-        {
-            return value;
-        }
 
         public override string TemplateGroupPage
         {

@@ -21,15 +21,21 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
-            //query.UseInJoin(6);
-            query.Where(b => b.ProductChannel.In(new ProductChannel[] { ProductChannel.其它, ProductChannel.自采 }));
-            //query.Where(b => b.CategoryName.In("12", "212", "122", "2424", "122", "2424", "122"));
-            //query.Where(b => b.CategoryName.Replace("22","") == "abc");
-            //var result = query.ToList();
-            Response.Write(query.PrintQuery());
-            //Response.End();
+            //Code.ProductDataManage.Instance.Test2();
+            var query3 = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query3.Join<Code.Member>((a, b) => a.Id == b.Id).SelectAppendValue(b => b.Name);
+            query3.Where(b => b.Id > 1);
+            var resutl3 = query3.ToList();
+            foreach (var d in resutl3)
+            {
+                var a = d.Bag.Name;
+            }
+            //var n2 = GC.GetTotalMemory(true);
+            //var list1 = Code.ProductDataManage.Instance.GetLambdaQuery().Top(1000).ToList();
+            //var list2 = Code.OrderManage.Instance.GetLambdaQuery().Top(1000).ToList();
+            //var n3 = GC.GetTotalMemory(false) - n2;
+            //Response.Write("ok " + n3 / 1024);
+            Response.End();
         }
-        
     }
 }

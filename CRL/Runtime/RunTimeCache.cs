@@ -11,7 +11,10 @@ namespace CRL.Runtime
     public class RunTimeCache : CoreHelper.ICoreConfig<RunTimeCache>
     {
         private System.Collections.Concurrent.ConcurrentDictionary<string, RunTime> runTimeCache = new System.Collections.Concurrent.ConcurrentDictionary<string, RunTime>();
-
+        public DateTime SaveTime
+        {
+            get;set;
+        }
         public ConcurrentDictionary<string, RunTime> RunTimeCacheList
         {
             get
@@ -66,6 +69,10 @@ namespace CRL.Runtime
             {
                 return times == 0 ? 0 : record.Min();
             }
+        }
+        public float TotalVisitor
+        {
+            get;set;
         }
         public List<CRL.Base.SqlInfo> AllCall = new List<CRL.Base.SqlInfo>();
         public List<string> DBCall = new List<string>();

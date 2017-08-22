@@ -29,7 +29,7 @@ namespace CRL.LambdaQuery
         public LambdaQuery<T> GroupBy(Expression<Func<T, object>> resultSelector)
         {
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
-            var fields = GetSelectField(false, resultSelector.Body, false, parameters).fields;
+            var fields = GetSelectField(false, resultSelector.Body, false, parameters).mapping;
             __GroupFields = fields;
             //CompileSp = true;
             return this;

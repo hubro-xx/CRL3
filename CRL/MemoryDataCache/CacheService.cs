@@ -166,7 +166,7 @@ namespace CRL.MemoryDataCache
 
             if (timer == null)
             {
-                //StarWatch();
+                StarWatch();
             }
             //更新缓存数据
             if (dataItem.UpdatedData != null)

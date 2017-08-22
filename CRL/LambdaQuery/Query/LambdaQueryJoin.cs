@@ -54,10 +54,8 @@ namespace CRL.LambdaQuery
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
             var selectFieldItem = BaseQuery.GetSelectField(true, resultSelector.Body, false, parameters);
             //BaseQuery.__QueryFields.AddRange(resultFields);
-            selectFieldItem.queryFieldString = "";
-            BaseQuery._CurrentSelectFieldCache = selectFieldItem;
-            BaseQuery._CurrentAppendSelectField.AddRange(selectFieldItem.fields);
-            //BaseQuery.currentSelectFieldCache.queryFieldString += "," + BaseQuery.GetQueryFieldsString(resultFields);
+            //selectFieldItem.queryFieldString = ""; //re
+            BaseQuery.SetSelectFiled(selectFieldItem);
             return this;
         }
         /// <summary>
@@ -87,12 +85,13 @@ namespace CRL.LambdaQuery
             //}
             if (BaseQuery._CurrentSelectFieldCache==null)
             {
-                BaseQuery.SelectAll();
+                BaseQuery.SelectAll(false);
             }
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
-            var resultFields = BaseQuery.GetSelectField(true, resultSelector.Body, true, parameters).fields;
+            var selectField = BaseQuery.GetSelectField(true, resultSelector.Body, true, parameters);
+            BaseQuery.SetSelectFiled(selectField);
             //BaseQuery.__QueryFields.AddRange(resultFields);
-            BaseQuery._CurrentAppendSelectField.AddRange(resultFields);
+            //BaseQuery._CurrentAppendSelectField.AddRange(resultFields);
             return this;
         }
         /// <summary>
@@ -106,7 +105,11 @@ namespace CRL.LambdaQuery
             //在关联两次以上,可调用以下方法指定关联对象获取对应的字段
             //var innerType = typeof(TJoin);
             var parameters = resultSelector.Parameters.Select(b => b.Type).ToArray();
-            var resultFields = BaseQuery.GetSelectField(false, resultSelector.Body, false, parameters).fields;
+            var resultFields = BaseQuery.GetSelectField(false, resultSelector.Body, false, parameters).mapping;
+            if(BaseQuery.__GroupFields==null)
+            {
+                BaseQuery.__GroupFields = new List<Attribute.FieldMapping>();
+            }
             BaseQuery.__GroupFields.AddRange(resultFields);
             return this;
         }
@@ -120,7 +123,7 @@ namespace CRL.LambdaQuery
         {
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
             //var innerType = typeof(TJoin);
-            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).fields;
+            var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).mapping;
             if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
             {
                 BaseQuery.__QueryOrderBy += ",";

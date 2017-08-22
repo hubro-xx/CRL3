@@ -38,7 +38,7 @@ namespace CRL.DBExtend.RelationDB
                 {
                     var db = GetBackgroundDBExtend();
                     //BackupParams();
-                    spCahe = db.ExecDictionary<string, int>(_DBAdapter.GetAllSPSql());
+                    spCahe = db.ExecDictionary<string, int>(_DBAdapter.GetAllSPSql(dbContext.DBHelper.DatabaseName));
                     //RecoveryParams();
                 }
             }
@@ -59,6 +59,7 @@ namespace CRL.DBExtend.RelationDB
                 }
             }
             string sp = CoreHelper.StringHelper.EncryptMD5(fields + "_" + sql.Trim());
+            //string sp = (fields + "_" + sql.Trim()).GetHashCode().ToString();
             sp = "ZautoSp_" + sp.Substring(8, 16);
             if (!spCahe.ContainsKey(sp))
             {

@@ -147,14 +147,16 @@ namespace CRL
             string contextName = GetType().Name;//同一线程调用只创建一次
             var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);
             if (_useCRLContext)//对于数据库事务,只创建一个上下文
-            {
+            {            
+                //todo 由于内置缓存问题,参数不能一直变化,不然生成重复缓存和重复存储过程
                 contextName = Base.CRLContextName;
+                db = CallContext.GetData<AbsDBExtend>(contextName);
+                if (db != null)
+                {
+                    return db;
+                }
             }
-            db = CallContext.GetData<AbsDBExtend>(contextName);
-            if (db != null)
-            {
-                return db;
-            }
+
             var dbContext2 = GetDbContext();
             if (_useCRLContext)//使用CRLContext,需由CRLContext来关闭数据连接
             {
@@ -165,10 +167,13 @@ namespace CRL
             {
                 db.OnUpdateNotifyCacheServer = OnUpdateNotifyCacheServer;
             }
-            CallContext.SetData(contextName, db);
+            if (_useCRLContext)
+            {
+                CallContext.SetData(contextName, db);
+            }
+            //占用内存..
             var allList = Base.GetCallDBContext();
             allList.Add(contextName);
-            //CallContext.SetData(Base.AllDBExtendName, allList);
             return db;
         }
         #endregion

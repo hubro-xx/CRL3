@@ -26,7 +26,7 @@ namespace CRL.DBExtend.MongoDBEx
         {
             var query = query1 as MongoDBLambdaQuery<TModel>;
             //var selectField = query.__QueryFields;
-            var selectField = query._CurrentSelectFieldCache.fields;
+            var selectField = query._CurrentSelectFieldCache.mapping;
             var collection = _MongoDB.GetCollection<TModel>(query.QueryTableName);
             var pageIndex = query1.SkipPage;
             var pageSize = query1.TakeNum;
@@ -35,25 +35,25 @@ namespace CRL.DBExtend.MongoDBEx
             {
                 skip = pageSize * pageIndex;
             }
-            if (query.__GroupFields.Count > 0)
+            if (query.__GroupFields != null)
             {
                 #region group
                 var groupField = query.__GroupFields.FirstOrDefault();//只支持一个字段
                 groupField.CheckNull("groupField");
 
                 var groupInfo = new BsonDocument();
-                groupInfo.Add("_id", "$" + groupField.MemberName);
+                groupInfo.Add("_id", "$" + groupField);
                 foreach (var f in selectField)
                 {
-                    var method = f.FieldQuery.MethodName.ToLower();
+                    var method = f.MethodName.ToLower();
                     object sumField = 1;
                     if (method == "sum")
                     {
-                        groupInfo.Add(f.FieldQuery.MemberName, new BsonDocument("$sum", "$" + f.FieldQuery.FieldName));
+                        groupInfo.Add(f.MemberName, new BsonDocument("$sum", "$" + f.FieldName));
                     }
                     else if (method == "count")
                     {
-                        groupInfo.Add(f.FieldQuery.MemberName, new BsonDocument("$sum", 1));
+                        groupInfo.Add(f.MemberName, new BsonDocument("$sum", 1));
                     }
                     else
                     {
@@ -78,11 +78,12 @@ namespace CRL.DBExtend.MongoDBEx
                     var dict = obj as IDictionary<string, object>;
                     foreach (var f in selectField)
                     {
-                        string columnName = f.FieldQuery.MemberName;
+                        string columnName = f.MemberName;
                         object value = item[columnName];
                         dict.Add(columnName, value);
                     }
-                    dict.Add(groupField.FieldQuery.MemberName, item["_id"]);
+                    dict.Add(groupField.MemberName, item["_id"]);
+                    //dict.Add(groupField, item["_id"]);
                     list.Add(obj);
                 }
                 return list;
@@ -111,14 +112,15 @@ namespace CRL.DBExtend.MongoDBEx
                 }
                 var result = query2.ToList();
                 var list = new List<dynamic>();
+                var fields = TypeCache.GetTable(typeof(TModel)).FieldsDic;
                 foreach (var item in result)
                 {
                     dynamic obj = new System.Dynamic.ExpandoObject();
                     var dict = obj as IDictionary<string, object>;
                     foreach (var f in selectField)
                     {
-                        string columnName = f.FieldQuery.MemberName;
-                        object value = f.GetValue(item);
+                        string columnName = f.MemberName;
+                        object value = fields[columnName].GetValue(item);
                         dict.Add(columnName, value);
                     }
                     list.Add(obj);

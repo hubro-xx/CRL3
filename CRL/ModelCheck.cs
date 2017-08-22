@@ -83,11 +83,17 @@ namespace CRL
         {
             string result = "";
             var dbAdapter = db._DBAdapter;
-            List<Attribute.FieldAttribute> columns = GetColumns(type, dbAdapter);
+            List<Attribute.FieldAttribute> columns = GetColumns(type, db);
             string tableName = TypeCache.GetTableName(type, db.dbContext);
             foreach (Attribute.FieldAttribute item in columns)
             {
-                string sql = dbAdapter.GetSelectTop(item.MapingName, "from " + dbAdapter.KeyWordFormat(tableName), "", 1);
+                var sb = new StringBuilder();
+                //string sql = dbAdapter.GetSelectTop(item.MapingName, "from " + dbAdapter.KeyWordFormat(tableName), "", 1);
+                dbAdapter.GetSelectTop(sb,item.MapingName, b=>
+                {
+                    b.Append(" from " + dbAdapter.KeyWordFormat(tableName));
+                }, "", 1);
+                var sql = sb.ToString();
                 try
                 {
                     db.Execute(sql);
@@ -102,10 +108,10 @@ namespace CRL
         }
         internal static void SetColumnDbType(DBAdapter.DBAdapterBase dbAdapter, Attribute.FieldAttribute info)
         {
-            if (info.FieldType != Attribute.FieldType.数据库字段)
-            {
-                return;
-            }
+            //if (info.FieldType != Attribute.FieldType.数据库字段)
+            //{
+            //    return;
+            //}
             string defaultValue;
             Type propertyType = info.PropertyType;
             var columnType = dbAdapter.GetColumnType(info, out defaultValue);
@@ -120,18 +126,18 @@ namespace CRL
         /// 获取列
         /// </summary>
         /// <returns></returns>
-        static List<Attribute.FieldAttribute> GetColumns(Type type, DBAdapter.DBAdapterBase dbAdapter)
+        static List<Attribute.FieldAttribute> GetColumns(Type type, AbsDBExtend db)
         {
             //var dbAdapter = Base.CurrentDBAdapter;
             //Type type = this.GetType();
-            string tableName = TypeCache.GetTableName(type, dbAdapter.dbContext);
+            string tableName = TypeCache.GetTableName(type, db.dbContext);
             var typeArry = TypeCache.GetProperties(type, true).Values;
             var columns = new List<CRL.Attribute.FieldAttribute>();
             foreach (var info in typeArry)
             {
-                if (info.FieldType != Attribute.FieldType.数据库字段)
-                    continue;
-                SetColumnDbType(dbAdapter, info);
+                //if (info.FieldType != Attribute.FieldType.数据库字段)
+                //    continue;
+                SetColumnDbType(db._DBAdapter, info);
                 columns.Add(info);
             }
             return columns;
@@ -140,7 +146,7 @@ namespace CRL
         {
             var dbAdapter = db._DBAdapter;
             List<string> list2 = new List<string>();
-            List<Attribute.FieldAttribute> columns = GetColumns(type, dbAdapter);
+            List<Attribute.FieldAttribute> columns = GetColumns(type, db);
             foreach (Attribute.FieldAttribute item in columns)
             {
                 if (item.FieldIndexType != Attribute.FieldIndexType.无)
@@ -179,7 +185,12 @@ namespace CRL
             message = "";
             //TypeCache.SetDBAdapterCache(GetType(),dbAdapter);
             string tableName = TypeCache.GetTableName(type, db.dbContext);
-            string sql = dbAdapter.GetSelectTop("0", "from " + dbAdapter.KeyWordFormat(tableName), "", 1);
+            var sb = new StringBuilder();
+            dbAdapter.GetSelectTop(sb, "0", b =>
+             {
+                 b.Append(" from " + dbAdapter.KeyWordFormat(tableName));
+             }, "", 1);
+            var sql = sb.ToString();
             bool needCreate = false;
             try
             {
@@ -196,8 +207,8 @@ namespace CRL
                 List<string> list = new List<string>();
                 try
                 {
-                    List<Attribute.FieldAttribute> columns = GetColumns(type, dbAdapter);
-                    dbAdapter.CreateTable(columns, tableName);
+                    List<Attribute.FieldAttribute> columns = GetColumns(type, db);
+                    dbAdapter.CreateTable(db.dbContext, columns, tableName);
                     message = string.Format("创建表:{0}\r\n", tableName);
                     CheckIndexExists(type, db);
                     //return true;

@@ -120,6 +120,7 @@
     <Compile Include="LambdaQuery\Mapping\DataContainer.cs" />
     <Compile Include="LambdaQuery\Mapping\QueryInfo.cs" />
     <Compile Include="LambdaQuery\Query\In.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryBaseField.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryViewJoin.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryResultSelect.cs" />
     <Compile Include="LambdaQuery\Query\TypeQuery.cs" />
@@ -223,6 +224,7 @@
     <Compile Include="SqlStopWatch.cs" />
     <Compile Include="SummaryAnalysis.cs" />
     <Compile Include="ExistsTableCache\ExistsTableCache.cs" />
+    <Compile Include="TempCache.cs" />
     <Compile Include="TypeCache.cs" />
   </ItemGroup>
   <ItemGroup>

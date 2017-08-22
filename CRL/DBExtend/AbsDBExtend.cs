@@ -191,7 +191,8 @@ namespace CRL
             }
             if (obj.CheckRepeatedInsert)
             {
-                string concurrentKey = "insertRepeatedCheck_" + CoreHelper.StringHelper.EncryptMD5(sb.ToString());
+                //string concurrentKey = "insertRepeatedCheck_" + CoreHelper.StringHelper.EncryptMD5(sb.ToString());
+                string concurrentKey = "insertRepeatedCheck_" + sb.ToString().GetHashCode();
                 if (!CoreHelper.ConcurrentControl.Check(concurrentKey, 1))
                 {
                     throw new CRLException("检测到有重复提交的数据,在" + obj.GetType());
@@ -302,19 +303,22 @@ namespace CRL
 
         #region 参数处理
         Dictionary<string, object> _Parame = new Dictionary<string, object>();
-        Dictionary<string, object> _OutParame = new Dictionary<string, object>();
+        Dictionary<string, object> _OutParame;
         internal void FillParame(CoreHelper.DBHelper db)
         {
             foreach(var kv in _Parame)
             {
                 db.AddParam(kv.Key,kv.Value);
             }
-            foreach (var kv in _OutParame)
+            if (_OutParame != null)
             {
-                db.AddOutParam(kv.Key, kv.Value);
+                foreach (var kv in _OutParame)
+                {
+                    db.AddOutParam(kv.Key, kv.Value);
+                }
+                _OutParame.Clear();
             }
             _Parame.Clear();
-            _OutParame.Clear();
         }
         /// <summary>
         /// 清除参数
@@ -322,7 +326,10 @@ namespace CRL
         public void ClearParame()
         {
             _Parame.Clear();
-            _OutParame.Clear();
+            if (_OutParame != null)
+            {
+                _OutParame.Clear();
+            }
             __DbHelper.ClearParams();
         }
         /// <summary>
@@ -348,6 +355,8 @@ namespace CRL
         /// <param name="value">对应类型任意值</param>
         public void AddOutParam(string name, object value = null)
         {
+            if (_OutParame == null)
+                _OutParame = new Dictionary<string, object>();
             //__DbHelper.AddOutParam(name, value);
             _OutParame.Add(name, value);
         }
@@ -870,8 +879,8 @@ namespace CRL
             }
             foreach (var item in list)
             {
-                TModel clone = item.Clone() as TModel;
-                item.OriginClone = clone;
+                //TModel clone = item.Clone() as TModel;
+                item.OriginClone = item.Clone();
             }
         }
         internal ParameCollection GetUpdateField<TModel>(TModel obj) where TModel : IModel, new()

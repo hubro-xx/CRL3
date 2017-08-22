@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SqlSugar;
+using CRL;
 namespace TestConsole
 {
     public partial class MainForm : Form
@@ -36,7 +37,7 @@ namespace TestConsole
         {
             //TestConsole.CRLManage.Instance.QueryItem(b => b.Id > 0);
             //var obj = CRL.Base.CreateObjectTest<TestEntity>();
-            //MappingSpeedTest.LinqToDBQueryTest(1); 
+            //MappingSpeedTest.LinqToDBQueryTest(1);
 
             //button1.Enabled = false;
             //button2.Enabled = false;
@@ -138,13 +139,17 @@ namespace TestConsole
             sw.Start();
             for (int i = 0; i < n; i++)
             {
-                var instance = CRLManage.Instance;
-                var query = instance.GetLambdaQuery();
-                query.WithTrackingModel(false).WithNoLock(false);
+                //var mapper = NLite.Mapper.CreateMapper<TestEntity, FS.TestEntity>();
+                //var fare = new TestEntity();
+                //var model = mapper.Map(fare);
 
-                query.Where(b => b.Id < id2 && b.Id > id);
+                //var instance = CRLManage.Instance;
+                //var query = instance.GetLambdaQuery();
+                //query.WithTrackingModel(false).WithNoLock(false);
 
-                var result = query.Top(1).ToString();
+                //query.Where(b => b.Id < id2 && b.Id > id);
+
+                //var result = query.Top(1).ToString();
 
             }
             //Code.TestAll.TestMethod();
@@ -158,16 +163,18 @@ namespace TestConsole
         private void btnTest2_Click(object sender, EventArgs e)
         {
             var n = Convert.ToInt32(textBox2.Text);
-            MappingSpeedTest.SugarQueryTest(1);
+            //MappingSpeedTest.SugarQueryTest(1);
             var sw = new Stopwatch();
             //int a = 20;
             sw.Start();
             for (int i = 0; i < n; i++)
             {
-                using (var db = SugarDao.GetInstance())
-                {
-                    var first = db.Queryable<TestEntity>().Where(b => b.Id < id2 && b.Id > id).OrderBy(b => b.Id).Take(1).ToString2();
-                }
+                var fare = new TestEntity();
+                var model = fare.ToType<FS.TestEntity>();
+                //using (var db = SugarDao.GetInstance())
+                //{
+                //    var first = db.Queryable<TestEntity>().Where(b => b.Id < id2 && b.Id > id).OrderBy(b => b.Id).Take(1).ToString2();
+                //}
 
             }
             //Code.TestAll.TestMethod();
@@ -180,13 +187,36 @@ namespace TestConsole
         int index = 0;
         private void button4_Click(object sender, EventArgs e)
         {
+            int n = 0;
+            var n2 = GC.GetTotalMemory(true);
+            var instance = CRLManage.Instance;
+            var list = new List<TestEntityCRL>();
             for (int i = 0; i < 100; i++)
             {
-                System.Threading.Tasks.Task.Run(() =>
-                {
-                    Task.Delay(10);
-                });
+                //list.Add(new TestEntityCRL() { F_String = "ffffffff" });
+                var query = instance.GetLambdaQuery().WithTrackingModel(false).Where(b => b.Id < 100 && b.Id > 1).OrderBy(b => b.Id).Top(i).ToString();
             }
+
+            var n3 = GC.GetTotalMemory(false) - n2;
+            txtResult.Text = (n3/1024).ToString();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            int n = 0;
+            var n2 = GC.GetTotalMemory(true);
+            using (var db = SugarDao.GetInstance())
+            {
+                var list = new List<TestEntity>();
+                for (int i = 0; i < 100; i++)
+                {
+                    //list.Add(new TestEntity() { F_String = "ffffffff" });
+                    var first = db.Queryable<TestEntity>().Where(b => b.Id < 100 && b.Id > 1).OrderBy(b => b.Id).Take(i).ToString();
+                }
+
+            }
+            var n3 = GC.GetTotalMemory(false) - n2;
+            txtResult.Text = (n3 / 1024).ToString();
         }
     }
 }

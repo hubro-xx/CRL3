@@ -144,7 +144,7 @@ namespace CRL
             var type = typeof(T);
             return (T)ConvertObject(type, obj);
         }
-        struct ActionItem<T>
+        class ActionItem<T>
         {
             public Action<T, object> Set;
             public Action<object, object> Set2;
@@ -176,7 +176,7 @@ namespace CRL
             //sw.Start();
             runTime = 0;
             var list = new List<object>();
-            var typeArry = TypeCache.GetTable(mainType).Fields;
+            var typeArry = TypeCache.GetTable(mainType).FieldsDic;
             var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
             {
@@ -187,13 +187,14 @@ namespace CRL
             object[] values = new object[reader.FieldCount];
             foreach (var mp in mapping)
             {
-                var fieldName = mp.QueryName.ToLower();
-                var info = typeArry.Find(b => b.MemberName == mp.MappingName);
-                if (info == null)
+                var fieldName = mp.FieldName.ToLower();
+                Attribute.FieldAttribute info;
+                var a = typeArry.TryGetValue(mp.PropertyName, out info);
+                if (!a)
                 {
                     continue;
                 }
-                var action = new ActionItem<object>() { Set2 = info.SetValue, Name = mp.MappingName, ValueIndex = columns[fieldName] };
+                var action = new ActionItem<object>() { Set2 = info.SetValue, Name = mp.PropertyName, ValueIndex = columns[fieldName] };
                 columns.Remove(fieldName);
                 actions.Add(action);
             }
@@ -215,16 +216,19 @@ namespace CRL
                     if (columns.Count > 0)
                     {
                         var model = detailItem as IModel;
-                        foreach (var item in columns)
+                        if (model != null)
                         {
-                            var col = item.Key;
-                            var n = col.LastIndexOf("__");
-                            if (n == -1)
+                            foreach (var item in columns)
                             {
-                                continue;
+                                var col = item.Key;
+                                var n = col.LastIndexOf("__");
+                                if (n == -1)
+                                {
+                                    continue;
+                                }
+                                var mapingName = col.Substring(n + 2);
+                                model.SetIndexData(mapingName, values[item.Value]);
                             }
-                            var mapingName = col.Substring(n + 2);
-                            model.SetIndexData(mapingName, values[item.Value]);
                         }
                     }
                     #endregion
@@ -260,7 +264,6 @@ namespace CRL
         /// <returns></returns>
         internal static List<T> DataReaderToSpecifiedList<T>(DbDataReader reader, QueryInfo<T> queryInfo)
         {
-      
             var mapping = queryInfo.Mapping;
             var list = new List<T>();
             string columnCacheKey = queryInfo.selectKey;
@@ -274,7 +277,7 @@ namespace CRL
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     var name = reader.GetName(i).ToLower();
-                    var find = mapping.Count(b => b.QueryName.ToLower() == name);
+                    var find = mapping.Count(b => b.MemberName.ToLower() == name);
                     if (find == 0)
                     {
                         leftColumns.Add(name, i);
@@ -302,6 +305,7 @@ namespace CRL
                 {
                     reader.Close();
                     reader.Dispose();
+                    queryInfo = null;
                     var columnName = dataContainer._GetCurrentColumnName();
                     throw new CRLException("反射赋值时发生错误,在:" + type + " 字段:" + columnName+ ",请检查数据库字段类型与对象是否一致");
                 }
@@ -310,17 +314,20 @@ namespace CRL
                 if (leftColumnCount > 0)
                 {
                     var model = detailItem as IModel;
-                    foreach (var item in leftColumns)
+                    if (model != null)//当不是IModel,不给索引赋值
                     {
-                        var col = item.Key;
-                        var n = col.LastIndexOf("__");
-                        if (n == -1)
+                        foreach (var item in leftColumns)
                         {
-                            continue;
+                            var col = item.Key;
+                            var n = col.LastIndexOf("__");
+                            if (n == -1)
+                            {
+                                continue;
+                            }
+                            var mapingName = col.Substring(n + 2);
+                            var val = reader.GetValue(item.Value);
+                            model.SetIndexData(mapingName, val);
                         }
-                        var mapingName = col.Substring(n + 2);
-                        var val = reader.GetValue(item.Value);
-                        model.SetIndexData(mapingName, val);
                     }
                 }
                 #endregion
@@ -328,6 +335,7 @@ namespace CRL
             }
             reader.Close();
             reader.Dispose();
+            queryInfo = null;
             return list;
         }
         #endregion

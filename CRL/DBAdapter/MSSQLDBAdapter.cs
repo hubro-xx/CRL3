@@ -160,7 +160,7 @@ end", spName, script);
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public override void CreateTable(List<Attribute.FieldAttribute> fields, string tableName)
+        public override void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName)
         {
             var defaultValues = new List<string>();
             string script = string.Format("create table [{0}] (\r\n", tableName);
@@ -191,6 +191,7 @@ end", spName, script);
             script += ") ON [PRIMARY]";
             //var list3 = GetIndexScript();
             //defaultValues.AddRange(list3);
+            var helper = dbContext.DBHelper;
             helper.Execute(script);
             foreach (string s in defaultValues)
             {
@@ -218,18 +219,23 @@ end", spName, script);
         /// </summary>
         /// <param name="details"></param>
         /// <param name="keepIdentity"></param>
-        public override void BatchInsert(System.Collections.IList details, bool keepIdentity = false)
+        public override void BatchInsert(DbContext dbContext, System.Collections.IList details, bool keepIdentity = false)
         {
             if (details.Count == 0)
                 return;
             var type = details[0].GetType();
             var table = TypeCache.GetTable(type);
             var tableName = KeyWordFormat(table.TableName);
-
+            var helper = dbContext.DBHelper;
             DataTable tempTable;
             if (!cacheTables.ContainsKey(type))
             {
-                string sql = GetSelectTop("*", " from " + tableName + " where 1=0", "", 1);
+                var sb = new StringBuilder();
+                GetSelectTop(sb,"*", b=>
+                {
+                    b.Append(" from " + tableName + " where 1=0");
+                }, "", 1);
+                var sql = sb.ToString();
                 var tempTable2 = helper.ExecDataTable(sql);
                 cacheTables.Add(type, tempTable2);
                 tempTable = tempTable2.Clone();//创建一个副本
@@ -251,10 +257,10 @@ end", spName, script);
                 DataRow dr = tempTable.NewRow();
                 foreach (Attribute.FieldAttribute info in typeArry)
                 {
-                    if (info.FieldType != Attribute.FieldType.数据库字段)
-                    {
-                        continue;
-                    }
+                    //if (info.FieldType != Attribute.FieldType.数据库字段)
+                    //{
+                    //    continue;
+                    //}
                     string name = info.MapingName;
                     object value = info.GetValue(item);
                     if (!keepIdentity)
@@ -282,9 +288,10 @@ end", spName, script);
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override object InsertObject(IModel obj)
+        public override object InsertObject(DbContext dbContext, IModel obj)
         {
             Type type = obj.GetType();
+            var helper = dbContext.DBHelper;
             string table = TypeCache.GetTableName(type, dbContext);
             var typeArry = TypeCache.GetProperties(type, true).Values;
             Attribute.FieldAttribute primaryKey = null;
@@ -293,10 +300,10 @@ end", spName, script);
             string sql2 = "";
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                if (info.FieldType != Attribute.FieldType.数据库字段)
-                {
-                    continue;
-                }
+                //if (info.FieldType != Attribute.FieldType.数据库字段)
+                //{
+                //    continue;
+                //}
                 string name = info.MapingName;
                 if (info.IsPrimaryKey)
                 {
@@ -358,19 +365,30 @@ end", spName, script);
         /// <param name="sort"></param>
         /// <param name="top"></param>
         /// <returns></returns>
-        public override string GetSelectTop(string fields, string query,string sort, int top)
+        public override void GetSelectTop(StringBuilder sb, string fields, Action<StringBuilder> query,string sort, int top)
         {
-            string sql = string.Format("select {0} {1} {2} {3}", top == 0 ? "" : "top " + top, fields, query, sort);
-            return sql;
+            //string sql = string.Format("select {0} {1} {2} {3}", top == 0 ? "" : "top " + top, fields, query, sort);
+            //string sql = "select " + (top == 0 ? "" : "top " + top) + fields + query + sort;
+            //return sql;
+            //sb.AppendFormat("select {0} {1} {2} {3}", top == 0 ? "" : "top " + top, fields, query, sort);
+            //return;
+            sb.Append("select ");
+            if (top > 0)
+            {
+                sb.Append("top " + top);
+            }
+            sb.Append(fields);
+            query(sb);
+            sb.Append(sort);
         }
         #endregion
 
         #region 系统查询
-        public override string GetAllTablesSql()
+        public override string GetAllTablesSql(string db)
         {
             return "select Lower(name),id from sysobjects where  type='u'";
         }
-        public override string GetAllSPSql()
+        public override string GetAllSPSql(string db)
         {
             return "select name,id from sysobjects where  type='P'";
         }
@@ -394,7 +412,14 @@ end", spName, script);
         {
             return string.Format("[{0}]", value);
         }
-
+        public override string FieldNameFormat(Attribute.FieldAttribute field)
+        {
+            if(string.IsNullOrEmpty(field.MapingNameFormat))
+            {
+                return field.MapingName;
+            }
+            return field.MapingNameFormat;
+        }
         public override string TemplateGroupPage
         {
             get
@@ -413,7 +438,7 @@ declare @pageCount INT
 begin
 
     --获取记录数
-	  select @count=count(0) from (select count(*) as a from  {sql}) t
+	  select @count=count(0) from (select count(*) as a  {sql}) t
     if @count = 0
         set @count = 1
 
@@ -427,7 +452,7 @@ begin
 	--计算开始结束的行号
 	set @start = @pageSize*(@pageIndex-1)+1
 	set @end = @start+@pageSize-1 
-	SELECT * FROM (select {fields},ROW_NUMBER() OVER ( Order by {rowOver} ) AS RowNumber From {sql}) T WHERE T.RowNumber BETWEEN @start AND @end 
+	SELECT * FROM (select {fields},ROW_NUMBER() OVER ( Order by {rowOver} ) AS RowNumber {sql}) T WHERE T.RowNumber BETWEEN @start AND @end 
 end
 ";
                 return str;
@@ -452,7 +477,7 @@ declare @pageCount INT
 begin
 
     --获取记录数
-	  select @count=count(0) from {sql}
+	  select @count=count(0) {sql}
     if @count = 0
         set @count = 1
 
@@ -466,7 +491,7 @@ begin
 	--计算开始结束的行号
 	set @start = @pageSize*(@pageIndex-1)+1
 	set @end = @start+@pageSize-1 
-	SELECT * FROM (select {fields},ROW_NUMBER() OVER ( Order by {rowOver} ) AS RowNumber From {sql}) T WHERE T.RowNumber BETWEEN @start AND @end order by RowNumber
+	SELECT * FROM (select {fields},ROW_NUMBER() OVER ( Order by {rowOver} ) AS RowNumber {sql}) T WHERE T.RowNumber BETWEEN @start AND @end order by RowNumber
 end
 
 ";
@@ -566,8 +591,9 @@ set  nocount  on
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public override void CreateTable(List<Attribute.FieldAttribute> fields, string tableName)
+        public override void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName)
         {
+            var helper = dbContext.DBHelper;
             var defaultValues = new List<string>();
             string script = string.Format("create table [{0}] (\r\n", tableName);
             List<string> list2 = new List<string>();

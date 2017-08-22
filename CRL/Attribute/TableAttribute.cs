@@ -31,6 +31,11 @@ namespace CRL.Attribute
             get;
             set;
         }
+        public string TableNameFormat
+        {
+            get;
+            set;
+        }
         /// <summary>
         /// 备注
         /// </summary>

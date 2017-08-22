@@ -1,5 +1,6 @@
 ﻿@{
     var currentUser = Shopping.BLL.MemberManage.CurrentUser;
+    var ss = Request.Cookies.AllKeys;
     var menus = new Dictionary<string, string>();
     if(currentUser!=null)
     {
@@ -8,7 +9,7 @@
             menus.Add("产品", "/product/");
             menus.Add("购物车", "/cart");
             menus.Add("账户", "/member/index");
-            
+
             menus.Add("订单", "/order");
             menus.Add("交易流水", "/member/Transaction");
             menus.Add("退出", "/home/Logoff");
@@ -40,6 +41,7 @@
 </head>
 
 <body>
+    @(string.Join(",",ss));
     <div class="navbar">
         <div class="navbar-inner">
             <a class="brand" href="/">首页</a>

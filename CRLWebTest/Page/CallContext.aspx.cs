@@ -64,7 +64,8 @@ namespace WebTest.Page
             Code.OrderManage.Instance.QueryItem(b => b.Id == 3);
             var item2 = Code.OrderManage.Instance.QueryItem(b => b.Id == 2);
             Code.ProductDataManage.Instance.QueryItem(2);
-            var allCall = CRL.Base.GetSQLRunningtime();
+            bool a;
+            var allCall = CRL.Base.GetSQLRunningtime(out a);
             GridView1.DataSource = allCall;
             GridView1.DataBind();
         }

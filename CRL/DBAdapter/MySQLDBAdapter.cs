@@ -151,8 +151,9 @@ EXECUTE  ' {1} ';
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public override void CreateTable(List<Attribute.FieldAttribute> fields, string tableName)
+        public override void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName)
         {
+            var helper = dbContext.DBHelper;
             var defaultValues = new List<string>();
             string script = string.Format("create table {0}(\r\n", tableName);
             List<string> list2 = new List<string>();
@@ -192,12 +193,13 @@ EXECUTE  ' {1} ';
         /// </summary>
         /// <param name="details"></param>
         /// <param name="keepIdentity"></param>
-        public override void BatchInsert(System.Collections.IList details, bool keepIdentity = false) 
+        public override void BatchInsert(DbContext dbContext, System.Collections.IList details, bool keepIdentity = false)
         {
+            var helper = dbContext.DBHelper;
             foreach(var item in details)
             {
                 helper.ClearParams();
-                InsertObject(item as IModel);
+                InsertObject(dbContext, item as IModel);
             }
             
         }
@@ -207,8 +209,9 @@ EXECUTE  ' {1} ';
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override object InsertObject(IModel obj)
+        public override object InsertObject(DbContext dbContext, IModel obj)
         {
+            var helper = dbContext.DBHelper;
             Type type = obj.GetType();
             string table = TypeCache.GetTableName(type, dbContext);
             var typeArry = TypeCache.GetProperties(type, true).Values;
@@ -218,10 +221,10 @@ EXECUTE  ' {1} ';
             string sql2 = "";
             foreach (Attribute.FieldAttribute info in typeArry)
             {
-                if (info.FieldType != Attribute.FieldType.数据库字段)
-                {
-                    continue;
-                }
+                //if (info.FieldType != Attribute.FieldType.数据库字段)
+                //{
+                //    continue;
+                //}
                 string name = info.MapingName;
                 if (info.IsPrimaryKey)
                 {
@@ -278,21 +281,27 @@ EXECUTE  ' {1} ';
         /// <param name="query">from table where 1=1</param>
         /// <param name="top"></param>
         /// <returns></returns>
-        public override string GetSelectTop(string fields, string query,string sort, int top)
+        public override void GetSelectTop(StringBuilder sb, string fields, Action<StringBuilder> query,string sort, int top)
         {
-            string sql = string.Format("select {1} {2} {3} {0}", top == 0 ? "" : " LIMIT 0, " + top, fields, query, sort);
-            return sql;
+            //string sql = string.Format("select {1} {2} {3} {0}", top == 0 ? "" : " LIMIT 0, " + top, fields, query, sort);
+            //return sql;
+
+            sb.Append("select ");
+            sb.Append(top == 0 ? "" : " LIMIT 0," + top);
+            sb.Append(fields);
+            sb.Append(query);
+            sb.Append(sort);
         }
         #endregion
 
         #region 系统查询
-        public override string GetAllTablesSql()
+        public override string GetAllTablesSql(string db)
         {
-            return "select lower(table_name),1 from information_schema.tables where table_schema='" + helper.DatabaseName + "' ";
+            return "select lower(table_name),1 from information_schema.tables where table_schema='" + db + "' ";
         }
-        public override string GetAllSPSql()
+        public override string GetAllSPSql(string db)
         {
-            return "select `name`,1 from mysql.proc where db = '" + helper.DatabaseName + "' and `type` = 'PROCEDURE' ";
+            return "select `name`,1 from mysql.proc where db = '" + db + "' and `type` = 'PROCEDURE' ";
         }
         #endregion
 

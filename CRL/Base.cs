@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Linq.Expressions;
 using System.Diagnostics;
 using CRL.LambdaQuery.Mapping;
+using System.Collections.Concurrent;
 
 namespace CRL
 {
@@ -175,6 +176,7 @@ namespace CRL
         internal const string AllDBExtendName = "__AllDBExtend";
         internal const string SQLRunningtimeName = "__SQLRunningtime";
         internal const string UseTransactionScopeName = "__TransactionScopeName";
+        internal const string ContextUrlName = "__ContextUrlName";
         /// <summary>
         /// 获取当前调用所有的数据访问会话
         /// 可用此检查代码调用深度
@@ -190,8 +192,11 @@ namespace CRL
             }
             return allList;
         }
+        //contenxt name sql
+        static ConcurrentDictionary<string, Dictionary<int, SqlInfo>> allSqlCache = new ConcurrentDictionary<string, Dictionary<int, SqlInfo>>();
+
         [Serializable]
-        public struct SqlInfo
+        public class SqlInfo
         {
             /// <summary>
             /// sql
@@ -207,31 +212,67 @@ namespace CRL
             {
                 get; set;
             }
-        }
-        public static List<SqlInfo> GetSQLRunningtime()
-        {
-            var allList = CallContext.GetData<List<SqlInfo>>(SQLRunningtimeName);
-            if (allList == null)
+            public int RowCount
             {
-                allList = new List<SqlInfo>();
-                CallContext.SetData(SQLRunningtimeName,allList);
+                get;set;
             }
-            return allList;
         }
-        internal static void SaveSQLRunningtme(string sql,long n)
+        public static Dictionary<int, SqlInfo> GetSQLRunningtime(out bool useContext)
         {
-            var list = GetSQLRunningtime();
-            list.Add(new SqlInfo { SQL = sql, Time = n });
+            var list = new Dictionary<int, SqlInfo>();
+            string key = CallContext.GetData<string>(ContextUrlName);
+            if (string.IsNullOrEmpty(key))
+            {
+                useContext = false;
+                return list;
+            }
+            var a = allSqlCache.TryGetValue(key, out list);
+            if (list == null)
+            {
+                list = new Dictionary<int, SqlInfo>();
+                allSqlCache.TryAdd(key, list);
+            }
+            useContext = true;
+            return list;
+        }
+        internal static void SaveSQLRunningtme(string sql, long n, int rowCount = 1)
+        {
+            bool useContext;
+            var dic = GetSQLRunningtime(out useContext);
+            if (!useContext)
+            {
+                return;
+            }
+            SqlInfo item;
+            var hash = sql.GetHashCode();
+            var a = dic.TryGetValue(hash, out item);
+            if (a)
+            {
+                if (item.Time < n)
+                {
+                    item.Time = n;
+                }
+                if (item.RowCount < rowCount)
+                {
+                    item.RowCount = rowCount;
+                }
+            }
+            else
+            {
+                dic.Add(hash, new SqlInfo() { SQL = sql, Time = n, RowCount = rowCount });
+            }
         }
         #endregion
         public static Dictionary<string, int> GetTempCacheCount()
         {
             var dic = new Dictionary<string, int>();
-            dic.Add("表达式二元运算缓存", LambdaQuery.ExpressionVisitor.BinaryExpressionCache.Count);
-            dic.Add("表达式方法解析缓存", LambdaQuery.ExpressionVisitor.MethodCallExpressionCache.Count);
+            //dic.Add("表达式二元运算缓存", LambdaQuery.ExpressionVisitor.BinaryExpressionCache.Count);
+            //dic.Add("表达式方法解析缓存", LambdaQuery.ExpressionVisitor.MethodCallExpressionCache.Count);
             dic.Add("表达式属性解析缓存", LambdaQuery.ExpressionVisitor.MemberExpressionCache.Count);
-            dic.Add("表达式字段筛选缓存", LambdaQuery.LambdaQueryBase._GetSelectFieldCache.Count);
+            dic.Add("对象字段筛选缓存", LambdaQuery.LambdaQueryBase.queryFieldCache.Count);
             dic.Add("对象映射列缓存", ObjectConvert.columnCache.Count);
+            dic.Add("IModel对象缓存", MemoryDataCache.CacheService.CacheCount);
+            dic.Add("SQL查询监视缓存", allSqlCache.Count());
             return dic;
         }
 

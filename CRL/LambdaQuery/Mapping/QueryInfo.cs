@@ -100,11 +100,11 @@ namespace CRL.LambdaQuery.Mapping
             int i = 0;
             foreach (var mp in mapping)
             {
-                if (!fields.ContainsKey(mp.MappingName))
+                if (!fields.ContainsKey(mp.PropertyName))
                 {
                     continue;
                 }
-                var m = fields[mp.MappingName].GetPropertyInfo();
+                var m = fields[mp.PropertyName].GetPropertyInfo();
                 var method = DataContainer.GetMethod(m.PropertyType, true);
                 //Expression getValue = Expression.Call(method, parame);
                 var getValue = parame.Call(method.Name, Expression.Constant(i));
@@ -141,16 +141,16 @@ namespace CRL.LambdaQuery.Mapping
             //mapping顺序和语句查询不一致
             foreach (var mp in mapping)
             {
-                if (!fields.ContainsKey(mp.MappingName))
+                if (!fields.ContainsKey(mp.PropertyName))
                 {
                     continue;
                 }
-                if (!queryFields.ContainsKey(mp.QueryName.ToLower()))
+                if (!queryFields.ContainsKey(mp.MemberName.ToLower()))
                 {
                     continue;
                 }
-                var i = queryFields[mp.QueryName.ToLower()];
-                var pro = fields[mp.MappingName].GetPropertyInfo();
+                var i = queryFields[mp.MemberName.ToLower()];
+                var pro = fields[mp.PropertyName].GetPropertyInfo();
                 var endIfLabel = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);

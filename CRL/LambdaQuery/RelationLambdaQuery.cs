@@ -48,6 +48,7 @@ namespace CRL.LambdaQuery
                 condition = " and " + condition;
             }
             Condition.Append(condition);
+            expression = null;
             //this.Condition += string.IsNullOrEmpty(Condition) ? condition : " and " + condition;
             return this;
         }
@@ -60,7 +61,7 @@ namespace CRL.LambdaQuery
         public override LambdaQuery<T> OrderBy<TResult>(Expression<Func<T, TResult>> expression, bool desc = true)
         {
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
-            var fields = GetSelectField(false, expression.Body, false, parameters).fields;
+            var fields = GetSelectField(false, expression.Body, false, parameters).mapping;
             if (!string.IsNullOrEmpty(__QueryOrderBy))
             {
                 __QueryOrderBy += ",";
@@ -97,7 +98,7 @@ namespace CRL.LambdaQuery
         {
             string condition1 = FormatExpression(expression.Body).SqlOut;
             //this.Condition = string.Format("({0}) or {1}", Condition, condition1);
-            Condition.Append(string.Format(" or {0}", condition1));
+            Condition.AppendFormat(" or {0}", condition1);
             return this;
         }
         LambdaQuery<T> __InnerSelect<TInner>(Expression<Func<T, object>> outField, Expression<Func<TInner, object>> innerField,
@@ -149,49 +150,34 @@ namespace CRL.LambdaQuery
         }
         internal override string GetQueryFieldString()
         {
-            //var allFields = GetQueryFields();
-            if (_CurrentSelectFieldCache == null)
-            {
-                SelectAll();
-            }
-            var str = _CurrentSelectFieldCache.queryFieldString;
-            if (_CurrentAppendSelectField.Count > 0)
-            {
-                str += (string.IsNullOrEmpty(str) ? "" : ",") + string.Join(",", _CurrentAppendSelectField.Select(b => b.QueryFullScript));
-            }
-            return str;
-            
+            GetSelectFieldInfo();
+            return _CurrentSelectFieldCache.GetQueryFieldString();
         }
 
         /// <summary>
         /// 获取查询条件串,带表名
         /// </summary>
         /// <returns></returns>
-        internal override string GetQueryConditions(bool withTableName = true)
+        internal override void GetQueryConditions(StringBuilder part, bool withTableName = true)
         {
-            var where = new StringBuilder(Condition.ToString());
             
-            StringBuilder part = new StringBuilder();
+            string where = Condition.ToString();
+            //var part = new StringBuilder();
             if (withTableName)
             {
+                //part.Append(" from ");
                 var prex1 = GetPrefix(__MainType);
-                prex1 = prex1.Remove(prex1.Length-1);
-                part.Append(string.Format("{0} {1} {2}", __DBAdapter.KeyWordFormat(QueryTableName), prex1, __DBAdapter.GetWithNolockFormat(__WithNoLock)));
+                prex1 = prex1.Remove(prex1.Length - 1);
+                part.AppendFormat(" from {0} {1} {2}", __DBAdapter.KeyWordFormat(QueryTableName), prex1, __DBAdapter.GetWithNolockFormat(__WithNoLock));
             }
-            if (_IsRelationUpdate)
+            string join = "";
+            if (__Relations != null)
             {
-                if (where.Length > 0)
-                {
-                    part.Append(string.Format(" where {0}", where));
-                }
+                join = string.Join(" ", __Relations.Values);
             }
-            else
-            {
-                string join = string.Join(" ", __Relations.Values);
-                part.Append(string.Format(" {0}{1}", join, where.Length == 0 ? " " : " where " + where));
-            }
+            part.AppendFormat(" {0}{1}", join, where.Length == 0 ? " " : " where " + where);
             #region group判断
-            if (__GroupFields.Count > 0)
+            if (__GroupFields!=null)
             {
                 part.Append(" group by ");
                 part.Append(string.Join(",", __GroupFields.Select(b => b.QueryField)));
@@ -202,7 +188,7 @@ namespace CRL.LambdaQuery
             }
             #endregion
 
-            return part.ToString();
+            //return part.ToString();
         }
         /// <summary>
         /// 获取排序 带 order by
@@ -224,6 +210,11 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         internal override string GetQuery()
         {
+            return GetQueryOrigin();
+        }
+
+        string GetQueryOrigin()
+        {
             string fields = GetQueryFieldString();
             if (!string.IsNullOrEmpty(__FieldFunctionFormat))
             {
@@ -231,18 +222,18 @@ namespace CRL.LambdaQuery
             }
             if (distinctCount)
             {
-                fields = System.Text.RegularExpressions.Regex.Replace(fields,@" as \w+","");//替换别名
+                fields = Regex.Replace(fields, @" as \w+", "");//替换别名
                 fields = string.Format(" count({0}) as Total", fields);
-                if (_CurrentSelectFieldCache.fields.Count > 1)
+                if (_CurrentSelectFieldCache.mapping.Count > 1)
                 {
                     throw new CRLException("distinct 时,不能count多个字段 " + fields);
                 }
             }
 
-            var part = " from " + GetQueryConditions();
+            //var part = " from " + GetQueryConditions();
 
             var orderBy = GetOrderBy();
-            StringBuilder sql = new StringBuilder();
+            var sql = new StringBuilder();
             //当设置了分表联合查询
             if (__DbContext.UseSharding && __ShanrdingUnionType != UnionType.None)
             {
@@ -254,30 +245,43 @@ namespace CRL.LambdaQuery
                 for (int i = 0; i < tables.Count; i++)
                 {
                     var table = tables[i];
-                    var part1 = part.Replace("from " + __DBAdapter.KeyWordFormat(tableName), "from " + __DBAdapter.KeyWordFormat(table.PartName));
-                    sql.Append(__DBAdapter.GetSelectTop(fields, part1, "", TakeNum));
+                    //var part1 = part.Replace("from " + __DBAdapter.KeyWordFormat(tableName), "from " + __DBAdapter.KeyWordFormat(table.PartName));
+                    //sql.Append(__DBAdapter.GetSelectTop(fields, part1, "", TakeNum));
+                    __DBAdapter.GetSelectTop(sql, fields, b =>
+                    {
+                        GetQueryConditions(b);
+                        b.Replace("from " + __DBAdapter.KeyWordFormat(tableName), "from " + __DBAdapter.KeyWordFormat(table.PartName));
+                    }, "", TakeNum);
                     if (i < tables.Count - 1)
                     {
                         sql.Append("\r\n " + unionType + " \r\n");
                     }
                 }
-                orderBy = System.Text.RegularExpressions.Regex.Replace(orderBy, @"t\d+\.", "");
+                orderBy = Regex.Replace(orderBy, @"t\d+\.", "");
                 sql.Append("\r\n " + orderBy);
                 #endregion
             }
             else
             {
 
-                if (__Unions.Count == 0)
+                if (__Unions.Count == 0)//默认
                 {
-                    var sql2 = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
-                    sql.Append(sql2);
+                    //var sql2 = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
+                    //sql.Append(sql2);
+                    __DBAdapter.GetSelectTop(sql, fields, b =>
+                     {
+                         GetQueryConditions(b);
+                     }, orderBy, TakeNum);
                 }
                 else
                 {
                     #region 联合查询
-                    var sql2 = __DBAdapter.GetSelectTop(fields, part, "", TakeNum);
-                    sql.Append(sql2);
+                    //var sql2 = __DBAdapter.GetSelectTop(fields, part, "", TakeNum);
+                    //sql.Append(sql2);
+                    __DBAdapter.GetSelectTop(sql,fields, b =>
+                    {
+                        GetQueryConditions(b);
+                    }, "", TakeNum);
                     foreach (var unionQuery in __Unions)
                     {
                         var query = unionQuery.query;

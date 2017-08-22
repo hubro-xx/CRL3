@@ -18,6 +18,9 @@ namespace CRL.LambdaQuery.CRLExpression
     /// </summary>
     public class CRLExpression
     {
+        public CRLExpression()
+        {
+        }
         public override string ToString()
         {
             return CoreHelper.StringHelper.SerializerToJson(this);
@@ -66,7 +69,7 @@ namespace CRL.LambdaQuery.CRLExpression
         /// <summary>
         /// 左右操作类型
         /// </summary>
-        public string ExpType
+        public ExpressionType ExpType
         {
             get;
             set;

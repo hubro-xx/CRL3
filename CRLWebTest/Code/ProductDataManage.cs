@@ -49,7 +49,7 @@ namespace WebTest.Code
         /// </summary>
         public static ProductDataManage Instance
         {
-            get { return CreateInstance<ProductDataManage>(); }
+            get { return  new ProductDataManage(); }
         }
 
         public List<ProductData> QueryDayProduct(DateTime date)
@@ -69,6 +69,12 @@ namespace WebTest.Code
                 var id = item.Id;
                 var productId = item.ProductId;
             }
+        }
+        public void Test2()
+        {
+            string sql = "select top 10 Id,ProductId,ProductName1 from ProductData";
+            var helper = DBExtend;
+            var obj = helper.ExecObject<ProductData>(sql);
         }
     }
 }

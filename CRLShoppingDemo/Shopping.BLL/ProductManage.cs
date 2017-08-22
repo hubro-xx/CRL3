@@ -35,5 +35,10 @@ namespace Shopping.BLL
             var sql = query.PrintQuery();
             return query;
         }
+        public List<Product> getList()
+        {
+            string sql = "select top 30 * from Product";
+            return DBExtend.ExecList<Product>(sql);
+        }
     }
 }

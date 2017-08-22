@@ -109,6 +109,7 @@ namespace CRL
             {
                 des.TableName = type.Name;
             }
+            des.TableNameFormat = string.Format("[{0}]", des.TableName);
             SetProperties(des);
             return des;
         }
@@ -213,10 +214,11 @@ namespace CRL
                     keyField = f;
                     n += 1;
                 }
-                if (f.FieldType != Attribute.FieldType.关联字段)
-                {
+                //if (f.FieldType != Attribute.FieldType.关联字段)
+                //{
                     fieldDic.Add(f.MemberName, f);
-                }
+                //}
+                f.MapingNameFormat = string.Format("[{0}]", f.MapingName);
                 list.Add(f);
             }
             if (n == 0)

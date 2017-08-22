@@ -24,58 +24,58 @@ namespace CRL
             : base(dic)
         {
         }
-        Dictionary<string, string> keyMaping = new Dictionary<string, string>();
-        string getKey(string key)
-        {
-            var key2 = key.ToUpper();
-            string value;
-            var a = keyMaping.TryGetValue(key2, out value);
-            if (!a)
-            {
-                keyMaping[key2] = key;
-                return key;
-            }
-            return value;
-        }
-        /// <summary>
-        /// 获取键值,按小写
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public new T this[string key]
-        {
-            get
-            {
-                T obj = default(T);
-                TryGetValue(getKey(key), out obj);
-                return (T)obj;
-            }
-            set
-            {
-                base[getKey(key)] = value;
-            }
-        }
-        /// <summary>
-        /// 添加到字典
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        public new void Add(string key, T value)
-        {
-            base.Add(getKey(key), value);
-        }
-        public new bool TryGetValue(string key, out T value)
-        {
-            return base.TryGetValue(getKey(key), out value);
-        }
-        public new bool ContainsKey(string key)
-        {
-            return base.ContainsKey(getKey(key));
-        }
-        public new bool Remove(string key)
-        {
-            return base.Remove(getKey(key));
-        }
+        //Dictionary<string, string> keyMaping = new Dictionary<string, string>();
+        //string getKey(string key)
+        //{
+        //    var key2 = key.ToUpper();
+        //    string value;
+        //    var a = keyMaping.TryGetValue(key2, out value);
+        //    if (!a)
+        //    {
+        //        keyMaping[key2] = key;
+        //        return key;
+        //    }
+        //    return value;
+        //}
+        ///// <summary>
+        ///// 获取键值,按小写
+        ///// </summary>
+        ///// <param name="key"></param>
+        ///// <returns></returns>
+        //public new T this[string key]
+        //{
+        //    get
+        //    {
+        //        T obj = default(T);
+        //        TryGetValue(getKey(key), out obj);
+        //        return (T)obj;
+        //    }
+        //    set
+        //    {
+        //        base[getKey(key)] = value;
+        //    }
+        //}
+        ///// <summary>
+        ///// 添加到字典
+        ///// </summary>
+        ///// <param name="key"></param>
+        ///// <param name="value"></param>
+        //public new void Add(string key, T value)
+        //{
+        //    base.Add(getKey(key), value);
+        //}
+        //public new bool TryGetValue(string key, out T value)
+        //{
+        //    return base.TryGetValue(getKey(key), out value);
+        //}
+        //public new bool ContainsKey(string key)
+        //{
+        //    return base.ContainsKey(getKey(key));
+        //}
+        //public new bool Remove(string key)
+        //{
+        //    return base.Remove(getKey(key));
+        //}
     }
 
     /// <summary>

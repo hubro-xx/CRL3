@@ -78,10 +78,11 @@ namespace CRL.LambdaQuery
             var prefix2 = GetPrefix(typeof(TJoinResult));
             var typeQuery = new TypeQuery(innerType, prefix2);
             var baseQuery = resultSelect.BaseQuery;
-            foreach (var kv in baseQuery.QueryParames)
-            {
-                QueryParames[kv.Key] = kv.Value;
-            }
+            QueryParames.AddRange(baseQuery.QueryParames);
+            //foreach (var kv in baseQuery.QueryParames)
+            //{
+            //    QueryParames[kv.Key] = kv.Value;
+            //}
             string innerQuery = baseQuery.GetQuery();
             typeQuery.InnerQuery = innerQuery;
             string condition = FormatJoinExpression(expression.Body);

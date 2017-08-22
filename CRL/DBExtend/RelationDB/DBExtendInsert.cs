@@ -32,7 +32,7 @@ namespace CRL.DBExtend.RelationDB
                 //item.CheckRepeatedInsert = false;
                 CheckData(item);
             }
-            _DBAdapter.BatchInsert(details, keepIdentity);
+            _DBAdapter.BatchInsert(dbContext, details, keepIdentity);
             //var type = typeof(TModel);
             //if (TypeCache.ModelKeyCache.ContainsKey(type))
             //{
@@ -62,7 +62,7 @@ namespace CRL.DBExtend.RelationDB
             CheckTableCreated<TModel>();
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
             CheckData(obj);
-            var index = _DBAdapter.InsertObject(obj);
+            var index = _DBAdapter.InsertObject(dbContext, obj);
             if (!primaryKey.KeepIdentity)
             {
                 //Reflection.GetAccessor(primaryKey.Name).Set((TModel)obj, index);

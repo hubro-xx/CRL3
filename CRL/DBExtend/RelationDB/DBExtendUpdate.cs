@@ -131,7 +131,7 @@ namespace CRL.DBExtend.RelationDB
             }
             var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
             var keyValue = primaryKey.GetValue(obj);
-            string where = string.Format("{0}=@{0}", primaryKey.MapingName);
+            string where = "where "+string.Format("{0}=@{0}", primaryKey.MapingName);
             AddParam(primaryKey.MapingName, keyValue);
             int n = Update<TModel>(c, where);
             UpdateCacheItem(obj, c);
@@ -154,11 +154,11 @@ namespace CRL.DBExtend.RelationDB
         public override int Update<TModel>(LambdaQuery<TModel> query, ParameCollection updateValue)
         {
             var query1 = query as RelationLambdaQuery<TModel>;
-            if (query1.__GroupFields.Count > 0)
+            if (query1.__GroupFields != null)
             {
                 throw new CRLException("update不支持group查询");
             }
-            if (query1.__Relations.Count > 1)
+            if (query1.__Relations != null && query1.__Relations.Count > 1)
             {
                 throw new CRLException("update关联不支持多次");
             }
@@ -166,31 +166,33 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new ArgumentNullException("更新时发生错误,参数值为空 ParameCollection setValue");
             }
-            query1._IsRelationUpdate = true;
-            var conditions = query1.GetQueryConditions(false).Trim();
-            if (conditions.Length > 5)
-            {
-                conditions = conditions.Substring(5);
-            }
+            //query1._IsRelationUpdate = true;
+            var sb = new StringBuilder();
+            query1.GetQueryConditions(sb, false);
+            var conditions = sb.ToString().Trim();
+            //if (conditions.Length > 5)
+            //{
+            //    conditions = conditions.Substring(5);
+            //}
 
             string table = query1.QueryTableName;
             table = query1.__DBAdapter.KeyWordFormat(table);
             query1.FillParames(this);
             //var properties = updateValue.GetType().GetProperties();
 
-            if (query1.__Relations.Count > 0)
+            if (query1.__Relations!=null)
             {
                 var kv = query1.__Relations.First();
                 string setString = ForamtSetValue<TModel>(updateValue, kv.Key.OriginType);
                 var t1 = query1.QueryTableName;
                 var t2 = TypeCache.GetTableName(kv.Key.OriginType, query1.__DbContext);
-                var join = query1.__Relations[kv.Key];
-                join = join.Substring(join.IndexOf(" on ") + 3);
-                if (!string.IsNullOrEmpty(conditions))
-                {
-                    join += " and ";
-                }
-                string sql = query1.__DBAdapter.GetRelationUpdateSql(t1, t2, join + conditions, setString);
+                //var join = query1.__Relations[kv.Key];
+                //join = join.Substring(join.IndexOf(" on ") + 3);
+                //if (!string.IsNullOrEmpty(conditions))
+                //{
+                //    join += " and ";
+                //}
+                string sql = query1.__DBAdapter.GetRelationUpdateSql(t1, t2, conditions , setString);
                 return Execute(sql);
             }
             else

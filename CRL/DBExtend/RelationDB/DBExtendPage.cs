@@ -34,7 +34,9 @@ namespace CRL.DBExtend.RelationDB
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
-            var condition = query1.GetQueryConditions();
+            var sb = new StringBuilder();
+            query1.GetQueryConditions(sb);
+            var condition = sb.ToString();
             condition = _DBAdapter.SqlFormat(condition);
             query1.FillParames(this);
             var pageIndex = query1.SkipPage;
@@ -68,7 +70,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         internal CallBackDataReader GetPageReader(LambdaQueryBase query1)
         {
-            if (query1.__GroupFields.Count > 0)
+            if (query1.__GroupFields != null)
             {
                 return GetGroupPageReader(query1);
             }
@@ -87,7 +89,9 @@ namespace CRL.DBExtend.RelationDB
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
-            var condition = query1.GetQueryConditions();
+            var sb = new StringBuilder();
+            query1.GetQueryConditions(sb);
+            var condition = sb.ToString();
 
             condition = _DBAdapter.SqlFormat(condition);
             query1.FillParames(this);
@@ -132,7 +136,9 @@ namespace CRL.DBExtend.RelationDB
         {
             //var query1 = query as RelationLambdaQuery<TModel>;
             CheckTableCreated(query1.__MainType);
-            var conditions = query1.GetQueryConditions();
+            var sb = new StringBuilder();
+            query1.GetQueryConditions(sb);
+            var conditions = sb.ToString();
             var fields = query1.GetQueryFieldString();
             if (!conditions.Contains("group"))
             {
@@ -186,7 +192,9 @@ namespace CRL.DBExtend.RelationDB
                 return GetSpGroupPageReader(query1);
             }
             CheckTableCreated(query1.__MainType);
-            var condition = query1.GetQueryConditions();
+            var sb = new StringBuilder();
+            query1.GetQueryConditions(sb);
+            var condition = sb.ToString();
             var fields = query1.GetQueryFieldString();
             if (!condition.Contains("group"))
             {

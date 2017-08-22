@@ -115,8 +115,8 @@ namespace CRL.ExistsTableCache
             //检查字段是否一致
             foreach (var item in fields)
             {
-                if (item.FieldType != Attribute.FieldType.数据库字段)
-                    continue;
+                //if (item.FieldType != Attribute.FieldType.数据库字段)
+                //    continue;
                 if (!tb.Fields.Contains(item.MemberName.ToLower()))
                 {
                     returns.Add(item);

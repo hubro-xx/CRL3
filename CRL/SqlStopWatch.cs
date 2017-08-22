@@ -40,17 +40,22 @@ namespace CRL
             Base.SaveSQLRunningtme(sql, el);
             return obj;
         }
-        internal static T ReturnList<T>(Func<T> func,string sql)
+        internal static T ReturnList<T>(Func<T> func, string sql) where T : ICollection
         {
             T list = default(T);
             var el = Run(() =>
             {
                 list = func();
             });
-            Base.SaveSQLRunningtme(sql, el);
+            var n = 0;
+            if (list != null)
+            {
+                n = list.Count;
+            }
+            Base.SaveSQLRunningtme(sql, el, n);
             return list;
         }
-        internal static T ReturnData<T>(Func<CallBackDataReader> func1, Func<CallBackDataReader, T> func2)
+        internal static T ReturnData<T>(Func<CallBackDataReader> func1, Func<CallBackDataReader, T> func2) where T : ICollection
         {
             T list = default(T);
             string sql = "";
@@ -60,16 +65,20 @@ namespace CRL
                  sql = reader.Sql;
                  list = func2(reader);
              });
-            Base.SaveSQLRunningtme(sql, el);
+            var n = 0;
+            if(list!=null)
+            {
+                n = list.Count;
+            }
+            Base.SaveSQLRunningtme(sql, el, n);
             return list;
         }
         public static long Run(Action act)
         {
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
+            var time = DateTime.Now;
             act();
-            sw.Stop();
-            return sw.ElapsedMilliseconds;
+            var ts = DateTime.Now - time;
+            return (long)ts.TotalMilliseconds;
         }
     }
 }

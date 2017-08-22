@@ -107,11 +107,6 @@ namespace WebTest.Code
             get;
             set;
         }
-        /// <summary>
-        /// 自动关联查询
-        /// 值等同为 select Name as ProductName from ProductData where BarCode=ModelTest.ModelTest
-        /// </summary>
-        [CRL.Attribute.Field(ConstraintType = typeof(ProductData), ConstraintField = "$BarCode=BarCode", ConstraintResultField = "Name")]
         public string ProductName
         {
             get;

@@ -15,12 +15,14 @@ namespace CRL.DBAdapter
 {
     public abstract class DBAdapterBase
     {
-        internal DbContext dbContext;
-        protected CoreHelper.DBHelper helper;
+        //internal DbContext dbContext;
+        //protected CoreHelper.DBHelper helper;
+        protected CoreHelper.DBType dbType;
         public DBAdapterBase(DbContext _dbContext)
         {
-            dbContext = _dbContext;
-            helper = dbContext.DBHelper;
+            //dbContext = _dbContext;
+            //helper = dbContext.DBHelper;
+            dbType = _dbContext.DBHelper.CurrentDBType;
         }
         /// <summary>
         /// 是否支持编译存储过程
@@ -32,6 +34,7 @@ namespace CRL.DBAdapter
                 return false;
             }
         }
+        static Dictionary<CoreHelper.DBType, DBAdapterBase> DBAdapterBaseCache = new Dictionary<CoreHelper.DBType, DBAdapterBase>();
         /// <summary>
         /// 根据数据库类型获取适配器
         /// </summary>
@@ -40,6 +43,11 @@ namespace CRL.DBAdapter
         public static DBAdapterBase GetDBAdapterBase(DbContext dbContext)
         {
             DBAdapterBase db = null;
+            var a = DBAdapterBaseCache.TryGetValue(dbContext.DBHelper.CurrentDBType, out db);
+            if(a)
+            {
+                return db;
+            }
             switch (dbContext.DBHelper.CurrentDBType)
             {
                 case CoreHelper.DBType.MSSQL:
@@ -64,6 +72,7 @@ namespace CRL.DBAdapter
             {
                 throw new CRLException("找不到对应的DBAdapte" + dbContext.DBHelper.CurrentDBType);
             }
+            DBAdapterBaseCache[dbContext.DBHelper.CurrentDBType] = db;
             return db;
         }
         public abstract CoreHelper.DBType DBType { get; }
@@ -82,11 +91,11 @@ namespace CRL.DBAdapter
         static Dictionary<CoreHelper.DBType, Dictionary<Type, string>> _FieldMaping = new Dictionary<CoreHelper.DBType, Dictionary<Type, string>>();
         protected System.Collections.Generic.Dictionary<Type, string> GetFieldMaping()
         {
-            if (!_FieldMaping.ContainsKey(dbContext.DBHelper.CurrentDBType))
+            if (!_FieldMaping.ContainsKey(dbType))
             {
-                _FieldMaping.Add(dbContext.DBHelper.CurrentDBType, FieldMaping());
+                _FieldMaping.Add(dbType, FieldMaping());
             }
-            return _FieldMaping[dbContext.DBHelper.CurrentDBType];
+            return _FieldMaping[dbType];
         }
         /// <summary>
         /// 获取字段数据库类型
@@ -136,7 +145,7 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
-        public abstract void CreateTable(List<Attribute.FieldAttribute> fields, string tableName);
+        public abstract void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName);
         #endregion
 
         #region SQL查询
@@ -145,7 +154,7 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="details"></param>
         /// <param name="keepIdentity">否保持自增主键</param>
-        public abstract void BatchInsert(System.Collections.IList details, bool keepIdentity = false);
+        public abstract void BatchInsert(DbContext dbContext, System.Collections.IList details, bool keepIdentity = false);
         /// <summary>
         /// 查询表所有字段名
         /// </summary>
@@ -161,7 +170,7 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public virtual string GetUpdateSql(string table, string setString, string where)
         {
-            string sql = string.Format("update {0} set {1} where {2}", KeyWordFormat(table), setString, where);
+            string sql = string.Format("update {0} set {1} {2}", KeyWordFormat(table), setString, where);
             return sql;
         }
         /// <summary>
@@ -172,7 +181,7 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public virtual string GetDeleteSql(string table, string where)
         {
-            string sql = string.Format("delete from {0}  where {1}", KeyWordFormat(table), where);
+            string sql = string.Format("delete from {0} {1}", KeyWordFormat(table), where);
             return sql;
         }
 
@@ -181,7 +190,7 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public abstract object InsertObject(CRL.IModel obj);
+        public abstract object InsertObject(DbContext dbContext, CRL.IModel obj);
         /// <summary>
         /// 获取查询前几条
         /// </summary>
@@ -189,7 +198,7 @@ namespace CRL.DBAdapter
         /// <param name="query"></param>
         /// <param name="top"></param>
         /// <returns></returns>
-        public abstract string GetSelectTop(string fields, string query,string sort, int top);
+        public abstract void GetSelectTop(StringBuilder sb, string fields, Action<StringBuilder> query, string sort, int top);
 
         /// <summary>
         /// 获取with nolock语法
@@ -203,12 +212,12 @@ namespace CRL.DBAdapter
         /// 获取所有存储过程
         /// </summary>
         /// <returns></returns>
-        public abstract string GetAllSPSql();
+        public abstract string GetAllSPSql(string db);
         /// <summary>
         /// 获取所有表,查询需要转为小写
         /// </summary>
         /// <returns></returns>
-        public abstract string GetAllTablesSql();
+        public abstract string GetAllTablesSql(string db);
         #endregion
 
         #region 模版
@@ -223,7 +232,18 @@ namespace CRL.DBAdapter
         /// <summary>
         /// 关键字格式化,如SQL为 [field]
         /// </summary>
-        public abstract string KeyWordFormat(string value);
+        public virtual string KeyWordFormat(string value)
+        {
+            return value;
+        }
+        public virtual string FieldNameFormat(Attribute.FieldAttribute field)
+        {
+            return field.MapingName;
+        }
+        public virtual string TableNameFormat(Attribute.TableAttribute table)
+        {
+            return table.TableName;
+        }
         /// <summary>
         /// GROUP分页模版
         /// </summary>
@@ -244,30 +264,30 @@ namespace CRL.DBAdapter
         public abstract string SqlFormat(string sql);
         #endregion
 
-        /// <summary>
-        /// page
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="fields"></param>
-        /// <param name="sort"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="pageIndex"></param>
-        /// <returns></returns>
-        internal virtual CallBackDataReader GetPageData(string query, string fields, string sort, int pageSize, int pageIndex)
-        {
-            helper.AddParam("query_", query);
-            helper.AddParam("fields_", fields);
-            helper.AddParam("sort_", sort);
-            helper.AddParam("pageSize_", pageSize);
-            helper.AddParam("pageIndex_", pageIndex);
-            helper.AddOutParam("count_",1);
-            //var reader = helper.RunDataReader("sp_page");
-            var reader = new CallBackDataReader(helper.RunDataReader("sp_page"), () =>
-            {
-                return Convert.ToInt32(helper.GetOutParam("count_"));
-            }, query);
-            return reader;
-        }
+        ///// <summary>
+        ///// page
+        ///// </summary>
+        ///// <param name="query"></param>
+        ///// <param name="fields"></param>
+        ///// <param name="sort"></param>
+        ///// <param name="pageSize"></param>
+        ///// <param name="pageIndex"></param>
+        ///// <returns></returns>
+        //internal virtual CallBackDataReader GetPageData(string query, string fields, string sort, int pageSize, int pageIndex)
+        //{
+        //    helper.AddParam("query_", query);
+        //    helper.AddParam("fields_", fields);
+        //    helper.AddParam("sort_", sort);
+        //    helper.AddParam("pageSize_", pageSize);
+        //    helper.AddParam("pageIndex_", pageIndex);
+        //    helper.AddOutParam("count_",1);
+        //    //var reader = helper.RunDataReader("sp_page");
+        //    var reader = new CallBackDataReader(helper.RunDataReader("sp_page"), () =>
+        //    {
+        //        return Convert.ToInt32(helper.GetOutParam("count_"));
+        //    }, query);
+        //    return reader;
+        //}
         #region 函数语法
         public virtual string SubstringFormat(string field, int index, int length)
         {
@@ -378,8 +398,8 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public virtual string GetRelationUpdateSql(string t1, string t2, string condition, string setValue)
         {
-            string table = string.Format("{0} t1,{1} t2", KeyWordFormat(t1), KeyWordFormat(t2));
-            string sql = string.Format("update t1 set {0} from {1} where {2}", setValue, table, condition);
+            string table = string.Format("{0} t1", KeyWordFormat(t1), KeyWordFormat(t2));
+            string sql = string.Format("update t1 set {0} from {1} {2}", setValue, table, condition);
             return sql;
         }
         /// <summary>
@@ -391,8 +411,8 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public virtual string GetRelationDeleteSql(string t1, string t2, string condition)
         {
-            string table = string.Format("{0} t1,{1} t2", KeyWordFormat(t1), KeyWordFormat(t2));
-            string sql = string.Format("delete t1 from {0} where {1}", table, condition);
+            string table = string.Format("{0} t1", KeyWordFormat(t1), KeyWordFormat(t2));
+            string sql = string.Format("delete t1 from {0} {1}", table, condition);
             return sql;
         }
     }

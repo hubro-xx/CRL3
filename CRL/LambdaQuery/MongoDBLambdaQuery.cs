@@ -45,15 +45,15 @@ namespace CRL.LambdaQuery
             public object Data;
             public CRLExpression.CRLExpressionType Type;
         }
-        FilterDefinition<T> getFilter(FilterData left, FilterData right, string expressionType)
+        FilterDefinition<T> getFilter(FilterData left, FilterData right, ExpressionType expressionType)
         {
             var builder = Builders<T>.Filter;
-            var _expressionType = (ExpressionType)Enum.Parse(typeof(ExpressionType), expressionType);
+            //var _expressionType = (ExpressionType)Enum.Parse(typeof(ExpressionType), expressionType);
             FilterDefinition<T> filter=null;
             if (left.Type == CRLExpression.CRLExpressionType.Binary || left.Type == CRLExpression.CRLExpressionType.Tree)//表示二元运算
             {
                 #region 按条件组合
-                switch (_expressionType)
+                switch (expressionType)
                 {
                     case ExpressionType.AndAlso:
                         filter = left.Filter & right.Filter;
@@ -111,7 +111,7 @@ namespace CRL.LambdaQuery
                     default:
                         throw new NotSupportedException(methodInfo.MethodName);//不支持
                 }
-                if (_expressionType == System.Linq.Expressions.ExpressionType.Not)
+                if (expressionType == System.Linq.Expressions.ExpressionType.Not)
                 {
                     filter = builder.Not(filter);
                 }
@@ -131,7 +131,7 @@ namespace CRL.LambdaQuery
                     name = right.Data;
                     value = left.Data;
                 }
-                switch (_expressionType)
+                switch (expressionType)
                 {
                     case ExpressionType.Equal:
                         filter = builder.Eq(name.ToString(), value);
@@ -158,7 +158,7 @@ namespace CRL.LambdaQuery
             }
             return filter;
         }
-        FilterData BinaryCRLExpression(CRLExpression.CRLExpression left, CRLExpression.CRLExpression right, string expressionType)
+        FilterData BinaryCRLExpression(CRLExpression.CRLExpression left, CRLExpression.CRLExpression right, ExpressionType expressionType)
         {
             var parLeft = RouteCRLExpression(left);
             var parRight = RouteCRLExpression(right);
@@ -173,9 +173,9 @@ namespace CRL.LambdaQuery
             else if(exp.Type== CRLExpression.CRLExpressionType.MethodCall)
             {
                 var methodInfo = exp.Data as CRLExpression.MethodCallObj;
-                var left = new CRLExpression.CRLExpression() { ExpType = methodInfo.ExpressionType.ToString(), Type = CRLExpression.CRLExpressionType.MethodCallArgs, Data = methodInfo };
-                var right = new CRLExpression.CRLExpression() { ExpType = methodInfo.ExpressionType.ToString(), Type = CRLExpression.CRLExpressionType.MethodCallArgs, Data = methodInfo.Args };
-                return BinaryCRLExpression(left, right, methodInfo.ExpressionType.ToString());
+                var left = new CRLExpression.CRLExpression() { ExpType = methodInfo.ExpressionType, Type = CRLExpression.CRLExpressionType.MethodCallArgs, Data = methodInfo };
+                var right = new CRLExpression.CRLExpression() { ExpType = methodInfo.ExpressionType, Type = CRLExpression.CRLExpressionType.MethodCallArgs, Data = methodInfo.Args };
+                return BinaryCRLExpression(left, right, methodInfo.ExpressionType);
             }
             //按值
             return new FilterData() { Data = exp.Data, Type = exp.Type };
@@ -187,7 +187,7 @@ namespace CRL.LambdaQuery
         {
             //var sortBuild = Builders<T>.Sort;
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
-            var field = GetSelectField(false, expression.Body, false, parameters).fields.First();
+            var field = GetSelectField(false, expression.Body, false, parameters).mapping.First();
             if (desc)
             {
                 _MongoDBSort = _MongoDBSort.Descending(field.MemberName);
@@ -228,9 +228,9 @@ namespace CRL.LambdaQuery
             return "";
         }
 
-        internal override string GetQueryConditions(bool withTableName = true)
+        internal override void GetQueryConditions(StringBuilder sb, bool withTableName = true)
         {
-            return "";
+            //return "";
         }
 
         internal override string GetOrderBy()

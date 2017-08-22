@@ -43,7 +43,7 @@ namespace CRL.DBExtend.RelationDB
         {
             var type = typeof(TModel);
             var table = TypeCache.GetTable(type);
-            string where = _DBAdapter.KeyWordFormat(table.PrimaryKey.MapingName) + "=@par1";
+            string where = "where " + _DBAdapter.KeyWordFormat(table.PrimaryKey.MapingName) + "=@par1";
             AddParam("par1", id);
             return Delete<TModel>(where);
 
@@ -61,6 +61,10 @@ namespace CRL.DBExtend.RelationDB
             LambdaQuery<TModel> query = new RelationLambdaQuery<TModel>(dbContext, false);
             query.Where(expression);
             string condition = query.FormatExpression(expression.Body).SqlOut;
+            if(!string.IsNullOrEmpty(condition))
+            {
+                condition = "where " + condition;
+            }
             query.FillParames(this);
             return Delete<TModel>(condition);
         }
@@ -89,32 +93,34 @@ namespace CRL.DBExtend.RelationDB
         public override int Delete<T>(LambdaQuery<T> query)
         {
             var query1 = query as RelationLambdaQuery<T>;
-            if (query1.__GroupFields.Count > 0)
+            if (query1.__GroupFields!= null)
             {
                 throw new CRLException("delete不支持group查询");
             }
-            if (query1.__Relations.Count > 1)
+            if (query1.__Relations != null && query1.__Relations.Count > 1)
             {
                 throw new CRLException("delete关联不支持多次");
             }
-            query1._IsRelationUpdate = true;
-            var conditions = query1.GetQueryConditions(false).Trim();
-            conditions = conditions.Substring(5);
+            //query1._IsRelationUpdate = true;
+            var sb = new StringBuilder();
+            query1.GetQueryConditions(sb, false);
+            var conditions = sb.ToString();
+            //conditions = conditions.Substring(5);
             string table = query1.QueryTableName;
             table = query1.__DBAdapter.KeyWordFormat(table);
             query1.FillParames(this);
-            if (query1.__Relations.Count > 0)
+            if (query1.__Relations!=null)
             {
                 var kv = query1.__Relations.First();
                 var t1 = query1.QueryTableName;
                 var t2 = TypeCache.GetTableName(kv.Key.OriginType, query1.__DbContext);
-                var join = kv.Value;
-                join = join.Substring(join.IndexOf(" on ") + 3);
-                if (!string.IsNullOrEmpty(conditions))
-                {
-                    join += " and ";
-                }
-                string sql = query1.__DBAdapter.GetRelationDeleteSql(t1, t2, join + conditions);
+                //var join = kv.Value;
+                //join = join.Substring(join.IndexOf(" on ") + 3);
+                //if (!string.IsNullOrEmpty(conditions))
+                //{
+                //    join += " and ";
+                //}
+                string sql = query1.__DBAdapter.GetRelationDeleteSql(t1, t2,  conditions);
                 return Execute(sql);
             }
             return Delete<T>(conditions);

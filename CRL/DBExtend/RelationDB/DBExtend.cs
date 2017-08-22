@@ -110,7 +110,7 @@ namespace CRL.DBExtend.RelationDB
             }, (r) =>
             {
                 var pro = TypeCache.GetTable(typeof(T)).Fields;
-                var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName });
+                var mapping = pro.Select(b => new Attribute.FieldMapping() { PropertyName = b.MemberName, QueryField = b.MemberName });
                 var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sql, mapping);
                 return ObjectConvert.DataReaderToSpecifiedList<T>(r.reader, queryInfo);
             });
@@ -224,7 +224,7 @@ namespace CRL.DBExtend.RelationDB
                 var reader = db.RunDataReader(sp);
                 ClearParame();
                 var pro = TypeCache.GetTable(typeof(T)).Fields;
-                var mapping = pro.Select(b => new Attribute.FieldMapping() { MappingName = b.MemberName, QueryName = b.MemberName }).ToList();
+                var mapping = pro.Select(b => new Attribute.FieldMapping() { PropertyName = b.MemberName, QueryField = b.MemberName }).ToList();
                 var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sp, mapping);
                 return ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
             }, sp);
@@ -355,7 +355,7 @@ namespace CRL.DBExtend.RelationDB
                 lock (lockObj)
                 {
                     //BackupParams();
-                    string sql = _DBAdapter.GetAllTablesSql();
+                    string sql = _DBAdapter.GetAllTablesSql(dbContext.DBHelper.DatabaseName);
                     var dic = db.ExecDictionary<string, int>(sql);
                     //RecoveryParams();
                     cacheInstance.InitTable(dbName, dic.Keys.ToList());
@@ -384,7 +384,7 @@ namespace CRL.DBExtend.RelationDB
                 cacheInstance.SaveTable(dbName, table, tableName);
                 if (created && initDatas != null)
                 {
-                    _DBAdapter.BatchInsert(initDatas, false);
+                    _DBAdapter.BatchInsert(dbContext, initDatas, false);
                 }
                 tableCheckedCache[typeKey] = true;
                 return;

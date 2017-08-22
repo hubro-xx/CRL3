@@ -93,10 +93,11 @@ namespace CRL.LambdaQuery
                 throw new CRLException("关联需要由LambdaQuery.CreateQuery创建");
             }
             var baseQuery = query.BaseQuery;
-            foreach (var kv in baseQuery.QueryParames)
-            {
-                QueryParames[kv.Key] = kv.Value;
-            }
+            QueryParames.AddRange(baseQuery.QueryParames);
+            //foreach (var kv in baseQuery.QueryParames)
+            //{
+            //    QueryParames[kv.Key] = kv.Value;
+            //}
             var query2 = baseQuery.GetQuery();
             return InnerSelect(outField, query2, type);
         }

@@ -36,10 +36,11 @@ namespace CRL.DBExtend.RelationDB
             if (query.SkipPage > 0)//按分页
             {
                 list = QueryResult<TModel>(query);
-                if (SettingConfig.AutoTrackingModel && query.__TrackingModel)
-                {
-                    SetOriginClone(list);
-                }
+                //分页不创建Clone
+                //if (SettingConfig.AutoTrackingModel && query.__TrackingModel)
+                //{
+                //    SetOriginClone(list);
+                //}
                 return list;
             }
             cacheKey = "";
@@ -68,11 +69,11 @@ namespace CRL.DBExtend.RelationDB
                     return ObjectConvert.DataReaderToSpecifiedList<TModel>(reader, queryInfo);
                 }, sql);
                 query.MapingTime += runTime;
-                if(!string.IsNullOrEmpty(query.__RemoveInJionBatchNo))
-                {
-                    Delete<InJoin>(b => b.BatchNo == query.__RemoveInJionBatchNo);
-                    query.__RemoveInJionBatchNo = "";
-                }
+                //if(!string.IsNullOrEmpty(query.__RemoveInJionBatchNo))
+                //{
+                //    Delete<InJoin>(b => b.BatchNo == query.__RemoveInJionBatchNo);
+                //    query.__RemoveInJionBatchNo = "";
+                //}
             }
             else
             {
@@ -84,6 +85,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 SetOriginClone(list);
             }
+            query = null;
             return list;
         }
        

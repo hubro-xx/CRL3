@@ -31,7 +31,7 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="_dbContext"></param>
         /// <param name="_useTableAliasesName">查询是否生成表别名,在更新和删除时用</param>
-        public LambdaQuery(DbContext _dbContext, bool _useTableAliasesName = true)
+        public LambdaQuery(DbContext _dbContext, bool _useTableAliasesName = true):base()
         {
             __DbContext = _dbContext;
             __MainType = typeof(T);
@@ -234,7 +234,8 @@ namespace CRL.LambdaQuery
                 return this;
             }
             var info = GetSelectField(true, resultSelectorBody, false, typeof(T));
-            _CurrentSelectFieldCache = info;
+            //_CurrentSelectFieldCache = info;
+            SetSelectFiled(info,true);
             //__QueryFields = fields;
             return this;
         }
@@ -305,12 +306,6 @@ namespace CRL.LambdaQuery
 
         #region 获取解析值
         
-
-        /// <summary>
-        /// 是否为关联更新/删除
-        /// </summary>
-        internal bool _IsRelationUpdate = false;
-
         /// <summary>
         /// 获取排序 带 order by
         /// </summary>
@@ -328,7 +323,7 @@ namespace CRL.LambdaQuery
             string log = string.Format("[SQL]:{0}\r\n", sql);
             foreach (var item in QueryParames)
             {
-                log += string.Format("[{0}]:[{1}]\r\n", item.Key, item.Value);
+                log += string.Format("[{0}]:[{1}]\r\n", item.Item1, item.Item2);
             }
             if (uselog)
             {

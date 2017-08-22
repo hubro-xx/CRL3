@@ -73,7 +73,7 @@ namespace CRL.Package.OnlinePay
                 catch (Exception ero)
                 {
                     CoreHelper.EventLog.Log("更新充值状态时发生错误,orderId:" + order.Id + "\t" + ero, true);
-                    CoreHelper.Reflection.DynamicVisitor.AddMechodCacheByHandler(SetConfirmStatus, parames1);
+                    CoreHelper.Reflection.DynamicVisitor.AddMethodCacheByHandler(SetConfirmStatus, parames1);
                 }
                 //CoreHelper.EventLog.Log("确认订单 " + order.OrderId + " From:" + fromType);
                 object[] parames = new object[] { order };
@@ -83,7 +83,7 @@ namespace CRL.Package.OnlinePay
                 }
                 catch (Exception ero)
                 {
-                    CoreHelper.Reflection.DynamicVisitor.AddMechodCacheByHandler(ConfirmOrderBase, parames);
+                    CoreHelper.Reflection.DynamicVisitor.AddMethodCacheByHandler(ConfirmOrderBase, parames);
                     CoreHelper.EventLog.Log("在线支付确认订单失败,加入缓存方法,orderId:" + order.Id + "\t" + ero, true);
                     //throw new Exception("确认订单产生错误");
                 }

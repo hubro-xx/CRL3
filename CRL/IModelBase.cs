@@ -178,15 +178,15 @@ namespace CRL
         [NonSerialized]
         internal object OriginClone = null;
 
-        [System.Xml.Serialization.XmlIgnore]
-        [NonSerialized]
-        internal bool BoundChange = true;
+        //[System.Xml.Serialization.XmlIgnore]
+        //[NonSerialized]
+        //internal bool BoundChange = true;
 
         /// <summary>
         /// 存储被更改的属性
         /// </summary>
         [System.Xml.Serialization.XmlIgnore]
-        ParameCollection Changes = null;
+        Dictionary<string, object> Changes = null;
         /// <summary>
         /// 表示值被更改了
         /// 当更新后,将被清空
@@ -195,16 +195,16 @@ namespace CRL
         /// <param name="value"></param>
         internal protected void SetChanges(string name,object value)
         {
-            if (!BoundChange)
-                return;
+            //if (!BoundChange)
+            //    return;
             if (name.ToLower() == "boundchange")
                 return;
             Changes = Changes ?? new ParameCollection();
             Changes[name] = value;
         }
-        ParameCollection GetChanges()
+        Dictionary<string, object> GetChanges()
         {
-            Changes = Changes ?? new ParameCollection();
+            Changes = Changes ?? new Dictionary<string, object>();
             return Changes;
         }
         /// <summary>
@@ -235,8 +235,10 @@ namespace CRL
                     var f = fields[key];
                     if (f == null)
                         continue;
-                    if (f.IsPrimaryKey || f.FieldType != Attribute.FieldType.数据库字段)
+                    if (f.IsPrimaryKey)
                         continue;
+                    //if (f.IsPrimaryKey || f.FieldType != Attribute.FieldType.数据库字段)
+                    //    continue;
                     var value = item.Value;
                     //如果表示值为被追加 名称为$name
                     //使用Cumulation扩展方法后按此处理
@@ -322,7 +324,7 @@ namespace CRL
             return ModelCheck.CreateTable(GetType(), db);
         }
         #region 动态字典,效果同索引
-        private Dynamic.DynamicViewDataDictionary _dynamicViewDataDictionary;
+        //private Dynamic.DynamicViewDataDictionary _dynamicViewDataDictionary;
 
         /// <summary>
         /// 动态Bag,可用此取索引值
@@ -334,11 +336,13 @@ namespace CRL
         {
             get
             {
-                if (this._dynamicViewDataDictionary == null)
-                {
-                    this._dynamicViewDataDictionary = new Dynamic.DynamicViewDataDictionary(Datas);
-                }
-                return this._dynamicViewDataDictionary;
+                return new Dynamic.DynamicViewDataDictionary(Datas);
+                //字段占内存
+                //if (this._dynamicViewDataDictionary == null)
+                //{
+                //    this._dynamicViewDataDictionary = new Dynamic.DynamicViewDataDictionary(Datas);
+                //}
+                //return this._dynamicViewDataDictionary;
             }
         }
 
