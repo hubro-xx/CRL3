@@ -62,11 +62,12 @@ namespace CRL.LambdaQuery
         {
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
             var fields = GetSelectField(false, expression.Body, false, parameters).mapping;
-            if (!string.IsNullOrEmpty(__QueryOrderBy))
-            {
-                __QueryOrderBy += ",";
-            }
-            __QueryOrderBy += string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
+            SetOrder(fields.First(), desc);
+            //if (!string.IsNullOrEmpty(__QueryOrderBy))
+            //{
+            //    __QueryOrderBy += ",";
+            //}
+            //__QueryOrderBy += string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
             return this;
         }
         /// <summary>
@@ -76,16 +77,23 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public override LambdaQuery<T> OrderByPrimaryKey(bool desc)
         {
-            if (!string.IsNullOrEmpty(__QueryOrderBy))
-            {
-                __QueryOrderBy += ",";
-            }
             var key = TypeCache.GetTable(typeof(T)).PrimaryKey;
             if (key == null)
             {
                 return this;
             }
-            __QueryOrderBy += string.Format(" {2}{0} {1}", key.MapingName, desc ? "desc" : "asc", GetPrefix());
+            var field = new Attribute.FieldMapping() { QueryField = GetPrefix() + key.MapingName };
+            SetOrder(field, desc);
+            //if (!string.IsNullOrEmpty(__QueryOrderBy))
+            //{
+            //    __QueryOrderBy += ",";
+            //}
+            //var key = TypeCache.GetTable(typeof(T)).PrimaryKey;
+            //if (key == null)
+            //{
+            //    return this;
+            //}
+            //__QueryOrderBy += string.Format(" {2}{0} {1}", key.MapingName, desc ? "desc" : "asc", GetPrefix());
             //QueryOrderBy = ReplacePrefix(QueryOrderBy);
             return this;
         }
@@ -196,10 +204,14 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         internal override string GetOrderBy()
         {
-            string orderBy = __QueryOrderBy;
-            if (string.IsNullOrEmpty(orderBy))
+            string orderBy = "";
+            if (__QueryOrderBy.Count == 0)
             {
                 orderBy = TypeCache.GetTable(typeof(T)).DefaultSort;
+            }
+            else
+            {
+                orderBy = string.Join(",", __QueryOrderBy);
             }
             orderBy = string.IsNullOrEmpty(orderBy) ? orderBy : " order by " + orderBy;
             return orderBy;
@@ -285,7 +297,7 @@ namespace CRL.LambdaQuery
                     foreach (var unionQuery in __Unions)
                     {
                         var query = unionQuery.query;
-                        query.__QueryOrderBy = "";
+                        query.__QueryOrderBy.Clear();
                         string unionType = unionQuery.unionType == UnionType.Union ? "union" : "union all";
                         var sqlUnoin = query.GetQuery();
                         sql.Append("\r\n " + unionType + " \r\n");

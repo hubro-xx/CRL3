@@ -94,16 +94,17 @@ namespace CRL.LambdaQuery
         /// <param name="expression"></param>
         /// <param name="desc"></param>
         /// <returns></returns>
-        public LambdaQueryViewJoin<T, TJoinResult> OrderBy<TResult>(Expression<Func<TJoinResult, TResult>> expression, bool desc = true) 
+        public LambdaQueryViewJoin<T, TJoinResult> OrderBy<TResult>(Expression<Func<TJoinResult, TResult>> expression, bool desc = true)
         {
             //var innerType = typeof(TJoin);
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
             var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).mapping;
-            if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
-            {
-                BaseQuery.__QueryOrderBy += ",";
-            }
-            BaseQuery.__QueryOrderBy += string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
+            BaseQuery.SetOrder(fields.First(), desc);
+            //if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
+            //{
+            //    BaseQuery.__QueryOrderBy += ",";
+            //}
+            //BaseQuery.__QueryOrderBy += string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
             return this;
         }
     }

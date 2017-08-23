@@ -27,7 +27,7 @@ namespace CRL.DBExtend.RelationDB
             CheckTableCreated(query1.__MainType);
             //var fields = query.GetQueryFieldString(b => b.Length > 500 || b.PropertyType == typeof(byte[]));
             var fields = query1.GetQueryFieldString();
-            var rowOver = query1.__QueryOrderBy;
+            var rowOver = string.Join(",", query1.__QueryOrderBy);
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(query1.__MainType);
@@ -82,7 +82,7 @@ namespace CRL.DBExtend.RelationDB
             CheckTableCreated(query1.__MainType);
             //var fields = query.GetQueryFieldString(b => b.Length > 500 || b.PropertyType == typeof(byte[]));
             var fields = query1.GetQueryFieldString();
-            var rowOver = query1.__QueryOrderBy;
+            var rowOver = string.Join(",", query1.__QueryOrderBy);
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(query1.__MainType);
@@ -144,7 +144,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new CRLException("缺少group语法");
             }
-            var rowOver = query1.__QueryOrderBy;
+            var rowOver = string.Join(",", query1.__QueryOrderBy);
             if (string.IsNullOrEmpty(rowOver))
             {
                 throw new CRLException("Group分页需指定Group排序字段");
@@ -200,7 +200,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 throw new CRLException("缺少group语法");
             }
-            var rowOver = query1.__QueryOrderBy;
+            var rowOver = string.Join(",", query1.__QueryOrderBy);
             if (string.IsNullOrEmpty(rowOver))
             {
                 throw new CRLException("Group分页需指定Group排序字段");

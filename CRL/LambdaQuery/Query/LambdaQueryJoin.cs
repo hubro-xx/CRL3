@@ -124,11 +124,12 @@ namespace CRL.LambdaQuery
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
             //var innerType = typeof(TJoin);
             var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).mapping;
-            if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
-            {
-                BaseQuery.__QueryOrderBy += ",";
-            }
-            BaseQuery.__QueryOrderBy += string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
+            BaseQuery.SetOrder(fields.First(),desc);
+            //if (!string.IsNullOrEmpty(BaseQuery.__QueryOrderBy))
+            //{
+            //    BaseQuery.__QueryOrderBy += ",";
+            //}
+            //BaseQuery.__QueryOrderBy += string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
             return this;
         }
         /// <summary>

@@ -38,11 +38,11 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQueryResultSelect<TResult> Union<TResult2>(LambdaQueryResultSelect<TResult2> resultSelect, UnionType unionType = UnionType.UnionAll)
         {
-            BaseQuery.__QueryOrderBy = "";//清除OrderBy
+            BaseQuery.__QueryOrderBy.Clear();//清除OrderBy
             BaseQuery.AddUnion(resultSelect.BaseQuery, unionType);
             return this;
         }
-        string __QueryOrderBy = "";
+        //string __QueryOrderBy = "";
         /// <summary>
         /// 设置排序
         /// 会重置原排序
@@ -55,13 +55,14 @@ namespace CRL.LambdaQuery
         {
             var parameters = expression.Parameters.Select(b => b.Type).ToArray();
             var fields = BaseQuery.GetSelectField(false, expression.Body, false, parameters).mapping;
-            var orderBy = string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
-            if (!string.IsNullOrEmpty(__QueryOrderBy))
-            {
-                __QueryOrderBy += ",";
-            }
-            __QueryOrderBy += orderBy;
-            BaseQuery.__QueryOrderBy = __QueryOrderBy;
+            BaseQuery.SetOrder(fields.First(), desc);
+            //var orderBy = string.Format(" {0} {1}", fields.First().QueryField, desc ? "desc" : "asc");
+            //if (!string.IsNullOrEmpty(__QueryOrderBy))
+            //{
+            //    __QueryOrderBy += ",";
+            //}
+            //__QueryOrderBy += orderBy;
+            //BaseQuery.__QueryOrderBy = __QueryOrderBy;
             return this;
         }
         /// <summary>

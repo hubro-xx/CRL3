@@ -85,7 +85,8 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 排序
         /// </summary>
-        internal string __QueryOrderBy = "";
+        //internal string __QueryOrderBy = "";
+        internal List<string> __QueryOrderBy = new List<string>();
         /// <summary>
         /// 填充参数
         /// </summary>
@@ -308,6 +309,14 @@ namespace CRL.LambdaQuery
         }
         #region In关联优化
         internal string __RemoveInJionBatchNo;
+        #endregion
+
+        #region 排序
+        internal void SetOrder(Attribute.FieldMapping field, bool desc)
+        {
+            var str = field.QueryField + (desc ? " desc" : " asc");
+            __QueryOrderBy.Add(str);
+        }
         #endregion
     }
 
