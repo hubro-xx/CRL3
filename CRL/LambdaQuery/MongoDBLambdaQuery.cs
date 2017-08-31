@@ -190,11 +190,11 @@ namespace CRL.LambdaQuery
             var field = GetSelectField(false, expression.Body, false, parameters).mapping.First();
             if (desc)
             {
-                _MongoDBSort = _MongoDBSort.Descending(field.MemberName);
+                _MongoDBSort = _MongoDBSort.Descending(field.ResultName);
             }
             else
             {
-                _MongoDBSort = _MongoDBSort.Ascending(field.MemberName);
+                _MongoDBSort = _MongoDBSort.Ascending(field.ResultName);
             }
             return this;
         }

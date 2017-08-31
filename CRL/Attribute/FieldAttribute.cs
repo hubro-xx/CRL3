@@ -159,14 +159,14 @@ namespace CRL.Attribute
                 //query += "{" + ModelType.FullName + "}";
                 query = usePrefix;
             }
-            var FieldMapping = new FieldMapping() { FieldName = MapingName, MemberName = memberName, PropertyName = MemberName };
+            var FieldMapping = new FieldMapping() { FieldName = MapingName, ResultName = memberName };
             if (string.IsNullOrEmpty(fieldName))
             {
                 fieldName = withTablePrefix ? MapingName : _DBAdapter.FieldNameFormat(this);
             }
-            if(string.IsNullOrEmpty(memberName))
+            if(string.IsNullOrEmpty(FieldMapping.ResultName))
             {
-                FieldMapping.MemberName = MapingName;
+                FieldMapping.ResultName = MemberName;
             }
             query += fieldName;
             FieldMapping.QueryField = query;
@@ -180,7 +180,7 @@ namespace CRL.Attribute
  
             if (withTablePrefix)
             {
-                FieldMapping.MemberName = mappNameFull;
+                FieldMapping.ResultName = mappNameFull;
                 mappNameFull = GetTableFieldFormat(TableName, mappNameFull);
                 //FieldMapping.QueryField = mappNameFull;
             }
@@ -193,6 +193,10 @@ namespace CRL.Attribute
             }
             else
             {
+                if (MapingName != MemberName)//有别名时转为属性名
+                {
+                    query += " as " + MemberName;
+                }
                 FieldMapping.QueryFull = query;
             }
             return FieldMapping;
@@ -327,13 +331,13 @@ namespace CRL.Attribute
         /// </summary>
         public string FieldName = "";
         /// <summary>
-        /// 成员名,别名 id2
+        /// 返回的名称
         /// </summary>
-        public string MemberName = "";
-        /// <summary>
-        /// 属性名 Id
-        /// </summary>
-        public string PropertyName = "";
+        public string ResultName = "";
+        ///// <summary>
+        ///// 属性名 Id
+        ///// </summary>
+        //public string PropertyName = "";
         /// <summary>
         /// 方法名
         /// </summary>
@@ -348,7 +352,7 @@ namespace CRL.Attribute
         public string QueryFull = "";
         public override string ToString()
         {
-            return string.Format("Q:{0} M:{1}", FieldName, MemberName);
+            return string.Format("Q:{0} M:{1}", FieldName, ResultName);
         }
     }
 }

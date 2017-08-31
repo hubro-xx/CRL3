@@ -116,23 +116,29 @@ namespace CRL
             template = template.Replace("{sql}", sql);
             string parames = "";
             //构造参数
-            foreach (var p in dbContext.DBHelper.Params)
+            if (dbContext.DBHelper.Params != null)
             {
-                string key = p.Key.Replace("@","");
-                var t = p.Value.GetType();
-                var par = adpater.GetDBColumnType(t);
-                if (t == typeof(System.String))
+                foreach (var p in dbContext.DBHelper.Params)
                 {
-                    par = string.Format(par, 500);
+                    string key = p.Key.Replace("@", "");
+                    var t = p.Value.GetType();
+                    var par = adpater.GetDBColumnType(t);
+                    if (t == typeof(System.String))
+                    {
+                        par = string.Format(par, 500);
+                    }
+                    parames += adpater.SpParameFormat(key, par, false);
                 }
-                parames += adpater.SpParameFormat(key, par, false);
             }
-            foreach (var p in dbContext.DBHelper.OutParams)
+            if (dbContext.DBHelper.OutParams != null)
             {
-                string key = p.Key;
-                var t = p.Value.GetType();
-                var par = adpater.GetDBColumnType(t);
-                parames += adpater.SpParameFormat(key, par, true);
+                foreach (var p in dbContext.DBHelper.OutParams)
+                {
+                    string key = p.Key;
+                    var t = p.Value.GetType();
+                    var par = adpater.GetDBColumnType(t);
+                    parames += adpater.SpParameFormat(key, par, true);
+                }
             }
             if (parames.Length > 0)
             {

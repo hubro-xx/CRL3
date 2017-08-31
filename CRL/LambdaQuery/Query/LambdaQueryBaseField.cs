@@ -11,7 +11,20 @@ namespace CRL.LambdaQuery
     public abstract partial class LambdaQueryBase
     {
         #region 解析选择的字段
-        ParameCollection newExpressionParame = new ParameCollection();
+        ParameCollection _newExpressionParame;
+        ParameCollection newExpressionParame
+        {
+            get
+            {
+                _newExpressionParame = _newExpressionParame ?? new ParameCollection();
+                return _newExpressionParame;
+            }
+            set
+            {
+                _newExpressionParame = _newExpressionParame ?? new ParameCollection();
+                _newExpressionParame = value;
+            }
+        }
         internal string GetQueryFieldsString(IEnumerable<Attribute.FieldMapping> fields)
         {
             return string.Join(",", fields.Select(b => b.QueryFull));
@@ -198,7 +211,7 @@ namespace CRL.LambdaQuery
                         var methodCallExpression = item as MethodCallExpression;
                         string methodMember;
                         var methodQuery = getSelectMethodCall(methodCallExpression, out methodMember, i);
-                        var f = new Attribute.FieldAttribute() { ModelType = __MainType };
+                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = memberName };
                         var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, memberName, methodQuery);
                         f2.MethodName = methodCallExpression.Method.Name;
                         resultFields.Add(f2);
@@ -206,14 +219,14 @@ namespace CRL.LambdaQuery
                     else if (item is BinaryExpression)
                     {
                         var field = getSeletctBinary(item);
-                        var f = new Attribute.FieldAttribute() { ModelType = __MainType };
+                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
                         var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, memberName, field);
                         resultFields.Add(f2);
                     }
                     else if (item is ConstantExpression)//常量
                     {
                         var constantExpression = item as ConstantExpression;
-                        var f = new Attribute.FieldAttribute() { ModelType = __MainType };
+                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
                         var value = constantExpression.Value + "";
                         if (!value.IsNumber())
                         {
@@ -288,7 +301,7 @@ namespace CRL.LambdaQuery
             {
                 #region 方法
                 var method = expressionBody as MethodCallExpression;
-                var f = new Attribute.FieldAttribute() { ModelType = __MainType };
+                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
                 string methodMember;
                 var methodQuery = getSelectMethodCall(expressionBody, out methodMember, 0);
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", methodQuery);
@@ -302,7 +315,7 @@ namespace CRL.LambdaQuery
             else if (expressionBody is BinaryExpression)
             {
                 var field = getSeletctBinary(expressionBody);
-                var f = new Attribute.FieldAttribute() { ModelType = __MainType };
+                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", field);
                 //f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.MemberName, FieldName = field, MethodName = "" };
                 resultFields.Add(f2);
@@ -312,7 +325,7 @@ namespace CRL.LambdaQuery
             else if (expressionBody is ConstantExpression)
             {
                 var constant = (ConstantExpression)expressionBody;
-                var f = new Attribute.FieldAttribute() { ModelType = __MainType };
+                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", constant.Value + "");
                 //f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.MemberName, FieldName = constant.Value + "", MethodName = "" };
                 resultFields.Add(f2);

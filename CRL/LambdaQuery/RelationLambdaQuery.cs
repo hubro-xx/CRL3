@@ -175,7 +175,7 @@ namespace CRL.LambdaQuery
             {
                 //part.Append(" from ");
                 var prex1 = GetPrefix(__MainType);
-                prex1 = prex1.Remove(prex1.Length - 1);
+                prex1 = prex1.Substring(0, prex1.Length - 1);
                 part.AppendFormat(" from {0} {1} {2}", __DBAdapter.KeyWordFormat(QueryTableName), prex1, __DBAdapter.GetWithNolockFormat(__WithNoLock));
             }
             string join = "";
@@ -276,7 +276,7 @@ namespace CRL.LambdaQuery
             else
             {
 
-                if (__Unions.Count == 0)//默认
+                if (__Unions == null)//默认
                 {
                     //var sql2 = __DBAdapter.GetSelectTop(fields, part, orderBy, TakeNum);
                     //sql.Append(sql2);
@@ -290,10 +290,10 @@ namespace CRL.LambdaQuery
                     #region 联合查询
                     //var sql2 = __DBAdapter.GetSelectTop(fields, part, "", TakeNum);
                     //sql.Append(sql2);
-                    __DBAdapter.GetSelectTop(sql,fields, b =>
-                    {
-                        GetQueryConditions(b);
-                    }, "", TakeNum);
+                    __DBAdapter.GetSelectTop(sql, fields, b =>
+                     {
+                         GetQueryConditions(b);
+                     }, "", TakeNum);
                     foreach (var unionQuery in __Unions)
                     {
                         var query = unionQuery.query;

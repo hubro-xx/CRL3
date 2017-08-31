@@ -84,48 +84,49 @@ namespace CRL.LambdaQuery.Mapping
             return ret;
         }
 
-        /// <summary>
-        /// 按Lambda创建对象
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="mapping"></param>
-        /// <returns></returns>
-        static Func<DataContainer, T> CreateObjectGeneratorLambda<T>(IEnumerable<Attribute.FieldMapping> mapping)
-        {
-            var objectType = typeof(T);
-            var fields = TypeCache.GetProperties(objectType, true);
-            var parame = Expression.Parameter(typeof(DataContainer), "par");
-            var memberBindings = new List<MemberBinding>();
-            //按顺序生成Binding
-            int i = 0;
-            foreach (var mp in mapping)
-            {
-                if (!fields.ContainsKey(mp.PropertyName))
-                {
-                    continue;
-                }
-                var m = fields[mp.PropertyName].GetPropertyInfo();
-                var method = DataContainer.GetMethod(m.PropertyType, true);
-                //Expression getValue = Expression.Call(method, parame);
-                var getValue = parame.Call(method.Name, Expression.Constant(i));
-                if (m.PropertyType.IsEnum)
-                {
-                    getValue = Expression.Convert(getValue, m.PropertyType);
-                }
-                var bind = (MemberBinding)Expression.Bind(m, getValue);
-                memberBindings.Add(bind);
-                i += 1;
-            }
-            Expression expr = Expression.MemberInit(Expression.New(objectType), memberBindings);
-            var ret = Expression.Lambda<Func<DataContainer, T>>(expr, parame);
-            return ret.Compile();
-        }
+        ///// <summary>
+        ///// 按Lambda创建对象
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="mapping"></param>
+        ///// <returns></returns>
+        //static Func<DataContainer, T> CreateObjectGeneratorLambda<T>(IEnumerable<Attribute.FieldMapping> mapping)
+        //{
+        //    var objectType = typeof(T);
+        //    var fields = TypeCache.GetProperties(objectType, true);
+        //    var parame = Expression.Parameter(typeof(DataContainer), "par");
+        //    var memberBindings = new List<MemberBinding>();
+        //    //按顺序生成Binding
+        //    int i = 0;
+        //    foreach (var mp in mapping)
+        //    {
+        //        if (!fields.ContainsKey(mp.MemberName))
+        //        {
+        //            continue;
+        //        }
+        //        var m = fields[mp.MemberName].GetPropertyInfo();
+        //        var method = DataContainer.GetMethod(m.PropertyType, true);
+        //        //Expression getValue = Expression.Call(method, parame);
+        //        var getValue = parame.Call(method.Name, Expression.Constant(i));
+        //        if (m.PropertyType.IsEnum)
+        //        {
+        //            getValue = Expression.Convert(getValue, m.PropertyType);
+        //        }
+        //        var bind = (MemberBinding)Expression.Bind(m, getValue);
+        //        memberBindings.Add(bind);
+        //        i += 1;
+        //    }
+        //    Expression expr = Expression.MemberInit(Expression.New(objectType), memberBindings);
+        //    var ret = Expression.Lambda<Func<DataContainer, T>>(expr, parame);
+        //    return ret.Compile();
+        //}
 
         /// <summary>
         /// 使用EMIT
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="mapping"></param>
+        /// <param name="queryFields"></param>
         /// <returns></returns>
         public static Func<DataContainer, T> CreateObjectGeneratorEmit<T>(IEnumerable<Attribute.FieldMapping> mapping, Dictionary<string, int> queryFields)
         {
@@ -141,16 +142,20 @@ namespace CRL.LambdaQuery.Mapping
             //mapping顺序和语句查询不一致
             foreach (var mp in mapping)
             {
-                if (!fields.ContainsKey(mp.PropertyName))
+                if(string.IsNullOrEmpty(mp.ResultName))
+                {
+                    throw new CRLException("ResultName为空,请检查mapping创建" + mp);
+                }
+                if (!queryFields.ContainsKey(mp.ResultName.ToLower()))
                 {
                     continue;
                 }
-                if (!queryFields.ContainsKey(mp.MemberName.ToLower()))
+                if(!fields.ContainsKey(mp.ResultName))
                 {
                     continue;
                 }
-                var i = queryFields[mp.MemberName.ToLower()];
-                var pro = fields[mp.PropertyName].GetPropertyInfo();
+                var i = queryFields[mp.ResultName.ToLower()];
+                var pro = fields[mp.ResultName].GetPropertyInfo();
                 var endIfLabel = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);

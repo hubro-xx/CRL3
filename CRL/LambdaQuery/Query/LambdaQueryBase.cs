@@ -86,7 +86,20 @@ namespace CRL.LambdaQuery
         /// 排序
         /// </summary>
         //internal string __QueryOrderBy = "";
-        internal List<string> __QueryOrderBy = new List<string>();
+        List<string> __queryOrderBy;
+        internal List<string> __QueryOrderBy
+        {
+            get
+            {
+                __queryOrderBy = __queryOrderBy ?? new List<string>();
+                return __queryOrderBy;
+            }
+            set
+            {
+                __queryOrderBy = __queryOrderBy ?? new List<string>();
+                __queryOrderBy = value;
+            }
+        }
         /// <summary>
         /// 填充参数
         /// </summary>
@@ -256,7 +269,7 @@ namespace CRL.LambdaQuery
             public LambdaQueryBase query;
             public UnionType unionType;
         }
-        internal List<UnionQuery> __Unions = new List<UnionQuery>();
+        internal List<UnionQuery> __Unions;
         /// <summary>
         /// 在分表情况下,联合查询所有表方式
         /// </summary>
@@ -267,6 +280,7 @@ namespace CRL.LambdaQuery
             {
                 throw new CRLException("没有指定UnionType");
             }
+            __Unions = __Unions ?? new List<UnionQuery>();
             __Unions.Add(new UnionQuery() { query = query2, unionType = unionType });
             QueryParames.AddRange(query2.QueryParames);
             //foreach (var kv in query2.QueryParames)

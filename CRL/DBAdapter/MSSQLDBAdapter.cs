@@ -379,7 +379,10 @@ end", spName, script);
             }
             sb.Append(fields);
             query(sb);
-            sb.Append(sort);
+            if (!string.IsNullOrEmpty(sort))
+            {
+                sb.Append(sort);
+            }
         }
         #endregion
 

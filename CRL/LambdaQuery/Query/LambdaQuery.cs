@@ -51,8 +51,6 @@ namespace CRL.LambdaQuery
         public override string ToString()
         {
             return GetQuery();
-            //string fields = GetQueryFieldString();
-            //return string.Format("{0}{1}{2}{3}", __QueryTop, fields, QueryTableName, Condition);
         }
         #region 字段
 

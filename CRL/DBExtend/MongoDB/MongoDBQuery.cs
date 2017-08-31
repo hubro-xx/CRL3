@@ -49,11 +49,11 @@ namespace CRL.DBExtend.MongoDBEx
                     object sumField = 1;
                     if (method == "sum")
                     {
-                        groupInfo.Add(f.MemberName, new BsonDocument("$sum", "$" + f.FieldName));
+                        groupInfo.Add(f.ResultName, new BsonDocument("$sum", "$" + f.FieldName));
                     }
                     else if (method == "count")
                     {
-                        groupInfo.Add(f.MemberName, new BsonDocument("$sum", 1));
+                        groupInfo.Add(f.ResultName, new BsonDocument("$sum", 1));
                     }
                     else
                     {
@@ -78,11 +78,11 @@ namespace CRL.DBExtend.MongoDBEx
                     var dict = obj as IDictionary<string, object>;
                     foreach (var f in selectField)
                     {
-                        string columnName = f.MemberName;
+                        string columnName = f.ResultName;
                         object value = item[columnName];
                         dict.Add(columnName, value);
                     }
-                    dict.Add(groupField.MemberName, item["_id"]);
+                    dict.Add(groupField.ResultName, item["_id"]);
                     //dict.Add(groupField, item["_id"]);
                     list.Add(obj);
                 }
@@ -92,7 +92,7 @@ namespace CRL.DBExtend.MongoDBEx
             else if (query.__DistinctFields)
             {
                 #region distinct
-                string fieldName = selectField.FirstOrDefault().MemberName;
+                string fieldName = selectField.FirstOrDefault().ResultName;
                 FieldDefinition<TModel, dynamic> distinctField = fieldName;
                 var query2 = collection.Distinct(distinctField, query.__MongoDBFilter);
                 return query2.ToList();
@@ -119,7 +119,7 @@ namespace CRL.DBExtend.MongoDBEx
                     var dict = obj as IDictionary<string, object>;
                     foreach (var f in selectField)
                     {
-                        string columnName = f.MemberName;
+                        string columnName = f.ResultName;
                         object value = fields[columnName].GetValue(item);
                         dict.Add(columnName, value);
                     }

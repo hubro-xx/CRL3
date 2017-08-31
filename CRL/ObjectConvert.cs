@@ -187,14 +187,14 @@ namespace CRL
             object[] values = new object[reader.FieldCount];
             foreach (var mp in mapping)
             {
-                var fieldName = mp.FieldName.ToLower();
+                var fieldName = mp.ResultName.ToLower();
                 Attribute.FieldAttribute info;
-                var a = typeArry.TryGetValue(mp.PropertyName, out info);
+                var a = typeArry.TryGetValue(mp.ResultName, out info);
                 if (!a)
                 {
                     continue;
                 }
-                var action = new ActionItem<object>() { Set2 = info.SetValue, Name = mp.PropertyName, ValueIndex = columns[fieldName] };
+                var action = new ActionItem<object>() { Set2 = info.SetValue, Name = mp.ResultName, ValueIndex = columns[fieldName] };
                 columns.Remove(fieldName);
                 actions.Add(action);
             }
@@ -277,7 +277,7 @@ namespace CRL
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     var name = reader.GetName(i).ToLower();
-                    var find = mapping.Count(b => b.MemberName.ToLower() == name);
+                    var find = mapping.Count(b => b.ResultName.ToLower() == name);
                     if (find == 0)
                     {
                         leftColumns.Add(name, i);
@@ -301,7 +301,7 @@ namespace CRL
                 {
                     detailItem = objCreater(dataContainer);
                 }
-                catch
+                catch(Exception ero)
                 {
                     reader.Close();
                     reader.Dispose();
