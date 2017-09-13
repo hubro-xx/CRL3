@@ -879,15 +879,15 @@ namespace CRL
             }
             foreach (var item in list)
             {
-                //TModel clone = item.Clone() as TModel;
-                item.OriginClone = item.Clone();
+                //item.SetInnerChanges();
+                item.SetOriginClone();
             }
         }
         internal ParameCollection GetUpdateField<TModel>(TModel obj) where TModel : IModel, new()
         {
             var c = obj.GetUpdateField();
             
-            if (c.Count() > 0 && obj.OriginClone != null)//只有克隆过的才进行检查
+            if (c.Count() > 0 && obj.GetOriginClone() != null)//只有克隆过的才进行检查
             {
                 CheckData(obj);
             }

@@ -70,14 +70,7 @@ namespace CRL.DBExtend.RelationDB
                 primaryKey.SetValue(obj, index);
             }
             ClearParame();
-            var clone = obj.Clone();
-            obj.OriginClone = clone as TModel;
-            //var type = typeof(TModel);
-            //if (TypeCache.ModelKeyCache.ContainsKey(type))
-            //{
-            //    string key = TypeCache.ModelKeyCache[type];
-            //    MemoryDataCache.UpdateCacheItem(key, obj);
-            //}
+            obj.SetOriginClone();
             UpdateCacheItem<TModel>(obj, null, true);
             //return index;
         }

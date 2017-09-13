@@ -119,7 +119,7 @@ namespace CRL
         /// <param name="type"></param>
         /// <param name="onlyField"></param>
         /// <returns></returns>
-        public static IgnoreCaseDictionary<Attribute.FieldAttribute> GetProperties(Type type, bool onlyField)
+        public static IgnoreCaseDictionary<Attribute.FieldAttribute> GetProperties(Type type, bool onlyField=true)
         {
             var table = GetTable(type);
             return table.FieldsDic;

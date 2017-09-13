@@ -36,6 +36,10 @@ namespace CRL.LambdaQuery
             }
         }
         /// <summary>
+        /// 条件
+        /// </summary>
+        internal StringBuilder Condition = new StringBuilder();
+        /// <summary>
         /// 查询字段是否需要加上前辍,如t1.Id
         /// </summary>
         internal bool __UseTableAliasesName = true;
@@ -85,21 +89,21 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 排序
         /// </summary>
-        //internal string __QueryOrderBy = "";
-        List<string> __queryOrderBy;
-        internal List<string> __QueryOrderBy
-        {
-            get
-            {
-                __queryOrderBy = __queryOrderBy ?? new List<string>();
-                return __queryOrderBy;
-            }
-            set
-            {
-                __queryOrderBy = __queryOrderBy ?? new List<string>();
-                __queryOrderBy = value;
-            }
-        }
+        string __QueryOrderBy = "";
+        //List<string> __queryOrderBy;
+        //internal List<string> __QueryOrderBy
+        //{
+        //    get
+        //    {
+        //        __queryOrderBy = __queryOrderBy ?? new List<string>();
+        //        return __queryOrderBy;
+        //    }
+        //    set
+        //    {
+        //        __queryOrderBy = __queryOrderBy ?? new List<string>();
+        //        __queryOrderBy = value;
+        //    }
+        //}
         /// <summary>
         /// 填充参数
         /// </summary>
@@ -153,7 +157,7 @@ namespace CRL.LambdaQuery
             return prefix;
         }
         #endregion
-        internal static Dictionary<string, SelectFieldInfo> queryFieldCache = new Dictionary<string, SelectFieldInfo>();
+        internal static System.Collections.Concurrent.ConcurrentDictionary <string, SelectFieldInfo> queryFieldCache = new System.Collections.Concurrent.ConcurrentDictionary<string, SelectFieldInfo>();
         internal void SelectAll(bool cacheAllFieldString = true)
         {
             var cache = false;
@@ -162,17 +166,19 @@ namespace CRL.LambdaQuery
             if (GetPrefix(__MainType) == "t1.")
             {
                 key = __MainType.ToString();
-                if (queryFieldCache.ContainsKey(key))
+                SelectFieldInfo value;
+                var a = queryFieldCache.TryGetValue(key, out value);
+                if (a)
                 {
                     if (!cacheAllFieldString)
                     {
-                        var item = queryFieldCache[key].Clone();
+                        var item = value.Clone();
                         item.CleanQueryFieldString();
                         _CurrentSelectFieldCache = item;
                     }
                     else
                     {
-                        _CurrentSelectFieldCache = queryFieldCache[key];
+                        _CurrentSelectFieldCache = value;
                     }
                     return;
                 }
@@ -184,7 +190,7 @@ namespace CRL.LambdaQuery
             {
                 var clone = fields.Clone();
                 clone.GetQueryFieldString();
-                queryFieldCache.Add(key, clone);
+                queryFieldCache.TryAdd(key, clone);
             }
             _CurrentSelectFieldCache = fields;
             //__QueryFields = fields;
@@ -329,7 +335,19 @@ namespace CRL.LambdaQuery
         internal void SetOrder(Attribute.FieldMapping field, bool desc)
         {
             var str = field.QueryField + (desc ? " desc" : " asc");
-            __QueryOrderBy.Add(str);
+            if (__QueryOrderBy != "")
+            {
+                str = "," + str;
+            }
+            __QueryOrderBy += str;
+        }
+        internal string GetOrder()
+        {
+            return __QueryOrderBy;
+        }
+        internal void CleanOrder()
+        {
+            __QueryOrderBy = "";
         }
         #endregion
     }

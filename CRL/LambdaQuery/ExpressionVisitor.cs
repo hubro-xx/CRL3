@@ -91,15 +91,15 @@ namespace CRL.LambdaQuery
             if (parameDic == null)
             {
                 parameDic = new Dictionary<int, string>();
-                for (int i = 0; i <= 6000; i++)
+                for (int i = 0; i <= 5000; i++)
                 {
                     parameDic.Add(i, "@par" + i);
                 }
             }
-            if (parIndex > 6000)
+            if (parIndex > 5000)
             {
                 //MSSQL 参数最多2800
-                throw new CRLException("参数计数超过了6000,请确认数据访问对象没有被静态化" + parIndex);
+                throw new CRLException("参数计数超过了5000,请确认数据访问对象没有被静态化" + parIndex);
             }
             switch (par1.Type)
             {
@@ -261,7 +261,7 @@ namespace CRL.LambdaQuery
             //}
             return e;
         }
-        internal static Dictionary<string, CRLExpression.CRLExpression> MemberExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
+        //internal static Dictionary<string, CRLExpression.CRLExpression> MemberExpressionCache = new Dictionary<string, CRLExpression.CRLExpression>();
         //internal static Dictionary<string, MethodCallExpressionCacheItem> MethodCallExpressionCache = new Dictionary<string, MethodCallExpressionCacheItem>();
         //internal struct MethodCallExpressionCacheItem
         //{
@@ -413,15 +413,22 @@ namespace CRL.LambdaQuery
                 //    return exp2;
                 //}
                 //var fieldStr = FormatFieldPrefix(type, field.MapingName);//格式化为别名
-                var fieldStr = __DBAdapter.FieldNameFormat(field);
+         
                 //return field;
                 if (firstLevel)
                 {
                     var exp2 = exp.Equal(Expression.Constant(true));
                     return RouteExpressionHandler(exp2);
                 }
+                if (field.DefaultCRLExpression != null)
+                {
+                    var c2 = field.DefaultCRLExpression;
+                    c2.Data = __DBAdapter.FieldNameFormat(field);
+                    return c2;
+                }
+                var fieldStr = __DBAdapter.FieldNameFormat(field);
                 var exp3 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr, MemberType = type };
-                //MemberExpressionCache[key] = exp3;
+                field.DefaultCRLExpression = exp3;
                 return exp3;
                 #endregion
             }

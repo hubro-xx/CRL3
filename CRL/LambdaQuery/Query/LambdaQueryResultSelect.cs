@@ -38,7 +38,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public LambdaQueryResultSelect<TResult> Union<TResult2>(LambdaQueryResultSelect<TResult2> resultSelect, UnionType unionType = UnionType.UnionAll)
         {
-            BaseQuery.__QueryOrderBy.Clear();//清除OrderBy
+            BaseQuery.CleanOrder();//清除OrderBy
             BaseQuery.AddUnion(resultSelect.BaseQuery, unionType);
             return this;
         }

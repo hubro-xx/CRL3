@@ -352,13 +352,21 @@ namespace CRL.LambdaQuery
             }
             else if (par2 is string[])
             {
-                IEnumerable list = par2 as IEnumerable;
-                //return "'" + string.Join("','", list) + "'";
+                var list = par2 as Array;
+                var max = list.Length > 1000;//超出直接拼字符串
                 foreach (var s in list)
                 {
-                    string parName = string.Format("@in{0}", parIndex);
-                    addParame(parName, s);
-                    parIndex += 1;
+                    string parName;
+                    if (max)
+                    {
+                        parName = string.Format("'{0}'", s);
+                    }
+                    else
+                    {
+                        parName = string.Format("@in{0}", parIndex);
+                        addParame(parName, s);
+                        parIndex += 1;
+                    }
                     str += string.Format("{0},", parName);
                 }
                 if (str.Length > 1)
@@ -368,12 +376,21 @@ namespace CRL.LambdaQuery
             }
             else//按数字
             {
-                IEnumerable list = par2 as IEnumerable;
+                var list = par2 as Array;
+                var max = list.Length > 1000;//超出直接拼字符串
                 foreach (var s in list)
                 {
-                    string parName = string.Format("@in{0}", parIndex);
-                    addParame(parName, (int)s);
-                    parIndex += 1;
+                    string parName;
+                    if (max)
+                    {
+                        parName = s.ToString();
+                    }
+                    else
+                    {
+                        parName = string.Format("@in{0}", parIndex);
+                        addParame(parName, (int)s);
+                        parIndex += 1;
+                    }
                     str += string.Format("{0},", parName);
                 }
                 if (str.Length > 1)

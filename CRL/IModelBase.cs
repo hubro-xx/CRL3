@@ -56,7 +56,7 @@ namespace CRL
     /// </summary>
     [Serializable]
     //[Attribute.ModelProxy]
-    public abstract class IModel 
+    public abstract class IModel /*: ContextBoundObject*/
     {
         /// <summary>
         /// 序列化为JSON
@@ -176,7 +176,16 @@ namespace CRL
         /// </summary>
         [System.Xml.Serialization.XmlIgnore]
         [NonSerialized]
-        internal object OriginClone = null;
+        object OriginClone = null;
+        internal object GetOriginClone()
+        {
+            return OriginClone;
+        }
+        internal void SetOriginClone()
+        {
+            OriginClone = null;
+            OriginClone = Clone();
+        }
 
         //[System.Xml.Serialization.XmlIgnore]
         //[NonSerialized]
@@ -193,7 +202,7 @@ namespace CRL
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        internal protected void SetChanges(string name,object value)
+        internal void SetChanges(string name,object value)
         {
             //if (!BoundChange)
             //    return;
@@ -348,5 +357,14 @@ namespace CRL
 
         #endregion
 
+        //bool __InnerChanges = false;
+        //internal bool GetInnerChanges()
+        //{
+        //    return __InnerChanges;
+        //}
+        //internal void SetInnerChanges(bool v = true)
+        //{
+        //    __InnerChanges = v;
+        //}
     }
 }

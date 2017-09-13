@@ -206,6 +206,7 @@ namespace CRL
                 while (reader.Read())
                 {
                     reader.GetValues(values);
+                    //var detailItem = System.Activator.CreateInstance(mainType);
                     var detailItem = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
                     foreach (var ac in _actions)
                     {

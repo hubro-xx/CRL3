@@ -17,10 +17,10 @@ namespace CRL.Attribute
         public override MarshalByRefObject CreateInstance(Type serverType)
         {
             AopProxy realProxy = new AopProxy(serverType);
-            if (!SettingConfig.UseAopProxy)
-            {
-                SettingConfig.UseAopProxy = true;
-            }
+            //if (!SettingConfig.UseAopProxy)
+            //{
+            //    SettingConfig.UseAopProxy = true;
+            //}
             return realProxy.GetTransparentProxy() as MarshalByRefObject;
         }
     }

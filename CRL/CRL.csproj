@@ -100,8 +100,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attribute\AopProxy.cs" />
     <Compile Include="Attribute\FieldIndexType.cs" />
     <Compile Include="Attribute\FieldType.cs" />
+    <Compile Include="Attribute\ModelProxyAttribute.cs" />
     <Compile Include="CacheServerSetting.cs" />
     <Compile Include="CacheServer\CacheClientProxy.cs" />
     <Compile Include="CacheServer\CacheService.cs" />

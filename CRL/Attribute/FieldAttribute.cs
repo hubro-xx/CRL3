@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using CRL.LambdaQuery.CRLExpression;
 
 namespace CRL.Attribute
 {
@@ -135,14 +136,6 @@ namespace CRL.Attribute
             get;set;
         }
 
-        ///// <summary>
-        ///// 查询完整语句
-        ///// </summary>
-        //internal string QueryFullScript;
-        ///// <summary>
-        ///// 查询的完整字段名,t1.Name
-        ///// </summary>
-        //internal string QueryField;
         /// <summary>
         /// 
         /// </summary>
@@ -153,6 +146,19 @@ namespace CRL.Attribute
         /// <param name="fieldName">自定义查询字段名,空则按Name</param>
         internal FieldMapping GetFieldMapping(DBAdapter.DBAdapterBase _DBAdapter, string usePrefix, bool withTablePrefix, string memberName,string fieldName = "")
         {
+            //对于单表查询,对默认字段查询进行缓存
+            if (memberName == MemberName && usePrefix == "t1.")
+            {
+                memberName = "";
+            }
+            bool cache = (usePrefix == "t1." && !withTablePrefix && (memberName == ""));
+            if(cache)
+            {
+                if (defaultFieldMapping != null)
+                {
+                    return defaultFieldMapping;
+                }
+            }
             string query = "";
             if (!string.IsNullOrEmpty(usePrefix))
             {
@@ -199,8 +205,13 @@ namespace CRL.Attribute
                 }
                 FieldMapping.QueryFull = query;
             }
+            if(cache)
+            {
+                defaultFieldMapping = FieldMapping;
+            }
             return FieldMapping;
         }
+        FieldMapping defaultFieldMapping;
         /// <summary>
         /// 按表名格式化字段名
         /// </summary>
@@ -255,6 +266,7 @@ namespace CRL.Attribute
         /// 默认30
         /// </summary>
         public int Length { get { return length; } set { length = value; } }
+
         /// <summary>
         /// 属性类型
         /// </summary>
@@ -323,6 +335,7 @@ namespace CRL.Attribute
                 return;
             propertyInfo.SetValue(obj, value, null);
         }
+        internal CRLExpression DefaultCRLExpression;
     }
     class FieldMapping
     {

@@ -58,10 +58,7 @@ namespace CRL.LambdaQuery
         /// 查询的表名
         /// </summary>
         internal string QueryTableName = "";
-        /// <summary>
-        /// 条件
-        /// </summary>
-        protected StringBuilder Condition = new StringBuilder();
+
         ///// <summary>
         ///// 前几条
         ///// </summary>

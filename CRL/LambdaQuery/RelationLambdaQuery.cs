@@ -159,6 +159,10 @@ namespace CRL.LambdaQuery
         internal override string GetQueryFieldString()
         {
             GetSelectFieldInfo();
+            if (_CurrentSelectFieldCache.mapping.Count() == 0)
+            {
+                throw new CRLException("选择的列不能为空");
+            }
             return _CurrentSelectFieldCache.GetQueryFieldString();
         }
 
@@ -205,13 +209,13 @@ namespace CRL.LambdaQuery
         internal override string GetOrderBy()
         {
             string orderBy = "";
-            if (__QueryOrderBy.Count == 0)
+            if (GetOrder() == "")
             {
                 orderBy = TypeCache.GetTable(typeof(T)).DefaultSort;
             }
             else
             {
-                orderBy = string.Join(",", __QueryOrderBy);
+                orderBy = GetOrder();
             }
             orderBy = string.IsNullOrEmpty(orderBy) ? orderBy : " order by " + orderBy;
             return orderBy;
@@ -297,7 +301,7 @@ namespace CRL.LambdaQuery
                     foreach (var unionQuery in __Unions)
                     {
                         var query = unionQuery.query;
-                        query.__QueryOrderBy.Clear();
+                        query.CleanOrder();
                         string unionType = unionQuery.unionType == UnionType.Union ? "union" : "union all";
                         var sqlUnoin = query.GetQuery();
                         sql.Append("\r\n " + unionType + " \r\n");

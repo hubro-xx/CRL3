@@ -375,7 +375,7 @@ end", spName, script);
             sb.Append("select ");
             if (top > 0)
             {
-                sb.Append("top " + top);
+                sb.AppendFormat("top {0} ", top);
             }
             sb.Append(fields);
             query(sb);

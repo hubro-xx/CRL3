@@ -274,7 +274,7 @@ namespace CRL
             var dic = new Dictionary<string, int>();
             //dic.Add("表达式二元运算缓存", LambdaQuery.ExpressionVisitor.BinaryExpressionCache.Count);
             //dic.Add("表达式方法解析缓存", LambdaQuery.ExpressionVisitor.MethodCallExpressionCache.Count);
-            dic.Add("表达式属性解析缓存", LambdaQuery.ExpressionVisitor.MemberExpressionCache.Count);
+            //dic.Add("表达式属性解析缓存", LambdaQuery.ExpressionVisitor.MemberExpressionCache.Count);
             dic.Add("对象字段筛选缓存", LambdaQuery.LambdaQueryBase.queryFieldCache.Count);
             dic.Add("对象映射列缓存", ObjectConvert.columnCache.Count);
             dic.Add("IModel对象缓存", MemoryDataCache.CacheService.CacheCount);

@@ -11,44 +11,25 @@ namespace CRL.LambdaQuery
     public abstract partial class LambdaQueryBase
     {
         #region 解析选择的字段
-        ParameCollection _newExpressionParame;
-        ParameCollection newExpressionParame
-        {
-            get
-            {
-                _newExpressionParame = _newExpressionParame ?? new ParameCollection();
-                return _newExpressionParame;
-            }
-            set
-            {
-                _newExpressionParame = _newExpressionParame ?? new ParameCollection();
-                _newExpressionParame = value;
-            }
-        }
         internal string GetQueryFieldsString(IEnumerable<Attribute.FieldMapping> fields)
         {
             return string.Join(",", fields.Select(b => b.QueryFull));
-            //var sb = "";
-            //foreach (var a in fields)
-            //{
-            //    sb += string.Format("{0},", a.QueryFull);
-            //}
-            //sb.Remove(sb.Length - 1, 1);
-            //return sb.Substring(0, sb.Length - 1);
         }
         #region 筛选缓存
         internal class SelectFieldInfo
         {
-            public SelectFieldInfo(List<Attribute.FieldMapping> _fields, ParameCollection _parame)
+            public SelectFieldInfo(List<Attribute.FieldMapping> _fields)
             {
-                parame = _parame;
                 mapping = _fields;
-                //mapping = _fields.FindAll(b => !b.WithTablePrefix);
-                //queryFieldString = _queryFieldString;
+            }
+            public SelectFieldInfo(Attribute.FieldMapping field)
+            {
+                mapping = mapping ?? new List<Attribute.FieldMapping>();
+                mapping.Add(field);
             }
             string queryFieldString;
             public List<Attribute.FieldMapping> mapping;
-            public ParameCollection parame;
+            //ParameCollection parame;
             public void Merge(SelectFieldInfo item)
             {
                 mapping.AddRange(item.mapping);
@@ -90,82 +71,6 @@ namespace CRL.LambdaQuery
                 _CurrentSelectFieldCache.Merge(info);
             }
         }
-        //internal List<Attribute.FieldMapping> _CurrentAppendSelectField = new List<Attribute.FieldMapping>();
-        internal SelectFieldInfo GetSelectField(bool isSelect, Expression expressionBody, bool withTablePrefix, params Type[] types)
-        {
-            SelectFieldInfo item;
-            //if (isSelect && SettingConfig.UseLambdaCache)
-            //{
-            //    var cacheKey = GetSelectFieldCacheKey(isSelect, expressionBody, withTablePrefix, types);
-            //    var cache = !string.IsNullOrEmpty(cacheKey);
-            //    //cache = false;
-            //    if (cache)
-            //    {
-            //        #region cache
-            //        var a = _GetSelectFieldCache.TryGetValue(cacheKey, out item);
-            //        if (a)
-            //        {
-            //            if (expressionBody is NewExpression)
-            //            {
-            //                var newExp = expressionBody as NewExpression;
-            //                foreach (var kv in item.parame)
-            //                {
-            //                    var v2 = Convert.ToInt32(kv.Value);
-            //                    var exp = newExp.Arguments[v2];
-            //                    if (exp is MethodCallExpression)
-            //                    {
-            //                        var mExp = exp as MethodCallExpression;
-            //                        if (mExp.Arguments.Count > 0)
-            //                        {
-            //                            string mName;
-            //                            getSelectMethodCall(exp, out mName, 0, false);//转换为参数
-            //                        }
-            //                    }
-            //                    else
-            //                    {
-            //                        var obj = ConstantValueVisitor.GetParameExpressionValue(exp);
-            //                        __Visitor.AddParame(kv.Key, obj);
-            //                    }
-            //                }
-            //            }
-            //            return item;
-            //        }
-            //        else
-            //        {
-            //            item = _GetSelectField(isSelect, expressionBody, withTablePrefix, types);
-            //            //item.expression = expressionBody;
-            //            _GetSelectFieldCache[cacheKey] = item;
-            //            return item;
-            //        }
-            //        #endregion
-            //    }
-            //}
-            item = _GetSelectField(isSelect, expressionBody, withTablePrefix, types);
-            return item;
-        }
-        string GetSelectFieldCacheKey(bool isSelect, Expression expressionBody, bool withTablePrefix, params Type[] types)
-        {
-            string cacheKey = "";
-            if (expressionBody is ParameterExpression)//选择所有字段 b=>b
-            {
-                cacheKey = "objSelect_" + expressionBody.Type;
-            }
-            else if (expressionBody is NewExpression)//按匿名对象
-            {
-                string prex = string.Join("-", __Prefixs.Keys);
-                //todo expressionBody.ToString()比较占内存
-                cacheKey = prex + string.Join("-", types.Select(b => b.Name)) + expressionBody.ToString() + isSelect + withTablePrefix;
-                //cacheKey = CoreHelper.StringHelper.EncryptMD5(cacheKey);
-                cacheKey = cacheKey.GetHashCode().ToString();
-            }
-            else if (expressionBody is MemberExpression)//b=>b.Id
-            {
-                var mExp = expressionBody as MemberExpression;
-                cacheKey = string.Format("objItemSelect_{0}.{1}", mExp.Expression.Type, mExp.Member.Name);
-            }
-            return cacheKey;
-        }
-
         #endregion
         /// <summary>
         /// 解析选择的字段
@@ -175,7 +80,7 @@ namespace CRL.LambdaQuery
         /// <param name="withTablePrefix">是否生按表生成前辍,关联时用 如Table__Name</param>
         /// <param name="types"></param>
         /// <returns></returns>
-        SelectFieldInfo _GetSelectField(bool isSelect, Expression expressionBody, bool withTablePrefix, params Type[] types)
+        internal SelectFieldInfo GetSelectField(bool isSelect, Expression expressionBody, bool withTablePrefix, params Type[] types)
         {
             var allFields = new Dictionary<Type, IgnoreCaseDictionary<Attribute.FieldAttribute>>();
             allFields.Add(__MainType, TypeCache.GetProperties(__MainType, true));
@@ -186,19 +91,21 @@ namespace CRL.LambdaQuery
                     allFields.Add(t, TypeCache.GetProperties(t, true));
                 }
             }
-            var resultFields = new List<Attribute.FieldMapping>();
+    
             if (expressionBody is ParameterExpression)//选择所有字段
             {
+                var resultFields = new List<Attribute.FieldMapping>();
                 foreach (var item in allFields[expressionBody.Type].Values)
                 {
                     var item2 = item.GetFieldMapping(__DBAdapter, GetPrefix(item.ModelType), false, "");
                     resultFields.Add(item2);
                 }
-                var selectFieldItem = new SelectFieldInfo(resultFields, new ParameCollection()/*, GetQueryFieldsString(resultFields)*/);
+                var selectFieldItem = new SelectFieldInfo(resultFields);
                 return selectFieldItem;
             }
             else if (expressionBody is NewExpression)//按匿名对象
             {
+                var resultFields = new List<Attribute.FieldMapping>();
                 #region 按匿名对象
 
                 var newExpression = expressionBody as NewExpression;
@@ -242,7 +149,7 @@ namespace CRL.LambdaQuery
                         if (memberExpression.Expression.NodeType == ExpressionType.Constant)
                         {
                             string parName = "@par" + i;
-                            newExpressionParame.Add(parName, i);
+                            //newExpressionParame.Add(parName, i);
                             var obj = ConstantValueVisitor.GetParameExpressionValue(item);
                             var f2 = new Attribute.FieldAttribute() { ModelType = __MainType };
                             var f3 = f2.GetFieldMapping(__DBAdapter, "", withTablePrefix, memberName, parName);
@@ -294,7 +201,7 @@ namespace CRL.LambdaQuery
                     }
                 }
                 #endregion
-                var selectFieldItem = new SelectFieldInfo(resultFields, new ParameCollection(newExpressionParame)/*, GetQueryFieldsString(resultFields)*/);
+                var selectFieldItem = new SelectFieldInfo(resultFields);
                 return selectFieldItem;
             }
             else if (expressionBody is MethodCallExpression)
@@ -306,10 +213,8 @@ namespace CRL.LambdaQuery
                 var methodQuery = getSelectMethodCall(expressionBody, out methodMember, 0);
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", methodQuery);
                 f2.MethodName = method.Method.Name;
-                //f.FieldQuery = new Attribute.FieldQuery() { MemberName = methodMember, FieldName = methodMember, MethodName = method.Method.Name };
-                resultFields.Add(f2);
                 #endregion
-                var selectFieldItem = new SelectFieldInfo(resultFields, new ParameCollection(newExpressionParame)/*, GetQueryFieldsString(resultFields)*/);
+                var selectFieldItem = new SelectFieldInfo(f2);
                 return selectFieldItem;
             }
             else if (expressionBody is BinaryExpression)
@@ -317,9 +222,7 @@ namespace CRL.LambdaQuery
                 var field = getSeletctBinary(expressionBody);
                 var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", field);
-                //f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.MemberName, FieldName = field, MethodName = "" };
-                resultFields.Add(f2);
-                var selectFieldItem = new SelectFieldInfo(resultFields, new ParameCollection()/*, GetQueryFieldsString(resultFields)*/);
+                var selectFieldItem = new SelectFieldInfo(f2);
                 return selectFieldItem;
             }
             else if (expressionBody is ConstantExpression)
@@ -327,15 +230,13 @@ namespace CRL.LambdaQuery
                 var constant = (ConstantExpression)expressionBody;
                 var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", constant.Value + "");
-                //f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.MemberName, FieldName = constant.Value + "", MethodName = "" };
-                resultFields.Add(f2);
-                var selectFieldItem = new SelectFieldInfo(resultFields, new ParameCollection()/*, GetQueryFieldsString(resultFields)*/);
+                var selectFieldItem = new SelectFieldInfo(f2);
                 return selectFieldItem;
             }
             else if (expressionBody is UnaryExpression)
             {
                 var unaryExpression = expressionBody as UnaryExpression;
-                return _GetSelectField(false, unaryExpression.Operand, withTablePrefix, types);
+                return GetSelectField(false, unaryExpression.Operand, withTablePrefix, types);
             }
             else if (expressionBody is MemberExpression)//按成员
             {
@@ -346,19 +247,16 @@ namespace CRL.LambdaQuery
                     //按匿名对象属性,视图关联时用
                     var _f = new Attribute.FieldAttribute() { MemberName = mExp.Member.Name };
                     var f3 = _f.GetFieldMapping(__DBAdapter, GetPrefix(mExp.Expression.Type), withTablePrefix, mExp.Member.Name);
-                    resultFields.Add(f3);
-                    return new SelectFieldInfo(resultFields, new ParameCollection()/*, GetQueryFieldsString(resultFields)*/);
+                    return new SelectFieldInfo(f3);
                 }
-
-                if (!allFields[mExp.Expression.Type].ContainsKey(mExp.Member.Name))
+                CRL.Attribute.FieldAttribute f;
+                var a = allFields[mExp.Expression.Type].TryGetValue(mExp.Member.Name, out f);
+                if (!a)
                 {
                     throw new CRLException("找不到可筛选的属性" + mExp.Member.Name + " 在" + mExp.Expression.Type);
                 }
-                var f = allFields[mExp.Expression.Type][mExp.Member.Name];
                 var f2 = f.GetFieldMapping(__DBAdapter, GetPrefix(f.ModelType), withTablePrefix, "");
-                //f.FieldQuery = new Attribute.FieldQuery() { MemberName = f.MemberName, FieldName = f.MapingName, MethodName = "" };
-                resultFields.Add(f2);
-                return new SelectFieldInfo(resultFields, new ParameCollection()/*, GetQueryFieldsString(resultFields)*/);
+                return new SelectFieldInfo(f2);
                 #endregion
             }
             else
@@ -384,10 +282,10 @@ namespace CRL.LambdaQuery
                 var parName = "@cons" + __DbContext.parIndex;
                 __DbContext.parIndex += 1;
                 __Visitor.AddParame(parName, cRLExpression.Data);
-                if (remArgsIndex)
-                {
-                    newExpressionParame.Add(parName, argsIndex);
-                }
+                //if (remArgsIndex)
+                //{
+                //    newExpressionParame.Add(parName, argsIndex);
+                //}
                 return parName;
             }
             var methodCallObj = cRLExpression.Data as CRLExpression.MethodCallObj;
@@ -402,10 +300,10 @@ namespace CRL.LambdaQuery
 
             var par = dic[methodCallObj.MethodName](methodCallObj, ref newParIndex, __Visitor.AddParame);
             __DbContext.parIndex = newParIndex;
-            if (remArgsIndex)
-            {
-                newExpressionParame[par] = argsIndex;
-            }
+            //if (remArgsIndex)
+            //{
+            //    newExpressionParame[par] = argsIndex;
+            //}
             return par;
             //return string.Format("{0}({1})", methodName, methodField);
         }
