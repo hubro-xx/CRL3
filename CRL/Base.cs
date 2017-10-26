@@ -243,6 +243,10 @@ namespace CRL
         }
         internal static void SaveSQLRunningtme(string sql, long n, int rowCount = 1)
         {
+            if(sql.Contains(" IN ("))
+            {
+                return;
+            }
             bool useContext;
             var dic = GetSQLRunningtime(out useContext);
             if (!useContext)

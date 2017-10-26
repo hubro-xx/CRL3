@@ -483,10 +483,15 @@ namespace CRL.LambdaQuery
             var allArguments = mcExp.Arguments;
             int argsIndex = 0;
             Expression firstArgs;
+            bool isLambdaQueryJoinExt = false;
             if (mcExp.Method.IsStatic)//区分静态方法还是实例方法
             {
                 firstArgs = allArguments[0];//like b.Name.IsNull("22")
                 argsIndex = 1;
+                if(firstArgs.Type.Name.Contains("LambdaQueryJoin"))
+                {
+                    isLambdaQueryJoinExt = true;
+                }
             }
             else
             {
@@ -530,7 +535,7 @@ namespace CRL.LambdaQuery
             string memberName = "";
             string methodName = mcExp.Method.Name;
 
-            if (firstArgs is ParameterExpression)
+            if (firstArgs is ParameterExpression || isLambdaQueryJoinExt)
             {
                 var exp2 = mcExp.Arguments[1] as UnaryExpression;
                 var type = exp2.Operand.GetType();
@@ -546,6 +551,11 @@ namespace CRL.LambdaQuery
                 var field = TypeCache.GetProperties(memberExpression.Expression.Type, true)[memberName];
                 memberName = __DBAdapter.FieldNameFormat(field);
                 methodField = FormatFieldPrefix(memberExpression.Expression.Type, memberName);
+            }
+            else if (firstArgs is BinaryExpression)
+            {
+                var be = firstArgs as BinaryExpression;
+                methodField = BinaryExpressionHandler(be.Left, be.Right, be.NodeType).Data.ToString();
             }
             else if (firstArgs is MemberExpression)
             {
@@ -566,16 +576,8 @@ namespace CRL.LambdaQuery
                     {
                         bool isConstant2;
                         var obj = GetParameExpressionValue(allArguments[i], out isConstant2);
-                        //if (!isConstant2)
-                        //{
-                        //    allConstant = false;
-                        //}
                         arguments.Add(obj);
                     }
-                    //if (allConstant)
-                    //{
-                    //    isConstantMethod = true;
-                    //}
                 }
                 else
                 {
@@ -678,6 +680,10 @@ namespace CRL.LambdaQuery
             {
                 //方法直接下一步解析
                 return RouteExpressionHandler(ue.Operand, ue.NodeType);
+            }
+            else if(ue.NodeType == ExpressionType.Convert)
+            {
+                return RouteExpressionHandler(ue.Operand);
             }
             else if (ue.Operand is MemberExpression)
             {

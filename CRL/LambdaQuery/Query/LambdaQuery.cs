@@ -280,6 +280,20 @@ namespace CRL.LambdaQuery
         public abstract LambdaQuery<T> OrderBy<TResult>(Expression<Func<T, TResult>> expression, bool desc = true);
        
         /// <summary>
+        /// 传入字符串排序
+        /// </summary>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> OrderBy(string orderBy)
+        {
+            if (__QueryOrderBy != "")
+            {
+                orderBy = "," + orderBy;
+            }
+            __QueryOrderBy += orderBy;
+            return this;
+        }
+        /// <summary>
         /// 按主键排序
         /// </summary>
         /// <param name="desc"></param>

@@ -57,35 +57,39 @@ namespace CRL.LambdaQuery
         public static object GetMemberExpressionValue(Expression exp, out bool isConstant)
         {
             isConstant = false;
-            if (exp.NodeType == ExpressionType.Constant)
+            switch(exp.NodeType)
             {
-                isConstant = true;
-                return ((ConstantExpression)exp).Value;
-            }
-            if (exp.NodeType == ExpressionType.MemberAccess)
-            {
-                var mExp = (MemberExpression)exp;
-                object instance = null;
-                if (mExp.Expression != null)
-                {
-                    instance = GetMemberExpressionValue(mExp.Expression, out isConstant);
-                    //字段属属性都按变量
-                    isConstant = false;
-                    if (instance == null)
+                case ExpressionType.Constant:
+                    isConstant = true;
+                    return ((ConstantExpression)exp).Value;
+                case ExpressionType.MemberAccess:
+                    var mExp = (MemberExpression)exp;
+                    object instance = null;
+                    if (mExp.Expression != null)
                     {
-                        throw new ArgumentNullException(exp.ToString());
+                        instance = GetMemberExpressionValue(mExp.Expression, out isConstant);
+                        //字段属属性都按变量
+                        isConstant = false;
+                        if (instance == null)
+                        {
+                            throw new ArgumentNullException(exp.ToString());
+                        }
                     }
-                }
 
-                if (mExp.Member.MemberType == MemberTypes.Field)
-                {
-                    return ((FieldInfo)mExp.Member).GetValue(instance);
-                }
-                else if (mExp.Member.MemberType == MemberTypes.Property)
-                {
-                    return ((PropertyInfo)mExp.Member).GetValue(instance, null);
-                }
-                throw new CRLException("未能解析" + mExp.Member.MemberType);
+                    if (mExp.Member.MemberType == MemberTypes.Field)
+                    {
+                        return ((FieldInfo)mExp.Member).GetValue(instance);
+                    }
+                    else if (mExp.Member.MemberType == MemberTypes.Property)
+                    {
+                        return ((PropertyInfo)mExp.Member).GetValue(instance, null);
+                    }
+                    throw new CRLException("未能解析" + mExp.Member.MemberType);
+                case ExpressionType.ArrayIndex:
+                    var arryExp = exp as BinaryExpression;
+                    var array = GetMemberExpressionValue(arryExp.Left, out isConstant) as Array;
+                    var index = (int)((ConstantExpression)arryExp.Right).Value;
+                    return array.GetValue(index);
             }
             throw new CRLException("未能解析" + exp.NodeType);
         }

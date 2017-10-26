@@ -50,5 +50,32 @@ namespace CRL
         {
             return default(TResult);
         }
+        /// <summary>
+        /// 关联时Sum一个二元运算
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="origin"></param>
+        /// <param name="resultSelector"></param>
+        /// <returns></returns>
+        public static object SUM<T,T2>(this T origin, Expression<Func<T, T2, object>> resultSelector) where T : IModel
+            where T2 : IModel
+        {
+            return default(object);
+        }
+        /// <summary>
+        /// 关联时Sum一个二元运算
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TJoin"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="origin"></param>
+        /// <param name="resultSelector"></param>
+        /// <returns></returns>
+        public static TResult SUM<T, TJoin,TResult>(this LambdaQueryJoin<T, TJoin> origin, Expression<Func<T, TJoin, TResult>> resultSelector) where T : IModel
+       where TJoin : IModel
+        {
+            return default(TResult);
+        }
     }
 }

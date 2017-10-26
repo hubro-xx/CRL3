@@ -89,7 +89,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 排序
         /// </summary>
-        string __QueryOrderBy = "";
+        internal string __QueryOrderBy = "";
         //List<string> __queryOrderBy;
         //internal List<string> __QueryOrderBy
         //{

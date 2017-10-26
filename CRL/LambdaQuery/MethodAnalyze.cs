@@ -51,6 +51,7 @@ namespace CRL.LambdaQuery
                 methodDic.Add("Between", Between);
                 methodDic.Add("DateDiff", DateTimeDateDiff);
                 methodDic.Add("Length", Length);
+                methodDic.Add("Len", Length);
                 methodDic.Add("Trim", Trim);
                 methodDic.Add("TrimStart", TrimStart);
                 methodDic.Add("TrimEnd", TrimEnd);
@@ -353,6 +354,10 @@ namespace CRL.LambdaQuery
             else if (par2 is string[])
             {
                 var list = par2 as Array;
+                if (list.Length == 0)
+                {
+                    throw new CRLException("in 参数为空");
+                }
                 var max = list.Length > 1000;//超出直接拼字符串
                 foreach (var s in list)
                 {
@@ -377,6 +382,10 @@ namespace CRL.LambdaQuery
             else//按数字
             {
                 var list = par2 as Array;
+                if (list.Length == 0)
+                {
+                    throw new CRLException("in 参数为空");
+                }
                 var max = list.Length > 1000;//超出直接拼字符串
                 foreach (var s in list)
                 {

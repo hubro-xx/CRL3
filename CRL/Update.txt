@@ -335,3 +335,14 @@
 2017-08-21
 	去掉了解析缓存,并优化拼接内存占用,优化所有列选择,查询内存占用大量减少
 	升级到4.5
+2017-09-15
+	增加扩展方法二元运算支持ss2=(b.Id*b.Number*1).SUM()
+	增加Len方法 b.Id.Len()==10
+2017-10-18
+	增加关联时也能进行Sum
+	q2.Select((a, b) => new { ss = a.Id.SUM(), ss2 = a.SUM<Code.ProductData, Code.Member>((a1, b1) => a1.Id * 3*b.Id) });
+	或关联条件
+    q2.Select((a, b) => new { ss = q2.SUM((a1, b1) => a1.Id * b1.Id) });
+2017-10-25
+	增加字符串参数排序
+	query3.OrderBy("id desc");

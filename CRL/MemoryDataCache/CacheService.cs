@@ -131,29 +131,28 @@ namespace CRL.MemoryDataCache
             //按参数进行缓存
             key = StringHelper.EncryptMD5(query + Params + "|" + helper.DatabaseName);//按库名
             //初始缓存
-            //lock (lockObj)
-            //{
-                if (!cacheDatas.ContainsKey(key))
+            if (!cacheDatas.ContainsKey(key))
+            {
+                cacheDatas.TryAdd(key, new MemoryDataCacheItem() { Data = null, Mapping = mapping, TimeOut = timeOut, DBHelper = helper, Query = query, Params = new Dictionary<string, object>(helper.Params), Type = type });
+                if (typeCache.ContainsKey(type))
                 {
-                    cacheDatas.TryAdd(key, new MemoryDataCacheItem() { Data = null, Mapping = mapping, TimeOut = timeOut, DBHelper = helper, Query = query, Params = new Dictionary<string, object>(helper.Params), Type = type });
-                    if (typeCache.ContainsKey(type))
-                    {
-                        typeCache[type].Add(key);
-                    }
-                    else
-                    {
-                        typeCache[type] = new List<string>() { key };
-                    }
+                    typeCache[type].Add(key);
                 }
                 else
                 {
-                    var dataItem2 = cacheDatas[key];
-                    if (dataItem2.QueryCount == 0)//缓存没有创建好时返回空
-                    {
-                        return new Dictionary<string, TItem>();
-                    }
+                    typeCache[type] = new List<string>() { key };
                 }
-            //}
+            }
+            else
+            {
+                var dataItem2 = cacheDatas[key];
+                if (dataItem2.QueryCount == 0)//缓存没有创建好时返回空
+                {
+                    throw new CRLException("CRL缓存创建中...");
+                    return new Dictionary<string, TItem>();
+                }
+            }
+
             var dataItem = cacheDatas[key];
             //首次查询
             if (dataItem.QueryCount == 0)
