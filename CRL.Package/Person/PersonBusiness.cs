@@ -142,7 +142,12 @@ namespace CRL.Package.Person
         /// <returns></returns>
         public TModel GetCurrent()
         {
-            return QueryItem(b => b.Id == CurrentUser.Id);
+            var item = QueryItem(b => b.Id == CurrentUser.Id);
+            if (item == null)
+            {
+                throw new Exception("当前编号用户不存在" + CurrentUser.Id);
+            }
+            return item;
         }
         /// <summary>
         /// 获取当前登录的用户

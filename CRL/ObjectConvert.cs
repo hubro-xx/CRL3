@@ -176,6 +176,10 @@ namespace CRL
             //sw.Start();
             runTime = 0;
             var list = new List<object>();
+            if (reader.FieldCount == 0)//分页时不会返回查询
+            {
+                return list;
+            }
             var typeArry = TypeCache.GetTable(mainType).FieldsDic;
             var columns = new Dictionary<string, int>();
             for (int i = 0; i < reader.FieldCount; i++)
@@ -255,7 +259,7 @@ namespace CRL
         #region 返回指定类型
 
         internal static Dictionary<string, Dictionary<string, int>> columnCache = new Dictionary<string, Dictionary<string, int>>();
-        internal static Dictionary<string, Dictionary<string, int>> queryColumnCache = new Dictionary<string, Dictionary<string, int>>();
+        internal static Dictionary<string, Dictionary<string, ColumnType>> queryColumnCache = new Dictionary<string, Dictionary<string, ColumnType>>();
         /// <summary>
         /// 返回指定类型,支持强类型和匿名类型
         /// </summary>
@@ -267,23 +271,32 @@ namespace CRL
         {
             var mapping = queryInfo.Mapping;
             var list = new List<T>();
+            if (reader.FieldCount == 0)//分页时不会返回查询
+            {
+                return list;
+            }
             string columnCacheKey = queryInfo.selectKey;
             var leftColumns = new Dictionary<string, int>();
-            var dicColumns = new Dictionary<string, int>();
+            var dicColumns = new Dictionary<string, ColumnType>();
             var a = columnCache.TryGetValue(columnCacheKey, out leftColumns);
             if (!a)
             {
                 leftColumns = new Dictionary<string, int>();
-                dicColumns= new Dictionary<string, int>();
+                dicColumns= new Dictionary<string, ColumnType>();
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     var name = reader.GetName(i).ToLower();
-                    var find = mapping.Count(b => b.ResultName.ToLower() == name);
-                    if (find == 0)
+                    var find = mapping.Find(b => b.ResultName.ToLower() == name);
+                    Type proType = typeof(string);
+                    if (find == null)
                     {
                         leftColumns.Add(name, i);
                     }
-                    dicColumns.Add(name, i);
+                    else
+                    {
+                        proType = find.PropertyType;
+                    }
+                    dicColumns.Add(name, new ColumnType() {name= name, index = i, typeName = proType.Name });
                 }
                 columnCache[columnCacheKey] = leftColumns;
                 queryColumnCache[columnCacheKey] = dicColumns;
@@ -307,8 +320,8 @@ namespace CRL
                     reader.Close();
                     reader.Dispose();
                     queryInfo = null;
-                    var columnName = dataContainer._GetCurrentColumnName();
-                    throw new CRLException("反射赋值时发生错误,在:" + type + " 字段:" + columnName+ ",请检查数据库字段类型与对象是否一致");
+                    var columnType = dataContainer._GetCurrentColumnName();
+                    throw new CRLException($"反射赋值时发生错误,在:{type }  字段:{columnType.name} 类型:{columnType.typeName },请检查数据库字段类型与对象是否一致");
                 }
                 #region 剩下的放索引
                 //按IModel算

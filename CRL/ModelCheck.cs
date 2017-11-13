@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 
 namespace CRL
 {
-    internal class ModelCheck
+    public class ModelCheck
     {
         #region 检查表
         /// <summary>
         /// 检查索引
         /// </summary>
+        /// <param name="type"></param>
         /// <param name="db"></param>
-        /// <returns></returns>
-        internal static void CheckIndexExists(Type type, AbsDBExtend db)
+        /// <param name="removeId"></param>
+        public static void CheckIndexExists(Type type, AbsDBExtend db, bool removeId= false)
         {
-            var list = GetIndexScript(type, db);
+            var list = GetIndexScript(type, db, removeId);
             foreach (var item in list)
             {
                 try
@@ -142,7 +143,7 @@ namespace CRL
             }
             return columns;
         }
-        internal static List<string> GetIndexScript(Type type, AbsDBExtend db)
+        internal static List<string> GetIndexScript(Type type, AbsDBExtend db, bool removeId)
         {
             var dbAdapter = db._DBAdapter;
             List<string> list2 = new List<string>();
@@ -152,6 +153,10 @@ namespace CRL
                 if (item.FieldIndexType != Attribute.FieldIndexType.无)
                 {
                     //string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]({1})", tableName, item.Name, item.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
+                    if (removeId && item.IsPrimaryKey)
+                    {
+                        continue;
+                    }
                     string indexScript = dbAdapter.GetColumnIndexScript(item);
                     list2.Add(indexScript);
                 }

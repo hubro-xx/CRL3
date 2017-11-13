@@ -356,7 +356,7 @@ namespace CRL.DBExtend.RelationDB
                 {
                     //BackupParams();
                     string sql = _DBAdapter.GetAllTablesSql(dbContext.DBHelper.DatabaseName);
-                    var dic = db.ExecDictionary<string, int>(sql);
+                    var dic = db.ExecDictionary<string, string>(sql);
                     //RecoveryParams();
                     cacheInstance.InitTable(dbName, dic.Keys.ToList());
                 }

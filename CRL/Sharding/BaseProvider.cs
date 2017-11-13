@@ -69,7 +69,7 @@ namespace CRL.Sharding
             SetLocation(dataIndex);
             base.Add(p);
         }
-        public override void BatchInsert(List<TModel> list, bool keepIdentity = false)
+        public override void BatchInsert<T>(List<T> list, bool keepIdentity = false)
         {
             throw new CRLException("暂不支持");
             //todo 判断主数据索引是不是在当前定位

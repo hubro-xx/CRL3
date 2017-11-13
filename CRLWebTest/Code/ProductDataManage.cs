@@ -72,7 +72,7 @@ namespace WebTest.Code
         }
         public void Test2()
         {
-            string sql = "select top 10 Id,ProductId,ProductName1 from ProductData";
+            string sql = "select top 10 Id,ProductId,ProductName from ProductData";
             var helper = DBExtend;
             var obj = helper.ExecObject<ProductData>(sql);
         }

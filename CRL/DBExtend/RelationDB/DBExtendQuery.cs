@@ -47,6 +47,7 @@ namespace CRL.DBExtend.RelationDB
             System.Data.Common.DbDataReader reader;
             query.FillParames(this);
             var sql = query.GetQuery();
+            sql = _DBAdapter.SqlFormat(sql);
             var cacheTime = query.__ExpireMinute;
             var compileSp = query.__CompileSp;
             double runTime = 0;

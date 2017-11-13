@@ -210,7 +210,7 @@ end", spName, script);
 
         public override string GetTableFields(string tableName)
         {
-            string sql = "Select name,0 from syscolumns Where ID=OBJECT_ID('" + tableName + "')";
+            string sql = "Select name,name from syscolumns Where ID=OBJECT_ID('" + tableName + "')";
             return sql;
         }
         static Dictionary<Type, DataTable> cacheTables = new Dictionary<Type, DataTable>();
@@ -389,7 +389,7 @@ end", spName, script);
         #region 系统查询
         public override string GetAllTablesSql(string db)
         {
-            return "select Lower(name),id from sysobjects where  type='u'";
+            return "select Lower(name),name from sysobjects where  type='u'";
         }
         public override string GetAllSPSql(string db)
         {
@@ -443,6 +443,8 @@ begin
     --获取记录数
 	  select @count=count(0) from (select count(*) as a  {sql}) t
     if @count = 0
+    return
+    if @count = 0
         set @count = 1
 
     --取得分页总数
@@ -481,6 +483,8 @@ begin
 
     --获取记录数
 	  select @count=count(0) {sql}
+    if @count = 0
+    return
     if @count = 0
         set @count = 1
 

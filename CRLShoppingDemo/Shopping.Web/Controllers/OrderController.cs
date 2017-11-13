@@ -69,7 +69,7 @@ namespace Shopping.Web.Controllers
         /// <returns></returns>
         public ActionResult Index()
         {
-            var orders = OrderManage.Instance.QueryList(b => b.UserId == CurrentUser.Id);
+            var orders = OrderManage.Instance.GetLambdaQuery().Where(b => b.UserId == CurrentUser.Id).Page(20,1).ToList();
             return View(orders);
         }
         /// <summary>

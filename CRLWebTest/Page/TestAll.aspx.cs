@@ -24,8 +24,8 @@ namespace WebTest.Page
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            var s=DateTime.Now.Second;
-            var array = typeof(Code.TestAll).GetMethods(BindingFlags.Static | BindingFlags.Public).OrderBy(b => b.Name.Length / s);
+            //var s=DateTime.Now.Second;
+            var array = typeof(Code.TestAll).GetMethods(BindingFlags.Static | BindingFlags.Public).OrderBy(b => b.Name.Length);
             var instance = new Code.TestAll();
             foreach (var item in array)
             {

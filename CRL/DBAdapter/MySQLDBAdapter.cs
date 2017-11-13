@@ -27,11 +27,6 @@ namespace CRL.DBAdapter
         public override string GetCreateSpScript(string spName, string script)
         {
             throw new NotSupportedException("MySql不支持动态创建存储过程");
-            string template = string.Format(@"
-drop procedure if exists {0};
-EXECUTE  ' {1} ';
-", spName, script);
-            return template;
         }
 
         /// <summary>
@@ -49,6 +44,7 @@ EXECUTE  ' {1} ';
             dic.Add(typeof(System.Boolean), "tinyint(1)");
             dic.Add(typeof(System.Int32), "int");
             dic.Add(typeof(System.Int16), "SMALLINT");
+            dic.Add(typeof(System.Int64), "bigint");
             dic.Add(typeof(System.Enum), "int");
             dic.Add(typeof(System.Byte), "SMALLINT");
             dic.Add(typeof(System.DateTime), "datetime");
@@ -89,7 +85,7 @@ EXECUTE  ' {1} ';
             //超过3000设为ntext
             if (propertyType == typeof(System.String) && info.Length > 3000)
             {
-                columnType = "varchar(max)";
+                columnType = "text";
             }
             if (info.Length > 0)
             {
@@ -186,7 +182,7 @@ EXECUTE  ' {1} ';
         #region SQL查询
         public override string GetTableFields(string tableName)
         {
-            throw new NotImplementedException();
+            return "select  column_name, column_name  from Information_schema.columns  where table_Name = '" + tableName + "';";
         }
         /// <summary>
         /// 批量插入,mysql不支持批量插入
@@ -287,17 +283,20 @@ EXECUTE  ' {1} ';
             //return sql;
 
             sb.Append("select ");
-            sb.Append(top == 0 ? "" : " LIMIT 0," + top);
             sb.Append(fields);
-            sb.Append(query);
-            sb.Append(sort);
+            query(sb);
+            if (!string.IsNullOrEmpty(sort))
+            {
+                sb.Append(sort);
+            }
+            sb.Append(top == 0 ? "" : " LIMIT 0," + top);
         }
         #endregion
 
         #region 系统查询
         public override string GetAllTablesSql(string db)
         {
-            return "select lower(table_name),1 from information_schema.tables where table_schema='" + db + "' ";
+            return "select lower(table_name),table_name from information_schema.tables where table_schema='" + db + "' ";
         }
         public override string GetAllSPSql(string db)
         {
@@ -329,31 +328,6 @@ EXECUTE  ' {1} ';
             get
             {
                 throw new NotSupportedException("MySql不支持动态创建存储过程");
-                string str = @"
-CREATE PROCEDURE {name}
-( 
-	{parame}
-) 
-
-BEGIN
- if pageSize<=1 then 
-  set pageSize=20;
- end if;
- if pageIndex < 1 then 
-  set pageIndex = 1; 
- end if;
- 
- set @strsql = concat('select {fields} from {sql} order by {sort} limit ',_pageIndex*_pageSize-_pageSize,',',_pageSize); 
- prepare stmtsql from @strsql; 
- execute stmtsql; 
- deallocate prepare stmtsql;
- set @strsqlcount='select count(1) as count from {sql}';
- prepare stmtsqlcount from @strsqlcount; 
- execute stmtsqlcount; 
- deallocate prepare stmtsqlcount; 
-END
-";
-                return str;
             }
         }
 
@@ -362,32 +336,6 @@ END
             get
             {
                 throw new NotSupportedException("MySql不支持动态创建存储过程");
-                string str = @"
-CREATE PROCEDURE {name}
-( 
-	{parame}
-) 
-
-BEGIN
- if pageSize<=1 then 
-  set pageSize=20;
- end if;
- if pageIndex < 1 then 
-  set pageIndex = 1; 
- end if;
- 
- set @strsql = concat('select {fields} from {sql} order by {sort} limit ',_pageIndex*_pageSize-_pageSize,',',_pageSize); 
- prepare stmtsql from @strsql; 
- execute stmtsql; 
- deallocate prepare stmtsql;
- set @strsqlcount='select count(1) as count from {sql}';
- prepare stmtsqlcount from @strsqlcount; 
- execute stmtsqlcount; 
- deallocate prepare stmtsqlcount; 
-END
-
-";
-                return str;
             }
         }
 
@@ -396,81 +344,125 @@ END
             get
             {
                 throw new NotSupportedException("MySql不支持动态创建存储过程");
-                string str = @"
-CREATE PROCEDURE {name}
-({parame})
-begin
-	{sql};
-end
-";
-                return str;
             }
         }
         public override string SqlFormat(string sql)
         {
-            return System.Text.RegularExpressions.Regex.Replace(sql, @"@(\w+)", "?$1");
+            return sql;
+            //var sql2 = System.Text.RegularExpressions.Regex.Replace(sql, @"@(\w+)", "?$1");
+            //return sql2;
         }
         #endregion
 
         public override string SubstringFormat(string field, int index, int length)
         {
-            throw new NotImplementedException();
+            return string.Format(" substring({0},{1},{2})", field, index + 1, length);
         }
 
         public override string StringLikeFormat(string field, string parName)
         {
-            throw new NotImplementedException();
+            return string.Format("{0} LIKE {1}", field, parName);
         }
 
         public override string StringNotLikeFormat(string field, string parName)
         {
-            throw new NotImplementedException();
+            return string.Format("{0} NOT LIKE {1}", field, parName);
         }
 
         public override string StringContainsFormat(string field, string parName)
         {
-            throw new NotImplementedException();
+            return string.Format("find_in_set({1},{0})", field, parName);
         }
-        public virtual string StringNotContainsFormat(string field, string parName)
+        public override string StringNotContainsFormat(string field, string parName)
         {
-            return string.Format("CHARINDEX({1},{0})<=0", field, parName);
+            return string.Format("not find_in_set({1},{0})", field, parName);
         }
         public override string BetweenFormat(string field, string parName, string parName2)
         {
-            throw new NotImplementedException();
+            return string.Format("{0} between {1} and {2}", field, parName, parName2);
         }
-        public virtual string NotBetweenFormat(string field, string parName, string parName2)
+        public override string NotBetweenFormat(string field, string parName, string parName2)
         {
             return string.Format("{0} not between {1} and {2}", field, parName, parName2);
         }
         public override string DateDiffFormat(string field, string format, string parName)
         {
-            throw new NotImplementedException();
+            return string.Format("DateDiff({0},{1})", field, parName);
         }
 
         public override string InFormat(string field, string parName)
         {
-            throw new NotImplementedException();
+            return string.Format("{0} IN ({1})", field, parName);
         }
 
         public override string NotInFormat(string field, string parName)
         {
-            throw new NotImplementedException();
+            return string.Format("{0} NOT IN ({1})", field, parName);
         }
-        public override string PageSqlFormat(string fields, string rowOver, string condition, int start, int end, string sort)
+        public override string PageSqlFormat(CoreHelper.DBHelper db, string fields, string rowOver, string condition, int start, int end, string sort)
         {
-            string sql = "SELECT {0} FROM {1} order by {4} limit {2},{3} ";
-            return string.Format(sql, fields, condition, start, end, sort);
+            start -= 1;
+            if (start < 0)
+            {
+                start = 0;
+            }
+            db.AddParam("?start", start);
+            db.AddParam("?row", end - start);
+            string sql = "SELECT {0} {1} {4} limit {2},{3} ";
+            return string.Format(sql, fields, condition, "?start", "?row", string.IsNullOrEmpty(sort) ? "" : "order by " + sort);
         }
         public override string GetRelationUpdateSql(string t1, string t2, string condition, string setValue)
         {
-            string sql = string.Format("update {0} t1, {1} t2 set {2} where {3}", KeyWordFormat(t1)
-                  , KeyWordFormat(t2), setValue, condition);
+            string table = string.Format("{0} t1", KeyWordFormat(t1));
+            var arry = condition.Split(new string[] { " where " }, StringSplitOptions.None);
+            string sql = string.Format(@"UPDATE {0} {1}
+SET {2} {3}", table, arry[0], setValue, arry.Length > 1 ? (" where " + arry[1]) : "");
             return sql;
         }
+        static Dictionary<Type, string> castDic = new Dictionary<Type, string>();
         public override string CastField(string field, Type fieldType)
         {
-            throw new NotImplementedException();
+            //CAST其中类型可以为：
+            //CHAR[(N)] 字符型
+            //DATE  日期型
+            //DATETIME  日期和时间型
+            //DECIMAL  float型
+            //SIGNED  int
+            //TIME  时间型
+            if (castDic.Count == 0)
+            {
+                castDic.Add(typeof(string), "CHAR");
+                castDic.Add(typeof(DateTime), "DATETIME");
+                castDic.Add(typeof(int), "SIGNED");
+                castDic.Add(typeof(float), "DECIMAL");
+                castDic.Add(typeof(TimeSpan), "TIME");
+            }
+            if (!castDic.ContainsKey(fieldType))
+            {
+                throw new CRLException(string.Format("没找到对应类型的转换{0} 在字段{1}", fieldType, field));
+            }
+            var type = castDic[fieldType];
+            //type = string.Format(type, 100);
+            return string.Format("CAST({0} as {1})", field, type);
+        }
+        public override string IsNull(string field, object value)
+        {
+            return string.Format("IFNULL({0},{1})", field, value);
+        }
+        public override string GetFieldConcat(string field, object value, Type type)
+        {
+            if (type == typeof(string))
+            {
+                return string.Format("concat('{0}',{1})", value, field);
+            }
+            else
+            {
+                return string.Format("{0}+{1}", field, value);
+            }
+        }
+        public virtual string GetParamName(string name, object index)
+        {
+            return string.Format("?{0}{1}", name, index);
         }
     }
 }

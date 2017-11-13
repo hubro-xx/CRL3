@@ -118,7 +118,7 @@ namespace CRL.LambdaQuery
                         var methodCallExpression = item as MethodCallExpression;
                         string methodMember;
                         var methodQuery = getSelectMethodCall(methodCallExpression, out methodMember, i);
-                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = memberName };
+                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = memberName, PropertyType = item.Type };
                         var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, memberName, methodQuery);
                         f2.MethodName = methodCallExpression.Method.Name;
                         resultFields.Add(f2);
@@ -126,14 +126,14 @@ namespace CRL.LambdaQuery
                     else if (item is BinaryExpression)
                     {
                         var field = getSeletctBinary(item);
-                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
+                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "", PropertyType = item.Type };
                         var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, memberName, field);
                         resultFields.Add(f2);
                     }
                     else if (item is ConstantExpression)//常量
                     {
                         var constantExpression = item as ConstantExpression;
-                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
+                        var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "", PropertyType = item.Type };
                         var value = constantExpression.Value + "";
                         if (!value.IsNumber())
                         {
@@ -148,10 +148,10 @@ namespace CRL.LambdaQuery
                         var memberExpression = item as MemberExpression;//转换为属性访问表达式
                         if (memberExpression.Expression.NodeType == ExpressionType.Constant)
                         {
-                            string parName = "@par" + i;
+                            string parName = "@p" + i;
                             //newExpressionParame.Add(parName, i);
                             var obj = ConstantValueVisitor.GetParameExpressionValue(item);
-                            var f2 = new Attribute.FieldAttribute() { ModelType = __MainType };
+                            var f2 = new Attribute.FieldAttribute() { ModelType = __MainType, PropertyType = item.Type };
                             var f3 = f2.GetFieldMapping(__DBAdapter, "", withTablePrefix, memberName, parName);
                             //f2.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = parName, MethodName = "" };
                             resultFields.Add(f3);
@@ -161,18 +161,19 @@ namespace CRL.LambdaQuery
                         else if (memberExpression.Member.ReflectedType.Name.StartsWith("<>f__AnonymousType"))
                         {
                             //按匿名对象属性,视图关联时用
-                            var f2 = new Attribute.FieldAttribute() { MemberName = memberExpression.Member.Name };
+                            var f2 = new Attribute.FieldAttribute() { MemberName = memberExpression.Member.Name, PropertyType = item.Type };
                             var f3 = f2.GetFieldMapping(__DBAdapter, GetPrefix(memberExpression.Expression.Type), withTablePrefix, memberName);
                             resultFields.Add(f3);
                             continue;
 
                         }
                         //按属性
-                        if (!allFields[memberExpression.Expression.Type].ContainsKey(memberExpression.Member.Name))
+                        Attribute.FieldAttribute f;
+                        var a2 = allFields[memberExpression.Expression.Type].TryGetValue(memberExpression.Member.Name, out f);
+                        if (!a2)
                         {
                             throw new CRLException("找不到可筛选的属性" + memberExpression.Member.Name + " 在" + memberExpression.Expression.Type);
                         }
-                        var f = allFields[memberExpression.Expression.Type][memberExpression.Member.Name];
                         Attribute.FieldMapping _f2;
                         if (memberName != memberExpression.Member.Name)//按有别名算
                         {
@@ -208,7 +209,7 @@ namespace CRL.LambdaQuery
             {
                 #region 方法
                 var method = expressionBody as MethodCallExpression;
-                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
+                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "", PropertyType = expressionBody.Type };
                 string methodMember;
                 var methodQuery = getSelectMethodCall(expressionBody, out methodMember, 0);
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", methodQuery);
@@ -220,7 +221,7 @@ namespace CRL.LambdaQuery
             else if (expressionBody is BinaryExpression)
             {
                 var field = getSeletctBinary(expressionBody);
-                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
+                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "", PropertyType = expressionBody.Type };
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", field);
                 var selectFieldItem = new SelectFieldInfo(f2);
                 return selectFieldItem;
@@ -228,7 +229,7 @@ namespace CRL.LambdaQuery
             else if (expressionBody is ConstantExpression)
             {
                 var constant = (ConstantExpression)expressionBody;
-                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "" };
+                var f = new Attribute.FieldAttribute() { ModelType = __MainType, MemberName = "", PropertyType = expressionBody.Type };
                 var f2 = f.GetFieldMapping(__DBAdapter, "", withTablePrefix, "", constant.Value + "");
                 var selectFieldItem = new SelectFieldInfo(f2);
                 return selectFieldItem;
@@ -245,7 +246,7 @@ namespace CRL.LambdaQuery
                 if (mExp.Expression.Type.BaseType == typeof(object))
                 {
                     //按匿名对象属性,视图关联时用
-                    var _f = new Attribute.FieldAttribute() { MemberName = mExp.Member.Name };
+                    var _f = new Attribute.FieldAttribute() { MemberName = mExp.Member.Name, PropertyType = mExp.Type };
                     var f3 = _f.GetFieldMapping(__DBAdapter, GetPrefix(mExp.Expression.Type), withTablePrefix, mExp.Member.Name);
                     return new SelectFieldInfo(f3);
                 }

@@ -232,7 +232,7 @@ namespace CRL
         /// 获取被修改的字段
         /// </summary>
         /// <returns></returns>
-        public ParameCollection GetUpdateField(bool check = true)
+        public ParameCollection GetUpdateField(DBAdapter.DBAdapterBase dBAdapterBase= null, bool check = true)
         {
             var c = new ParameCollection();
             var fields = TypeCache.GetProperties(GetType(), true);
@@ -253,14 +253,18 @@ namespace CRL
                     //使用Cumulation扩展方法后按此处理
                     if (key != item.Key)//按$name=name+'123123'
                     {
-                        if (f.PropertyType == typeof(string))
+                        if (dBAdapterBase != null)
                         {
-                            value = string.Format("{0}+'{1}'", key, value);
+                            value = dBAdapterBase.GetFieldConcat(dBAdapterBase.KeyWordFormat(f.MapingName), value, f.PropertyType);
                         }
-                        else
-                        {
-                            value = string.Format("{0}+{1}", key, value);
-                        }
+                        //if (f.PropertyType == typeof(string))
+                        //{
+                        //    value = string.Format("{0}+'{1}'", key, value);
+                        //}
+                        //else
+                        //{
+                        //    value = string.Format("{0}+{1}", key, value);
+                        //}
                     }
                     c[item.Key] = value;
                 }
@@ -290,7 +294,7 @@ namespace CRL
         /// </summary>
         public bool IsModified()
         {
-            return GetUpdateField(false).Count > 0;
+            return GetUpdateField(null,false).Count > 0;
         }
         /// <summary>
         /// 清除通过Change方法设置的变更字典

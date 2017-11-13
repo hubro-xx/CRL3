@@ -175,7 +175,7 @@ namespace CRL.DBExtend.RelationDB
         public override List<TResult> QueryResult<TResult>(LambdaQueryBase query, NewExpression newExpression)
         {
             List<TResult> list;
-            var queryInfo = new LambdaQuery.Mapping.QueryInfo<TResult>(true, query.GetQueryFieldString(), null, newExpression.Constructor);
+            var queryInfo = new LambdaQuery.Mapping.QueryInfo<TResult>(true, query.GetQueryFieldString(), query.GetFieldMapping(), newExpression.Constructor);
             if (query.SkipPage > 0)
             {
                 //var reader = GetPageReader(query);

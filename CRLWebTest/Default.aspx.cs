@@ -21,21 +21,31 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-            //Code.ProductDataManage.Instance.Test2();
-            var query3 = Code.ProductDataManage.Instance.GetLambdaQuery();
-            query3.Join<Code.Member>((a, b) => a.Id == b.Id).SelectAppendValue(b => b.Name);
-            query3.Where(b => b.Id > 1);
-            var resutl3 = query3.ToList();
-            foreach (var d in resutl3)
+            Code.CRLManage.Instance.Test();
+            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query.Join<Code.Member>((a, b) => a.Id == b.Id).Select((a, b) => new
             {
-                var a = d.Bag.Name;
-            }
+                aa1 = b.Id,
+                ss2 = a.TransType
+            });
+            var sql = query.ToString();
             //var n2 = GC.GetTotalMemory(true);
             //var list1 = Code.ProductDataManage.Instance.GetLambdaQuery().Top(1000).ToList();
             //var list2 = Code.OrderManage.Instance.GetLambdaQuery().Top(1000).ToList();
             //var n3 = GC.GetTotalMemory(false) - n2;
-            //Response.Write("ok " + n3 / 1024);
+            Response.Write(sql);
             Response.End();
+        }
+        class testA
+        {
+            public string CategoryName
+            {
+                get;set;
+            }
+            public string ProductName
+            {
+                get;set;
+            }
         }
     }
 }

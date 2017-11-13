@@ -93,7 +93,7 @@ namespace CRL.LambdaQuery
                 parameDic = new Dictionary<int, string>();
                 for (int i = 0; i <= 5000; i++)
                 {
-                    parameDic.Add(i, "@par" + i);
+                    parameDic.Add(i, __DBAdapter.GetParamName("p", i));
                 }
             }
             if (parIndex > 5000)

@@ -82,11 +82,15 @@ namespace CRL.LambdaQuery
             }
             return methodDic;
         }
+        string GetParamName(string name, object index)
+        {
+            return dBAdapter.GetParamName(name, index);
+        }
         public string IsNull(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
             var field = methodInfo.MemberQueryName;
             var args = methodInfo.Args.First();
-            string parName = string.Format("@isnull{0}", parIndex);
+            string parName = GetParamName("isnull", parIndex);
             parIndex += 1;
             addParame(parName, args);
             return dBAdapter.IsNull(field, parName);
@@ -135,7 +139,7 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             if (string.IsNullOrEmpty(field))//按转换常量算
             {
-                string parName = string.Format("@case{0}", parIndex);
+                string parName = GetParamName("case", parIndex);
                 parIndex += 1;
                 addParame(parName, methodInfo.Args.First());
                 field = parName;
@@ -179,7 +183,7 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args[0];
-            string parName = string.Format("@like{0}" , parIndex);
+            string parName = GetParamName("like", parIndex);
             parIndex += 1;
 
             if (args is ExpressionValueObj)
@@ -213,7 +217,7 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
-            string parName = string.Format("@contrains{0}", parIndex);
+            string parName = GetParamName("contains", parIndex);
             var args1 = args[0];
             if (args1 is ExpressionValueObj)
             {
@@ -239,7 +243,7 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
-            string parName = string.Format("@between{0}", parIndex);
+            string parName = GetParamName("between", parIndex);
             var args1 = args[0];
             var args2 = args[1];
             if (args1 is ExpressionValueObj)
@@ -251,7 +255,7 @@ namespace CRL.LambdaQuery
                 addParame(parName, args1);
             }
             parIndex += 1;
-            string parName2 = string.Format("@between{0}", parIndex);
+            string parName2 = GetParamName("between", parIndex);
             if (args2 is ExpressionValueObj)
             {
                 parName2 = args2.ToString();
@@ -276,7 +280,7 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
-            string parName = string.Format("@DateDiff{0}", parIndex);
+            string parName = GetParamName("dateDiff", parIndex);
             var args1 = args[0];
             if (args1 is ExpressionValueObj)
             {
@@ -287,7 +291,7 @@ namespace CRL.LambdaQuery
                 addParame(parName, args[1]);
             }
             parIndex += 1;
-            //DateDiff(2015/2/5 17:59:44,t1.AddTime,@DateDiff1)>1 
+            //DateDiff(2015/2/5 17:59:44,t1.AddTime,DateDiff1)>1 
             return dBAdapter.DateDiffFormat(field, args[0].ToString(), parName);
             //return string.Format("DateDiff({0},{1},{2}){3}", args[0], field, parName, args[2]);
         }
@@ -295,7 +299,7 @@ namespace CRL.LambdaQuery
         {
             var field = methodInfo.MemberQueryName;
             var args = methodInfo.Args;
-            string parName = string.Format("@repf{0}", parIndex);
+            string parName = GetParamName("repd", parIndex);
             var args1 = args[0];
             if (args1 is ExpressionValueObj)
             {
@@ -307,10 +311,10 @@ namespace CRL.LambdaQuery
             }
             var args2= args[1];
             parIndex += 1;
-            string parName2 = string.Format("@repd{0}", parIndex);
+            string parName2 = GetParamName("repd", parIndex);
             addParame(parName2, args2);
             parIndex += 1;
-            //DateDiff(2015/2/5 17:59:44,t1.AddTime,@DateDiff1)>1 
+            //DateDiff(2015/2/5 17:59:44,t1.AddTime,DateDiff1)>1 
             return dBAdapter.Replace(field, parName, parName2);
         }
         #region 函数
@@ -347,7 +351,7 @@ namespace CRL.LambdaQuery
             var par2 = value;
             if (par2 is string)
             {
-                string parName = string.Format("@in{0}", parIndex);
+                string parName = GetParamName("in", parIndex);
                 addParame(parName, value);
                 str = parName;
             }
@@ -368,7 +372,7 @@ namespace CRL.LambdaQuery
                     }
                     else
                     {
-                        parName = string.Format("@in{0}", parIndex);
+                        parName = GetParamName("in", parIndex);
                         addParame(parName, s);
                         parIndex += 1;
                     }
@@ -396,7 +400,7 @@ namespace CRL.LambdaQuery
                     }
                     else
                     {
-                        parName = string.Format("@in{0}", parIndex);
+                        parName = GetParamName("in", parIndex);
                         addParame(parName, (int)s);
                         parIndex += 1;
                     }
@@ -430,7 +434,7 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
-            string parName = string.Format("@equalEnum{0}", parIndex);
+            string parName = GetParamName("equalEnum", parIndex);
             parIndex += 1;
             var args1 = args[0];
             if (args1 is ExpressionValueObj)
@@ -459,7 +463,7 @@ namespace CRL.LambdaQuery
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
             var par = args[0].ToString();
-            string parName = string.Format("@StartsWith{0}", parIndex);
+            string parName = GetParamName("startsWith", parIndex);
             parIndex += 1;
             var args1 = args[0];
             if (args1 is ExpressionValueObj)

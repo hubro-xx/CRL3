@@ -23,7 +23,7 @@ namespace CRL.LambdaQuery.Mapping
             AnonymousClass = anonymousClass;
             
         }
-        public void CreateObjCreater(Dictionary<string, int> queryFields)
+        public void CreateObjCreater(Dictionary<string, ColumnType> queryFields)
         {
             #region 按EMIT创建
             //var key = typeof(TSource).ToString() + string.Join("-", mapping.Select(b => b.MappingName));
@@ -128,7 +128,7 @@ namespace CRL.LambdaQuery.Mapping
         /// <param name="mapping"></param>
         /// <param name="queryFields"></param>
         /// <returns></returns>
-        public static Func<DataContainer, T> CreateObjectGeneratorEmit<T>(IEnumerable<Attribute.FieldMapping> mapping, Dictionary<string, int> queryFields)
+        public static Func<DataContainer, T> CreateObjectGeneratorEmit<T>(IEnumerable<Attribute.FieldMapping> mapping, Dictionary<string, ColumnType> queryFields)
         {
             var type = typeof(T);
             var fields = TypeCache.GetProperties(type, true);
@@ -154,7 +154,7 @@ namespace CRL.LambdaQuery.Mapping
                 {
                     continue;
                 }
-                var i = queryFields[mp.ResultName.ToLower()];
+                var i = queryFields[mp.ResultName.ToLower()].index;
                 var pro = fields[mp.ResultName].GetPropertyInfo();
                 var endIfLabel = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldloc, result);

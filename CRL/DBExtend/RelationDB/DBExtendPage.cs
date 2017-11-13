@@ -88,7 +88,9 @@ namespace CRL.DBExtend.RelationDB
                 var table = TypeCache.GetTable(query1.__MainType);
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
-            var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
+            //var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "");
+            rowOver = _DBAdapter.SqlFormat(rowOver);
+            var orderBy = rowOver;
             var sb = new StringBuilder();
             query1.GetQueryConditions(sb);
             var condition = sb.ToString();
@@ -98,24 +100,24 @@ namespace CRL.DBExtend.RelationDB
 
             var pageIndex = query1.SkipPage;
             var pageSize = query1.TakeNum;
-            pageIndex = pageIndex == 0 ? 1 : pageIndex;
-            pageSize = pageSize == 0 ? 15 : pageSize;
-            string countSql = string.Format("select count(*) from {0}", condition);
+            pageIndex = pageIndex <= 0 ? 1 : pageIndex;
+            pageSize = pageSize <= 0 ? 15 : pageSize;
+            string countSql = string.Format("select count(*) {0}", condition);
             var db = GetDBHelper(AccessType.Read);
             int count = Convert.ToInt32(SqlStopWatch.ExecScalar(db, countSql));
             query1.ExecuteTime += db.ExecuteTime;
             query1.RowCount = count;
-            //if (count == 0)
-            //{
-            //    return null;
-            //}
+            if (count == 0)
+            {
+                return null;
+            }
             int pageCount = (count + pageSize - 1) / pageSize;
             if (pageIndex > pageCount)
                 pageIndex = pageCount;
 
             var start = pageSize * (pageIndex - 1) + 1;
             var end = start + pageSize - 1;
-            string sql = _DBAdapter.PageSqlFormat(fields, rowOver, condition, start, end, orderBy);
+            string sql = _DBAdapter.PageSqlFormat(db,fields, rowOver, condition, start, end, orderBy);
             var reader = new CallBackDataReader(db.ExecDataReader(sql), () =>
             {
                 return count;
@@ -216,22 +218,22 @@ namespace CRL.DBExtend.RelationDB
             pageIndex = pageIndex == 0 ? 1 : pageIndex;
             pageSize = pageSize == 0 ? 15 : pageSize;
 
-            string countSql = string.Format("select count(*)  from (select count(*) as a from {0}) t", condition);
+            string countSql = string.Format("select count(*)  from (select count(*) as a {0}) t", condition);
             var db = GetDBHelper(AccessType.Read);
             int count = Convert.ToInt32(SqlStopWatch.ExecScalar(db, countSql));
             query1.ExecuteTime += db.ExecuteTime;
             query1.RowCount = count;
-            //if (count == 0)
-            //{
-            //    return null;
-            //}
+            if (count == 0)
+            {
+                return null;
+            }
             int pageCount = (count + pageSize - 1) / pageSize;
             if (pageIndex > pageCount)
                 pageIndex = pageCount;
 
             var start = pageSize * (pageIndex - 1) + 1;
             var end = start + pageSize - 1;
-            string sql = _DBAdapter.PageSqlFormat(fields, rowOver, condition, start, end, "");
+            string sql = _DBAdapter.PageSqlFormat(db,fields, rowOver, condition, start, end, "");
             //System.Data.Common.DbDataReader reader;
             //reader = dbHelper.ExecDataReader(sql);
             var reader = new CallBackDataReader(db.ExecDataReader(sql), () =>

@@ -62,8 +62,15 @@ namespace CRL
             var el = Run(() =>
              {
                  var reader = func1();
-                 sql = reader.Sql;
-                 list = func2(reader);
+                 if (reader != null)
+                 {
+                     sql = reader.Sql;
+                     list = func2(reader);
+                 }
+                 else
+                 {
+                     list = Activator.CreateInstance<T>();
+                 }
              });
             var n = 0;
             if(list!=null)

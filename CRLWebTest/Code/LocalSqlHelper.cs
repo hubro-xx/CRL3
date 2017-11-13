@@ -31,13 +31,21 @@ namespace WebTest.Code
             return new CoreHelper.SqlHelper(connString);
 
             ////mysql
-            //connString = "Server=127.0.0.1;Port=3306;Stmt=;Database=testDB; User=root;Password=;";
+            //connString = "Server=127.0.0.1;Port=3306;Stmt=;Database=testDB; User=root;Password=123456;";
             //return new CoreHelper.MySqlHelper(connString);
 
             //oracle
             //connString = "Data Source={0};User ID={1};Password={2};Integrated Security=no;";
             //connString = string.Format(connString, "orcl", "SCOTT", "a123");
             //return new CoreHelper.OracleHelper(connString);
+        }
+        public static CoreHelper.DBHelper MysqlConnection
+        {
+            get
+            {
+                var connString = CoreHelper.CustomSetting.GetConnectionString("Mysql");
+                return new CoreHelper.MySqlHelper(connString);
+            }
         }
         public static CoreHelper.DBHelper TestConnection
         {

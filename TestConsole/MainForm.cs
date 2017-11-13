@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SqlSugar;
 using CRL;
+using System.Drawing.Drawing2D;
+
 namespace TestConsole
 {
     public partial class MainForm : Form
@@ -33,6 +35,7 @@ namespace TestConsole
             methods.Add("CRLQueryTest", MappingSpeedTest.CRLQueryTest);
             methods.Add("CRLSQLQueryTest(SQL)", MappingSpeedTest.CRLSQLQueryTest);
         }
+
         private async void MainForm_Load(object sender, EventArgs e)
         {
             //TestConsole.CRLManage.Instance.QueryItem(b => b.Id > 0);
@@ -217,6 +220,31 @@ namespace TestConsole
             }
             var n3 = GC.GetTotalMemory(false) - n2;
             txtResult.Text = (n3 / 1024).ToString();
+        }
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            //base.OnPaintBackground(e);
+            Graphics g = e.Graphics;
+            Color FColor = Color.White;
+            Color TColor = Color.FromArgb(192, 229, 245);
+
+            Brush b = new LinearGradientBrush(this.ClientRectangle, FColor, TColor, LinearGradientMode.Vertical);
+
+
+            g.FillRectangle(b, this.ClientRectangle);
+        }
+        protected override void OnResize(EventArgs e)
+        {
+            this.Invalidate();//重绘窗体
+            //base.OnResize(e);
+        }
+        private void Form2_Paint(object sender, PaintEventArgs e)
+        {
+            
+        }
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            //this.Invalidate();//重绘窗体
         }
     }
 }

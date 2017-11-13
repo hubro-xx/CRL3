@@ -264,30 +264,6 @@ namespace CRL.DBAdapter
         public abstract string SqlFormat(string sql);
         #endregion
 
-        ///// <summary>
-        ///// page
-        ///// </summary>
-        ///// <param name="query"></param>
-        ///// <param name="fields"></param>
-        ///// <param name="sort"></param>
-        ///// <param name="pageSize"></param>
-        ///// <param name="pageIndex"></param>
-        ///// <returns></returns>
-        //internal virtual CallBackDataReader GetPageData(string query, string fields, string sort, int pageSize, int pageIndex)
-        //{
-        //    helper.AddParam("query_", query);
-        //    helper.AddParam("fields_", fields);
-        //    helper.AddParam("sort_", sort);
-        //    helper.AddParam("pageSize_", pageSize);
-        //    helper.AddParam("pageIndex_", pageIndex);
-        //    helper.AddOutParam("count_",1);
-        //    //var reader = helper.RunDataReader("sp_page");
-        //    var reader = new CallBackDataReader(helper.RunDataReader("sp_page"), () =>
-        //    {
-        //        return Convert.ToInt32(helper.GetOutParam("count_"));
-        //    }, query);
-        //    return reader;
-        //}
         #region 函数语法
         public virtual string SubstringFormat(string field, int index, int length)
         {
@@ -376,6 +352,7 @@ namespace CRL.DBAdapter
         /// <summary>
         /// 分页SQL 默认为MSSQL
         /// </summary>
+        /// <param name="db"></param>
         /// <param name="fields"></param>
         /// <param name="rowOver"></param>
         /// <param name="condition"></param>
@@ -383,9 +360,9 @@ namespace CRL.DBAdapter
         /// <param name="end"></param>
         /// <param name="sort"></param>
         /// <returns></returns>
-        public virtual string PageSqlFormat(string fields, string rowOver, string condition,int start,int end,string sort)
+        public virtual string PageSqlFormat(CoreHelper.DBHelper db, string fields, string rowOver, string condition,int start,int end,string sort)
         {
-            string sql = "SELECT * FROM (select {0},ROW_NUMBER() OVER ( Order by {1} ) AS RowNumber From {2}) T WHERE T.RowNumber BETWEEN {3} AND {4} order by RowNumber";
+            string sql = "SELECT * FROM (select {0},ROW_NUMBER() OVER ( Order by {1} ) AS RowNumber {2}) T WHERE T.RowNumber BETWEEN {3} AND {4} order by RowNumber";
             return string.Format(sql, fields, rowOver, condition, start, end);
         }
         /// <summary>
@@ -414,6 +391,27 @@ namespace CRL.DBAdapter
             string table = string.Format("{0} t1", KeyWordFormat(t1), KeyWordFormat(t2));
             string sql = string.Format("delete t1 from {0} {1}", table, condition);
             return sql;
+        }
+        public virtual string GetFieldConcat(string field,object value,Type type)
+        {
+            string str;
+            if (type == typeof(string))
+            {
+                str = string.Format("{0}+'{1}'", field, value);
+            }
+            else
+            {
+                str = string.Format("{0}+{1}", field, value);
+            }
+            return str;
+        }
+        /// <summary>
+        /// 参数名
+        /// </summary>
+        public virtual string GetParamName(string name,object index)
+        {
+            return string.Format("@{0}{1}", name,index);
+
         }
     }
 }

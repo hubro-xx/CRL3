@@ -44,7 +44,7 @@ namespace CRL.DBExtend.RelationDB
                     var field = fields[name];
                     string value1 = value.ToString();
                     //未处理空格
-                    value1 = System.Text.RegularExpressions.Regex.Replace(value1, name + @"([\+\-])", field.MapingName + "$1", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    value1 = System.Text.RegularExpressions.Regex.Replace(value1, name + @"([\+\-])", _DBAdapter.KeyWordFormat(field.MapingName) + "$1", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                     name = field.MapingName;
                     value = value1;
                     setString += string.Format(" {0}={1},", _DBAdapter.KeyWordFormat(name), value);
@@ -83,6 +83,10 @@ namespace CRL.DBExtend.RelationDB
                         AddParam(name, value);
                         dbContext.parIndex += 1;
                         value = parame;
+                        if (joinType != null)//mysql 修正
+                        {
+                            name = string.Format("t1.{0}", name);
+                        }
                     }
                     setString += string.Format(" {0}={1},", name, value);
 

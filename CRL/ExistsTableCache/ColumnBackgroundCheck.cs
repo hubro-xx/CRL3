@@ -51,7 +51,10 @@ namespace CRL.ExistsTableCache
             {
                 DoCheck();
             }
-            catch { }
+            catch(Exception ero)
+            {
+                CoreHelper.EventLog.Log("检查列时发生错误:"+ero,"ColumnCheck");
+            }
             #endregion
         }
         static void DoCheck()
@@ -67,7 +70,7 @@ namespace CRL.ExistsTableCache
                 var table = TypeCache.GetTable(item.Key);
                 var _DBAdapter = DBAdapter.DBAdapterBase.GetDBAdapterBase(db.dbContext);
                 var sql = _DBAdapter.GetTableFields(table.TableName);
-                var allFileds = db.ExecDictionary<string, int>(sql);
+                var allFileds = db.ExecDictionary<string, string>(sql);
                 var allFileds2 = new Dictionary<string, int>();
                 foreach(var f in allFileds)
                 {

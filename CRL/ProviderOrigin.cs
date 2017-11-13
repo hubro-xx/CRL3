@@ -226,7 +226,7 @@ namespace CRL
         /// </summary>
         /// <param name="list"></param>
         /// <param name="keepIdentity"></param>
-        public virtual void Add(List<TModel> list, bool keepIdentity = false)
+        public virtual void Add<T>(List<T> list, bool keepIdentity = false) where T : IModel, new()
         {
             BatchInsert(list, keepIdentity);
         }
@@ -235,7 +235,7 @@ namespace CRL
         /// </summary>
         /// <param name="list"></param>
         /// <param name="keepIdentity">是否保持自增主键</param>
-        public virtual void BatchInsert(List<TModel> list, bool keepIdentity = false)
+        public virtual void BatchInsert<T>(List<T> list, bool keepIdentity = false) where T : IModel, new()
         {
             AbsDBExtend db = DBExtend;
             db.BatchInsert(list, keepIdentity);
@@ -355,7 +355,7 @@ namespace CRL
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int Delete(IModel obj)
+        public int Delete(TModel obj)
         {
             var db = DBExtend;
             var v = obj.GetpPrimaryKeyValue();
@@ -443,7 +443,7 @@ namespace CRL
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public int Update(TModel item)
+        public int Update<T>(T item) where T : IModel, new()
         {
             AbsDBExtend db = DBExtend;
             return db.Update(item);
@@ -747,6 +747,7 @@ namespace CRL
                 {
                     CallContext.SetData(Base.UseTransactionScopeName, false);
                     error = "提交事务时发生错误:" + ero.Message;
+                    CoreHelper.EventLog.Log("提交事务时发生错误:" + ero, "Trans");
                     return false;
                 }
             }

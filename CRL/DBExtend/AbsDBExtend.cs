@@ -885,7 +885,7 @@ namespace CRL
         }
         internal ParameCollection GetUpdateField<TModel>(TModel obj) where TModel : IModel, new()
         {
-            var c = obj.GetUpdateField();
+            var c = obj.GetUpdateField(_DBAdapter);
             
             if (c.Count() > 0 && obj.GetOriginClone() != null)//只有克隆过的才进行检查
             {

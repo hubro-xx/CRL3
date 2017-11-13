@@ -329,7 +329,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         #region 系统查询
         public override string GetAllTablesSql(string db)
         {
-            return "SELECT lower(table_name),1 FROM user_TABLES";
+            return "SELECT lower(table_name),table_name FROM user_TABLES";
         }
         public override string GetAllSPSql(string db)
         {
@@ -367,31 +367,6 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             get
             {
                 throw new NotSupportedException("ORACLE不支持动态创建存储过程");
-                string str = @"
-create or replace PROCEDURE {name}
-( 
-	{parame}
-) 
-
-BEGIN
- if pageSize<=1 then 
-  set pageSize=20;
- end if;
- if pageIndex < 1 then 
-  set pageIndex = 1; 
- end if;
- 
- set @strsql = concat('select {fields} from {sql} order by {sort} limit ',_pageIndex*_pageSize-_pageSize,',',_pageSize); 
- prepare stmtsql from @strsql; 
- execute stmtsql; 
- deallocate prepare stmtsql;
- set @strsqlcount='select count(1) as count from {sql}';
- prepare stmtsqlcount from @strsqlcount; 
- execute stmtsqlcount; 
- deallocate prepare stmtsqlcount; 
-END
-";
-                return str;
             }
         }
 
@@ -400,32 +375,6 @@ END
             get
             {
                 throw new NotSupportedException("ORACLE不支持动态创建存储过程");
-                string str = @"
-create or replace PROCEDURE {name}
-( 
-	{parame}
-) 
-
-BEGIN
- if pageSize<=1 then 
-  set pageSize=20;
- end if;
- if pageIndex < 1 then 
-  set pageIndex = 1; 
- end if;
- 
- set @strsql = concat('select {fields} from {sql} order by {sort} limit ',_pageIndex*_pageSize-_pageSize,',',_pageSize); 
- prepare stmtsql from @strsql; 
- execute stmtsql; 
- deallocate prepare stmtsql;
- set @strsqlcount='select count(1) as count from {sql}';
- prepare stmtsqlcount from @strsqlcount; 
- execute stmtsqlcount; 
- deallocate prepare stmtsqlcount; 
-END
-
-";
-                return str;
             }
         }
 
@@ -434,14 +383,6 @@ END
             get
             {
                 throw new NotSupportedException("ORACLE不支持动态创建存储过程");
-                string str = @"
-CREATE PROCEDURE {name}
-({parame})
-begin
-	{sql};
-end
-";
-                return str;
             }
         }
         public override string SqlFormat(string sql)

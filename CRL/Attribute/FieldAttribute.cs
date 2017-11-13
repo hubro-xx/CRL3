@@ -165,7 +165,7 @@ namespace CRL.Attribute
                 //query += "{" + ModelType.FullName + "}";
                 query = usePrefix;
             }
-            var FieldMapping = new FieldMapping() { FieldName = MapingName, ResultName = memberName };
+            var FieldMapping = new FieldMapping() { FieldName = MapingName, ResultName = memberName, PropertyType = PropertyType };
             if (string.IsNullOrEmpty(fieldName))
             {
                 fieldName = withTablePrefix ? MapingName : _DBAdapter.FieldNameFormat(this);
@@ -347,6 +347,7 @@ namespace CRL.Attribute
         /// 返回的名称
         /// </summary>
         public string ResultName = "";
+        public Type PropertyType;
         ///// <summary>
         ///// 属性名 Id
         ///// </summary>

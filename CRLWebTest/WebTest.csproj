@@ -167,6 +167,7 @@
     <Compile Include="Code\Sharding\MemberManage.cs" />
     <Compile Include="Code\Sharding\OrderManage.cs" />
     <Compile Include="Code\TestAll.cs" />
+    <Compile Include="Code\TestEntityCRL.cs" />
     <Compile Include="CRLExpressionTest.aspx.cs">
       <DependentUpon>CRLExpressionTest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -471,6 +472,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DBConnection\mongodb.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DBConnection\Mysql.config">
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
