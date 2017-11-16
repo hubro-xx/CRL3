@@ -161,7 +161,7 @@ namespace CRL
         ///检测数据
         /// </summary>
         /// <param name="obj"></param>
-        internal void CheckData(IModel obj)
+        internal void CheckData(IModel obj, bool checkRepeated=true)
         {
             //var types = CRL.TypeCache.GetProperties(obj.GetType(), true).Values;
             var types = TypeCache.GetTable(obj.GetType()).Fields;
@@ -189,7 +189,7 @@ namespace CRL
                     }
                 }
             }
-            if (obj.CheckRepeatedInsert)
+            if (obj.CheckRepeatedInsert && checkRepeated)
             {
                 //string concurrentKey = "insertRepeatedCheck_" + CoreHelper.StringHelper.EncryptMD5(sb.ToString());
                 string concurrentKey = "insertRepeatedCheck_" + sb.ToString().GetHashCode();

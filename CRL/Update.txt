@@ -350,3 +350,7 @@
 	版本升为4.51
 	MySql升级到最新版,所有查询实现,测试通过
 	优化分页返回,count为0时不再二次查询
+2017-11-14
+	增加异步插入方法
+	public virtual void Add(TModel p, bool asyn = false)
+	为TRUE时,会使用消息队列定时批量插入

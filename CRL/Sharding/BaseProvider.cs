@@ -62,12 +62,13 @@ namespace CRL.Sharding
         /// 插入对象
         /// </summary>
         /// <param name="p"></param>
-        public override void Add(TModel p)
+        /// <param name="asyn"></param>
+        public override void Add(TModel p, bool asyn = false)
         {
             //todo 判断主数据索引是不是在当前定位
             var dataIndex = Convert.ToInt32(p.GetpPrimaryKeyValue());
             SetLocation(dataIndex);
-            base.Add(p);
+            base.Add(p, asyn);
         }
         public override void BatchInsert<T>(List<T> list, bool keepIdentity = false)
         {

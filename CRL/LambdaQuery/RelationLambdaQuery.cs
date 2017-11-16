@@ -82,7 +82,7 @@ namespace CRL.LambdaQuery
             {
                 return this;
             }
-            var field = new Attribute.FieldMapping() { QueryField = GetPrefix() + key.MapingName };
+            var field = new Attribute.FieldMapping() { QueryField = GetPrefix() + key.MapingName, PropertyType = key.PropertyType };
             SetOrder(field, desc);
             //if (!string.IsNullOrEmpty(__QueryOrderBy))
             //{

@@ -12,6 +12,8 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Transactions;
 using CRL.LambdaQuery;
+using System.Messaging;
+
 namespace CRL
 {
     /// <summary>
@@ -212,15 +214,87 @@ namespace CRL
         }
 
         #region 添加
+        #region 异步队列
+        static MessageQueue msmq;
+        static string pathLocal = @".\Private$\crlqueue";
+        static System.Timers.Timer timer;
+        static bool timerRuning = false;
+        void MessageQueueWork()
+        {
+            if(timerRuning)
+            {
+                return;
+            }
+            timerRuning = true;
+            var msgs = msmq.GetAllMessages();
+            if (msgs.Length == 0)
+            {
+                timerRuning = false;
+                return;
+            }
+            //msmq.Purge();
+            var list = new List<TModel>();
+            foreach (var msg in msgs)
+            {
+                list.Add(msg.Body as TModel);
+            }
+            try
+            {
+                BatchInsert(list);
+                foreach (var msg in msgs)
+                {
+                    msmq.ReceiveById(msg.Id);
+                }
+            }
+            catch { }
+            timerRuning = false;
+        }
+        #endregion
         /// <summary>
         /// 添加一条记录[基本方法]
+        /// 异步时,会定时执行批量插入,依赖MSMQ服务
         /// </summary>
         /// <param name="p"></param>
-        public virtual void Add(TModel p)
+        /// <param name="asyn">异步插入</param>
+        public virtual void Add(TModel p, bool asyn = false)
         {
+            #region MQ初始
+            if (asyn)
+            {
+                if (msmq == null)
+                {
+                    pathLocal = string.Format(@".\Private$\CRL_{0}", typeof(TModel).FullName);
+                    if (MessageQueue.Exists(pathLocal))
+                    {
+                        msmq = new MessageQueue(pathLocal);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            msmq = MessageQueue.Create(pathLocal, false);
+                        }
+                        catch (Exception ero)
+                        {
+                            throw new CRLException("创建MessageQueue失败,请检查MSMQ服务安装正确" + ero.Message);
+                        }
+                    }
+                    msmq.Formatter = new XmlMessageFormatter(new Type[] { typeof(TModel) });
+                    timer = new System.Timers.Timer(5000);
+                    timer.Elapsed += (a, b) =>
+                    {
+                        MessageQueueWork();
+                    };
+                    timer.Start();
+                }
+                msmq.Send(p, "CRLQueue");
+                return;
+            }
+            #endregion
             AbsDBExtend db = DBExtend;
             db.InsertFromObj(p);
         }
+        
         /// <summary>
         /// 批量插入[基本方法]
         /// </summary>
@@ -304,39 +378,7 @@ namespace CRL
             AbsDBExtend db = GetDBExtend();
             return db.QueryList<TModel>(expression, compileSp);
         }
-        /**
-        /// <summary>
-        /// 指定条件查询[基本方法]
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public List<TModel> QueryList(LambdaQuery<TModel> query)
-        {
-            DBExtend db = GetDbHelper();//避开事务控制,使用新的连接
-            return db.QueryList<TModel>(query);
-        }
-        /// <summary>
-        /// 返回动态对象的查询
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public List<dynamic> QueryDynamic(LambdaQuery<TModel> query)
-        {
-            DBExtend db = DBExtend;
-            return db.QueryDynamic<TModel>(query);
-        }
-        /// <summary>
-        /// 返回指定类型
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public List<TResult> QueryDynamic<TResult>(LambdaQuery<TModel> query) where TResult : class,new()
-        {
-            DBExtend db = DBExtend;
-            return db.QueryDynamic<TModel, TResult>(query);
-        }
-        **/
+        
         #endregion
 
         #region 删除

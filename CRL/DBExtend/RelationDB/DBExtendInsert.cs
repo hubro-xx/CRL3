@@ -30,7 +30,7 @@ namespace CRL.DBExtend.RelationDB
             foreach (TModel item in details)
             {
                 //item.CheckRepeatedInsert = false;
-                CheckData(item);
+                CheckData(item, false);
             }
             _DBAdapter.BatchInsert(dbContext, details, keepIdentity);
             //var type = typeof(TModel);
