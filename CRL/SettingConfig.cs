@@ -57,6 +57,7 @@ namespace CRL
         {
             MemoryDataCache.CacheService.Clear();
         }
+        #region 设置
         /// <summary>
         /// 是否使用属性更改通知
         /// 如果使用了,在查询时就不设置源对象克隆
@@ -83,6 +84,19 @@ namespace CRL
         /// </summary>
         public static bool UseReadSeparation = false;
 
+        /// <summary>
+        /// 是否记录SQL语句调用
+        /// </summary>
+        public static bool LogSql = true;
+        /// <summary>
+        /// 生成参数是否与字段名一致
+        /// </summary>
+        public static bool FieldParameName = false;
+        /// <summary>
+        /// 是否替换SQL拼接参数
+        /// </summary>
+        public static bool ReplaceSqlParameter = false;//生成存储过程时不能替换
+        #endregion
     }
 
 

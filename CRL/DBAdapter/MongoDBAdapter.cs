@@ -142,5 +142,10 @@ namespace CRL.DBAdapter
         {
             throw new NotImplementedException();
         }
+
+        public override string GetParamName(string name, object index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

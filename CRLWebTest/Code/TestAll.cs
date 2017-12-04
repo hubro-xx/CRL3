@@ -72,7 +72,7 @@ namespace WebTest.Code
             query.Where(b => b.Id.ToString() == "123");//支持Cast转换
             query.Where(b => Convert.ToString(b.Id) == "123");//支持Cast转换
             query.Where(b => int.Parse(b.InterFaceUser) == 123);//支持Cast转换
-            query.Where(b => b.CategoryName != null);
+            //query.Where(b => b.CategoryName != null);
             query.Page(2, 1);
             query.OrderBy(b => b.Id * 1);
             var result = query.ToList();

@@ -28,11 +28,13 @@ namespace WebTest
             CRL.Package.SettingConfig.OnlinePayOrderRefund = (order) =>
                 {
                 };
+            CRL.SettingConfig.FieldParameName = true;
+            CRL.SettingConfig.ReplaceSqlParameter = true;
             //配置数据连接
             CRL.SettingConfig.GetDbAccess = (dbLocation) =>
             {
                 var obj = dbLocation.TagData;
-                return Code.LocalSqlHelper.MysqlConnection;
+                //return Code.LocalSqlHelper.MysqlConnection;
                 if (dbLocation.ShardingDataBase != null)//按分库判断
                 {
                     if (dbLocation.ShardingDataBase.Name == "db1")
@@ -52,7 +54,7 @@ namespace WebTest
                     {
                         return Code.LocalSqlHelper.MongoDB;
                     }
-                    if (dbLocation.AccessType == CRL.AccessType.Read)
+                    if (dbLocation.DataAccessType == CRL.DataAccessType.Read)
                     {
                         return Code.LocalSqlHelper.TestConnection2;
                     }

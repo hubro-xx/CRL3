@@ -26,10 +26,6 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override List<dynamic> ExecDynamicList(string sql, params Type[] types)
         {
-            //var reader = GetDataReader(sql, types);
-            //double runTime;
-            //return Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, out runTime);
-
             var list = SqlStopWatch.ReturnData(() =>
             {
                 return GetDataReader(sql, types);
@@ -54,7 +50,7 @@ namespace CRL.DBExtend.RelationDB
             //return Dynamic.DynamicObjConvert.DataReaderToDynamic(reader,out runTime);
             var list = SqlStopWatch.ReturnList(() =>
             {
-                var db = GetDBHelper(AccessType.Read);
+                var db = GetDBHelper(DataAccessType.Read);
                 var reader = db.RunDataReader(sp);
                 return Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, out runTime);
             }, sp);
@@ -266,7 +262,7 @@ namespace CRL.DBExtend.RelationDB
             sql = _DBAdapter.SqlFormat(sql);
             System.Data.Common.DbDataReader reader;
             var compileSp = query.__CompileSp;
-            var db = GetDBHelper(AccessType.Read);
+            var db = GetDBHelper(DataAccessType.Read);
             if (!compileSp)
             {
                 if (query.TakeNum > 0)

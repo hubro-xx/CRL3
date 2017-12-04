@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CoreHelper;
 
 namespace CRL.DBAdapter
 {
@@ -460,7 +461,7 @@ SET {2} {3}", table, arry[0], setValue, arry.Length > 1 ? (" where " + arry[1]) 
                 return string.Format("{0}+{1}", field, value);
             }
         }
-        public virtual string GetParamName(string name, object index)
+        public override string GetParamName(string name, object index)
         {
             return string.Format("?{0}{1}", name, index);
         }

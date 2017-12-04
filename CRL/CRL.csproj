@@ -210,6 +210,7 @@
     <Compile Include="ProviderOrigin.cs" />
     <Compile Include="Runtime\RunTimeCache.cs" />
     <Compile Include="Runtime\RunTimeService.cs" />
+    <Compile Include="DbSet.cs" />
     <Compile Include="SettingConfig.cs" />
     <Compile Include="Attribute\TableAttribute.cs" />
     <Compile Include="Sharding\BaseProvider.cs" />

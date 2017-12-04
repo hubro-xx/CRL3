@@ -64,8 +64,8 @@ namespace Shopping.Web.Controllers
         #endregion
         public ActionResult Product(int page = 1, int pageSize = 15)
         {
-            var query = ProductManage.Instance.GetLambdaQuery();
-            query.Where(b => b.SupplierId == CurrentUser.Id);
+            var sup = SupplierManage.Instance.GetCurrent();
+            var query = ProductManage.Instance.GetLambdaQuery().Where(b => b.SupplierId == sup.Id);
             query.Page(pageSize, page);
             
             query.OrderBy(b => b.Id, false);

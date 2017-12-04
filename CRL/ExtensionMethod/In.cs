@@ -25,7 +25,7 @@ namespace CRL
         /// <returns></returns>
         public static bool In(this string origin, params string[] values)
         {
-            return true;
+            return values.Contains(origin);
         }
         /// <summary>
         /// 表示in
@@ -36,7 +36,7 @@ namespace CRL
         /// <returns></returns>
         public static bool In<T>(this T origin, params T[] values) where T : struct
         {
-            return true;
+            return values.Contains(origin);
         }
         /// <summary>
         /// 表示in
@@ -45,9 +45,9 @@ namespace CRL
         /// <param name="origin"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public static bool In<T>(this Nullable<T> origin, params T[] values) where T : struct
+        public static bool In<T>(this T? origin, params T[] values) where T : struct
         {
-            return true;
+            return values.Contains(origin.Value);
         }
         
     }

@@ -51,7 +51,7 @@ namespace CRL.DBExtend.RelationDB
             var cacheTime = query.__ExpireMinute;
             var compileSp = query.__CompileSp;
             double runTime = 0;
-            var db = GetDBHelper(AccessType.Read);
+            var db = GetDBHelper(DataAccessType.Read);
             if (cacheTime <= 0)
             {
                 list = SqlStopWatch.ReturnList(() =>
@@ -86,7 +86,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 SetOriginClone(list);
             }
-            query = null;
+            //query = null;
             return list;
         }
        
@@ -100,7 +100,10 @@ namespace CRL.DBExtend.RelationDB
             LambdaQuery<TModel> query = new RelationLambdaQuery<TModel>(dbContext, true);
             query.Select(selectField.Body);
             query.__FieldFunctionFormat = string.Format("{0}({1}) as Total", functionType, "{0}");
-            query.Where(expression);
+            if (expression != null)
+            {
+                query.Where(expression);
+            }
             var result = QueryScalar(query);
             if (result == null || result is DBNull)
             {

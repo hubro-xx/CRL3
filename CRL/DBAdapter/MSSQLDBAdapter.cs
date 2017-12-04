@@ -580,6 +580,10 @@ set  nocount  on
             type = string.Format(type, 100);
             return string.Format("CAST({0} as {1})", field, type);
         }
+        public override string GetParamName(string name, object index)
+        {
+            return string.Format("@{0}{1}", name, index);
+        }
     }
 
     internal class MSSQL2000DBAdapter : MSSQLDBAdapter

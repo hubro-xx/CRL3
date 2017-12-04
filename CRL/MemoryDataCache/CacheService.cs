@@ -157,10 +157,19 @@ namespace CRL.MemoryDataCache
             //首次查询
             if (dataItem.QueryCount == 0)
             {
-                var data = QueryData(key, type, query, mapping, helper);
-                dataItem.Data = ObjectConvert.ConvertToDictionary<TItem>(data);
-                dataItem.Count = data.Count;
-                dataItem.QueryCount = 1;
+                try
+                {
+                    var data = QueryData(key, type, query, mapping, helper);
+                    dataItem.Data = ObjectConvert.ConvertToDictionary<TItem>(data);
+                    dataItem.Count = data.Count;
+                    dataItem.QueryCount = 1;
+                }
+                catch(Exception ero)
+                {
+                    MemoryDataCacheItem item;
+                    cacheDatas.TryRemove(key,out item);
+                    throw ero;
+                }
             }
 
             if (timer == null)
@@ -242,7 +251,7 @@ namespace CRL.MemoryDataCache
                 var keys = GetCacheTypeKey(type);
                 foreach (var key in keys)
                 {
-                    MemoryDataCache.MemoryDataCacheItem val;
+                    MemoryDataCacheItem val;
                     cacheDatas.TryRemove(key,out val);
                 }
             }

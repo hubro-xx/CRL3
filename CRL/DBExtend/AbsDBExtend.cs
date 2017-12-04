@@ -30,7 +30,7 @@ namespace CRL
             GUID = Guid.NewGuid();
             __DbHelper = _helper;
         }
-        protected DBHelper GetDBHelper(AccessType accessType = AccessType.Default)
+        protected DBHelper GetDBHelper(DataAccessType accessType = DataAccessType.Default)
         {
             if (!SettingConfig.UseReadSeparation)//不使用主从时
             {
@@ -440,23 +440,39 @@ namespace CRL
         /// <typeparam name="TJoin"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public abstract int Delete<TModel, TJoin>(System.Linq.Expressions.Expression<Func<TModel, TJoin, bool>> expression)
+        public int Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
             where TModel : CRL.IModel, new()
-            where TJoin : CRL.IModel, new();
+            where TJoin : CRL.IModel, new()
+        {
+            var query = CreateLambdaQuery<TModel>();
+            query.Join(expression);
+            return Delete(query);
+        }
         /// <summary>
         /// 按条件删除
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public abstract int Delete<TModel>(System.Linq.Expressions.Expression<Func<TModel, bool>> expression) where TModel : CRL.IModel, new();
+        public int Delete<TModel>(Expression<Func<TModel, bool>> expression) where TModel : CRL.IModel, new()
+        {
+            var query = CreateLambdaQuery<TModel>();
+            query.Where(expression);
+            return Delete(query);
+        }
         /// <summary>
         /// 按主键删除
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public abstract int Delete<TModel>(object id) where TModel : CRL.IModel, new();
+        public int Delete<TModel>(object id) where TModel : CRL.IModel, new()
+        {
+            var query = CreateLambdaQuery<TModel>();
+            var exp = Base.GetQueryIdExpression<TModel>(id);
+            query.Where(exp);
+            return Delete(query);
+        }
         #endregion
 
         #region 杂项查询
@@ -544,7 +560,7 @@ namespace CRL
         /// <returns></returns>
         public int Count<TType>(Expression<Func<TType, bool>> expression, bool compileSp = false) where TType : IModel, new()
         {
-            return GetFunction<int, TType>(expression, b => 0, FunctionType.COUNT, compileSp);
+            return GetFunction(expression, b => 0, FunctionType.COUNT, compileSp);
         }
 
         #endregion
@@ -561,7 +577,7 @@ namespace CRL
         /// <returns></returns>
         public TType Min<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false) where TModel : IModel, new()
         {
-            return GetFunction<TType, TModel>(expression, field, FunctionType.MIN, compileSp);
+            return GetFunction(expression, field, FunctionType.MIN, compileSp);
         }
         #endregion
 
@@ -577,7 +593,7 @@ namespace CRL
         /// <returns></returns>
         public TType Max<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false) where TModel : IModel, new()
         {
-            return GetFunction<TType, TModel>(expression, field, FunctionType.MAX, compileSp);
+            return GetFunction(expression, field, FunctionType.MAX, compileSp);
         }
 
         #endregion
@@ -594,7 +610,7 @@ namespace CRL
         /// <returns></returns>
         public TType Sum<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false) where TModel : IModel, new()
         {
-            return GetFunction<TType, TModel>(expression, field, FunctionType.SUM, compileSp);
+            return GetFunction(expression, field, FunctionType.SUM, compileSp);
         }
         //public TType Sum<TType, TModel>(Expression<Func<TModel, bool>> expression, string field, bool compileSp = false) where TModel : IModel, new()
         //{
@@ -789,9 +805,14 @@ namespace CRL
         /// <param name="expression"></param>
         /// <param name="updateValue"></param>
         /// <returns></returns>
-        public abstract int Update<TModel, TJoin>(System.Linq.Expressions.Expression<Func<TModel, TJoin, bool>> expression, CRL.ParameCollection updateValue)
+        public int Update<TModel, TJoin>(System.Linq.Expressions.Expression<Func<TModel, TJoin, bool>> expression, CRL.ParameCollection updateValue)
             where TModel : CRL.IModel, new()
-            where TJoin : CRL.IModel, new();
+            where TJoin : CRL.IModel, new()
+        {
+            var query = CreateLambdaQuery<TModel>();
+            query.Join(expression);
+            return Update(query, updateValue);
+        }
         /// <summary>
         /// 使用完整查询更新
         /// </summary>
@@ -799,7 +820,7 @@ namespace CRL
         /// <param name="query"></param>
         /// <param name="updateValue"></param>
         /// <returns></returns>
-        public abstract int Update<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query, CRL.ParameCollection updateValue) where TModel : CRL.IModel, new();
+        public abstract int Update<TModel>(LambdaQuery.LambdaQuery<TModel> query, CRL.ParameCollection updateValue) where TModel : CRL.IModel, new();
         /// <summary>
         /// 指定条件和参数进行更新
         /// </summary>
@@ -807,7 +828,7 @@ namespace CRL
         /// <param name="expression"></param>
         /// <param name="setValue"></param>
         /// <returns></returns>
-        public int Update<TModel>(System.Linq.Expressions.Expression<Func<TModel, bool>> expression, CRL.ParameCollection setValue) where TModel : CRL.IModel, new()
+        public int Update<TModel>(Expression<Func<TModel, bool>> expression, CRL.ParameCollection setValue) where TModel : CRL.IModel, new()
         {
             var query = CreateLambdaQuery<TModel>();
             query.Where(expression);
@@ -863,7 +884,28 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public abstract int Update<TModel>(TModel obj) where TModel : CRL.IModel, new();
+        public int Update<TModel>(TModel obj) where TModel : CRL.IModel, new()
+        {
+            var c = GetUpdateField(obj);
+            if (c.Count == 0)
+            {
+                return 0;
+                //throw new CRLException("更新集合为空");
+            }
+            var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
+            var keyValue = primaryKey.GetValue(obj);
+            var query = CreateLambdaQuery<TModel>();
+            var exp = Base.GetQueryIdExpression<TModel>(keyValue);
+            query.Where(exp);
+            var n = Update(query, c);
+            UpdateCacheItem(obj, c);
+            if (n == 0)
+            {
+                throw new CRLException("更新失败,找不到主键为 " + keyValue + " 的记录");
+            }
+            obj.CleanChanges();
+            return n;
+        }
         #endregion
 
         /// <summary>

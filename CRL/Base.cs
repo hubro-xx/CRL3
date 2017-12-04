@@ -243,6 +243,10 @@ namespace CRL
         }
         internal static void SaveSQLRunningtme(string sql, long n, int rowCount = 1)
         {
+            if(!SettingConfig.LogSql)
+            {
+                return;
+            }
             if(sql.Contains(" IN ("))
             {
                 return;

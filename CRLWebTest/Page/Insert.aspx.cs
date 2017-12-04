@@ -24,9 +24,9 @@ namespace WebTest
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            var item = new Code.ProductData() { InterFaceUser = "2222", ProductName = "product2", BarCode = "1212122",UserId=1,Number=10 };
+            var item = new Code.ProductData() { InterFaceUser = "2222", ProductName = "product2"+DateTime.Now.Second, BarCode = "1212122",UserId=1,Number=10 };
 
-            Code.ProductDataManage.Instance.Add(item);
+            Code.ProductDataManage.Instance.Add(item,true);
         }
 
         protected void Button2_Click(object sender, EventArgs e)

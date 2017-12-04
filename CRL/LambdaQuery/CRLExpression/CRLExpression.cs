@@ -62,6 +62,11 @@ namespace CRL.LambdaQuery.CRLExpression
             get;
             set;
         }
+        public string Data_
+        {
+            get;
+            set;
+        }
         [System.Xml.Serialization.XmlIgnore]
         [Newtonsoft.Json.JsonIgnore]
         public string DataParamed;

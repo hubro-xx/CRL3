@@ -49,7 +49,10 @@ namespace CRL.Runtime
                     bool useContext;
                     runTime.AllCall = CRL.Base.GetSQLRunningtime(out useContext).Select(b => b.Value).ToList();
                 }
-                runTime.record.Add(el);
+                lock (lockObj)
+                {
+                    runTime.record.Add(el);
+                }
             }
             lock (lockObj)
             {

@@ -111,6 +111,11 @@ namespace CRL.LambdaQuery
                     }
                     else
                     {
+                        if(SettingConfig.FieldParameName)
+                        {
+                            par1.DataParamed = par;
+                            return par1;//参数名按字段名
+                        }
                         var _par = parameDic[parIndex];
                         AddParame(_par, par);
                         par = _par;
@@ -247,6 +252,27 @@ namespace CRL.LambdaQuery
             #endregion
             outLeft = DealCRLExpression(left, leftPar, typeStr, out isNullValue, true);
             outRight = DealCRLExpression(right, rightPar, typeStr, out isNullValue, true);
+            #region 固定名称的参数
+            if(isBinary&& SettingConfig.FieldParameName)
+            {
+                if (leftPar.Type == CRLExpression.CRLExpressionType.Name && rightPar.Type == CRLExpression.CRLExpressionType.Value)
+                {
+                    var pre = Prefixs[leftPar.MemberType];
+                    pre = pre.Replace(".","_");
+                    var pName = __DBAdapter.GetParamName(pre, leftPar.Data_);
+                    AddParame(pName,rightPar.Data);
+                    outRight = pName;
+                }
+                else if(leftPar.Type == CRLExpression.CRLExpressionType.Value && rightPar.Type == CRLExpression.CRLExpressionType.Name)
+                {
+                    var pre = Prefixs[rightPar.MemberType];
+                    pre = pre.Replace(".", "_");
+                    var pName = __DBAdapter.GetParamName(pre, rightPar.Data_);
+                    AddParame(pName, leftPar.Data);
+                    outLeft = pName;
+                }
+            }
+            #endregion
             if (isNullValue)//left为null则语法错误
             {
                 __typeStr2 = "";
@@ -427,7 +453,7 @@ namespace CRL.LambdaQuery
                     return c2;
                 }
                 var fieldStr = __DBAdapter.FieldNameFormat(field);
-                var exp3 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr, MemberType = type };
+                var exp3 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldStr, Data_ = field.MapingName, MemberType = type };
                 field.DefaultCRLExpression = exp3;
                 return exp3;
                 #endregion

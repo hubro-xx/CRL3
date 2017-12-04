@@ -24,11 +24,12 @@ namespace Shopping.Web
             //WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+            CRL.SettingConfig.FieldParameName = true;
             //初始数据访问
             CRL.SettingConfig.GetDbAccess = (type) =>
             {
-                //return new CoreHelper.SqlHelper(System.Configuration.ConfigurationManager.ConnectionStrings["default"].ConnectionString);
-                return new CoreHelper.MySqlHelper(System.Configuration.ConfigurationManager.ConnectionStrings["default2"].ConnectionString);
+                return new CoreHelper.SqlHelper(System.Configuration.ConfigurationManager.ConnectionStrings["default"].ConnectionString);
+                //return new CoreHelper.MySqlHelper(System.Configuration.ConfigurationManager.ConnectionStrings["default2"].ConnectionString);
             };
 
             var QuartzWorker = new CoreHelper.QuartzScheduler.QuartzWorker();

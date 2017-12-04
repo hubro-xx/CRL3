@@ -69,6 +69,7 @@ left:500px;
                             menus.Add("继承使用封装的业务", "/page/UserTransactionTest.aspx");
                             menus.Add("继承实现新的业务", "/page/OrderTest.aspx");
                             menus.Add("对象结构", "/page/Model.aspx");
+                            menus.Add("对象DbSet方式", "/page/DbSet.aspx");
                             menus.Add("对象/表结构同步", "/page/Synchronous.aspx");
                             menus.Add("数据表创建缓存依赖", "/page/TableExistsCache.aspx");
                             menus.Add("导出/导入数据", "/page/ExportAndImport.aspx");

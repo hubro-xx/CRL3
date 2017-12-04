@@ -445,5 +445,9 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         {
             throw new NotImplementedException();
         }
+        public override string GetParamName(string name, object index)
+        {
+            return string.Format("@{0}{1}", name, index);
+        }
     }
 }

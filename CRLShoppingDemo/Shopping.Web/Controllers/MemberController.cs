@@ -82,10 +82,12 @@ namespace Shopping.Web.Controllers
         public ActionResult Transaction(TransactionType type = TransactionType.现金, int page = 1, int pageSize = 15)
         {
             ViewBag.TransactionType = type;
-            var query = BLL.Transaction.TransactionManage.Instance.GetLambdaQuery();
-            var accountId = BLL.Transaction.AccountManage.Instance.GetAccountId(CurrentUser.Id, AccountType.会员, type);
-            query.Where(b => b.AccountId == accountId);
+            //var query = BLL.Transaction.TransactionManage.Instance.GetLambdaQuery();
+            var account = BLL.Transaction.AccountManage.Instance.GetAccount(CurrentUser.Id, AccountType.会员, type);
 
+            //query.Where(b => b.AccountId == accountId);
+            var query = account.Transactions.GetQuery();
+            query.Page(pageSize,page);
             var result = query.ToList();
             int count = query.RowCount;
             var pageObj = new PageObj<CRL.Package.Account.Transaction>(result, page, count, pageSize);

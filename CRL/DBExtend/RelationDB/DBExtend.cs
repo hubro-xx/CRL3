@@ -102,7 +102,6 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override List<T> ExecList<T>(string sql, params Type[] types)
         {
-            sql = _DBAdapter.SqlFormat(sql);
             var list = SqlStopWatch.ReturnData(() =>
             {
                 return GetDataReader(sql, types);
@@ -123,13 +122,14 @@ namespace CRL.DBExtend.RelationDB
             //var queryInfo = new LambdaQuery.Mapping.QueryInfo<T>(false, sql, mapping);
             //var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
         }
-        
-        CallBackDataReader GetDataReader(string sql, params Type[] types)
+
+        CallBackDataReader GetDataReader(string sql,  params Type[] types)
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            var db = GetDBHelper(AccessType.Read);
-            var  reader = db.ExecDataReader(sql);
+            var db = GetDBHelper(DataAccessType.Read);
+            sql = _DBAdapter.ReplaceParameter(db, sql);
+            var reader = db.ExecDataReader(sql);
             ClearParame();
             return new CallBackDataReader(reader, null, sql);
         }
@@ -161,6 +161,7 @@ namespace CRL.DBExtend.RelationDB
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
             var db = GetDBHelper();
+            sql = _DBAdapter.ReplaceParameter(db, sql);
             int count = SqlStopWatch.Execute(db, sql);
             ClearParame();
             return count;
@@ -175,7 +176,8 @@ namespace CRL.DBExtend.RelationDB
         {
             sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
-            var db = GetDBHelper(AccessType.Read);
+            var db = GetDBHelper(DataAccessType.Read);
+            sql = _DBAdapter.ReplaceParameter(db, sql);
             object obj = SqlStopWatch.ExecScalar(db, sql);
             ClearParame();
             return obj;
@@ -189,7 +191,6 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override T ExecScalar<T>(string sql, params Type[] types)
         {
-            sql = _DBAdapter.SqlFormat(sql);
             var obj = ExecScalar(sql, types);
             return ObjectConvert.ConvertObject<T>(obj);
         }
@@ -220,7 +221,7 @@ namespace CRL.DBExtend.RelationDB
         {
             var list = SqlStopWatch.ReturnList(() =>
             {
-                var db = GetDBHelper(AccessType.Read);
+                var db = GetDBHelper(DataAccessType.Read);
                 var reader = db.RunDataReader(sp);
                 ClearParame();
                 var pro = TypeCache.GetTable(typeof(T)).Fields;
@@ -262,7 +263,7 @@ namespace CRL.DBExtend.RelationDB
         /// <returns></returns>
         public override object RunScalar(string sp)
         {
-            var db = GetDBHelper(AccessType.Read);
+            var db = GetDBHelper(DataAccessType.Read);
             object obj = db.RunScalar(sp);
             ClearParame();
             return obj;

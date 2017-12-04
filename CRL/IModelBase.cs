@@ -66,7 +66,36 @@ namespace CRL
         {
             return CoreHelper.StringHelper.SerializerToJson(this);
         }
-
+        internal bool FromCache;
+        #region 外关联
+        Dictionary<Type, object> _DbSets;
+        /// <summary>
+        /// 创建关联关系
+        /// </summary>
+        /// <typeparam name="T">关联对象</typeparam>
+        /// <param name="member"></param>
+        /// <param name="key">member=key</param>
+        /// <returns></returns>
+        protected DbSet<T> GetDbSet<T>(System.Linq.Expressions.Expression<Func<T, object>> member, object key) where T : IModel, new()
+        {
+            if (FromCache)//当是缓存时
+            {
+                return new DbSet<T>(member, key);
+            }
+            var type = typeof(T);
+            if (_DbSets == null)
+            {
+                _DbSets = new Dictionary<Type, object>();
+            }
+            if (_DbSets.ContainsKey(type))
+            {
+                return _DbSets[type] as DbSet<T>;
+            }
+            var set = new DbSet<T>(member, key);
+            _DbSets.Add(type, set);
+            return set;
+        }
+        #endregion
         #region 方法重写
         /// <summary>
         /// ToJson

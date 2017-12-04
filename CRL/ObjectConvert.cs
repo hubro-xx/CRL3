@@ -397,10 +397,16 @@ namespace CRL
             var dic = new Dictionary<string, TItem>();
             foreach (var item in list)
             {
-                var keyValue = (item as IModel).GetpPrimaryKeyValue().ToString();
+                var model = item as TItem;
+                var keyValue = model.GetpPrimaryKeyValue().ToString();
                 if (!dic.ContainsKey(keyValue))
                 {
-                    dic.Add(keyValue, item as TItem);
+                    model.FromCache = true;
+                    if (SettingConfig.AutoTrackingModel)
+                    {
+                        model.SetOriginClone();
+                    }
+                    dic.Add(keyValue, model);
                 }
             }
             return dic;

@@ -79,8 +79,8 @@ namespace CRL.DBExtend.RelationDB
                         }
                         var field = fields[name];
                         name = field.MapingName;//转换映射名
-                        string parame = string.Format("@{0}", name, dbContext.parIndex);
-                        AddParam(name, value);
+                        var parame = _DBAdapter.GetParamName(name, dbContext.parIndex);
+                        AddParam(parame, value);
                         dbContext.parIndex += 1;
                         value = parame;
                         if (joinType != null)//mysql 修正
@@ -119,33 +119,35 @@ namespace CRL.DBExtend.RelationDB
             return n;
         }
         
-        /// <summary>
-        /// 按对象差异更新,由主键确定记录
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override int Update<TModel>(TModel obj)
-        {
-            var c = GetUpdateField(obj);
-            if (c.Count == 0)
-            {
-                return 0;
-                //throw new CRLException("更新集合为空");
-            }
-            var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
-            var keyValue = primaryKey.GetValue(obj);
-            string where = "where "+string.Format("{0}=@{0}", primaryKey.MapingName);
-            AddParam(primaryKey.MapingName, keyValue);
-            int n = Update<TModel>(c, where);
-            UpdateCacheItem(obj, c);
-            if (n == 0)
-            {
-                throw new CRLException("更新失败,找不到主键为 " + keyValue + " 的记录");
-            }
-            obj.CleanChanges();
-            return n;
-        }
+        ///// <summary>
+        ///// 按对象差异更新,由主键确定记录
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <param name="obj"></param>
+        ///// <returns></returns>
+        //public override int Update<TModel>(TModel obj)
+        //{
+        //    var c = GetUpdateField(obj);
+        //    if (c.Count == 0)
+        //    {
+        //        return 0;
+        //        //throw new CRLException("更新集合为空");
+        //    }
+        //    var primaryKey = TypeCache.GetTable(obj.GetType()).PrimaryKey;
+        //    var keyValue = primaryKey.GetValue(obj);
+        //    var pName = _DBAdapter.GetParamName("par", "1");
+        //    var where = string.Format("where {0}={1}", _DBAdapter.KeyWordFormat(primaryKey.MapingName), pName);
+
+        //    AddParam(pName, keyValue);
+        //    int n = Update<TModel>(c, where);
+        //    UpdateCacheItem(obj, c);
+        //    if (n == 0)
+        //    {
+        //        throw new CRLException("更新失败,找不到主键为 " + keyValue + " 的记录");
+        //    }
+        //    obj.CleanChanges();
+        //    return n;
+        //}
 
         /// <summary>
         /// 按完整查询条件进行更新
@@ -180,7 +182,7 @@ namespace CRL.DBExtend.RelationDB
             //}
 
             string table = query1.QueryTableName;
-            table = query1.__DBAdapter.KeyWordFormat(table);
+            table = _DBAdapter.KeyWordFormat(table);
             query1.FillParames(this);
             //var properties = updateValue.GetType().GetProperties();
 
@@ -196,7 +198,7 @@ namespace CRL.DBExtend.RelationDB
                 //{
                 //    join += " and ";
                 //}
-                string sql = query1.__DBAdapter.GetRelationUpdateSql(t1, t2, conditions , setString);
+                string sql = _DBAdapter.GetRelationUpdateSql(t1, t2, conditions , setString);
                 return Execute(sql);
             }
             else
@@ -206,20 +208,20 @@ namespace CRL.DBExtend.RelationDB
             return Update<TModel>(updateValue, conditions);
         }
 
-        /// <summary>
-        /// 关联更新
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <typeparam name="TJoin"></typeparam>
-        /// <param name="expression"></param>
-        /// <param name="updateValue"></param>
-        /// <returns></returns>
-        public override int Update<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)
-        {
-            var query = new RelationLambdaQuery<TModel>(dbContext);
-            query.Join<TJoin>(expression);
-            return Update(query, updateValue);
-        }
+        ///// <summary>
+        ///// 关联更新
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <typeparam name="TJoin"></typeparam>
+        ///// <param name="expression"></param>
+        ///// <param name="updateValue"></param>
+        ///// <returns></returns>
+        //public override int Update<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)
+        //{
+        //    var query = new RelationLambdaQuery<TModel>(dbContext);
+        //    query.Join<TJoin>(expression);
+        //    return Update(query, updateValue);
+        //}
 
         #endregion
     }

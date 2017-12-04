@@ -24,7 +24,11 @@ namespace CRL
         /// <returns></returns>
         public static int Len(this object origin)
         {
-            return 0;
+            if (origin == null)
+            {
+                return 0;
+            }
+            return origin.ToString().Length;
         }
     }
 }

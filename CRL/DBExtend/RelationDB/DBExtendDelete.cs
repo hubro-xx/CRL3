@@ -33,55 +33,56 @@ namespace CRL.DBExtend.RelationDB
             ClearParame();
             return n;
         }
-        /// <summary>
-        /// 按主键删除
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public override int Delete<TModel>(object id)
-        {
-            var type = typeof(TModel);
-            var table = TypeCache.GetTable(type);
-            string where = "where " + _DBAdapter.KeyWordFormat(table.PrimaryKey.MapingName) + "=@par1";
-            AddParam("par1", id);
-            return Delete<TModel>(where);
+        ///// <summary>
+        ///// 按主键删除
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //public override int Delete<TModel>(object id)
+        //{
+        //    var type = typeof(TModel);
+        //    var table = TypeCache.GetTable(type);
+        //    var pName = _DBAdapter.GetParamName("par", "1");
+        //    var where = string.Format("where {0}={1}", _DBAdapter.KeyWordFormat(table.PrimaryKey.MapingName), pName);
+        //    AddParam(pName, id);
+        //    return Delete<TModel>(where);
 
-            //var expression = Base.GetQueryIdExpression<TModel>(id);
-            //return Delete<TModel>(expression);
-        }
-        /// <summary>
-        /// 指定条件删除
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public override int Delete<TModel>(Expression<Func<TModel, bool>> expression)
-        {
-            LambdaQuery<TModel> query = new RelationLambdaQuery<TModel>(dbContext, false);
-            query.Where(expression);
-            string condition = query.FormatExpression(expression.Body).SqlOut;
-            if(!string.IsNullOrEmpty(condition))
-            {
-                condition = "where " + condition;
-            }
-            query.FillParames(this);
-            return Delete<TModel>(condition);
-        }
+        //    //var expression = Base.GetQueryIdExpression<TModel>(id);
+        //    //return Delete<TModel>(expression);
+        //}
+        ///// <summary>
+        ///// 指定条件删除
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <param name="expression"></param>
+        ///// <returns></returns>
+        //public override int Delete<TModel>(Expression<Func<TModel, bool>> expression)
+        //{
+        //    LambdaQuery<TModel> query = new RelationLambdaQuery<TModel>(dbContext, false);
+        //    query.Where(expression);
+        //    string condition = query.FormatExpression(expression.Body).SqlOut;
+        //    if(!string.IsNullOrEmpty(condition))
+        //    {
+        //        condition = "where " + condition;
+        //    }
+        //    query.FillParames(this);
+        //    return Delete<TModel>(condition);
+        //}
 
-        /// <summary>
-        /// 关联删除
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <typeparam name="TJoin"></typeparam>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public override int Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
-        {
-            var query = new RelationLambdaQuery<TModel>(dbContext);
-            query.Join<TJoin>(expression);
-            return Delete(query);
-        }
+        ///// <summary>
+        ///// 关联删除
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <typeparam name="TJoin"></typeparam>
+        ///// <param name="expression"></param>
+        ///// <returns></returns>
+        //public override int Delete<TModel, TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
+        //{
+        //    var query = new RelationLambdaQuery<TModel>(dbContext);
+        //    query.Join<TJoin>(expression);
+        //    return Delete(query);
+        //}
 
         /// <summary>
         /// 按完整查询条件进行删除
@@ -107,7 +108,7 @@ namespace CRL.DBExtend.RelationDB
             var conditions = sb.ToString();
             //conditions = conditions.Substring(5);
             string table = query1.QueryTableName;
-            table = query1.__DBAdapter.KeyWordFormat(table);
+            table = _DBAdapter.KeyWordFormat(table);
             query1.FillParames(this);
             if (query1.__Relations!=null)
             {
@@ -120,9 +121,10 @@ namespace CRL.DBExtend.RelationDB
                 //{
                 //    join += " and ";
                 //}
-                string sql = query1.__DBAdapter.GetRelationDeleteSql(t1, t2,  conditions);
+                string sql = _DBAdapter.GetRelationDeleteSql(t1, t2,  conditions);
                 return Execute(sql);
             }
+            conditions = conditions.Replace("t1.", "");
             return Delete<T>(conditions);
         }
 

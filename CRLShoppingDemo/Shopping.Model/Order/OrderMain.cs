@@ -18,6 +18,13 @@ namespace Shopping.Model.Order
     /// </summary>
     public class OrderMain : CRL.IModelBase
     {
+        public CRL.DbSet<OrderDetail> Details
+        {
+            get
+            {
+                return GetDbSet<OrderDetail>(b => b.OrderId , OrderId);
+            }
+        }
         public OrderMain()
         {
             OrderId = DateTime.Now.ToString("yyMMddhhmmssff");

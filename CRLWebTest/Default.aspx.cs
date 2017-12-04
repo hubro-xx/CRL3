@@ -21,13 +21,19 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-            Code.CRLManage.Instance.Test();
+            var order = new Code.Order();
+            //var result = order.Products.Where(b => b.Id > 0).ToList();
+
+            var resutl2 = ProductDataManage.Instance.QueryFromCache(b => b.ProductName.Len() > 2);
+
+            Code.ProductDataManage.Instance.DynamicQueryTest();
             var query = Code.ProductDataManage.Instance.GetLambdaQuery();
             query.Join<Code.Member>((a, b) => a.Id == b.Id).Select((a, b) => new
             {
                 aa1 = b.Id,
                 ss2 = a.TransType
             });
+            query.Where(b=>b.Id==2);
             var sql = query.ToString();
             //var n2 = GC.GetTotalMemory(true);
             //var list1 = Code.ProductDataManage.Instance.GetLambdaQuery().Top(1000).ToList();

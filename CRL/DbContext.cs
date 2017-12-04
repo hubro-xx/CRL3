@@ -57,9 +57,9 @@ namespace CRL
         /// 为了让多次操作能串行,参数索引放在这
         /// </summary>
         internal int parIndex = 0;
-        internal CoreHelper.DBHelper GetDBHelper(AccessType accessType = AccessType.Default)
+        internal CoreHelper.DBHelper GetDBHelper(DataAccessType accessType = DataAccessType.Default)
         {
-            DBLocation.AccessType = accessType;
+            DBLocation.DataAccessType = accessType;
             var helper = SettingConfig.GetDbAccess(DBLocation);
             return helper;
         }
@@ -67,7 +67,7 @@ namespace CRL
     /// <summary>
     /// 数据访问类型
     /// </summary>
-    public enum AccessType
+    public enum DataAccessType
     {
         /// <summary>
         /// 默认
@@ -100,6 +100,6 @@ namespace CRL
         /// <summary>
         /// 访问类型,当不是在事务内查询时,返回Read
         /// </summary>
-        public AccessType AccessType;
+        public DataAccessType DataAccessType;
     }
 }

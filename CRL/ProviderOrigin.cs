@@ -84,7 +84,7 @@ namespace CRL
         /// 创建当前类型查询表达式实列
         /// </summary>
         /// <returns></returns>
-        public LambdaQuery<TModel> GetLambdaQuery()
+        public virtual LambdaQuery<TModel> GetLambdaQuery()
         {
             //var dbContext2 = GetDbContext(true);//避开事务控制,使用新的连接
             var query = LambdaQueryFactory.CreateLambdaQuery<TModel>(DBExtend.dbContext);
@@ -103,7 +103,7 @@ namespace CRL
         }
 
         #region 数据访问对象
-            AbsDBExtend _dBExtend;
+        AbsDBExtend _dBExtend;
         /// <summary>
         /// 数据访部对象
         /// 当前实例内只会创建一个,查询除外
@@ -219,20 +219,29 @@ namespace CRL
         static string pathLocal = @".\Private$\crlqueue";
         static System.Timers.Timer timer;
         static bool timerRuning = false;
+        static string queueLabel;
+        static int queueInitStatus = 0;
         void MessageQueueWork()
         {
-            if(timerRuning)
+            var type = typeof(TModel);
+            //var pathLocal = string.Format(@".\Private$\CRL_{0}", type.FullName);
+            //var msmq2 = new MessageQueue(pathLocal);
+            //msmq2.Formatter = new XmlMessageFormatter(new Type[] { type });
+
+            //Log("开始读取");
+            if (timerRuning)
             {
                 return;
             }
             timerRuning = true;
-            var msgs = msmq.GetAllMessages();
-            if (msgs.Length == 0)
+            //只取前应用的消息
+            var msgs = msmq.GetAllMessages().FindAll(b => b.Label == queueLabel);
+            if (msgs.Count == 0)
             {
                 timerRuning = false;
                 return;
             }
-            //msmq.Purge();
+            Log(type + "队列条数" + msgs.Count(), "MSMQ");
             var list = new List<TModel>();
             foreach (var msg in msgs)
             {
@@ -240,14 +249,67 @@ namespace CRL
             }
             try
             {
+                //Log("开始插入");
                 BatchInsert(list);
                 foreach (var msg in msgs)
                 {
                     msmq.ReceiveById(msg.Id);
                 }
+                if (list.Count > 0)
+                {
+                    Log(type + "插入接收完成" + list.Count, "MSMQ");
+                }
             }
-            catch { }
+            catch (Exception ero) {
+                Log(type + "处理队列消息出错" + ero.Message, "MSMQ");
+            }
             timerRuning = false;
+        }
+        void IniteQueue()
+        {
+            if (queueInitStatus == 0)
+            {
+                lock (lockObj)
+                {
+                    if (queueInitStatus != 0)
+                    {
+                        return;
+                    }
+                    queueInitStatus = 1;
+                }
+                #region init
+
+                pathLocal = string.Format(@".\Private$\CRL_{0}", typeof(TModel).FullName);
+                try
+                {
+                    if (MessageQueue.Exists(pathLocal))
+                    {
+                        msmq = new MessageQueue(pathLocal);
+                    }
+                    else
+                    {
+                        msmq = MessageQueue.Create(pathLocal, false);
+                    }
+                }
+                catch (Exception ero)
+                {
+                    queueInitStatus = 0;
+                    throw new CRLException("创建MessageQueue失败,请检查MSMQ服务安装正确" + ero.Message);
+                }
+                msmq.Formatter = new XmlMessageFormatter(new Type[] { typeof(TModel) });
+                //多个应用只运行一个消费端
+                var path = CoreHelper.RequestHelper.GetFilePath("/Config");
+                queueLabel = path.GetHashCode().ToString();
+                timer = new System.Timers.Timer(10000);
+                timer.Elapsed += (a, b) =>
+                {
+                    MessageQueueWork();
+                };
+                timer.Start();
+                Log(typeof(TModel) + "队列TIMER启动", "MSMQ");
+                #endregion
+                queueInitStatus = 2;
+            }
         }
         #endregion
         /// <summary>
@@ -258,40 +320,19 @@ namespace CRL
         /// <param name="asyn">异步插入</param>
         public virtual void Add(TModel p, bool asyn = false)
         {
+            AbsDBExtend db = DBExtend;
             #region MQ初始
             if (asyn)
             {
-                if (msmq == null)
+                IniteQueue();
+                if (queueInitStatus == 2)
                 {
-                    pathLocal = string.Format(@".\Private$\CRL_{0}", typeof(TModel).FullName);
-                    if (MessageQueue.Exists(pathLocal))
-                    {
-                        msmq = new MessageQueue(pathLocal);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            msmq = MessageQueue.Create(pathLocal, false);
-                        }
-                        catch (Exception ero)
-                        {
-                            throw new CRLException("创建MessageQueue失败,请检查MSMQ服务安装正确" + ero.Message);
-                        }
-                    }
-                    msmq.Formatter = new XmlMessageFormatter(new Type[] { typeof(TModel) });
-                    timer = new System.Timers.Timer(5000);
-                    timer.Elapsed += (a, b) =>
-                    {
-                        MessageQueueWork();
-                    };
-                    timer.Start();
+                    db.CheckData(p);
+                    msmq.Send(p, queueLabel);
+                    return;
                 }
-                msmq.Send(p, "CRLQueue");
-                return;
             }
             #endregion
-            AbsDBExtend db = DBExtend;
             db.InsertFromObj(p);
         }
         
@@ -352,8 +393,14 @@ namespace CRL
         /// <returns></returns>
         public TModel QueryItem(Expression<Func<TModel, bool>> expression, bool idDest = true, bool compileSp = false)
         {
-            AbsDBExtend db = DBExtend;
-            return db.QueryItem<TModel>(expression, idDest, compileSp);
+            //AbsDBExtend db = DBExtend;
+            //return db.QueryItem(expression, idDest, compileSp);
+            var query = GetLambdaQuery();
+            query.Top(1);
+            query.CompileToSp(compileSp);
+            query.Where(expression).OrderByPrimaryKey(idDest);
+            var db = DBExtend;
+            return db.QueryList(query).FirstOrDefault();
         }
         #endregion
 
@@ -364,8 +411,11 @@ namespace CRL
         /// <returns></returns>
         public List<TModel> QueryList()
         {
-            AbsDBExtend db = GetDBExtend();
-            return db.QueryList<TModel>();
+            //AbsDBExtend db = GetDBExtend();
+            //return db.QueryList<TModel>();
+            var query = GetLambdaQuery();
+            var db = DBExtend;
+            return db.QueryList(query);
         }
         /// <summary>
         /// 指定条件查询[基本方法]
@@ -375,8 +425,13 @@ namespace CRL
         /// <returns></returns>
         public List<TModel> QueryList(Expression<Func<TModel, bool>> expression, bool compileSp = false)
         {
-            AbsDBExtend db = GetDBExtend();
-            return db.QueryList<TModel>(expression, compileSp);
+            //AbsDBExtend db = GetDBExtend();
+            //return db.QueryList<TModel>(expression, compileSp);
+            var query = GetLambdaQuery();
+            query.CompileToSp(compileSp);
+            query.Where(expression);
+            var db = DBExtend;
+            return db.QueryList(query);
         }
         
         #endregion
@@ -410,9 +465,13 @@ namespace CRL
         /// <returns></returns>
         public int Delete(Expression<Func<TModel, bool>> expression)
         {
-            AbsDBExtend db = DBExtend;
-            int n = db.Delete<TModel>(expression);
-            return n;
+            //var db = DBExtend;
+            var query = GetLambdaQuery();
+            query.Where(expression);
+            return Delete(query);
+            //AbsDBExtend db = DBExtend;
+            //int n = db.Delete<TModel>(expression);
+            //return n;
         }
         /// <summary>
         /// 按完整查询删除
@@ -421,7 +480,7 @@ namespace CRL
         /// <returns></returns>
         public int Delete(LambdaQuery<TModel> query)
         {
-            AbsDBExtend db = DBExtend;
+            var db = DBExtend;
             int n = db.Delete(query);
             return n;
         }
@@ -434,49 +493,12 @@ namespace CRL
         public int Delete<TJoin>(Expression<Func<TModel, TJoin, bool>> expression)
             where TJoin : IModel, new()
         {
-            return DBExtend.Delete(expression);
+            //var db = DBExtend;
+            var query = GetLambdaQuery();
+            query.Join(expression);
+            return Delete(query);
+            //return DBExtend.Delete(expression);
         }
-        #endregion
-
-        #region 分页
-      
-        /**
-        /// <summary>
-        /// 分页,并返回当前类型
-        /// 会按GROUP和自动编译判断
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public List<TModel> Page(CRL.LambdaQuery<TModel> query)
-        {
-            DBExtend db = DBExtend;
-            return db.Page<TModel, TModel>(query);
-        }
-        /// <summary>
-        /// 分页,并返回指定类型
-        /// 会按GROUP和自动编译判断
-        /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public List<TResult> Page<TResult>(CRL.LambdaQuery<TModel> query) where TResult : class,new()
-        {
-            DBExtend db = DBExtend;
-            return db.Page<TModel, TResult>(query);
-        }
-
-        /// <summary>
-        /// 返回动态类型分页
-        /// 会按GROUP和自动编译判断
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public List<dynamic> PageDynamic(CRL.LambdaQuery<TModel> query)
-        {
-            DBExtend db = DBExtend;
-            return db.Page(query);
-        }
-         * */
         #endregion
 
         #region 更新
@@ -487,7 +509,7 @@ namespace CRL
         /// <returns></returns>
         public int Update<T>(T item) where T : IModel, new()
         {
-            AbsDBExtend db = DBExtend;
+            var db = DBExtend;
             return db.Update(item);
         }
 
@@ -499,8 +521,9 @@ namespace CRL
         /// <returns></returns>
         public int Update(Expression<Func<TModel, bool>> expression, TModel model)
         {
-            AbsDBExtend db = DBExtend;
-            int n = db.Update<TModel>(expression, model);
+            var query = GetLambdaQuery();
+            query.Where(expression);
+            int n = Update(query, model.GetUpdateField());
             return n;
         }
         /// <summary>
@@ -511,9 +534,13 @@ namespace CRL
         /// <returns></returns>
         public int Update(Expression<Func<TModel, bool>> expression, ParameCollection setValue)
         {
-            AbsDBExtend db = DBExtend;
-            int n = db.Update<TModel>(expression, setValue);
+            var query = GetLambdaQuery();
+            query.Where(expression);
+            int n = Update(query, setValue);
             return n;
+            //var db = DBExtend;
+            //int n = db.Update(expression, setValue);
+            //return n;
         }
         /// <summary>
         /// 按匿名对象更新
@@ -524,8 +551,15 @@ namespace CRL
         /// <returns></returns>
         public int Update<TOjbect>(Expression<Func<TModel, bool>> expression, TOjbect updateValue) where TOjbect : class
         {
-            var db = DBExtend;
-            int n = db.Update<TModel>(expression, updateValue);
+            var properties = updateValue.GetType().GetProperties();
+            var c = new ParameCollection();
+            foreach (var p in properties)
+            {
+                c.Add(p.Name, p.GetValue(updateValue));
+            }
+            var query = GetLambdaQuery();
+            query.Where(expression);
+            int n = Update(query, c);
             return n;
         }
         /// <summary>
@@ -549,10 +583,10 @@ namespace CRL
         public int Update<TJoin>(Expression<Func<TModel, TJoin, bool>> expression, ParameCollection updateValue)
             where TJoin : IModel, new()
         {
-            return DBExtend.Update(expression, updateValue);
-            //var query = GetLambdaQuery();
-            //query.Join<TJoin>(expression);
-            //return Update(query, updateValue);
+            //return DBExtend.Update(expression, updateValue);
+            var query = GetLambdaQuery();
+            query.Join(expression);
+            return Update(query, updateValue);
         }
         #endregion
 
@@ -648,7 +682,7 @@ namespace CRL
         public int Count(Expression<Func<TModel, bool>> expression, bool compileSp = false)
         {
             AbsDBExtend db = GetDBExtend();
-            return db.Count<TModel>(expression, compileSp);
+            return db.Count(expression, compileSp);
         }
         /// <summary>
         /// sum 按表达式指定字段[基本方法]
@@ -661,7 +695,7 @@ namespace CRL
         public TType Sum<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
             AbsDBExtend db = GetDBExtend();
-            return db.Sum<TType, TModel>(expression, field, compileSp);
+            return db.Sum(expression, field, compileSp);
         }
         /// <summary>
         /// 取最大值[基本方法]
@@ -674,7 +708,7 @@ namespace CRL
         public TType Max<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
             AbsDBExtend db = GetDBExtend();
-            return db.Max<TType, TModel>(expression, field, compileSp);
+            return db.Max(expression, field, compileSp);
         }
         /// <summary>
         /// 取最小值[基本方法]
@@ -687,7 +721,7 @@ namespace CRL
         public TType Min<TType>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> field, bool compileSp = false)
         {
             AbsDBExtend db = GetDBExtend();
-            return db.Min<TType, TModel>(expression, field, compileSp);
+            return db.Min(expression, field, compileSp);
         }
         #endregion
 
@@ -799,7 +833,7 @@ namespace CRL
         #endregion
     }
 
-    public interface IProvider
+    internal interface IProvider
     {
         /// <summary>
         /// 绑定对象类型

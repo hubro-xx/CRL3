@@ -121,6 +121,7 @@
     <Content Include="Page\CallContext.aspx" />
     <Content Include="Page\DataVerification.aspx" />
     <Content Include="Default.aspx" />
+    <Content Include="Page\DbSet.aspx" />
     <Content Include="Page\Delete.aspx" />
     <Content Include="Page\ExportAndImport.aspx" />
     <Content Include="Page\ExportModelInfo.aspx" />
@@ -241,6 +242,13 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Page\DbSet.aspx.cs">
+      <DependentUpon>DbSet.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Page\DbSet.aspx.designer.cs">
+      <DependentUpon>DbSet.aspx</DependentUpon>
     </Compile>
     <Compile Include="Page\Delete.aspx.cs">
       <DependentUpon>Delete.aspx</DependentUpon>

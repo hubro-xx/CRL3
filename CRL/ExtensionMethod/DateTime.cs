@@ -21,31 +21,70 @@ namespace CRL
     /// </summary>
     public static partial class ExtensionMethod
     {
-
+        #region Between
         /// <summary>
         /// 表示Between
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="origin"></param>
         /// <param name="begin"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public static bool Between<T>(this T origin, T begin, T end) where T : struct
+        public static bool Between(this int origin, int begin, int end)
         {
-            return true;
+            return origin > begin && origin < end;
         }
         /// <summary>
         /// 表示Between
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="origin"></param>
         /// <param name="begin"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public static bool Between<T>(this Nullable<T> origin, T begin, T end) where T : struct
+        public static bool Between(this int? origin, int begin, int end) 
         {
-            return true;
+            return origin > begin && origin < end;
         }
+        public static bool Between(this decimal origin, decimal begin, decimal end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this decimal? origin, decimal begin, decimal end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this double origin, double begin, double end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this double? origin, double begin, double end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this float origin, float begin, float end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this float? origin, float begin, float end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this long origin, long begin, long end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this long? origin, long begin, long end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this DateTime origin, DateTime begin, DateTime end)
+        {
+            return origin > begin && origin < end;
+        }
+        public static bool Between(this DateTime? origin, DateTime begin, DateTime end)
+        {
+            return origin > begin && origin < end;
+        }
+        #endregion
         /// <summary>
         /// DateDiff
         /// </summary>
@@ -53,9 +92,47 @@ namespace CRL
         /// <param name="format">DatePart</param>
         /// <param name="compareTime">比较的时间</param>
         /// <returns></returns>
-        public static int DateDiff(this DateTime time, DatePart format, DateTime compareTime)
+        public static double DateDiff(this DateTime time, DatePart format, DateTime compareTime)
         {
-            return 1;
+            var ts = compareTime - time;
+            double val=0;
+            switch (format)
+            {
+                case DatePart.dd:
+                    val = ts.TotalDays;
+                    break;
+                case DatePart.dw:
+                    val = ts.TotalDays / 7;
+                    break;
+                case DatePart.dy:
+                    val = ts.TotalDays;
+                    break;
+                case DatePart.hh:
+                    val = ts.TotalHours;
+                    break;
+                case DatePart.mi:
+                    val = ts.TotalMinutes;
+                    break;
+                case DatePart.mm:
+                    val = ts.TotalDays / 30;
+                    break;
+                case DatePart.ms:
+                    val = ts.TotalMilliseconds;
+                    break;
+                case DatePart.qq:
+                    val = ts.TotalDays / 90;
+                    break;
+                case DatePart.ss:
+                    val = ts.TotalSeconds;
+                    break;
+                case DatePart.ww:
+                    val = ts.TotalDays / 7;
+                    break;
+                case DatePart.yy:
+                    val = ts.TotalDays / 365;
+                    break;
+            }
+            return val;
         }
         /// <summary>
         /// DateDiff
@@ -64,9 +141,9 @@ namespace CRL
         /// <param name="format"></param>
         /// <param name="compareTime"></param>
         /// <returns></returns>
-        public static int DateDiff(this Nullable<DateTime> time, DatePart format, DateTime compareTime)
+        public static double DateDiff(this DateTime? time, DatePart format, DateTime compareTime)
         {
-            return 1;
+            return DateDiff(time.Value, format, compareTime);
         }
     }
     #region 比较时间格式
@@ -119,14 +196,14 @@ namespace CRL
         /// 毫秒
         /// </summary>
         ms,
-        /// <summary>
-        /// 微妙
-        /// </summary>
-        mcs,
-        /// <summary>
-        /// 纳秒
-        /// </summary>
-        ns
+        ///// <summary>
+        ///// 微妙
+        ///// </summary>
+        //mcs,
+        ///// <summary>
+        ///// 纳秒
+        ///// </summary>
+        //ns
     }
     #endregion
 }

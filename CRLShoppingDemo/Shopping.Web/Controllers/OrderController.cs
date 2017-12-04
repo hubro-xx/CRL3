@@ -69,8 +69,12 @@ namespace Shopping.Web.Controllers
         /// <returns></returns>
         public ActionResult Index()
         {
-            var orders = OrderManage.Instance.GetLambdaQuery().Where(b => b.UserId == CurrentUser.Id).Page(20,1).ToList();
-            return View(orders);
+            //var orders = OrderManage.Instance.GetLambdaQuery().Where(b => b.UserId == CurrentUser.Id).Page(20,1).ToList();
+            var user = MemberManage.Instance.GetCurrent();
+            var sum = user.Orders.Sum(b => b.TotalAmount > 0, b => b.TotalAmount);
+            var q = user.Orders.GetProvider().QueryList();
+            var orders = user.Orders.Page(20, 1).ToList();
+            return View(q);
         }
         /// <summary>
         /// 订单详细
@@ -80,7 +84,7 @@ namespace Shopping.Web.Controllers
         public ActionResult OrderDetail(string orderId)
         {
             var order = OrderManage.Instance.QueryItem(b => b.OrderId == orderId);
-            var details = OrderDetailManage.Instance.QueryList(b => b.OrderId == orderId);
+            var details = order.Details.ToList();
             ViewBag.Order = order;
             return View(details);
         }

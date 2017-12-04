@@ -29,6 +29,13 @@ namespace Shopping.Model
             list.Add(new Member() { Name = "Member1", AccountNo = "Member1", PassWord = "E10ADC3949BA59ABBE56E057F20F883E" });
             return list;
         }
+        public CRL.DbSet<Order.OrderMain> Orders
+        {
+            get
+            {
+                return GetDbSet<Order.OrderMain>(b => b.UserId , Id);
+            }
+        }
         public override string CheckData()
         {
             return base.CheckData();

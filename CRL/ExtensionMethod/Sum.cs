@@ -25,7 +25,7 @@ namespace CRL
         /// <returns></returns>
         public static T SUM<T>(this T origin) where T : struct
         {
-            return default(T);
+            return origin;
         }
         /// <summary>
         /// 表示SUM此字段
@@ -33,9 +33,9 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="origin"></param>
         /// <returns></returns>
-        public static T SUM<T>(this Nullable<T> origin) where T : struct
+        public static T SUM<T>(this T? origin) where T : struct
         {
-            return default(T);
+            return origin.Value;
         }
 
         /// <summary>

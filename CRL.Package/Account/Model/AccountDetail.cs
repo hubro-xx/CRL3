@@ -18,6 +18,13 @@ namespace CRL.Package.Account
     [Attribute.Table(TableName = "AccountInfo")]
     public class AccountDetail : IModelBase
     {
+        public DbSet<Transaction> Transactions
+        {
+            get
+            {
+                return GetDbSet<Transaction>(b => b.AccountId , Id);
+            }
+        } 
         /// <summary>
         /// 帐号类型
         /// 用以区分不同业务的帐号

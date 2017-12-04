@@ -25,7 +25,7 @@ namespace CRL
         /// <returns></returns>
         public static T MIN<T>(this T origin) where T : struct
         {
-            return default(T);
+            return origin;
         }
         /// <summary>
         /// 表示Min此字段
@@ -33,9 +33,9 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="origin"></param>
         /// <returns></returns>
-        public static T MIN<T>(this Nullable<T> origin) where T : struct
+        public static T MIN<T>(this T? origin) where T : struct
         {
-            return default(T);
+            return origin.Value;
         }
         /// <summary>
         /// 表示Min一个属性二元运算 如 MIN(b=>b.Num*b.Price)

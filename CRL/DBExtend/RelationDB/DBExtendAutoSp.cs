@@ -58,9 +58,18 @@ namespace CRL.DBExtend.RelationDB
                     fields += "_" + parames["rowOver"];
                 }
             }
-            string sp = CoreHelper.StringHelper.EncryptMD5(fields + "_" + sql.Trim());
-            //string sp = (fields + "_" + sql.Trim()).GetHashCode().ToString();
-            sp = "ZautoSp_" + sp.Substring(8, 16);
+            string sp;
+            if(SettingConfig.FieldParameName)
+            {
+                sp = (fields + "_" + sql.Trim()).GetHashCode().ToString();
+                sp = "ZautoSp_H" + (sp.Replace("-", "F"));
+            }
+            else
+            {
+                sp = CoreHelper.StringHelper.EncryptMD5(fields + "_" + sql.Trim());
+                sp = "ZautoSp_" + sp.Substring(8, 16);
+            }
+            
             if (!spCahe.ContainsKey(sp))
             {
                 //sql = __DbHelper.FormatWithNolock(sql);
@@ -70,7 +79,7 @@ namespace CRL.DBExtend.RelationDB
                 try
                 {
                     //BackupParams();
-                    db.Execute(spScript);
+                    db.dbContext.DBHelper.Execute(spScript);
                     //RecoveryParams();
                     lock (lockObj)
                     {

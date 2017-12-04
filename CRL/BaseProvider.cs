@@ -365,8 +365,14 @@ namespace CRL
             if (!a)
             {
                 var db = DBExtend;
-                var list2 = db.QueryOrFromCache<TModel>(query, out dataCacheKey);
-                list = ObjectConvert.ConvertToDictionary<TModel>(list2);
+                var helper = db.dbContext.DBHelper;
+                foreach(var p in query.QueryParames)
+                {
+                    helper.AddParam(p.Item1,p.Item2);
+                }
+                var sql = query.GetQuery();
+                list = MemoryDataCache.CacheService.GetCacheList<TModel>(sql, query.GetFieldMapping(), expMinute, helper, out dataCacheKey);
+
                 lock (lockObj)
                 {
                     string key2;

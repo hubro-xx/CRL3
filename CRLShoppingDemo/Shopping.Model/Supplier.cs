@@ -18,6 +18,13 @@ namespace Shopping.Model
     /// </summary>
     public class Supplier : CRL.Package.Person.Person
     {
+        //public CRL.DbSet<Product> Products
+        //{
+        //    get
+        //    {
+        //        return GetDbSet<Product>(b => b.SupplierId, Id);
+        //    }
+        //}
         /// <summary>
         /// 初始数据
         /// </summary>

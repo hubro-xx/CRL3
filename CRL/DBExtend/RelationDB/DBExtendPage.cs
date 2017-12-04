@@ -54,7 +54,7 @@ namespace CRL.DBExtend.RelationDB
             //string sql = string.Format("{0} with(nolock) where {1}", tableName, where);
             string sp = CompileSqlToSp(_DBAdapter.TemplatePage, condition, dic);
             CallBackDataReader reader;
-            var db = GetDBHelper(AccessType.Read);
+            var db = GetDBHelper(DataAccessType.Read);
             reader = new CallBackDataReader(db.RunDataReader(sp), () =>
             {
                 return GetOutParam<int>("count");
@@ -103,7 +103,7 @@ namespace CRL.DBExtend.RelationDB
             pageIndex = pageIndex <= 0 ? 1 : pageIndex;
             pageSize = pageSize <= 0 ? 15 : pageSize;
             string countSql = string.Format("select count(*) {0}", condition);
-            var db = GetDBHelper(AccessType.Read);
+            var db = GetDBHelper(DataAccessType.Read);
             int count = Convert.ToInt32(SqlStopWatch.ExecScalar(db, countSql));
             query1.ExecuteTime += db.ExecuteTime;
             query1.RowCount = count;
@@ -163,7 +163,7 @@ namespace CRL.DBExtend.RelationDB
             pageSize = pageSize == 0 ? 15 : pageSize;
             AddParam("pageIndex", pageIndex);
             AddParam("pageSize", pageSize);
-            var db = GetDBHelper(AccessType.Read);
+            var db = GetDBHelper(DataAccessType.Read);
             db.AddOutParam("count", -1);
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic.Add("fields", fields);
@@ -219,7 +219,7 @@ namespace CRL.DBExtend.RelationDB
             pageSize = pageSize == 0 ? 15 : pageSize;
 
             string countSql = string.Format("select count(*)  from (select count(*) as a {0}) t", condition);
-            var db = GetDBHelper(AccessType.Read);
+            var db = GetDBHelper(DataAccessType.Read);
             int count = Convert.ToInt32(SqlStopWatch.ExecScalar(db, countSql));
             query1.ExecuteTime += db.ExecuteTime;
             query1.RowCount = count;

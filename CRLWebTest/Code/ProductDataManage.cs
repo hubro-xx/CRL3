@@ -60,7 +60,7 @@ namespace WebTest.Code
         public void DynamicQueryTest()
         {
             //此方法演示根据结果集返回动态对象
-            string sql = "select top 10 Id,ProductId,ProductName1 from ProductData";
+            string sql = "select top 10 Id,ProductId,ProductName1 from ProductData a where a.addtime>='2017-09-01' and a.id=234";
             var helper = DBExtend;
             var list = helper.ExecDynamicList(sql);
             //添加引用 Miscorsoft.CSharp程序集

@@ -18,6 +18,13 @@ namespace WebTest.Code
     [CRL.Attribute.Table(TableName = "OrderProduct")]//重新指定对应的表名
     public class Order : CRL.IModelBase
     {
+        public CRL.DbSet<ProductData> Products
+        {
+            get
+            {
+                return GetDbSet<ProductData>(b => b.Id, ProductId);
+            }
+        }
         protected override System.Collections.IList GetInitData()
         {
             var list = new List<Order>();
@@ -29,6 +36,10 @@ namespace WebTest.Code
         {
             get;
             set;
+        }
+        public int ProductId
+        {
+            get;set;
         }
         public string OrderId
         {
