@@ -40,7 +40,7 @@ namespace WebTest
             //var list2 = Code.OrderManage.Instance.GetLambdaQuery().Top(1000).ToList();
             //var n3 = GC.GetTotalMemory(false) - n2;
             Response.Write(sql);
-            Response.End();
+            //Response.End();
         }
         class testA
         {

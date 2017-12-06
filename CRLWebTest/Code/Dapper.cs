@@ -5,12 +5,6 @@
 * 主页 http://www.cnblogs.com/hubro
 * 在线文档 http://crl.changqidongli.com/
 */
- License: http://www.apache.org/licenses/LICENSE-2.0 
- Home page: http://code.google.com/p/dapper-dot-net/
-
- Note: to build on C# 3.0 + .NET 3.5, include the CSHARP30 compiler symbol (and yes,
- I know the difference between language and runtime versions; this is a compromise).
- */
 
 using System;
 using System.Collections;
