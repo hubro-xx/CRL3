@@ -4,7 +4,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <h4>DbSet结构</h4>
         <blockquote>
-    为让对象关联更方便,4.51版本增加了DbSet的方式
+    为让对象关联更方便,4.52版本增加了DbSet的方式
      
             
     </blockquote>

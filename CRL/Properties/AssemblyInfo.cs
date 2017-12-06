@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V4.0
+* CRL 快速开发框架 V4.5
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -42,5 +42,5 @@ using System.Security;
 // 可以指定所有这些值，也可以使用“内部版本号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("4.5.1.0")]
+[assembly: AssemblyVersion("4.5.2.0")]
 [assembly: AssemblyFileVersion("4.0.0.0")]

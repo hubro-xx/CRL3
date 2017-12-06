@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.5
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -34,6 +34,20 @@ namespace Shopping.Model
             get
             {
                 return GetDbSet<Order.OrderMain>(b => b.UserId , Id);
+            }
+        }
+        public CRL.EntityRelation<CRL.Package.Account.AccountDetail> Account
+        {
+            get
+            {
+                return GetEntityRelation<CRL.Package.Account.AccountDetail>(b => b.Account, Id, b => b.AccountType == 0 && b.TransactionType == 0);
+            }
+        }
+        public CRL.DbSet<CartItem> CartItems
+        {
+            get
+            {
+                return GetDbSet<CartItem>(b => b.UserId, Id);
             }
         }
         public override string CheckData()

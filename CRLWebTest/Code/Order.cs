@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V4.0
+* CRL 快速开发框架 V4.5
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -23,6 +23,13 @@ namespace WebTest.Code
             get
             {
                 return GetDbSet<ProductData>(b => b.Id, ProductId);
+            }
+        }
+        public CRL.EntityRelation<Member> Member
+        {
+            get
+            {
+                return GetEntityRelation<Member>(b => b.Id, UserId);
             }
         }
         protected override System.Collections.IList GetInitData()

@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.5
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.Mvc;
 using Shopping.Model;
 using Shopping.BLL;
+using CRL;
 namespace Shopping.Web.Controllers
 {
     [Authorize(Roles = "Member")]
@@ -74,6 +75,7 @@ namespace Shopping.Web.Controllers
             var sum = user.Orders.Sum(b => b.TotalAmount > 0, b => b.TotalAmount);
             var q = user.Orders.GetProvider().QueryList();
             var orders = user.Orders.Page(20, 1).ToList();
+            var account = user.Account.Value;
             return View(q);
         }
         /// <summary>

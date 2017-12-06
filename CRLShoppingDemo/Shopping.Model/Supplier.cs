@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.5
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -18,13 +18,13 @@ namespace Shopping.Model
     /// </summary>
     public class Supplier : CRL.Package.Person.Person
     {
-        //public CRL.DbSet<Product> Products
-        //{
-        //    get
-        //    {
-        //        return GetDbSet<Product>(b => b.SupplierId, Id);
-        //    }
-        //}
+        public CRL.DbSet<Product> Products
+        {
+            get
+            {
+                return GetDbSet<Product>(b => b.SupplierId, Id);
+            }
+        }
         /// <summary>
         /// 初始数据
         /// </summary>
@@ -35,6 +35,13 @@ namespace Shopping.Model
             //123456
             list.Add(new Supplier() { Name = "Supplier1", AccountNo = "Supplier1", PassWord = "E10ADC3949BA59ABBE56E057F20F883E" });
             return list;
+        }
+        public CRL.EntityRelation<CRL.Package.Account.AccountDetail> Account
+        {
+            get
+            {
+                return GetEntityRelation<CRL.Package.Account.AccountDetail>(b => b.Account, Id, b => b.AccountType == 1);
+            }
         }
         /// <summary>
         /// 简称

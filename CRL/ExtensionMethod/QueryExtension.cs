@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V4.0
+* CRL 快速开发框架 V4.5
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -40,6 +40,39 @@ namespace CRL
         {
             var db = DBExtendFactory.CreateDBExtend(query.__DbContext);
             return db.Update(query, updateValue);
+        }
+        static DbContext getDbContext<T>()
+        {
+            var dbLocation = new CRL.DBLocation() { DataAccessType = DataAccessType.Default, ManageType = typeof(T) };
+            var helper = SettingConfig.GetDbAccess(dbLocation);
+            var dbContext = new DbContext(helper, dbLocation);
+            return dbContext;
+        }
+        /// <summary>
+        /// 保存更改
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static int Save<T>(this T obj) where T : IModel, new()
+        {
+            obj.CheckNull("obj");
+            var dbContext = getDbContext<T>();
+            var db = DBExtendFactory.CreateDBExtend(dbContext);
+            return db.Update(obj);
+        }
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static int Delete<T>(this T obj) where T : IModel, new()
+        {
+            obj.CheckNull("obj");
+            var dbContext = getDbContext<T>();
+            var db = DBExtendFactory.CreateDBExtend(dbContext);
+            return db.Delete<T>(obj.GetpPrimaryKeyValue());
         }
     }
 }

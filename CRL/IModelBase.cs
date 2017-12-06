@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V4.0
+* CRL 快速开发框架 V4.5
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -70,13 +70,14 @@ namespace CRL
         #region 外关联
         Dictionary<Type, object> _DbSets;
         /// <summary>
-        /// 创建关联关系
+        /// 创建一对多关联
         /// </summary>
         /// <typeparam name="T">关联对象</typeparam>
         /// <param name="member"></param>
         /// <param name="key">member=key</param>
+        /// <param name="expression">补充条件</param>
         /// <returns></returns>
-        protected DbSet<T> GetDbSet<T>(System.Linq.Expressions.Expression<Func<T, object>> member, object key) where T : IModel, new()
+        protected DbSet<T> GetDbSet<T>(System.Linq.Expressions.Expression<Func<T, object>> member, object key, System.Linq.Expressions.Expression<Func<T, bool>> expression = null) where T : IModel, new()
         {
             if (FromCache)//当是缓存时
             {
@@ -87,13 +88,26 @@ namespace CRL
             {
                 _DbSets = new Dictionary<Type, object>();
             }
-            if (_DbSets.ContainsKey(type))
+            if (_DbSets.ContainsKey(type))//当expression不为空时,会产生冲突
             {
                 return _DbSets[type] as DbSet<T>;
             }
             var set = new DbSet<T>(member, key);
             _DbSets.Add(type, set);
             return set;
+        }
+        /// <summary>
+        /// 创建一对一关联
+        /// 在循环内调用会多次调用数据库
+        /// </summary>
+        /// <typeparam name="T">关联对象</typeparam>
+        /// <param name="member"></param>
+        /// <param name="key">member=key</param>
+        /// <param name="expression">补充条件</param>
+        /// <returns></returns>
+        protected EntityRelation<T> GetEntityRelation<T>(System.Linq.Expressions.Expression<Func<T, object>> member, object key, System.Linq.Expressions.Expression<Func<T, bool>> expression = null) where T : IModel, new()
+        {
+            return new EntityRelation<T>(member, key, expression);
         }
         #endregion
         #region 方法重写

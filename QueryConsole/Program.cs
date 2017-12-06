@@ -1,13 +1,25 @@
-﻿using System;
+/**
+* CRL 快速开发框架 V4.5
+* Copyright (c) 2016 Hubro All rights reserved.
+* GitHub https://github.com/hubro-xx/CRL3
+* 主页 http://www.cnblogs.com/hubro
+* 在线文档 http://crl.changqidongli.com/
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CRL;
+using System.Text.RegularExpressions;
+
 namespace QueryConsole
 {
     class Program
     {
+        static int queueInitStatus = 0;
+        static object lockObj = new object();
+
         static void Main(string[] args)
         {
             CRL.SettingConfig.GetDbAccess = (dbLocation) =>
@@ -15,22 +27,16 @@ namespace QueryConsole
                 var connString = CoreHelper.CustomSetting.GetConnectionString("default");
                 return new CoreHelper.SqlHelper(connString);
             };
- 
-            var ja = (Newtonsoft.Json.Linq.JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(Properties.Resources.String1);
-            var return_code = ja["return_code"].ToString();
-            var return_msg = ja["return_msg"].ToString();
-
+            //ProductDataManage.Instance.Test();
+            var resutl2 = ProductDataManage.Instance.QueryFromCache(b => b.Id<10);
+            return;
             label1:
 
             Console.WriteLine("query CRL4");
             int n = 2;
             var n2 = GC.GetTotalMemory(true);
             var time = DateTime.Now;
-            var sb = new StringBuilder();
-            var data = new ProductData[]{new  ProductData()
-                     };
-            var query2 = ProductDataManage.Instance.GetLambdaQuery();
-            query2.Top(1).Select(b=>new { Id = b.Id, sss2= b.Number});
+            
             //var r1 = query2.ToSingle();
             //var v2=r1.Bag.sss2;
             //var str = "";
@@ -40,9 +46,6 @@ namespace QueryConsole
                 //str += "ProductDataManageProductDataManage";
                 //var item = ProductDataManage.Instance.QueryItem(i);
                 //var a = item == null;
-                string sql = "sdfsf @sdfs=222 where id=" + i;
-                var sql2 = System.Text.RegularExpressions.Regex.Replace(sql, @"@(\w+)", "?$1");
-                continue;
                 var query = ProductDataManage.Instance.GetLambdaQuery();
                 query.Top(10);
                 query.WithTrackingModel(false);
@@ -52,7 +55,7 @@ namespace QueryConsole
                 //query.OrderBy(b => b.Id);
                 ////query.Where(b => b.Id < 10);
                 var str = query.ToString();
-                //var result = query.ToList();
+                var result = query.ToList();
                 //query.Where(b => b.ProductId == "333" && b.PurchasePrice < 100);
                 //n += list.Count;
                 //list = null;

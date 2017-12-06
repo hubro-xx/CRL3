@@ -1,5 +1,5 @@
 /**
-* CRL 快速开发框架 V3.1
+* CRL 快速开发框架 V4.5
 * Copyright (c) 2016 Hubro All rights reserved.
 * GitHub https://github.com/hubro-xx/CRL3
 * 主页 http://www.cnblogs.com/hubro
@@ -65,7 +65,8 @@ namespace Shopping.Web.Controllers
         public ActionResult Product(int page = 1, int pageSize = 15)
         {
             var sup = SupplierManage.Instance.GetCurrent();
-            var query = ProductManage.Instance.GetLambdaQuery().Where(b => b.SupplierId == sup.Id);
+            //var query = ProductManage.Instance.GetLambdaQuery().Where(b => b.SupplierId == sup.Id);
+            var query = sup.Products.GetQuery();
             query.Page(pageSize, page);
             
             query.OrderBy(b => b.Id, false);

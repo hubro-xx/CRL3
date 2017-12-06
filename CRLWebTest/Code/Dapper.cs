@@ -1,4 +1,10 @@
-﻿/*
+/**
+* CRL 快速开发框架 V4.5
+* Copyright (c) 2016 Hubro All rights reserved.
+* GitHub https://github.com/hubro-xx/CRL3
+* 主页 http://www.cnblogs.com/hubro
+* 在线文档 http://crl.changqidongli.com/
+*/
  License: http://www.apache.org/licenses/LICENSE-2.0 
  Home page: http://code.google.com/p/dapper-dot-net/
 
