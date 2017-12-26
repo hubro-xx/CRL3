@@ -157,15 +157,19 @@ namespace CRL
             List<Attribute.FieldAttribute> columns = GetColumns(type, db);
             foreach (Attribute.FieldAttribute item in columns)
             {
-                if (item.FieldIndexType != Attribute.FieldIndexType.无)
+                if (item.FieldIndexType != Attribute.FieldIndexType.无 || item.IsPrimaryKey)
                 {
                     //string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]({1})", tableName, item.Name, item.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
+                    //主建也检查索引
                     if (removeId && item.IsPrimaryKey)
                     {
                         continue;
                     }
                     string indexScript = dbAdapter.GetColumnIndexScript(item);
-                    list2.Add(indexScript);
+                    if (!string.IsNullOrEmpty(indexScript))
+                    {
+                        list2.Add(indexScript);
+                    }
                 }
             }
             return list2;

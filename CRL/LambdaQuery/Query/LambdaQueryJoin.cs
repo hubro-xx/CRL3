@@ -39,7 +39,21 @@ namespace CRL.LambdaQuery
         public LambdaQueryJoin<T, TJoin> Where(Expression<Func<TJoin, bool>> expression)
         {
             string condition = BaseQuery.FormatExpression(expression.Body).SqlOut;
-            //BaseQuery.AddInnerRelationCondition(new TypeQuery(typeof(TJoin)), condition);
+            if (BaseQuery.Condition.Length > 0)
+            {
+                condition = " and " + condition;
+            }
+            BaseQuery.Condition.Append(condition);
+            return this;
+        }
+        /// <summary>
+        /// 在关联结果后增加条件
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQueryJoin<T, TJoin> Where(Expression<Func<T, TJoin, bool>> expression)
+        {
+            string condition = BaseQuery.FormatExpression(expression.Body).SqlOut;
             if (BaseQuery.Condition.Length > 0)
             {
                 condition = " and " + condition;

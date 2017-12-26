@@ -288,7 +288,7 @@ namespace CRL
                     }
                     else
                     {
-                        msmq = MessageQueue.Create(pathLocal, false);
+                        msmq = MessageQueue.Create(pathLocal, true);
                     }
                 }
                 catch (Exception ero)
@@ -328,7 +328,10 @@ namespace CRL
                 if (queueInitStatus == 2)
                 {
                     db.CheckData(p);
-                    msmq.Send(p, queueLabel);
+                    var trans = new MessageQueueTransaction();
+                    trans.Begin();
+                    msmq.Send(p, queueLabel, trans);
+                    trans.Commit();
                     return;
                 }
             }

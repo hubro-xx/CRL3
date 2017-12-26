@@ -18,7 +18,7 @@ namespace Shopping.Model.Order
     /// </summary>
     public class OrderMain : CRL.IModelBase
     {
-        public CRL.DbSet<OrderDetail> Details
+        public CRL.Set.DbSet<OrderDetail> Details
         {
             get
             {

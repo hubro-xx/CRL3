@@ -145,6 +145,10 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
+            if(filed.IsPrimaryKey)
+            {
+                return "";
+            }
             string indexName = string.Format("pk_{0}_{1}", filed.TableName, filed.MapingName);
             string indexScript = string.Format("create {3} index {0} on {1}({2}); ", indexName, filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
             return indexScript;

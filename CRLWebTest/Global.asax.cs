@@ -34,7 +34,7 @@ namespace WebTest
             CRL.SettingConfig.GetDbAccess = (dbLocation) =>
             {
                 var obj = dbLocation.TagData;
-                //return Code.LocalSqlHelper.MysqlConnection;
+                return Code.LocalSqlHelper.MysqlConnection;
                 if (dbLocation.ShardingDataBase != null)//按分库判断
                 {
                     if (dbLocation.ShardingDataBase.Name == "db1")

@@ -18,7 +18,7 @@ namespace CRL.Package.Account
     [Attribute.Table(TableName = "AccountInfo")]
     public class AccountDetail : IModelBase
     {
-        public DbSet<Transaction> Transactions
+        public Set.DbSet<Transaction> Transactions
         {
             get
             {

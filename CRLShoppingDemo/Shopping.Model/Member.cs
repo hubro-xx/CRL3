@@ -29,21 +29,21 @@ namespace Shopping.Model
             list.Add(new Member() { Name = "Member1", AccountNo = "Member1", PassWord = "E10ADC3949BA59ABBE56E057F20F883E" });
             return list;
         }
-        public CRL.DbSet<Order.OrderMain> Orders
+        public CRL.Set.DbSet<Order.OrderMain> Orders
         {
             get
             {
                 return GetDbSet<Order.OrderMain>(b => b.UserId , Id);
             }
         }
-        public CRL.EntityRelation<CRL.Package.Account.AccountDetail> Account
+        public CRL.Set.EntityRelation<CRL.Package.Account.AccountDetail> Account
         {
             get
             {
                 return GetEntityRelation<CRL.Package.Account.AccountDetail>(b => b.Account, Id, b => b.AccountType == 0 && b.TransactionType == 0);
             }
         }
-        public CRL.DbSet<CartItem> CartItems
+        public CRL.Set.DbSet<CartItem> CartItems
         {
             get
             {

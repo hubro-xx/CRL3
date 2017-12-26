@@ -12,7 +12,7 @@
     <pre>
          public class Order : CRL.IModelBase
     {
-        public CRL.DbSet&lt;ProductData&gt; Products
+        public CRL.Set.DbSet&lt;ProductData&gt; Products
         {
             get
             {

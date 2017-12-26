@@ -18,14 +18,14 @@ namespace WebTest.Code
     [CRL.Attribute.Table(TableName = "OrderProduct")]//重新指定对应的表名
     public class Order : CRL.IModelBase
     {
-        public CRL.DbSet<ProductData> Products
+        public CRL.Set.DbSet<ProductData> Products
         {
             get
             {
                 return GetDbSet<ProductData>(b => b.Id, ProductId);
             }
         }
-        public CRL.EntityRelation<Member> Member
+        public CRL.Set.EntityRelation<Member> Member
         {
             get
             {

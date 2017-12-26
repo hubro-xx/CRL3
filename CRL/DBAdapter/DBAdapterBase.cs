@@ -266,15 +266,17 @@ namespace CRL.DBAdapter
         {
             return sql;
         }
+        int parIndex = 1;
         /// <summary>
         /// 提取SQL参数
         /// </summary>
         /// <param name="db"></param>
         /// <param name="sql"></param>
+        /// <param name="manual"></param>
         /// <returns></returns>
-        public virtual string ReplaceParameter(CoreHelper.DBHelper db,string sql)
+        public virtual string ReplaceParameter(CoreHelper.DBHelper db,string sql,bool manual = false)
         {
-            if (!SettingConfig.ReplaceSqlParameter)
+            if (!SettingConfig.ReplaceSqlParameter && !manual)
             {
                 return sql;
             }
@@ -287,7 +289,7 @@ namespace CRL.DBAdapter
             }
             Regex r = new Regex(re, RegexOptions.IgnoreCase);
             List<string> pars = new List<string>();
-            int index = 1;
+            //int index = 1;
             for (var m = r.Match(sql); m.Success; m = m.NextMatch())
             {
                 var name = m.Groups[3];
@@ -297,10 +299,10 @@ namespace CRL.DBAdapter
                 var value = string.IsNullOrEmpty(value2.Value) ? value1 : value2;
                 var p = m.Groups[1];
                 var p2 = m.Groups[8];
-                var pName = GetParamName("p", index);
+                var pName = GetParamName("_p", parIndex);
                 db.AddParam(pName, value.ToString());
                 sql = sql.Replace(m.ToString(), string.Format("{0}{1}{4}{2}{3} ", p, name, pName, p2, op));
-                index += 1;
+                parIndex += 1;
             }
             return sql;
         }

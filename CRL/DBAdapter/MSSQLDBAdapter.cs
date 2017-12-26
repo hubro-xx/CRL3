@@ -150,6 +150,12 @@ end", spName, script);
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
+            if (filed.IsPrimaryKey)
+            {
+                return "";
+                //mssql不能用语句设为自增
+                //return string.Format("alter table [{0}] add constraint PK{0} primary key ([{0}])", filed.TableName, filed.MapingName);
+            }
             string indexScript = string.Format("CREATE {2} NONCLUSTERED INDEX  IX_INDEX_{0}_{1}  ON dbo.[{0}]([{1}])", filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "");
             return indexScript;
         }

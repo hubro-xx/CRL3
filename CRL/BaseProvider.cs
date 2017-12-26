@@ -275,37 +275,22 @@ namespace CRL
             }
             return QueryFromCacheBase(expression, out total, pageIndex, pageSize);
         }
-        static Dictionary<string, bool> idExpressionCache = new Dictionary<string, bool>();
-        List<TModel> QueryFormCacheById(object id)
+        TModel QueryFormCacheById(object id)
         {
             var key = id.ToString();
             var all = GetCache(CacheQuery());
             if (all == null)
             {
-                return new List<TModel>();
+                return null;
             }
             TModel item;
             var a = all.TryGetValue(key, out item);
-            if (a)
-            {
-                return new List<TModel>() { item };
-            }
-            return new List<TModel>();
+            return item;
         }
         List<TModel> QueryFromCacheBase(Expression<Func<TModel, bool>> expression, out int total, int pageIndex = 0, int pageSize = 0)
         {
             total = 0;
             #region 按KEY查找
-            bool b;
-            var a = idExpressionCache.TryGetValue(expression.Body.ToString(), out b);
-            if (a)
-            {
-                var binary = expression.Body as BinaryExpression;
-                var value = LambdaQuery.ConstantValueVisitor.GetParameExpressionValue(binary.Right);
-                var list = QueryFormCacheById(value);
-                total = list.Count();
-                return list;
-            }
             if (expression.Body is BinaryExpression)
             {
                 var binary = expression.Body as BinaryExpression;
@@ -315,11 +300,15 @@ namespace CRL
                     {
                         var member = binary.Left as MemberExpression;
                         var primaryKey = TypeCache.GetTable(typeof(TModel)).PrimaryKey.MemberName;
-                        if (member.Member.Name.ToUpper() == primaryKey.ToUpper())
+                        if (member.Member.Name == primaryKey)
                         {
-                            idExpressionCache[expression.Body.ToString()] = true;
                             var value = ConstantValueVisitor.GetParameExpressionValue(binary.Right);
-                            var list = QueryFormCacheById(value);
+                            var item = QueryFormCacheById(value);
+                            var list = new List<TModel>();
+                            if (item != null)
+                            {
+                                list.Add(item);
+                            }
                             total = list.Count();
                             return list; 
                         }

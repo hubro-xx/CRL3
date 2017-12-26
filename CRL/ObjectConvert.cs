@@ -20,6 +20,7 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace CRL
@@ -157,6 +158,7 @@ namespace CRL
             public Action<object, object> Set2;
             public string Name;
             public int ValueIndex;
+            public Attribute.FieldAttribute FieldAttribute;
             public void SetValue(T item, object[] values)
             {
                 Set(item, values[ValueIndex]);
@@ -205,7 +207,7 @@ namespace CRL
                 {
                     continue;
                 }
-                var action = new ActionItem<object>() { Set2 = info.SetValue, Name = mp.ResultName, ValueIndex = columns[fieldName] };
+                var action = new ActionItem<object>() { Set2 = info.SetValue, Name = mp.ResultName, ValueIndex = columns[fieldName], FieldAttribute = info };
                 columns.Remove(fieldName);
                 actions.Add(action);
             }
@@ -221,7 +223,18 @@ namespace CRL
                     var detailItem = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(mainType);
                     foreach (var ac in _actions)
                     {
-                        ac.SetValue2(detailItem, values);
+                        try
+                        {
+                            ac.SetValue2(detailItem, values);
+                        }
+                        catch (Exception ero)
+                        {
+                            var value = reader.GetValue(ac.ValueIndex);
+                            reader.Close();
+                            reader.Dispose();
+                            var columnType = ac.FieldAttribute;
+                            throw new CRLException($"反射赋值时发生错误,在:{mainType }  字段:{columnType.MapingName} {value.GetType()} 类型:{columnType.PropertyType },请检查数据库字段类型与对象是否一致");
+                        }
                     }
                     #region 剩下的放索引
                     //按IModel算
@@ -303,7 +316,7 @@ namespace CRL
                     {
                         proType = find.PropertyType;
                     }
-                    dicColumns.Add(name, new ColumnType() {name= name, index = i, typeName = proType.Name });
+                    dicColumns.Add(name, new ColumnType() { name = name, index = i, typeName = proType.Name });
                 }
                 columnCache[columnCacheKey] = leftColumns;
                 queryColumnCache[columnCacheKey] = dicColumns;

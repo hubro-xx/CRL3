@@ -229,7 +229,6 @@
     <Compile Include="SqlStopWatch.cs" />
     <Compile Include="SummaryAnalysis.cs" />
     <Compile Include="ExistsTableCache\ExistsTableCache.cs" />
-    <Compile Include="TempCache.cs" />
     <Compile Include="TypeCache.cs" />
   </ItemGroup>
   <ItemGroup>

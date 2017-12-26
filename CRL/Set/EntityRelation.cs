@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CRL
+namespace CRL.Set
 {
     public class EntityRelation<T> where T : IModel, new()
     {

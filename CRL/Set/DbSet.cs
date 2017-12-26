@@ -14,7 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CRL
+namespace CRL.Set
 {
     /// <summary>
     /// DbSet结构,增强对象关联性

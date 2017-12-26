@@ -259,12 +259,18 @@ namespace CRL.LambdaQuery
         /// <param name="expression">最好用变量代替属性或方法</param>
         /// <returns></returns>
         public abstract LambdaQuery<T> Where(Expression<Func<T, bool>> expression);
-        internal LambdaQuery<T> Where(string expression)
+        /// <summary>
+        /// 按字符串
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> Where(string expression)
         {
             if (Condition.Length > 0)
             {
                 expression = " and " + expression;
             }
+            expression = __DBAdapter.ReplaceParameter(__DbContext.DBHelper, string.Format(" {0} ", expression), true);
             Condition.Append(expression);
             return this;
         }

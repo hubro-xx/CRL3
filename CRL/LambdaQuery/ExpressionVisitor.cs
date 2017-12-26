@@ -414,37 +414,23 @@ namespace CRL.LambdaQuery
             if (mExp.Expression != null && mExp.Expression.NodeType == ExpressionType.Parameter) //like b.Name==b.Name1 或b.Name
             {
                 #region MemberParameter
-                var fieldName = mExp.Member.Name;
+                var memberName = mExp.Member.Name;
                 var type = mExp.Expression.Type;
                 if (mExp.Member.ReflectedType.Name.StartsWith("<>f__AnonymousType"))//按匿名类
                 {
-                    //var queryField = FormatFieldPrefix(type, fieldName);
-                    var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = fieldName, MemberType = type };
-                    //MemberExpressionCache[key] = exp2;
+                    var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = memberName, MemberType = type };
                     return exp2;
                 }
-
-                CRL.Attribute.FieldAttribute field;
-                var a = TypeCache.GetProperties(type, true).TryGetValue(fieldName, out field);
-                if (!a)
-                {
-                    throw new CRLException("类型 " + type.Name + "." + fieldName + " 未设置Mapping,请检查查询条件");
-                }
-                //if (!string.IsNullOrEmpty(field.VirtualField))//按虚拟字段
-                //{
-                //    //return filed.VirtualField;
-                //    var queryField = field.VirtualField.Replace("{" + type.FullName + "}", Prefixs[type]);//替换前辍
-                //    var exp2 = new CRLExpression.CRLExpression() { Type = CRLExpression.CRLExpressionType.Name, Data = queryField, MemberType = type };
-                //    //MemberExpressionCache[key] = exp2;
-                //    return exp2;
-                //}
-                //var fieldStr = FormatFieldPrefix(type, field.MapingName);//格式化为别名
-         
-                //return field;
-                if (firstLevel)
+                if (firstLevel)//没有运算符的BOOL判断
                 {
                     var exp2 = exp.Equal(Expression.Constant(true));
                     return RouteExpressionHandler(exp2);
+                }
+                CRL.Attribute.FieldAttribute field;
+                var a = TypeCache.GetProperties(type, true).TryGetValue(memberName, out field);
+                if (!a)
+                {
+                    throw new CRLException("类型 " + type.Name + "." + memberName + " 未设置Mapping,请检查查询条件");
                 }
                 if (field.DefaultCRLExpression != null)
                 {
@@ -460,13 +446,6 @@ namespace CRL.LambdaQuery
             }
             else
             {
-                //string key = mExp.ToString() + firstLevel;
-                //CRLExpression.CRLExpression val;
-                //var a1 = MemberExpressionCache.TryGetValue(key, out val);
-                //if (a1)
-                //{
-                //    return val;
-                //}
                 #region 按值
                 bool isConstant;
                 var obj = GetParameExpressionValue(mExp, out isConstant);

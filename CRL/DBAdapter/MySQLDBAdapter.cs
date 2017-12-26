@@ -138,7 +138,16 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
         {
-            string indexScript = string.Format("ALTER TABLE `{0}` ADD {2} ({1}) ", filed.TableName, filed.MapingName, filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "INDEX index_name");
+            //            ALTER TABLE table_name ADD INDEX index_name (column_list)
+            //ALTER TABLE table_name ADD UNIQUE(column_list)
+            //ALTER TABLE table_name ADD PRIMARY KEY(column_list)
+            if(filed.IsPrimaryKey)
+            {
+                return "";
+                return string.Format("ALTER TABLE `{0}` modify `{1}` int auto_increment", filed.TableName, filed.MapingName);
+            }
+            string indexScript = string.Format("ALTER TABLE `{0}` ADD {2} ({1}) ", filed.TableName, filed.MapingName,
+                filed.FieldIndexType == Attribute.FieldIndexType.非聚集唯一 ? "UNIQUE" : "INDEX index_" + filed.MapingName);
             return indexScript;
         }
 
