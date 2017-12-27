@@ -421,14 +421,14 @@ end", spName, script);
         {
             return string.Format("[{0}]", value);
         }
-        public override string FieldNameFormat(Attribute.FieldAttribute field)
-        {
-            if(string.IsNullOrEmpty(field.MapingNameFormat))
-            {
-                return field.MapingName;
-            }
-            return field.MapingNameFormat;
-        }
+        //public override string FieldNameFormat(Attribute.FieldAttribute field)
+        //{
+        //    if(string.IsNullOrEmpty(field.MapingNameFormat))
+        //    {
+        //        return field.MapingName;
+        //    }
+        //    return field.MapingNameFormat;
+        //}
         public override string TemplateGroupPage
         {
             get

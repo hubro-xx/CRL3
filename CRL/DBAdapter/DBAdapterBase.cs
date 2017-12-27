@@ -237,9 +237,13 @@ namespace CRL.DBAdapter
         {
             return value;
         }
-        public virtual string FieldNameFormat(Attribute.FieldAttribute field)
+        public string FieldNameFormat(Attribute.FieldAttribute field)
         {
-            return field.MapingName;
+            if (string.IsNullOrEmpty(field.MapingNameFormat))
+            {
+                field.MapingNameFormat = KeyWordFormat(field.MapingName);
+            }
+            return field.MapingNameFormat;
         }
         public virtual string TableNameFormat(Attribute.TableAttribute table)
         {

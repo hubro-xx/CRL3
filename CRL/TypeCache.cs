@@ -218,7 +218,7 @@ namespace CRL
                 //{
                     fieldDic.Add(f.MemberName, f);
                 //}
-                f.MapingNameFormat = string.Format("[{0}]", f.MapingName);
+                //f.MapingNameFormat = string.Format("[{0}]", f.MapingName);
                 list.Add(f);
             }
             if (n == 0)
