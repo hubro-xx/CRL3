@@ -332,7 +332,7 @@ end", spName, script);
                     }
                 }
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", info.MapingNameFormat);
+                sql1 += string.Format("{0},", FieldNameFormat(info));
                 sql2 += string.Format("@{0},", name);
                 helper.AddParam(name, value);
             }

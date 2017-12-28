@@ -253,7 +253,7 @@ namespace CRL.DBAdapter
                     }
                 }
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", info.MapingName);
+                sql1 += string.Format("{0},", FieldNameFormat(info));
                 sql2 += string.Format("?{0},", name);
                 helper.AddParam(name, value);
             }
