@@ -161,14 +161,14 @@ namespace CRL.DBAdapter
         {
             var helper = dbContext.DBHelper;
             var defaultValues = new List<string>();
-            string script = string.Format("create table {0}(\r\n", tableName);
+            string script = string.Format("create table {0}(\r\n", KeyWordFormat(tableName));
             List<string> list2 = new List<string>();
             foreach (Attribute.FieldAttribute item in fields)
             {
                 string nullStr = item.NotNull ? "NOT NULL" : "";
                 var columnType = GetDBColumnType(item.PropertyType);
 
-                string str = string.Format("{0} {1} {2} ", item.MapingName, item.ColumnType, nullStr);
+                string str = string.Format("{0} {1} {2} ", KeyWordFormat(item.MapingName), item.ColumnType, nullStr);
 
                 list2.Add(str);
                 
@@ -215,60 +215,64 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override object InsertObject(DbContext dbContext, IModel obj)
+        public override object InsertObject<T>(DbContext dbContext, T obj)
         {
-            var helper = dbContext.DBHelper;
             Type type = obj.GetType();
-            string table = TypeCache.GetTableName(type, dbContext);
-            var typeArry = TypeCache.GetProperties(type, true).Values;
-            Attribute.FieldAttribute primaryKey = null;
-            string sql = string.Format("insert into `{0}`(", table);
-            string sql1 = "";
-            string sql2 = "";
-            foreach (Attribute.FieldAttribute info in typeArry)
-            {
-                //if (info.FieldType != Attribute.FieldType.数据库字段)
-                //{
-                //    continue;
-                //}
-                string name = info.MapingName;
-                if (info.IsPrimaryKey)
-                {
-                    primaryKey = info;
-                }
-                if (info.IsPrimaryKey && !info.KeepIdentity)
-                {
-                    continue;
-                }
-                //if (!string.IsNullOrEmpty(info.VirtualField))
-                //{
-                //    continue;
-                //}
-                object value = info.GetValue(obj);
-                if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
-                {
-                    if (value == null)
-                    {
-                        continue;
-                    }
-                }
-                value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                sql1 += string.Format("{0},", FieldNameFormat(info));
-                sql2 += string.Format("?{0},", name);
-                helper.AddParam(name, value);
-            }
-            sql1 = sql1.Substring(0, sql1.Length - 1);
-            sql2 = sql2.Substring(0, sql2.Length - 1);
-            sql += sql1 + ") values( " + sql2 + ") ; ";
-            sql = SqlFormat(sql);
+            var helper = dbContext.DBHelper;
+            var table = TypeCache.GetTable(type);
+            var primaryKey = table.PrimaryKey;
+            //Type type = obj.GetType();
+            //string table = TypeCache.GetTableName(type, dbContext);
+            //var typeArry = TypeCache.GetProperties(type, true).Values;
+            //Attribute.FieldAttribute primaryKey = null;
+            //string sql = string.Format("insert into `{0}`(", table);
+            //string sql1 = "";
+            //string sql2 = "";
+            //foreach (Attribute.FieldAttribute info in typeArry)
+            //{
+            //    //if (info.FieldType != Attribute.FieldType.数据库字段)
+            //    //{
+            //    //    continue;
+            //    //}
+            //    string name = info.MapingName;
+            //    if (info.IsPrimaryKey)
+            //    {
+            //        primaryKey = info;
+            //    }
+            //    if (info.IsPrimaryKey && !info.KeepIdentity)
+            //    {
+            //        continue;
+            //    }
+            //    //if (!string.IsNullOrEmpty(info.VirtualField))
+            //    //{
+            //    //    continue;
+            //    //}
+            //    object value = info.GetValue(obj);
+            //    if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
+            //    {
+            //        if (value == null)
+            //        {
+            //            continue;
+            //        }
+            //    }
+            //    value = ObjectConvert.CheckNullValue(value, info.PropertyType);
+            //    sql1 += string.Format("{0},", FieldNameFormat(info));
+            //    sql2 += string.Format("?{0},", name);
+            //    helper.AddParam(name, value);
+            //}
+            //sql1 = sql1.Substring(0, sql1.Length - 1);
+            //sql2 = sql2.Substring(0, sql2.Length - 1);
+            //sql += sql1 + ") values( " + sql2 + ") ; ";
+            //sql = SqlFormat(sql);
+            var sql = GetInsertSql(dbContext, table, obj);
             if (primaryKey.KeepIdentity)
             {
-                helper.Execute(sql);
+                SqlStopWatch.Execute(helper,sql);
                 return primaryKey.GetValue(obj);
             }
             else
             {
-                sql += "SELECT LAST_INSERT_ID();";
+                sql += ";SELECT LAST_INSERT_ID();";
                 return SqlStopWatch.ExecScalar(helper, sql);
             }
         }
@@ -358,9 +362,15 @@ namespace CRL.DBAdapter
         }
         public override string SqlFormat(string sql)
         {
+            if (sql.Contains("@"))
+            {
+                sql = System.Text.RegularExpressions.Regex.Replace(sql, @"@(\w+)", "?$1");
+            }
+            if(System.Text.RegularExpressions.Regex.IsMatch(sql, @"\[(\w+)\]"))
+            {
+                sql = System.Text.RegularExpressions.Regex.Replace(sql, @"\[(\w+)\]", "`$1`");
+            }
             return sql;
-            //var sql2 = System.Text.RegularExpressions.Regex.Replace(sql, @"@(\w+)", "?$1");
-            //return sql2;
         }
         #endregion
 

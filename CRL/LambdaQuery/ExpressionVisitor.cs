@@ -78,7 +78,7 @@ namespace CRL.LambdaQuery
                 dbContext.parIndex = value;
             }
         }
-        static Dictionary<int, string> parameDic = null;
+        static string[] parameDic = null;
         CRLExpression.CRLExpression DealParame(CRLExpression.CRLExpression par1, string typeStr)
         {
             var par = par1.Data + "";
@@ -90,13 +90,13 @@ namespace CRL.LambdaQuery
             }
             if (parameDic == null)
             {
-                parameDic = new Dictionary<int, string>();
-                for (int i = 0; i <= 5000; i++)
+                parameDic = new string[5000];
+                for (int i = 0; i < 5000; i++)
                 {
-                    parameDic.Add(i, __DBAdapter.GetParamName("p", i));
+                    parameDic[i] = __DBAdapter.GetParamName("p", i);
                 }
             }
-            if (parIndex > 5000)
+            if (parIndex >= 5000)
             {
                 //MSSQL 参数最多2800
                 throw new CRLException("参数计数超过了5000,请确认数据访问对象没有被静态化" + parIndex);
@@ -199,6 +199,7 @@ namespace CRL.LambdaQuery
                     return par2.DataParamed;
             }
         }
+        List<string> existsTempParameName;
         CRLExpression.CRLExpression BinaryExpressionHandler(Expression left, Expression right, ExpressionType expType)
         {
             var isBinary = binaryTypes.Contains(expType);
@@ -255,21 +256,32 @@ namespace CRL.LambdaQuery
             #region 固定名称的参数
             if(isBinary&& SettingConfig.FieldParameName)
             {
-                if (leftPar.Type == CRLExpression.CRLExpressionType.Name && rightPar.Type == CRLExpression.CRLExpressionType.Value)
+                if ((int)(leftPar.Type | rightPar.Type) == 12)
                 {
-                    var pre = Prefixs[leftPar.MemberType];
-                    pre = pre.Replace(".","_");
-                    var pName = __DBAdapter.GetParamName(pre, leftPar.Data_);
-                    AddParame(pName,rightPar.Data);
+                    CRLExpression.CRLExpression tempName;
+                    CRLExpression.CRLExpression tempValue;
+                    if (leftPar.Type == CRLExpression.CRLExpressionType.Name)
+                    {
+                        tempName = leftPar;
+                        tempValue = rightPar;
+                    }
+                    else
+                    {
+                        tempName = rightPar;
+                        tempValue = leftPar;
+                        outLeft = outRight;
+                    }
+                    existsTempParameName = existsTempParameName ?? new List<string>();
+                    var pre = Prefixs[tempName.MemberType];
+                    pre = pre.Replace(".", $"_");
+                    var pName = __DBAdapter.GetParamName(pre, tempName.Data_);
+                    if (existsTempParameName.Contains(pName))
+                    {
+                        pName = pName.Replace("_", "_" + existsTempParameName.Count + "_");
+                    }
+                    AddParame(pName, tempValue.Data);
+                    existsTempParameName.Add(pName);
                     outRight = pName;
-                }
-                else if(leftPar.Type == CRLExpression.CRLExpressionType.Value && rightPar.Type == CRLExpression.CRLExpressionType.Name)
-                {
-                    var pre = Prefixs[rightPar.MemberType];
-                    pre = pre.Replace(".", "_");
-                    var pName = __DBAdapter.GetParamName(pre, rightPar.Data_);
-                    AddParame(pName, leftPar.Data);
-                    outLeft = pName;
                 }
             }
             #endregion
@@ -341,29 +353,33 @@ namespace CRL.LambdaQuery
             //parIndex += 1;
         }
         static ConcurrentDictionary<ExpressionType, string> expressionTypeCache = null;
+        static object lockObj = new object();
         public static string ExpressionTypeCast(ExpressionType expType)
         {
             if (expressionTypeCache == null)
             {
-                expressionTypeCache = new ConcurrentDictionary<ExpressionType, string>();
-                expressionTypeCache.TryAdd(ExpressionType.And, "&");
-                expressionTypeCache.TryAdd(ExpressionType.AndAlso, " AND ");
-                expressionTypeCache.TryAdd(ExpressionType.Equal, "=");
-                expressionTypeCache.TryAdd(ExpressionType.GreaterThan, ">");
-                expressionTypeCache.TryAdd(ExpressionType.GreaterThanOrEqual, ">=");
-                expressionTypeCache.TryAdd(ExpressionType.LessThan, "<");
-                expressionTypeCache.TryAdd(ExpressionType.LessThanOrEqual, "<=");
-                expressionTypeCache.TryAdd(ExpressionType.NotEqual, "<>");
-                expressionTypeCache.TryAdd(ExpressionType.Or, "|");
-                expressionTypeCache.TryAdd(ExpressionType.OrElse, " OR ");
-                expressionTypeCache.TryAdd(ExpressionType.Add, "+");
-                expressionTypeCache.TryAdd(ExpressionType.AddChecked, "+");
-                expressionTypeCache.TryAdd(ExpressionType.Subtract, "-");
-                expressionTypeCache.TryAdd(ExpressionType.SubtractChecked, "-");
-                expressionTypeCache.TryAdd(ExpressionType.Multiply, "*");
-                expressionTypeCache.TryAdd(ExpressionType.MultiplyChecked, "*");
-                expressionTypeCache.TryAdd(ExpressionType.Divide, "/");
-                expressionTypeCache.TryAdd(ExpressionType.Not, "!=");
+                lock (lockObj)
+                {
+                    expressionTypeCache = new ConcurrentDictionary<ExpressionType, string>();
+                    expressionTypeCache.TryAdd(ExpressionType.And, "&");
+                    expressionTypeCache.TryAdd(ExpressionType.AndAlso, " AND ");
+                    expressionTypeCache.TryAdd(ExpressionType.Equal, "=");
+                    expressionTypeCache.TryAdd(ExpressionType.GreaterThan, ">");
+                    expressionTypeCache.TryAdd(ExpressionType.GreaterThanOrEqual, ">=");
+                    expressionTypeCache.TryAdd(ExpressionType.LessThan, "<");
+                    expressionTypeCache.TryAdd(ExpressionType.LessThanOrEqual, "<=");
+                    expressionTypeCache.TryAdd(ExpressionType.NotEqual, "<>");
+                    expressionTypeCache.TryAdd(ExpressionType.Or, "|");
+                    expressionTypeCache.TryAdd(ExpressionType.OrElse, " OR ");
+                    expressionTypeCache.TryAdd(ExpressionType.Add, "+");
+                    expressionTypeCache.TryAdd(ExpressionType.AddChecked, "+");
+                    expressionTypeCache.TryAdd(ExpressionType.Subtract, "-");
+                    expressionTypeCache.TryAdd(ExpressionType.SubtractChecked, "-");
+                    expressionTypeCache.TryAdd(ExpressionType.Multiply, "*");
+                    expressionTypeCache.TryAdd(ExpressionType.MultiplyChecked, "*");
+                    expressionTypeCache.TryAdd(ExpressionType.Divide, "/");
+                    expressionTypeCache.TryAdd(ExpressionType.Not, "!=");
+                }
             }
             string type;
             var a = expressionTypeCache.TryGetValue(expType, out type);

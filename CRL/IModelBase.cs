@@ -13,13 +13,13 @@ using System.Reflection;
 using System.Dynamic;
 using Newtonsoft.Json;
 using CRL.Set;
+using System.Runtime.Serialization;
 
 namespace CRL
 {
     /// <summary>
     /// 基类,包含Id, AddTime字段
     /// </summary>
-    [Serializable]
     public abstract class IModelBase : IModel
     {
         /// <summary>
@@ -55,7 +55,6 @@ namespace CRL
     /// 基类,不包含任何字段
     /// 如果有自定义主键名对象,请继承此类型
     /// </summary>
-    [Serializable]
     //[Attribute.ModelProxy]
     public abstract class IModel /*: ContextBoundObject*/
     {

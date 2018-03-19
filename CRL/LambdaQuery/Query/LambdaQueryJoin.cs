@@ -47,6 +47,20 @@ namespace CRL.LambdaQuery
             return this;
         }
         /// <summary>
+        /// 在Join后增加条件
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQueryJoin<T, TJoin> JoinAfter(Expression<Func<TJoin, bool>> expression)
+        {
+            string condition = BaseQuery.FormatExpression(expression.Body).SqlOut;
+            condition = " and " + condition;
+            var innerType = typeof(TJoin);
+            var typeQuery = new TypeQuery(innerType);
+            BaseQuery.__Relations[typeQuery] += condition;
+            return this;
+        }
+        /// <summary>
         /// 在关联结果后增加条件
         /// </summary>
         /// <param name="expression"></param>
@@ -57,6 +71,21 @@ namespace CRL.LambdaQuery
             if (BaseQuery.Condition.Length > 0)
             {
                 condition = " and " + condition;
+            }
+            BaseQuery.Condition.Append(condition);
+            return this;
+        }
+        /// <summary>
+        /// 按OR
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQueryJoin<T, TJoin> Or(Expression<Func<T, TJoin, bool>> expression)
+        {
+            string condition = BaseQuery.FormatExpression(expression.Body).SqlOut;
+            if (BaseQuery.Condition.Length > 0)
+            {
+                condition = " or " + condition;
             }
             BaseQuery.Condition.Append(condition);
             return this;

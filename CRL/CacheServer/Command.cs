@@ -43,7 +43,7 @@ namespace CRL.CacheServer
         }
         public static Command FromJson(string json)
         {
-            var result = (Command)CoreHelper.StringHelper.SerializerFromJSON(System.Text.Encoding.UTF8.GetBytes(json), typeof(Command));
+            var result = (Command)CoreHelper.SerializeHelper.SerializerFromJSON(System.Text.Encoding.UTF8.GetBytes(json), typeof(Command));
             return result;
         }
     }

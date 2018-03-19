@@ -131,7 +131,10 @@ namespace CRL.Attribute
                 mapingName = value;
             }
         }
-        public string MapingNameFormat
+        /// <summary>
+        /// 默认为空
+        /// </summary>
+        internal string MapingNameFormat
         {
             get;set;
         }

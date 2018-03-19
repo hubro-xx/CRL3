@@ -117,7 +117,7 @@ namespace CRL.LambdaQuery
             }
         }
         internal bool __WithNoLock = true;
-        internal int __AutoInJoin = 0;
+        //internal int __AutoInJoin = 0;
         //internal bool __QueryAllField = false;
         
 

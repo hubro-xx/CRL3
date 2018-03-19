@@ -50,7 +50,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public override string ToString()
         {
-            return GetQuery();
+            return PrintQuery();
         }
         #region 字段
 
@@ -145,11 +145,11 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
-        public LambdaQuery<T> UseInJoin(int count = 20)
-        {
-            __AutoInJoin = count;
-            return this;
-        }
+        //public LambdaQuery<T> UseInJoin(int count = 20)
+        //{
+        //    __AutoInJoin = count;
+        //    return this;
+        //}
         /// <summary>
         /// 设置是否编译为存储过程
         /// </summary>
@@ -335,16 +335,19 @@ namespace CRL.LambdaQuery
         public string PrintQuery(bool uselog = false)
         {
             string sql = GetQuery();
-            string log = string.Format("[SQL]:{0}\r\n", sql);
+            //string log = string.Format("[SQL]:{0}\r\n", sql);
             foreach (var item in QueryParames)
             {
-                log += string.Format("[{0}]:[{1}]\r\n", item.Item1, item.Item2);
+                var pat = @"\" + item.Item1 + @"(?!\w)";
+                sql = Regex.Replace(sql, pat, "'" + item.Item2 + "'");
+                //sql = sql.Replace(item.Item1, "'" + item.Item2 + "'");
+                //log += string.Format("[{0}]:[{1}]\r\n", item.Item1, item.Item2);
             }
             if (uselog)
             {
-                CoreHelper.EventLog.Log(log, "LambdaQuery", false);
+                EventLog.Log(sql + "\r\n", "LambdaQuery", false);
             }
-            return log;
+            return sql;
         }
         #endregion
 

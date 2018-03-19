@@ -23,6 +23,16 @@ namespace CRL
         /// <param name="origin"></param>
         /// <param name="values"></param>
         /// <returns></returns>
+        public static bool In(this string origin, string values)
+        {
+            return values.Contains(origin);
+        }
+        /// <summary>
+        /// 表示in
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
         public static bool In(this string origin, params string[] values)
         {
             return values.Contains(origin);
@@ -49,6 +59,9 @@ namespace CRL
         {
             return values.Contains(origin.Value);
         }
-        
+        //public static bool In<T>(this T t, IEnumerable<T> c)
+        //{
+        //    return c.Contains(t);
+        //}
     }
 }

@@ -347,7 +347,9 @@ namespace CRL.LambdaQuery
         #endregion
         string InFormat(object value, ref int parIndex, AddParameHandler addParame)
         {
+            value.CheckNull("value");
             string str = "";
+            #region in
             var par2 = value;
             if (par2 is string)
             {
@@ -355,14 +357,14 @@ namespace CRL.LambdaQuery
                 addParame(parName, value);
                 str = parName;
             }
-            else if (par2 is string[])
+            else if (par2 is IEnumerable<string>)
             {
-                var list = par2 as Array;
-                if (list.Length == 0)
+                var list = par2 as IEnumerable<string>;
+                if (list.Count() == 0)
                 {
                     throw new CRLException("in 参数为空");
                 }
-                var max = list.Length > 1000;//超出直接拼字符串
+                var max = list.Count() > 1000;//超出直接拼字符串
                 foreach (var s in list)
                 {
                     string parName;
@@ -385,12 +387,13 @@ namespace CRL.LambdaQuery
             }
             else//按数字
             {
-                var list = par2 as Array;
-                if (list.Length == 0)
+                var list = par2 as IEnumerable<int>;
+                var length = list.Count();
+                if (length == 0)
                 {
                     throw new CRLException("in 参数为空");
                 }
-                var max = list.Length > 1000;//超出直接拼字符串
+                var max = length > 1000;//超出直接拼字符串
                 foreach (var s in list)
                 {
                     string parName;
@@ -411,6 +414,7 @@ namespace CRL.LambdaQuery
                     str = str.Substring(0, str.Length - 1);
                 }
             }
+            #endregion
             return str;
         }
         public string In(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)

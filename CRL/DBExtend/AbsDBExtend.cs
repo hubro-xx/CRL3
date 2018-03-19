@@ -131,7 +131,8 @@ namespace CRL
         {
             get
             {
-                return CoreHelper.StringHelper.EncryptMD5(__DbHelper.ConnectionString);
+                return __DbHelper.ConnectionString.GetHashCode().ToString();
+                //return CoreHelper.StringHelper.EncryptMD5(__DbHelper.ConnectionString);
             }
         }
         DBAdapter.DBAdapterBase __DBAdapter;
@@ -158,10 +159,11 @@ namespace CRL
         internal DbContext dbContext;
         #endregion
         /// <summary>
-        ///检测数据
+        /// 检测数据
         /// </summary>
         /// <param name="obj"></param>
-        internal void CheckData(IModel obj, bool checkRepeated=true)
+        /// <param name="checkRepeated"></param>
+        internal void CheckData(IModel obj, bool checkRepeated = true)
         {
             //var types = CRL.TypeCache.GetProperties(obj.GetType(), true).Values;
             var types = TypeCache.GetTable(obj.GetType()).Fields;
@@ -298,7 +300,7 @@ namespace CRL
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{0} {1}", GUID, DatabaseName);
+            return string.Format("{2} {0} {1}", GUID, DatabaseName, __DbHelper.DatabaseName);
         }
 
         #region 参数处理
@@ -394,7 +396,7 @@ namespace CRL
         /// <summary>
         /// 开始事务
         /// </summary>
-        public abstract void BeginTran();
+        public abstract void BeginTran(System.Data.IsolationLevel isolationLevel= System.Data.IsolationLevel.ReadCommitted);
         /// <summary>
         /// 回滚事务
         /// </summary>
@@ -903,7 +905,7 @@ namespace CRL
             {
                 throw new CRLException("更新失败,找不到主键为 " + keyValue + " 的记录");
             }
-            obj.CleanChanges();
+            //obj.CleanChanges();
             return n;
         }
         #endregion

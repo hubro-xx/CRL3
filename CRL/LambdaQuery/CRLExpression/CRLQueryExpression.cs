@@ -58,7 +58,7 @@ namespace CRL.LambdaQuery.CRLExpression
         /// <returns></returns>
         public static CRLQueryExpression FromJson(string json)
         {
-            var result = (CRLQueryExpression)CoreHelper.StringHelper.SerializerFromJSON(System.Text.Encoding.UTF8.GetBytes(json), typeof(CRLQueryExpression));
+            var result = (CRLQueryExpression)CoreHelper.SerializeHelper.SerializerFromJSON(System.Text.Encoding.UTF8.GetBytes(json), typeof(CRLQueryExpression));
             return result;
         }
     }

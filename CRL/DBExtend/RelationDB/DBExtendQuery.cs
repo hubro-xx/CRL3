@@ -56,7 +56,7 @@ namespace CRL.DBExtend.RelationDB
             {
                 list = SqlStopWatch.ReturnList(() =>
                 {
-                    if (!compileSp)
+                    if (!compileSp || !_DBAdapter.CanCompileSP)
                     {
                         reader = db.ExecDataReader(sql);
                     }

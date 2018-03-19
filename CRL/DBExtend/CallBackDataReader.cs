@@ -33,6 +33,8 @@ namespace CRL
         {
             var data = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
             outParame = handler();
+            reader.Close();
+            reader.Dispose();
             return data;
         }
         public List<dynamic> GetDataDynamic(out int outParame) 
@@ -41,6 +43,8 @@ namespace CRL
             var data = Dynamic.DynamicObjConvert.DataReaderToDynamic(reader, out runTime);
             //reader.Close();
             outParame = handler();
+            reader.Close();
+            reader.Dispose();
             return data;
         }
     }

@@ -359,3 +359,9 @@
 	增加生成参数时,按固定参数名处理
 2017-12-04
 	增加DbSet方式,子集合能更方便查询了
+2017-12-26
+	增加方法 LambdaQueryJoin<T, TJoin> Where(Expression<Func<T, TJoin, bool>> expression)
+	能传入所有关联内型条件
+2018-01-23
+	增加关联追加条件
+	public LambdaQueryJoin<T, TJoin> JoinAfter(Expression<Func<TJoin, bool>> expression)

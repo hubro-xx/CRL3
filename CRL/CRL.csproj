@@ -101,10 +101,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attribute\AopProxy.cs" />
     <Compile Include="Attribute\FieldIndexType.cs" />
-    <Compile Include="Attribute\FieldType.cs" />
-    <Compile Include="Attribute\ModelProxyAttribute.cs" />
     <Compile Include="CacheServerSetting.cs" />
     <Compile Include="CacheServer\CacheClientProxy.cs" />
     <Compile Include="CacheServer\CacheService.cs" />
@@ -127,7 +124,6 @@
     <Compile Include="LambdaQuery\Query\LambdaQueryViewJoin.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryResultSelect.cs" />
     <Compile Include="LambdaQuery\Query\TypeQuery.cs" />
-    <Compile Include="ListenTest.cs" />
     <Compile Include="ModelCheck.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="DBAdapter\MongoDBAdapter.cs" />
@@ -158,8 +154,6 @@
     <Compile Include="DBExtend\RelationDB\DynamicQuery.cs" />
     <Compile Include="DBExtend\FunctionType.cs" />
     <Compile Include="DBExtend\AbsDBExtend.cs" />
-    <Compile Include="Dynamic\DynamicObject.cs" />
-    <Compile Include="Dynamic\DapperRowMetaObject.cs" />
     <Compile Include="Dynamic\DynamicObjConvert.cs" />
     <Compile Include="Dynamic\DynamicViewDataDictionary.cs" />
     <Compile Include="ExistsTableCache\ColumnBackgroundCheck.cs" />

@@ -131,29 +131,35 @@ namespace CRL.MemoryDataCache
             //按参数进行缓存
             key = StringHelper.EncryptMD5(query + Params + "|" + helper.DatabaseName);//按库名
             //初始缓存
-            if (!cacheDatas.ContainsKey(key))
+            MemoryDataCacheItem dataItem;
+            var a = cacheDatas.TryGetValue(key, out dataItem);
+            if (!a)
             {
-                cacheDatas.TryAdd(key, new MemoryDataCacheItem() { Data = null, Mapping = mapping, TimeOut = timeOut, DBHelper = helper, Query = query, Params = new Dictionary<string, object>(helper.Params), Type = type });
-                if (typeCache.ContainsKey(type))
+                dataItem = new MemoryDataCacheItem() { Data = null, Mapping = mapping, TimeOut = timeOut, DBHelper = helper, Query = query, Params = new Dictionary<string, object>(helper.Params), Type = type };
+                cacheDatas.TryAdd(key, dataItem);
+                lock (lockObj)
                 {
-                    typeCache[type].Add(key);
-                }
-                else
-                {
-                    typeCache[type] = new List<string>() { key };
+                    if (typeCache.ContainsKey(type))
+                    {
+                        typeCache[type].Add(key);
+                    }
+                    else
+                    {
+                        typeCache[type] = new List<string>() { key };
+                    }
                 }
             }
             else
             {
-                var dataItem2 = cacheDatas[key];
-                if (dataItem2.QueryCount == 0)//缓存没有创建好时返回空
+                if (dataItem.QueryCount == 0)//缓存没有创建好时返回空
                 {
-                    throw new CRLException("CRL缓存创建中...");
-                    return new Dictionary<string, TItem>();
+                    var ts = DateTime.Now - dataItem.UpdateTime;
+                    if (ts.TotalMinutes < 1)
+                    {
+                        throw new CRLException($"缓存[{typeof(TItem)}]创建中...");
+                    }
                 }
             }
-
-            var dataItem = cacheDatas[key];
             //首次查询
             if (dataItem.QueryCount == 0)
             {
@@ -163,11 +169,12 @@ namespace CRL.MemoryDataCache
                     dataItem.Data = ObjectConvert.ConvertToDictionary<TItem>(data);
                     dataItem.Count = data.Count;
                     dataItem.QueryCount = 1;
+                    dataItem.UpdateTime = DateTime.Now;
                 }
                 catch(Exception ero)
                 {
-                    MemoryDataCacheItem item;
-                    cacheDatas.TryRemove(key,out item);
+                    cacheDatas.TryRemove(key, out dataItem);
+                    typeCache[type].Remove(key);
                     throw ero;
                 }
             }
@@ -182,7 +189,7 @@ namespace CRL.MemoryDataCache
                 dataItem.Data = ObjectConvert.ConvertToDictionary<TItem>(dataItem.UpdatedData);
                 dataItem.UpdatedData = null;
             }
-            cacheDatas[key].UseTime = DateTime.Now;
+            dataItem.UseTime = DateTime.Now;
             return dataItem.Data as Dictionary<string, TItem>;
         }
 

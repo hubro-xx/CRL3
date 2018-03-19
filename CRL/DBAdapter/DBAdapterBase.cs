@@ -191,7 +191,64 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public abstract object InsertObject(DbContext dbContext, CRL.IModel obj);
+        public abstract object InsertObject<T>(DbContext dbContext, T obj);
+
+        static System.Collections.Concurrent.ConcurrentDictionary<Type, string> insertSqlCache = new System.Collections.Concurrent.ConcurrentDictionary<Type, string>();
+        protected string GetInsertSql<T>(DbContext dbContext, Attribute.TableAttribute table, T obj)
+        {
+            Type type = obj.GetType();
+            var helper = dbContext.DBHelper;
+            var tableName = table.TableName;
+            var primaryKey = table.PrimaryKey;
+            var typeArry = table.Fields;
+            var reflect = ReflectionHelper.GetInfo<T>();
+            string sql;
+            var a = insertSqlCache.TryGetValue(type, out sql);
+            if (!a)
+            {
+                sql = string.Format("insert into {0}(", KeyWordFormat(tableName));
+            }
+            string sql1 = "";
+            string sql2 = "";
+            foreach (Attribute.FieldAttribute info in typeArry)
+            {
+                string name = info.MapingName;
+                if (info.IsPrimaryKey)
+                {
+                    primaryKey = info;
+                }
+                if (info.IsPrimaryKey && !info.KeepIdentity)
+                {
+                    continue;
+                }
+                //object value = info.GetValue(obj);
+                var value = reflect.GetAccessor(info.MemberName).Get(obj);
+                if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
+                {
+                    if (value == null)
+                    {
+                        continue;
+                    }
+                }
+                value = ObjectConvert.CheckNullValue(value, info.PropertyType);
+                if (!a)
+                {
+                    sql1 += string.Format("{0},", FieldNameFormat(info));
+                    var par = GetParamName(name,"");
+                    sql2 += string.Format("{0},", par);//@{0}
+                }
+                helper.AddParam(name, value);
+            }
+            if (!a)
+            {
+                sql1 = sql1.Substring(0, sql1.Length - 1);
+                sql2 = sql2.Substring(0, sql2.Length - 1);
+                sql += sql1 + ") values( " + sql2 + ")";
+                sql = SqlFormat(sql);
+                insertSqlCache.TryAdd(type,sql);
+            }
+            return sql;
+        }
         /// <summary>
         /// 获取查询前几条
         /// </summary>

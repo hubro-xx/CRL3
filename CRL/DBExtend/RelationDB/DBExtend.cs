@@ -276,14 +276,14 @@ namespace CRL.DBExtend.RelationDB
         /// <summary>
         /// 开始物务
         /// </summary>
-        public override void BeginTran()
+        public override void BeginTran(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {
             if (currentTransStatus != TranStatus.未开始)
             {
                 throw new CRLException("事务开始失败,已有未完成的事务");
             }
             transDb = GetDBHelper();
-            transDb.BeginTran();
+            transDb.BeginTran(isolationLevel);
             currentTransStatus = TranStatus.已开始;
         }
         /// <summary>

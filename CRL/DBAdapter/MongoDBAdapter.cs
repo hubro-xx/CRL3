@@ -88,7 +88,7 @@ namespace CRL.DBAdapter
             throw new NotImplementedException();
         }
 
-        public override object InsertObject(DbContext dbContext, IModel obj)
+        public override object InsertObject<T>(DbContext dbContext, T obj)
         {
             throw new NotImplementedException();
         }

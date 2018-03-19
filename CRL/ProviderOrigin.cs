@@ -756,8 +756,9 @@ namespace CRL
         /// </summary>
         /// <param name="method"></param>
         /// <param name="error"></param>
+        /// <param name="isolationLevel"></param>
         /// <returns></returns>
-        public bool PackageTrans2(TransMethod method, out string error)
+        public bool PackageTrans2(TransMethod method, out string error,  System.Data.IsolationLevel isolationLevel = System.Data.IsolationLevel.ReadCommitted)
         {
             error = "";
             var _useCRLContext = CallContext.GetData<bool>(Base.UseCRLContextFlagName);//事务已开启,内部事务不用处理
@@ -766,7 +767,7 @@ namespace CRL
                 var db = GetDBExtend();
                 if (!_useCRLContext)
                 {
-                    db.BeginTran();
+                    db.BeginTran(isolationLevel);
                 }
                 bool result;
                 try

@@ -18,7 +18,7 @@ namespace CRL.DBExtend.MongoDBEx
 
 
 
-        public override void BeginTran()
+        public override void BeginTran(System.Data.IsolationLevel isolationLevel = System.Data.IsolationLevel.ReadCommitted)
         {
             return;
         }
