@@ -198,7 +198,7 @@ namespace CRL.DBExtend.RelationDB
                 //{
                 //    join += " and ";
                 //}
-                string sql = _DBAdapter.GetRelationUpdateSql(t1, t2, conditions , setString);
+                string sql = _DBAdapter.GetRelationUpdateSql(t1, t2, conditions, setString, query1);
                 return Execute(sql);
             }
             else

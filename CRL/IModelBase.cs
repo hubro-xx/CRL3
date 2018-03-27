@@ -68,7 +68,7 @@ namespace CRL
         }
         internal bool FromCache;
         #region 外关联
-        Dictionary<Type, object> _DbSets;
+        internal Dictionary<Type, object> _DbSets;
         /// <summary>
         /// 创建一对多关联
         /// </summary>
@@ -109,6 +109,18 @@ namespace CRL
         {
             return new EntityRelation<T>(member, key, expression);
         }
+        //public void SaveChanges()
+        //{
+        //    if (_DbSets == null)
+        //    {
+        //        return;
+        //    }
+        //    foreach(var kv in _DbSets)
+        //    {
+        //        var set = kv.Value as IDbSet;
+        //        set.Save();
+        //    }
+        //}
         #endregion
         #region 方法重写
         /// <summary>

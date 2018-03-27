@@ -34,8 +34,8 @@ namespace WebTest.Page
             //添加一项
             order.Products.Add(p);
 
-            order.Products.Delete(p);//删除一项
-
+            order.Products.Remove(p);//删除一项
+            order.Products.Save();
             //返回完整的BaseProvider
             var provider = order.Products.GetProvider();
 

@@ -356,6 +356,10 @@ namespace CRL
         public virtual void BatchInsert<T>(List<T> list, bool keepIdentity = false) where T : IModel, new()
         {
             AbsDBExtend db = DBExtend;
+            if (list == null || list.Count == 0)
+            {
+                return;
+            }
             db.BatchInsert(list, keepIdentity);
         }
         #endregion

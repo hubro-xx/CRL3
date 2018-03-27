@@ -47,6 +47,10 @@ namespace CRL
             }
             if (nullCheckMethod.Count == 0)
             {
+                nullCheckMethod.Add(typeof(bool), (a) =>
+                {
+                    return Convert.ToInt32(a);
+                });
                 nullCheckMethod.Add(typeof(string), (a) =>
                 {
                     return a + "";
@@ -85,6 +89,10 @@ namespace CRL
             if (type.BaseType == typeof(Enum))
             {
                 return nullCheckMethod[type.BaseType](value);
+            }
+            if (value == null)
+            {
+                return DBNull.Value;
             }
             return value;
         }

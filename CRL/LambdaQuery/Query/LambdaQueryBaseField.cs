@@ -155,7 +155,7 @@ namespace CRL.LambdaQuery
                         var memberExpression = item as MemberExpression;//转换为属性访问表达式
                         if (memberExpression.Expression.NodeType == ExpressionType.Constant)
                         {
-                            string parName = "@p" + i;
+                            string parName = __DBAdapter.GetParamName("p",i);
                             //newExpressionParame.Add(parName, i);
                             var obj = ConstantValueVisitor.GetParameExpressionValue(item);
                             var f2 = new Attribute.FieldAttribute() { ModelType = __MainType, PropertyType = item.Type };
@@ -287,7 +287,7 @@ namespace CRL.LambdaQuery
             if (cRLExpression.Type == CRLExpression.CRLExpressionType.Value)
             {
                 //值类型返回参数值
-                var parName = "@cons" + __DbContext.parIndex;
+                var parName =  __DBAdapter.GetParamName("cons", __DbContext.parIndex);
                 __DbContext.parIndex += 1;
                 __Visitor.AddParame(parName, cRLExpression.Data);
                 //if (remArgsIndex)

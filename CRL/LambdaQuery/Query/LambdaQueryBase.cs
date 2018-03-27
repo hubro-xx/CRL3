@@ -61,7 +61,7 @@ namespace CRL.LambdaQuery
         /// group字段 QueryField
         /// </summary>
         internal List<Attribute.FieldMapping> __GroupFields;
-        internal Dictionary<TypeQuery, string> __Relations;
+        internal Dictionary<TypeQuery, JoinInfo> __Relations;
         internal DbContext __DbContext;
         internal DBAdapter.DBAdapterBase __DBAdapter;
         internal bool __DistinctFields = false;
@@ -224,15 +224,15 @@ namespace CRL.LambdaQuery
             //GetPrefix(typeof(TInner));
             return condition;
         }
-        internal void AddInnerRelationCondition(TypeQuery inner, string condition)
-        {
-            __Relations[inner] += "  and " + condition;
-        }
+        //internal void AddInnerRelationCondition(TypeQuery inner, string condition)
+        //{
+        //    __Relations[inner] += "  and " + condition;
+        //}
         internal void AddInnerRelation(TypeQuery typeQuery, JoinType joinType, string condition)
         {
             if (__Relations == null)
             {
-                __Relations = new Dictionary<TypeQuery, string>();
+                __Relations = new Dictionary<TypeQuery, JoinInfo>();
             }
             var inner = typeQuery.OriginType;
             if (__Relations.ContainsKey(typeQuery))
@@ -263,10 +263,11 @@ namespace CRL.LambdaQuery
             {
                 tableName = string.Format("{0} {1} {2}", __DBAdapter.KeyWordFormat(tableName), aliasName, __DBAdapter.GetWithNolockFormat(__WithNoLock));
             }
-            string str = string.Format(" {0} join {1} on {2}", joinType, tableName, condition);
+            //string str = string.Format(" {0} join {1} on {2}", joinType, tableName, condition);
             if (!__Relations.ContainsKey(typeQuery))
             {
-                __Relations.Add(typeQuery, str);
+                var join = new JoinInfo() { joinType = joinType, tableName = tableName, condition = condition };
+                __Relations.Add(typeQuery, join);
             }
         }
         #region Union
@@ -394,6 +395,17 @@ namespace CRL.LambdaQuery
         public double V_Double
         {
             get; set;
+        }
+    }
+
+    internal class JoinInfo
+    {
+        public JoinType joinType;
+        public string tableName;
+        public string condition;
+        public override string ToString()
+        {
+            return string.Format(" {0} join {1} on {2}", joinType, tableName, condition);
         }
     }
 }

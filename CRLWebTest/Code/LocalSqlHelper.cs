@@ -47,6 +47,14 @@ namespace WebTest.Code
                 return new CoreHelper.MySqlHelper(connString);
             }
         }
+        public static CoreHelper.DBHelper MysqlConnection2
+        {
+            get
+            {
+                var connString = CoreHelper.CustomSetting.GetConnectionString("Mysql2");
+                return new CoreHelper.MySqlHelper(connString);
+            }
+        }
         public static CoreHelper.DBHelper TestConnection
         {
             get

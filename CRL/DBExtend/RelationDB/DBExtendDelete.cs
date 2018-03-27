@@ -121,7 +121,7 @@ namespace CRL.DBExtend.RelationDB
                 //{
                 //    join += " and ";
                 //}
-                string sql = _DBAdapter.GetRelationDeleteSql(t1, t2,  conditions);
+                string sql = _DBAdapter.GetRelationDeleteSql(t1, t2,  conditions, query1);
                 return Execute(sql);
             }
             conditions = conditions.Replace("t1.", "");

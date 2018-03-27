@@ -21,27 +21,28 @@ namespace WebTest
         int id = 20;
         protected void Page_Load(object sender, EventArgs e)
         {
-            var order = new Code.Order();
-            //var result = order.Products.Where(b => b.Id > 0).ToList();
+            //var result = ProductDataManage.Instance.QueryItem(1);
 
-            //var resutl2 = ProductDataManage.Instance.QueryFromCache(b => b.ProductName.Len() > 2);
+            //testThread();
+            //return;
+            var query2 = Code.ProductDataManage.Instance.GetLambdaQuery();
+            query2.Where(b => b.Id == 10);
+            query2.Join<Code.Member>((a, b) => a.SupplierId == "10" && b.Name == "123");
+            Code.ProductDataManage.Instance.Delete(query2);
 
-            //Code.ProductDataManage.Instance.DynamicQueryTest();
-            var query = Code.ProductDataManage.Instance.GetLambdaQuery();
-            var query2=query.Join<Code.Member>((a, b) => a.Id == b.Id).Select((a, b) => new
+            //Response.Write(sql);
+            Response.End();
+        }
+        void testThread()
+        {
+            for (int i = 0; i < 10; i++)
             {
-                aa1 = b.Id,
-                ss2 = a.TransType
-            });
-            query2.Where((a, b) => a.BarCode == "" && b.AccountNo == "222");
-            //query.Where(b=>b.Id==2);
-            var sql = query.ToString();
-            //var n2 = GC.GetTotalMemory(true);
-            //var list1 = Code.ProductDataManage.Instance.GetLambdaQuery().Top(1000).ToList();
-            //var list2 = Code.OrderManage.Instance.GetLambdaQuery().Top(1000).ToList();
-            //var n3 = GC.GetTotalMemory(false) - n2;
-            Response.Write(sql);
-            //Response.End();
+                var thread = new System.Threading.Thread(b =>
+                {
+                    ProductDataManage.Instance.QueryItemFromCache(2);
+                });
+                thread.Start();
+            }
         }
         class testA
         {

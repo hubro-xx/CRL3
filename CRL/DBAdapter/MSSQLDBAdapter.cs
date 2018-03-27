@@ -275,13 +275,13 @@ end", spName, script);
                             continue;
                     }
                     var value2 = ObjectConvert.CheckNullValue(value,info.PropertyType);
-                    if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
-                    {
-                        if (value2 == null)
-                        {
-                            continue;
-                        }
-                    }
+                    //if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
+                    //{
+                    //    if (value2 == null)
+                    //    {
+                    //        continue;
+                    //    }
+                    //}
                     dr[name] = value2;
                 }
                 tempTable.Rows.Add(dr);

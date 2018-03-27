@@ -451,10 +451,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         {
             throw new NotImplementedException();
         }
-        public override string GetRelationUpdateSql(string t1, string t2, string condition, string setValue)
-        {
-            throw new NotImplementedException();
-        }
+
         public override string CastField(string field, Type fieldType)
         {
             throw new NotImplementedException();

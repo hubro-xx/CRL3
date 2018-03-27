@@ -193,18 +193,19 @@ namespace CRL.DBAdapter
         /// <returns></returns>
         public abstract object InsertObject<T>(DbContext dbContext, T obj);
 
-        static System.Collections.Concurrent.ConcurrentDictionary<Type, string> insertSqlCache = new System.Collections.Concurrent.ConcurrentDictionary<Type, string>();
-        protected string GetInsertSql<T>(DbContext dbContext, Attribute.TableAttribute table, T obj)
+        static System.Collections.Concurrent.ConcurrentDictionary<string, string> insertSqlCache = new System.Collections.Concurrent.ConcurrentDictionary<string, string>();
+        protected string GetInsertSql(DbContext dbContext, Attribute.TableAttribute table, object obj, bool fillParame = true)
         {
             Type type = obj.GetType();
+            var key = string.Format("{0}_{1}", type, fillParame);
             var helper = dbContext.DBHelper;
             var tableName = table.TableName;
-            var primaryKey = table.PrimaryKey;
+            //var primaryKey = table.PrimaryKey;
             var typeArry = table.Fields;
-            var reflect = ReflectionHelper.GetInfo<T>();
+            //var reflect = ReflectionHelper.GetInfo<T>();
             string sql;
-            var a = insertSqlCache.TryGetValue(type, out sql);
-            if (!a)
+            var cached = insertSqlCache.TryGetValue(key, out sql);
+            if (!cached)
             {
                 sql = string.Format("insert into {0}(", KeyWordFormat(tableName));
             }
@@ -213,39 +214,45 @@ namespace CRL.DBAdapter
             foreach (Attribute.FieldAttribute info in typeArry)
             {
                 string name = info.MapingName;
-                if (info.IsPrimaryKey)
-                {
-                    primaryKey = info;
-                }
                 if (info.IsPrimaryKey && !info.KeepIdentity)
                 {
                     continue;
                 }
-                //object value = info.GetValue(obj);
-                var value = reflect.GetAccessor(info.MemberName).Get(obj);
-                if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
-                {
-                    if (value == null)
-                    {
-                        continue;
-                    }
-                }
+                object value = info.GetValue(obj);
+                //var value = reflect.GetAccessor(info.MemberName).Get(obj);
+                //if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
+                //{
+                //    if (value == null)
+                //    {
+                //        continue;
+                //    }
+                //}
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                if (!a)
+                if (!cached)
                 {
                     sql1 += string.Format("{0},", FieldNameFormat(info));
-                    var par = GetParamName(name,"");
-                    sql2 += string.Format("{0},", par);//@{0}
+                    if (fillParame)
+                    {
+                        var par = GetParamName(name, "");
+                        sql2 += string.Format("{0},", par);//@{0}
+                    }
                 }
-                helper.AddParam(name, value);
+                if (fillParame)
+                {
+                    helper.AddParam(name, value);
+                }
             }
-            if (!a)
+            if (!cached)
             {
-                sql1 = sql1.Substring(0, sql1.Length - 1);
-                sql2 = sql2.Substring(0, sql2.Length - 1);
-                sql += sql1 + ") values( " + sql2 + ")";
-                sql = SqlFormat(sql);
-                insertSqlCache.TryAdd(type,sql);
+                sql1 = sql1.Substring(0, sql1.Length - 1)+") values";
+                sql += sql1;
+                if (fillParame)
+                {
+                    sql2 = sql2.Substring(0, sql2.Length - 1);
+                    sql += "( " + sql2 + ")";
+                }
+                //sql = SqlFormat(sql);
+                insertSqlCache.TryAdd(key, sql);
             }
             return sql;
         }
@@ -478,7 +485,7 @@ namespace CRL.DBAdapter
         /// <param name="condition"></param>
         /// <param name="setValue"></param>
         /// <returns></returns>
-        public virtual string GetRelationUpdateSql(string t1, string t2, string condition, string setValue)
+        public virtual string GetRelationUpdateSql(string t1, string t2, string condition, string setValue, LambdaQuery.LambdaQueryBase query)
         {
             string table = string.Format("{0} t1", KeyWordFormat(t1), KeyWordFormat(t2));
             string sql = string.Format("update t1 set {0} from {1} {2}", setValue, table, condition);
@@ -491,7 +498,7 @@ namespace CRL.DBAdapter
         /// <param name="t2"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public virtual string GetRelationDeleteSql(string t1, string t2, string condition)
+        public virtual string GetRelationDeleteSql(string t1, string t2, string condition, LambdaQuery.LambdaQueryBase query)
         {
             string table = string.Format("{0} t1", KeyWordFormat(t1), KeyWordFormat(t2));
             string sql = string.Format("delete t1 from {0} {1}", table, condition);

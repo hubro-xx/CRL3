@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CoreHelper;
+using CRL.LambdaQuery;
 
 namespace CRL.DBAdapter
 {
@@ -201,13 +202,56 @@ namespace CRL.DBAdapter
         /// <param name="keepIdentity"></param>
         public override void BatchInsert(DbContext dbContext, System.Collections.IList details, bool keepIdentity = false)
         {
-            var helper = dbContext.DBHelper;
-            foreach(var item in details)
+            if (details == null || details.Count == 0)
             {
-                helper.ClearParams();
-                InsertObject(dbContext, item as IModel);
+                return;
             }
-            
+            var type = details[0].GetType();
+            var table = TypeCache.GetTable(type);
+            var typeArry = table.Fields;
+            var sql = GetInsertSql(dbContext, table, details[0], false);
+
+            var helper = dbContext.DBHelper;
+            var sb = new StringBuilder();
+            //var reflect = ReflectionHelper.GetInfo<T>();
+            foreach (var item in details)
+            {
+                var line = "(";
+                foreach (Attribute.FieldAttribute info in typeArry)
+                {
+                    string name = info.MapingName;
+                    if (info.IsPrimaryKey && !info.KeepIdentity)
+                    {
+                        continue;
+                    }
+                    var value = info.GetValue(item);
+                    //if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
+                    //{
+                    //    if (value == null)
+                    //    {
+                    //        continue;
+                    //    }
+                    //}
+                    value = ObjectConvert.CheckNullValue(value, info.PropertyType);
+                    if (value != null && value != DBNull.Value)
+                    {
+                        if (info.PropertyType == typeof(string))
+                        {
+                            value = value.ToString().Replace("'", "\'");
+                        }
+                        line += string.Format("'{0}',", value);
+                    }
+                    else
+                    {
+                        line += "null,";
+                    }
+                }
+                line = line.Substring(0, line.Length - 1);
+                line += "),";
+                sb.Append(line);
+            }
+            sb.Remove(sb.Length - 1, 1);
+            helper.Execute(sql + sb.ToString());
         }
 
         /// <summary>
@@ -221,49 +265,6 @@ namespace CRL.DBAdapter
             var helper = dbContext.DBHelper;
             var table = TypeCache.GetTable(type);
             var primaryKey = table.PrimaryKey;
-            //Type type = obj.GetType();
-            //string table = TypeCache.GetTableName(type, dbContext);
-            //var typeArry = TypeCache.GetProperties(type, true).Values;
-            //Attribute.FieldAttribute primaryKey = null;
-            //string sql = string.Format("insert into `{0}`(", table);
-            //string sql1 = "";
-            //string sql2 = "";
-            //foreach (Attribute.FieldAttribute info in typeArry)
-            //{
-            //    //if (info.FieldType != Attribute.FieldType.数据库字段)
-            //    //{
-            //    //    continue;
-            //    //}
-            //    string name = info.MapingName;
-            //    if (info.IsPrimaryKey)
-            //    {
-            //        primaryKey = info;
-            //    }
-            //    if (info.IsPrimaryKey && !info.KeepIdentity)
-            //    {
-            //        continue;
-            //    }
-            //    //if (!string.IsNullOrEmpty(info.VirtualField))
-            //    //{
-            //    //    continue;
-            //    //}
-            //    object value = info.GetValue(obj);
-            //    if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
-            //    {
-            //        if (value == null)
-            //        {
-            //            continue;
-            //        }
-            //    }
-            //    value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-            //    sql1 += string.Format("{0},", FieldNameFormat(info));
-            //    sql2 += string.Format("?{0},", name);
-            //    helper.AddParam(name, value);
-            //}
-            //sql1 = sql1.Substring(0, sql1.Length - 1);
-            //sql2 = sql2.Substring(0, sql2.Length - 1);
-            //sql += sql1 + ") values( " + sql2 + ") ; ";
-            //sql = SqlFormat(sql);
             var sql = GetInsertSql(dbContext, table, obj);
             if (primaryKey.KeepIdentity)
             {
@@ -431,12 +432,27 @@ namespace CRL.DBAdapter
             string sql = "SELECT {0} {1} {4} limit {2},{3} ";
             return string.Format(sql, fields, condition, "?start", "?row", string.IsNullOrEmpty(sort) ? "" : "order by " + sort);
         }
-        public override string GetRelationUpdateSql(string t1, string t2, string condition, string setValue)
+        public override string GetRelationUpdateSql(string t1, string t2, string condition, string setValue, LambdaQuery.LambdaQueryBase query)
         {
-            string table = string.Format("{0} t1", KeyWordFormat(t1));
-            var arry = condition.Split(new string[] { " where " }, StringSplitOptions.None);
-            string sql = string.Format(@"UPDATE {0} {1}
-SET {2} {3}", table, arry[0], setValue, arry.Length > 1 ? (" where " + arry[1]) : "");
+            //update table1,table2, set a=1 where table1.id=table2.id and  id>2
+            string table = string.Format("{0} t1,{1} t2", KeyWordFormat(t1), KeyWordFormat(t2));
+            var where = query.__Relations.First().Value.condition;
+            if (query.Condition.Length > 0)
+            {
+                where += string.Format(" and {0}", query.Condition);
+            }
+            string sql = string.Format(@"UPDATE {0} SET {1} where {2}", table, setValue, where);
+            return sql;
+        }
+        public override string GetRelationDeleteSql(string t1, string t2, string condition, LambdaQueryBase query)
+        {
+            string table = string.Format("{0} t1,{1} t2", KeyWordFormat(t1), KeyWordFormat(t2));
+            var where = query.__Relations.First().Value.condition;
+            if (query.Condition.Length > 0)
+            {
+                where += string.Format(" and {0}", query.Condition);
+            }
+            string sql = string.Format("delete t1 from {0} where {1}", table, where);
             return sql;
         }
         static Dictionary<Type, string> castDic = new Dictionary<Type, string>();

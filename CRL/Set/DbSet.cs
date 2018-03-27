@@ -16,11 +16,15 @@ using System.Threading.Tasks;
 
 namespace CRL.Set
 {
+    public interface IDbSet
+    {
+        void Save();
+    }
     /// <summary>
     /// DbSet结构,增强对象关联性
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DbSet<T> where T : IModel, new()
+    public class DbSet<T>: IDbSet where T : IModel, new()
     {
         #region inner
         class DbSetProvider: BaseProvider<T>
@@ -40,19 +44,25 @@ namespace CRL.Set
         internal object mainValue = null;
 
         Expression<Func<T, bool>> _relationExp;
+        string memberName;
         internal DbSet(Expression<Func<T, object>> member, object key, Expression<Func<T, bool>> expression = null)
         {
             mainValue = key;
-            Expression relationExpression;
+            MemberExpression relationExpression;
             var parameterExpression = member.Parameters.ToArray();
             if (member.Body is UnaryExpression)
             {
-                relationExpression = ((UnaryExpression)member.Body).Operand;
+                relationExpression = ((UnaryExpression)member.Body).Operand as MemberExpression;
             }
             else
             {
-                relationExpression = member.Body;
+                relationExpression = member.Body as MemberExpression;
             }
+            if (relationExpression == null)
+            {
+                throw new CRLException("member 不为 MemberExpression");
+            }
+            memberName = relationExpression.Member.Name;
             var constant = Expression.Constant(mainValue);
             var body = Expression.Equal(relationExpression, constant);
             _relationExp = Expression.Lambda<Func<T, bool>>(body, parameterExpression);
@@ -117,37 +127,64 @@ namespace CRL.Set
         {
             return _BaseProvider.QueryItem(id);
         }
+        internal List<T> addObjs = new List<T>();
+        internal List<T> removeObjs = new List<T>();
+        internal List<T> updateObjs = new List<T>();
         /// <summary>
         /// 添加
+        /// 需调用Save保存更改
         /// </summary>
         /// <param name="item"></param>
         public void Add(T item)
         {
-            _BaseProvider.Add(item);
+            addObjs.Add(item);
+            //_BaseProvider.Add(item);
         }
         /// <summary>
         /// 删除一项
+        /// 需调用Save保存更改
         /// </summary>
         /// <param name="item"></param>
-        public int Delete(T item)
+        public void Remove(T item)
         {
-            return _BaseProvider.Delete(item);
+            removeObjs.Add(item);
+            //return _BaseProvider.Delete(item);
+        }
+        /// <summary>
+        /// 保存更改
+        /// </summary>
+        public void Save()
+        {
+            _BaseProvider.Add(addObjs);
+            foreach(var item in removeObjs)
+            {
+                _BaseProvider.Delete(item);
+            }
+            foreach (var item in updateObjs)
+            {
+                _BaseProvider.Update(item);
+            }
+            addObjs.Clear();
+            removeObjs.Clear();
+            updateObjs.Clear();
         }
         /// <summary>
         /// 删除所有
         /// </summary>
         /// <returns></returns>
-        public int DeleteAll()
+        public int RemoveAll()
         {
             return _BaseProvider.Delete(_relationExp);
         }
         /// <summary>
         /// 更改
+        /// 需调用Save保存更改
         /// </summary>
         /// <param name="item"></param>
-        public int Update(T item)
+        public void Update(T item)
         {
-            return _BaseProvider.Update(item);
+            updateObjs.Add(item);
+            //return _BaseProvider.Update(item);
         }
         #region 函数
         public TType Sum<TType>(Expression<Func<T, bool>> expression, Expression<Func<T, TType>> field, bool compileSp = false)

@@ -180,6 +180,10 @@ namespace WebTest.Code
             get;
             set;
         }
+        public object Object2
+        {
+            get;set;
+        }
         public bool Show;
         ///// <summary>
         ///// 自动关联字段

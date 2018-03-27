@@ -57,7 +57,7 @@ namespace CRL.LambdaQuery
             condition = " and " + condition;
             var innerType = typeof(TJoin);
             var typeQuery = new TypeQuery(innerType);
-            BaseQuery.__Relations[typeQuery] += condition;
+            BaseQuery.__Relations[typeQuery].condition += condition;
             return this;
         }
         /// <summary>

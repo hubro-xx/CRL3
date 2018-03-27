@@ -72,8 +72,10 @@ namespace WebTest.Code
         }
         public void Test2()
         {
-            string sql = "select top 10 Id,ProductId,ProductName from ProductData";
+            string sql = "select Id,ProductId from ProductData where [id]>@id and ProductId<@id2";
             var helper = DBExtend;
+            helper.AddParam("id",10);
+            helper.AddParam("id2", 10);
             var obj = helper.ExecObject<ProductData>(sql);
         }
     }
