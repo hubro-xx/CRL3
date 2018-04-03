@@ -274,6 +274,14 @@ namespace CRL.LambdaQuery
             Condition.Append(expression);
             return this;
         }
+        public LambdaQuery<T> WhereIf( Expression<Func<T, bool>> expression, bool boolEx) 
+        {
+            if (boolEx)
+            {
+                return Where(expression);
+            }
+            return this;
+        }
         #endregion
 
         #region order

@@ -231,7 +231,7 @@ namespace CRL
         /// </summary>
         [System.Xml.Serialization.XmlIgnore]
         [NonSerialized]
-        object OriginClone = null;
+        internal object OriginClone = null;
         internal object GetOriginClone()
         {
             return OriginClone;
@@ -337,7 +337,7 @@ namespace CRL
                     continue;
                 var originValue = f.GetValue(origin);
                 var currentValue = f.GetValue(this);
-                if (!Object.Equals(originValue, currentValue))
+                if (!Equals(originValue, currentValue))
                 {
                     c.Add(f.MemberName, currentValue);
                 }

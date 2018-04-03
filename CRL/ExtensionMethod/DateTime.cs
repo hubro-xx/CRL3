@@ -95,44 +95,46 @@ namespace CRL
         public static double DateDiff(this DateTime time, DatePart format, DateTime compareTime)
         {
             var ts = compareTime - time;
-            double val=0;
+            CoreHelper.TimeHelper.DateInterval val = 0;
             switch (format)
             {
                 case DatePart.dd:
-                    val = ts.TotalDays;
+                    val = CoreHelper.TimeHelper.DateInterval.Day;
                     break;
                 case DatePart.dw:
-                    val = ts.TotalDays / 7;
+                    val = CoreHelper.TimeHelper.DateInterval.Weekday;
                     break;
                 case DatePart.dy:
-                    val = ts.TotalDays;
+                    val = CoreHelper.TimeHelper.DateInterval.DayOfYear;
                     break;
                 case DatePart.hh:
-                    val = ts.TotalHours;
+                    val = CoreHelper.TimeHelper.DateInterval.Hour;
                     break;
                 case DatePart.mi:
-                    val = ts.TotalMinutes;
+                    val = CoreHelper.TimeHelper.DateInterval.Minute;
                     break;
                 case DatePart.mm:
-                    val = ts.TotalDays / 30;
+                    val = CoreHelper.TimeHelper.DateInterval.Month;
                     break;
                 case DatePart.ms:
-                    val = ts.TotalMilliseconds;
+                    val = CoreHelper.TimeHelper.DateInterval.Second;
                     break;
-                case DatePart.qq:
-                    val = ts.TotalDays / 90;
-                    break;
+                //case DatePart.qq:
+                //    val = ts.TotalDays / 90;
+                //    break;
                 case DatePart.ss:
-                    val = ts.TotalSeconds;
+                    val = CoreHelper.TimeHelper.DateInterval.Second;
                     break;
                 case DatePart.ww:
-                    val = ts.TotalDays / 7;
+                    val = CoreHelper.TimeHelper.DateInterval.WeekOfYear;
                     break;
                 case DatePart.yy:
-                    val = ts.TotalDays / 365;
+                    val =  CoreHelper.TimeHelper.DateInterval.Year;
                     break;
+                default:
+                    throw new NotSupportedException("不支持的比较" + format);
             }
-            return val;
+            return CoreHelper.TimeHelper.DateDiff(val, time, compareTime);
         }
         /// <summary>
         /// DateDiff

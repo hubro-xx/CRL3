@@ -24,7 +24,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public dynamic ToSingleDynamic()
         {
-            return Top(1).Page(0, 0).ToDynamic().FirstOrDefault();
+            return Top(1).ToDynamic().FirstOrDefault();
         }
         /// <summary>
         /// 获取一条
@@ -32,7 +32,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public T ToSingle()
         {
-            return Top(1).Page(0, 0).ToList().FirstOrDefault();
+            return Top(1).ToList().FirstOrDefault();
         }
         /// <summary>
         /// 获取一条
@@ -41,7 +41,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public TResult ToSingle<TResult>()where TResult : class,new()
         {
-            return Top(1).Page(0, 0).ToList<TResult>().FirstOrDefault();
+            return Top(1).ToList<TResult>().FirstOrDefault();
         }
         #endregion
 

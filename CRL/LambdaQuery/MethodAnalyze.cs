@@ -281,7 +281,7 @@ namespace CRL.LambdaQuery
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
             string parName = GetParamName("dateDiff", parIndex);
-            var args1 = args[0];
+            var args1 = args[1];
             if (args1 is ExpressionValueObj)
             {
                 parName = args1.ToString();

@@ -114,6 +114,7 @@
     <Compile Include="CRLDbConnectionScope.cs" />
     <Compile Include="DBExtend\CallBackDataReader.cs" />
     <Compile Include="CRLException.cs" />
+    <Compile Include="ExtensionMethod\IModelEx.cs" />
     <Compile Include="ExtensionMethod\DateTime.cs" />
     <Compile Include="ExtensionMethod\IsNull.cs" />
     <Compile Include="ExtensionMethod\Length.cs" />

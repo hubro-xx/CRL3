@@ -319,7 +319,21 @@ namespace CRL.LambdaQuery
         {
             if (exp is BinaryExpression)
             {
+                //like a.Name??str
                 BinaryExpression be = (BinaryExpression)exp;
+                if (be.NodeType == ExpressionType.Coalesce)
+                {
+                    var par1 = new CRLExpression.CRLExpression();
+                    par1.Type = CRLExpression.CRLExpressionType.MethodCall;
+                    var member = be.Left as MemberExpression;
+                    if (member == null)
+                    {
+                        throw new CRLException(be.Left + "不为MemberExpression");
+                    }
+                    var args = RouteExpressionHandler(be.Right);
+                    par1.Data = new CRLExpression.MethodCallObj() { MemberName = member.Member.Name, MethodName = "IsNull", Args = new List<object>() { args.Data }, MemberQueryName= member.Member.Name };
+                    return DealParame(par1, "");
+                }
                 return BinaryExpressionHandler(be.Left, be.Right, be.NodeType);
             }
             if (exp is MemberExpression)
@@ -677,7 +691,7 @@ namespace CRL.LambdaQuery
             }
             else
             {
-                if (cExp.Value is Boolean)
+                if (cExp.Value is bool)
                 {
                     returnValue = Convert.ToInt32(cExp.Value).ToString();
                 }
